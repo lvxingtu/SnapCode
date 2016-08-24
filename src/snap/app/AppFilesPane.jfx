@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<panel width="200" height="395">
+  <font name="Arial" size="11" />
+  <jlabel name="FilesLabel" x="2" y="2" width="198" height="26" asize="-~-,--~" text="      Project Files" align="left">
+    <font name="Arial Bold" size="16" />
+    <border type="bevel" />
+  </jlabel>
+  <jbutton name="AllFilesButton" x="5" y="5" width="22" height="20" asize="--~,--~" image="FilesTree.png" align="center" bgroup="FBG" Selected="true" ttip="Toggle Files Tree/List" />
+  <jbutton name="NewFileButton" x="155" y="5" width="20" height="20" asize="~--,--~" image="Add.png" align="center" />
+  <menubutton name="MenuButton" x="177" y="5" width="20" height="20" asize="~--,--~" align="center">
+    <border type="bevel" bevel-type="raised" />
+    <jmenuitem name="NewFileMenuItem" text="New File..." />
+    <jmenuitem name="RemoveFileMenuItem" text="Remove File(s)..." />
+    <jmenuitem name="RenameFileMenuItem" text="Rename File..." />
+    <jmenuitem name="DuplicateFileMenuItem" text="Duplicate File..." />
+    <jmenuitem name="RefreshFileMenuItem" text="Refresh File(s)" />
+    <jmenuitem />
+    <jmenuitem name="OpenInTextEditorMenuItem" text="Open File in Text Editor" />
+    <jmenuitem name="OpenInBrowserMenuItem" text="Open File in Separate Browser" />
+    <jmenuitem name="ShowFileMenuItem" text="Show File in Explorer/Finder" />
+    <jmenuitem />
+    <jmenuitem name="RunFileMenuItem" text="Run File" />
+    <jmenuitem name="DebugFileMenuItem" text="Debug File" />
+    <jmenuitem />
+    <jmenuitem name="UpdateFilesMenuItem" text="Update File(s) from Remote Source" />
+    <jmenuitem name="ReplaceFilesMenuItem" text="Replace File(s) from Remote Source" />
+    <jmenuitem name="CommitFilesMenuItem" text="Commit File(s) to Remote Source" />
+    <jmenuitem name="DiffFilesMenuItem" text="Compare File to Remote File" />
+    <jmenuitem />
+    <jmenuitem name="CleanProjectMenuItem" text="Clean Project" />
+    <jmenuitem name="BuildProjectMenuItem" text="Build Project" />
+    <jmenuitem />
+    <jmenuitem name="ShowClassInfoMenuItem" text="Show Class File Info" />
+  </menubutton>
+  <jscrollpane y="30" width="200" height="365" asize="-~-,-~-">
+    <font name="Arial" size="15" />
+    <jlist name="FilesList" ItemKey="Text" />
+  </jscrollpane>
+  <jscrollpane y="30" width="200" height="365" asize="-~-,-~-">
+    <jtree name="FilesTree" RootVisible="false" ShowsRootHandles="false" />
+  </jscrollpane>
+</panel>

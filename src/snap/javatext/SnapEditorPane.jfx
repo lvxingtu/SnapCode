@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<panel width="630" height="28">
+  <font name="Arial" size="11" />
+  <jbutton name="SaveButton" x="3" y="3" width="22" height="22" ttip="Save" image="/com/reportmill/app/pkg.images/File_Save.png" align="center" ShowBorder="false" margin="0" />
+  <jseparator x="26" y="6" width="13" height="18" orientation="1" />
+  <jbutton name="CutButton" x="39" y="3" width="22" height="22" ttip="Cut" image="/com/reportmill/app/pkg.images/Edit_Cut.png" align="center" ShowBorder="false" margin="0" />
+  <jbutton name="CopyButton" x="61" y="3" width="22" height="22" ttip="Copy" image="/com/reportmill/app/pkg.images/Edit_Copy.png" align="center" ShowBorder="false" margin="0" />
+  <jbutton name="PasteButton" x="83" y="3" width="22" height="22" ttip="Paste" image="/com/reportmill/app/pkg.images/Edit_Paste.png" align="center" ShowBorder="false" margin="0" />
+  <jbutton name="DeleteButton" x="105" y="3" width="22" height="22" ttip="Delete" image="/com/reportmill/app/pkg.images/Edit_Delete.png" align="center" ShowBorder="false" margin="0" />
+  <jseparator x="128" y="6" width="13" height="18" orientation="1" />
+  <jbutton name="UndoButton" x="141" y="3" width="22" height="22" ttip="Undo" image="/com/reportmill/app/pkg.images/Edit_Undo.png" align="center" ShowBorder="false" margin="0">
+    <binding aspect="Enabled" key="JavaView.Undoer.hasUndos" />
+  </jbutton>
+  <jbutton name="RedoButton" x="163" y="3" width="22" height="22" ttip="Redo" image="/com/reportmill/app/pkg.images/Edit_Redo.png" align="center" ShowBorder="false" margin="0">
+    <binding aspect="Enabled" key="JavaView.Undoer.hasRedos" />
+  </jbutton>
+  <jbutton name="JavaButton" x="535" y="3" width="80" height="22" asize="~--,--~" ttip="Java Code" text="Java Code" align="center" />
+</panel>

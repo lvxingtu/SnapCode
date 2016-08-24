@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<panel width="640" height="480">
+  <font name="Arial" size="11" />
+  <jlabel name="SearchResultsText" x="4" y="4" width="474" height="22" asize="-~-,--~" text="Label">
+    <font name="Arial" size="12" />
+  </jlabel>
+  <jbutton name="SearchButton" x="482" y="4" width="75" height="22" asize="~--,--~" text="Search" />
+  <jbutton name="ClearButton" x="561" y="4" width="75" height="22" asize="~--,--~" text="Clear">
+    <binding aspect="Enabled" key="Search" />
+  </jbutton>
+  <jscrollpane x="2" y="30" width="636" height="448" asize="-~-,-~-">
+    <font name="Arial" size="12" />
+    <jlist name="ResultsList" width="617" height="415" selection="single-interval">
+      <binding aspect="Items" key="Results" />
+      <binding aspect="SelectedItem" key="SelectedResult" />
+    </jlist>
+  </jscrollpane>
+</panel>

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<VBox Padding="7,0,0,0" Spacing="3">
+  <font name="Arial" size="12" />
+  <jlabel Padding="0,0,0,5" text="Problems:">
+    <binding aspect="Text" key="BuildStatusText" />
+  </jlabel>
+  <jscrollpane GrowWidth="true" GrowHeight="true">
+    <jlist name="ErrorsList">
+      <font name="Arial" size="14" />
+      <binding aspect="Items" key="Issues" />
+      <binding aspect="SelectedItem" key="SelectedIssue" />
+    </jlist>
+  </jscrollpane>
+</VBox>

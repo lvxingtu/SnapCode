@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jsplitpane width="800" height="595">
+  <font name="Arial" size="11" />
+  <jsplitpane name="FilesSplitView" width="200" height="595" orientation="vertical" />
+  <jsplitpane name="BrowserBox" x="200" width="595" height="593" orientation="vertical">
+    <panel name="BrowserAndStatusBar" width="595" height="573" asize="-~-,-~-">
+      <panel name="Browser" width="595" height="553" asize="-~-,-~-" class="snap.app.AppBrowser" />
+      <panel name="StatusBar" y="553" width="595" height="20" asize="-~-,~--">
+        <jlabel name="StatusText" x="2" width="227" height="20" asize="-~~,~--" />
+        <jprogressbar name="ProgressBar" x="257" y="2" width="80" height="16" asize="~~~,~--" visible="false" />
+        <jbutton name="ShowTrayButton" x="268" y="2" width="60" height="16" text="Show Tray" asize="~-~,~--" margin="0" />
+        <jlabel name="ActivityText" x="330" width="261" height="20" asize="~~-,~--" align="right" />
+      </panel>
+    </panel>
+  </jsplitpane>
+</jsplitpane>

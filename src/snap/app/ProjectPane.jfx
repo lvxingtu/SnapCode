@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<VBox PrefWidth="500" PrefHeight="500" Padding="16,16,16,16" Spacing="10">
+  <font name="Arial" size="11" />
+  <HBox Spacing="5">
+    <jlabel text="Home Page:" />
+    <jtextfield PrefWidth="255">
+      <binding aspect="Text" key="SitePane.HomePageURLString" />
+    </jtextfield>
+    <jbutton name="ResetHomePageButton" PrefWidth="47" text="Reset" />
+  </HBox>
+  <HBox Spacing="5">
+    <jlabel text="Source Directory:" />
+    <jtextfield PrefWidth="255">
+      <binding aspect="Text" key="Project.ClassPath.SourcePath" />
+    </jtextfield>
+  </HBox>
+  <HBox Spacing="5">
+    <jlabel text="Build Directory:" />
+    <jtextfield PrefWidth="255">
+      <binding aspect="Text" key="Project.ClassPath.BuildPath" />
+    </jtextfield>
+  </HBox>
+  <jlabel text="Dependencies:" />
+  <jtabbedpane PrefWidth="360" PrefHeight="160">
+    <border type="bevel" bevel-type="lowered" />
+    <Box Padding="3,3,3,3" FillWidth="true" FillHeight="true" title="    Jars    ">
+      <jscrollpane>
+        <font name="Arial" size="12" />
+        <jlist name="JarPathsList">
+          <binding aspect="Items" key="JarPaths" />
+          <binding aspect="SelectedItem" key="SelectedJarPath" />
+        </jlist>
+      </jscrollpane>
+    </Box>
+    <Box Padding="3,3,3,3" FillWidth="true" FillHeight="true" title="  Projects  ">
+      <jscrollpane>
+        <font name="Arial" size="12" />
+        <jlist name="ProjectPathsList">
+          <binding aspect="Items" key="ProjectPaths" />
+          <binding aspect="SelectedItem" key="SelectedProjectPath" />
+        </jlist>
+      </jscrollpane>
+    </Box>
+  </jtabbedpane>
+  <jcheckbox text="Build Project Automatically">
+    <binding aspect="Selected" key="SitePane.AutoBuild" />
+  </jcheckbox>
+  <jcheckbox text="Open Source Files in SnapCode Editor">
+    <binding aspect="Selected" key="SitePane.UseSnapEditor" />
+  </jcheckbox>
+</VBox>

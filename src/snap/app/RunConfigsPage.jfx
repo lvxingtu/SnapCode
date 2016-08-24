@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document version="14" show-margin="true" snap-margin="true" margin="36 36 36 36" null-string="&lt;NA&gt;">
+  <page width="700" height="612">
+    <text x="36" y="36" width="457" height="42">
+      <effect type="shadow" radius="10" dx="5" dy="5" color="#000000a6" />
+      <font name="Arial Bold" size="36" />
+      <string>Run Configurations</string>
+    </text>
+    <jbutton name="AddButton" x="60" y="518" width="80" height="22" text="Add" align="center" />
+    <jbutton name="RemoveButton" x="144" y="518" width="80" height="22" text="Remove" align="center" />
+    <jlabel x="289" y="131" width="67" height="22" text="Name:" align="right" />
+    <jtextfield name="NameText" x="364" y="131" width="291" height="22">
+      <binding aspect="Text" key="SelectedRunConfig.Name" />
+      <binding aspect="Enabled" key="SelectedRunConfig" />
+    </jtextfield>
+    <jlabel x="289" y="162" width="67" height="22" text="Main Class:" align="right" />
+    <jtextfield name="MainClassText" x="364" y="162" width="291" height="22">
+      <binding aspect="Text" key="SelectedRunConfig.MainClassName" />
+      <binding aspect="Enabled" key="SelectedRunConfig" />
+    </jtextfield>
+    <jscrollpane x="36" y="102" width="217" height="410">
+      <jlist ItemKey="Name">
+        <binding aspect="Items" key="RunConfigs" />
+        <binding aspect="SelectedItem" key="SelectedRunConfig" />
+      </jlist>
+    </jscrollpane>
+    <jlabel x="289" y="194" width="67" height="22" text="App Args:" align="right" />
+    <jtextarea name="AppArgsText" x="369" y="196" width="283" height="60" asize="-~-,-~-" >
+      <binding aspect="Text" key="SelectedRunConfig.AppArgs" />
+      <binding aspect="Enabled" key="SelectedRunConfig" />
+    </jtextarea>
+    <jlabel x="289" y="268" width="67" height="22" text="VM Args:" align="right" />
+    <jtextarea name="VMArgsText" x="369" y="270" width="283" height="60" asize="-~-,-~-">
+      <binding aspect="Text" key="SelectedRunConfig.VMArgs" />
+      <binding aspect="Enabled" key="SelectedRunConfig" />
+    </jtextarea>
+  </page>
+</document>

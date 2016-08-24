@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<panel width="200" height="180">
+  <font name="Arial" size="11" />
+  <jlabel x="2" width="198" height="20" asize="-~-,--~" text=" Processes" align="left">
+    <font name="Arial Bold" size="12" />
+  </jlabel>
+  <jbutton name="DebugButton" x="172" width="24" height="24" asize="~--,--~" image="Debug.gif" align="center" ShowBorder="false" />
+  <jbutton name="ResumeButton" x="20" y="20" width="24" height="24" image="Resume.gif" align="center" ShowBorder="false">
+    <binding aspect="Enabled" key="Paused" />
+  </jbutton>
+  <jbutton name="SuspendButton" x="48" y="20" width="24" height="24" image="Suspend.gif" align="center" ShowBorder="false">
+    <binding aspect="Enabled" key="Pausable" />
+  </jbutton>
+  <jbutton name="TerminateButton" x="76" y="20" width="24" height="24" image="Terminate.gif" align="center" ShowBorder="false">
+    <binding aspect="Enabled" key="!Terminated" />
+  </jbutton>
+  <jseparator x="101" y="20" width="13" height="24" orientation="1" />
+  <jbutton name="StepIntoButton" x="112" y="20" width="24" height="24" image="StepInto.gif" align="center" ShowBorder="false">
+    <binding aspect="Enabled" key="Paused" />
+  </jbutton>
+  <jbutton name="StepOverButton" x="140" y="20" width="24" height="24" image="StepOver.gif" align="center" ShowBorder="false">
+    <binding aspect="Enabled" key="Paused" />
+  </jbutton>
+  <jbutton name="StepReturnButton" x="168" y="20" width="24" height="24" image="StepReturn.gif" align="center" ShowBorder="false">
+    <binding aspect="Enabled" key="Paused" />
+  </jbutton>
+  <jscrollpane y="44" width="200" height="134" asize="-~-,-~-">
+    <jtree name="ProcTree" width="200" height="138" RootVisible="false" ShowsRootHandles="false" />
+  </jscrollpane>
+</panel>

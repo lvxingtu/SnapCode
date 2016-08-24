@@ -1,0 +1,20 @@
+
+rm -rf /tmp/javadoc
+
+cd /Temp/RM15/src
+
+javadoc -d /tmp/javadoc -windowtitle 'SnapCode API' \
+-header 'SnapCode API' \
+-footer 'SnapCode API' \
+-public \
+snap/javafx/*.java \
+snap/studio/*.java \
+snap/util/*.java \
+snap/web/*.java \
+com/reportmill/base/*.java \
+com/reportmill/graphics/*.java \
+com/reportmill/shape/*.java \
+
+echo "Zipping javadoc.zip"
+cd /tmp
+zip -rq javadoc.zip javadoc

@@ -1,0 +1,160 @@
+/*
+ * Copyright (c) 2010, ReportMill Software. All rights reserved.
+ */
+package snap.javaparse;
+import java.io.*;
+import java.lang.reflect.*;
+import java.util.*;
+import snap.project.Project;
+import snap.util.*;
+import snap.web.*;
+
+/**
+ * A file to represent a Java class.
+ */
+public class ClassData extends WebFileData {
+
+/**
+ * Returns the project.
+ */
+private Project getProj()  { return Project.get(getSite()); }
+
+/**
+ * Returns the sets of JavaDecls that this class declares and (externally) references.
+ */
+public void getDeclsAndRefs(Set <JavaDecl> theDecls, Set <JavaDecl> theRefs)
+{
+    // Get bytes
+    if(getBytes()==null) return;
+    
+    // Get ClassFile reader and read
+    ClassFileData cfd = new ClassFileData();
+    try { cfd.read(new DataInputStream(getInputStream())); }
+    catch(Exception e) { System.err.println(e); return; }
+    
+    // Iterate over constants and add to set top level class names
+    String cname = getRootClassName(getProj().getClassName(getSourceFile()));
+    for(int i=1, iMax=cfd.getConstantCount(); i<=iMax; i++) { ClassFileData.Constant constant = cfd.getConstant(i);
+        if(constant.isClass() && (isInRootClassName(cname, constant.getClassName()) ||
+            ClassUtils.isPrimitiveClassName(constant.getClassName())))
+            continue;
+        JavaDecl ref = getRef(constant);
+        if(ref!=null) theRefs.add(ref);
+    }
+    
+    // Get class and make sure TypeParameters, superclass and interfaces are in refs
+    Class cls = getProj().getClassForFile(getSourceFile());
+    theDecls.add(new JavaDecl(cls));
+    for(TypeVariable tp : cls.getTypeParameters()) addClassRef(tp, theRefs);
+    addClassRef(cls.getGenericSuperclass(), theRefs);
+    for(Type tp : cls.getGenericInterfaces()) addClassRef(tp, theRefs);
+    
+    // Fields: add JavaDecl for each declared field - also make sure field type is in references
+    Field fields[]; try { fields = cls.getDeclaredFields(); }
+    catch(Throwable e) { System.err.println(e + " in " + getSourceURL().getPath()); return; }
+    for(Field field : fields) {
+        theDecls.add(new JavaDecl(field));
+        addClassRef(field.getGenericType(), theRefs);
+    }
+    
+    // Constructors: Add JavaDecl for each constructor - also make sure parameter types are in references
+    Constructor constrs[]; try { constrs = cls.getDeclaredConstructors(); }
+    catch(Throwable e) { System.err.println(e + " in " + getSourceURL().getPath()); return; }
+    for(Constructor constr : constrs) {
+        if(constr.isSynthetic()) continue;
+        theDecls.add(new JavaDecl(constr));
+        for(Type t : constr.getGenericParameterTypes()) addClassRef(t, theRefs);
+    }
+    
+    // Methods: Add JavaDecl for each declared method - also make sure return type and parameter types are in references
+    Method methods[]; try { methods = cls.getDeclaredMethods(); }
+    catch(Throwable e) { System.err.println(e + " in " + getSourceURL().getPath()); return; }
+    for(Method meth : methods) {
+        if(meth.isSynthetic()) continue;
+        theDecls.add(new JavaDecl(meth));
+        addClassRef(meth.getGenericReturnType(), theRefs);
+        for(Type t : meth.getGenericParameterTypes()) addClassRef(t, theRefs);
+    }
+}
+
+/**
+ * Returns the JavaDecl for given Class ConstantPool Constant.
+ */
+private JavaDecl getRef(ClassFileData.Constant aConst)
+{
+    if(aConst.isClass()) {
+        String cname = aConst.getClassName(); if(cname.startsWith("[")) return null;
+        return new JavaDecl(cname, null, null, null);
+    }
+    if(aConst.isField()) {
+        String cname = aConst.getDeclClassName(); if(cname.startsWith("[")) return null;
+        return new JavaDecl(cname, aConst.getMemberName(), aConst.getType(), null);
+    }
+    if(aConst.isMethod()) {
+        String cname = aConst.getDeclClassName(); if(cname.startsWith("[")) return null;
+        return new JavaDecl(cname, aConst.getMemberName(), aConst.getType(), aConst.getParameterTypes());
+    }
+    return null;
+}
+
+/**
+ * Adds a ref for a declaration type class.
+ */
+private final void addClassRef(Type aType, Set <JavaDecl> theRefs)
+{
+    // Handle simple Class
+    if(aType instanceof Class)
+        addClassRef((Class)aType, theRefs);
+        
+    // Handle ParameterizedType
+    else if(aType instanceof ParameterizedType) { ParameterizedType ptype = (ParameterizedType)aType;
+        addClassRef(ptype.getRawType(), theRefs);
+        for(Type type : ptype.getActualTypeArguments())
+            addClassRef(type, theRefs);
+    }
+    
+    // Handle TypeVariable
+    else if(aType instanceof TypeVariable) { TypeVariable tv = (TypeVariable)aType;
+        for(Type type : tv.getBounds())
+            if(type instanceof Class)  // Bogus!
+                addClassRef(type, theRefs); }
+        
+    // Handle WildcardType
+    else if(aType instanceof WildcardType) { WildcardType wct = (WildcardType)aType;
+        for(Type type : wct.getLowerBounds())
+            addClassRef(type, theRefs);
+        for(Type type : wct.getUpperBounds())
+            addClassRef(type, theRefs);
+    }
+}
+
+/**
+ * Adds a ref for a declaration type class.
+ */
+private final void addClassRef(Class aClass, Set <JavaDecl> theRefs)
+{
+    while(aClass.isArray()) aClass = aClass.getComponentType();
+    if(aClass.isAnonymousClass() || aClass.isPrimitive() || aClass.isSynthetic()) return;
+    JavaDecl ref; try { ref = new JavaDecl(aClass); ref._modifier = 0; }
+    catch(Throwable e) { System.err.println(e + " in " + getSourceURL().getPath()); return; }
+    theRefs.add(ref);
+}
+
+/** Returns the top level class name. */
+private static String getRootClassName(String cname)
+{
+    int i = cname.indexOf('$'); if(i>0) cname = cname.substring(0,i); return cname;
+}
+
+/** Returns a simple class name. */
+private static boolean isInRootClassName(String aRoot, String aChild)
+{
+    return aChild.startsWith(aRoot) && (aChild.length()==aRoot.length() || aChild.charAt(aRoot.length())=='$');
+}
+
+/**
+ * Returns the ClassData for given file.
+ */
+public static ClassData get(WebFile aFile)  { return get(aFile, ClassData.class); }
+
+}
