@@ -134,6 +134,9 @@ public List <WebSite> getSites()  { return _sites; }
  */
 public void addSite(WebSite aSite)
 {
+    // If site already added, just return
+    if(_sites.contains(aSite)) return;
+    
     // Create project for site
     Project proj = Project.get(aSite, true);
 
