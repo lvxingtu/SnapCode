@@ -3,12 +3,6 @@ echo "Buildjars SnapCode"
 cd /Temp/SnapCode
 date > bin/BuildInfo.txt
 
-echo "Getting resources"
-cp lib/jgit.jar bin
-cp lib/jsch.jar bin
-cp lib/tools.jar bin
-cp lib/spell.jar bin
-
 echo "Creating SnapCode Manifest"
 echo "Main-Class: snap.app.AppLoader\nClass-Path: jgit.jar jsch.jar tools.jar spell.jar" > bin/MANIFEST.MF
 

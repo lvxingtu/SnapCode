@@ -20,3 +20,9 @@ jar cmf MANIFEST.MF SnapCode1.jar snap \
     -C ../../SnapKit/bin snap/view \
     -C ../../SnapKit/bin snap/viewx \
     -C ../../SnapKit/bin snap/web
+
+echo "Getting resources"
+cp ../lib/jgit.jar .
+cp ../lib/jsch.jar .
+cp ../lib/tools.jar .
+cp ../../RM15/lib/spell.jar .
