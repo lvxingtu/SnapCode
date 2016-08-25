@@ -2,7 +2,6 @@ package snap.app;
 import java.io.File;
 import java.util.*;
 import snap.gfx.*;
-import snap.project.*;
 import snap.util.*;
 import snap.view.*;
 import snap.viewx.*;
@@ -54,6 +53,11 @@ public List <WebFile> getSelectedFiles()
     //List files = new ArrayList(); AppFile item = _app.getSelectedItem();
     //if(item!=null && item.getFile()!=null) files.add(item.getFile()); return files;
 }
+
+/**
+ * Returns the top level site.
+ */
+public WebSite getRootSite()  { return _appPane.getRootSite(); }
 
 /**
  * Returns the selected site.
@@ -431,6 +435,14 @@ public void removeFile(WebFile aFile)
 }
 
 /**
+ * Saves all unsaved files.
+ */
+public void saveAllFiles()
+{
+    saveFiles(getSelectedSite().getRootDir(), true);
+}
+
+/**
  * Saves any unsaved files in given directory.
  */
 public int saveFiles(WebFile aFile, boolean doSaveAll)
@@ -601,14 +613,11 @@ public void debug()  { run(null, null, true); }
 protected void run(RunConfig aConfig, WebFile aFile, boolean isDebug)
 {
     // Automatically save all files
-    saveFiles(getSelectedSite().getRootDir(), true);
+    saveAllFiles();
     
-    // Get site/project
-    WebSite site = aFile!=null? aFile.getSite() : getSelectedSite();
-    Project proj = Project.get(site);
-    
-    // Get RunConfig
-    RunConfig config = aConfig!=null || aFile!=null? aConfig : proj!=null? RunConfigs.get(site).getRunConfig() : null;
+    // Get site and RunConfig (if available)
+    WebSite site = getRootSite();
+    RunConfig config = aConfig!=null || aFile!=null? aConfig : RunConfigs.get(site).getRunConfig();
 
     // Get file
     WebFile file = aFile;

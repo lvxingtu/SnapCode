@@ -69,7 +69,7 @@ protected List <Marker> createMarkers()
     List <Marker> markers = new ArrayList();
     
     // Add markers for TextView.JavaSource.BuildIssues
-    BuildIssue buildIssues[] = _textView.getTextBox().getBuildIssues();
+    BuildIssue buildIssues[] = _textView.getBuildIssues();
     for(BuildIssue issue : buildIssues)
         markers.add(new BuildIssueMarker(issue));
     

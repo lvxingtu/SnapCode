@@ -115,6 +115,11 @@ public int getSupportTrayIndex()  { return isSupportTrayVisible()? _supportTray.
 public void setSupportTrayIndex(int anIndex) { setSupportTrayVisible(true); _supportTray.setSelectedIndex(anIndex); }
 
 /**
+ * Returns the top level site.
+ */
+public WebSite getRootSite()  { return _sites.get(0); }
+
+/**
  * Returns the number of sites.
  */
 public int getSiteCount()  { return _sites.size(); }

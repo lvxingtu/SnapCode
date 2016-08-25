@@ -8,6 +8,7 @@ import snap.javaparse.*;
 import snap.project.*;
 import snap.util.PropChange;
 import snap.view.*;
+import snap.web.WebFile;
 
 /**
  * A TextView subclass for Java source editing.
@@ -277,7 +278,7 @@ protected void paintBack(Painter aPntr)
     }
     
     // Underline build issues
-    BuildIssue issues[] = getTextBox().getBuildIssues();
+    BuildIssue issues[] = getBuildIssues();
     for(BuildIssue issue : issues) {
         int istart = issue.getStart(), iend = issue.getEnd(); if(iend<istart) continue;
         TextBoxLine line = getLineAt(iend); int lstart = line.getStart(); if(istart<lstart) istart = lstart;
@@ -514,10 +515,121 @@ public void outdentLines()
  */
 public void propertyChange(PropChange anEvent)
 {
-    // Do normal version and update TextPane.TextModified
-    super.propertyChange(anEvent);
-    if(anEvent.getPropertyName()==RichText.Chars_Prop) { JavaTextPane tp = getTextPane();
-        if(tp!=null) tp.setTextModified(getUndoer().hasUndos()); }
+    // Do normal version and update TextPane.TextModified (just return if not chars change)
+    super.propertyChange(anEvent); if(anEvent.getPropertyName()!=RichText.Chars_Prop) return;
+    
+    // Set TextPane modified
+    JavaTextPane tp = getTextPane(); if(tp!=null) tp.setTextModified(getUndoer().hasUndos());
+    
+    // Call didAddChars/didRemoveChars
+    RichText.CharsChange cc = (RichText.CharsChange)anEvent;
+    int start = anEvent.getIndex(); CharSequence oval = cc.getOldValue(), nval = cc.getNewValue();
+    if(nval!=null) didAddChars(start, nval);
+    else didRemoveChars(start, oval);
+}
+
+/**
+ * Called when characters are added.
+ */
+protected void didAddChars(int aStart, CharSequence theChars)
+{
+    // Iterate over BuildIssues and shift start/end for removed chars
+    int len = theChars.length(), endNew = aStart + len;
+    for(BuildIssue is : getBuildIssues()) {
+        int istart = is.getStart(), iend = is.getEnd();
+        if(aStart<=istart) is.setStart(istart + len);
+        if(aStart<iend) is.setEnd(iend + len);
+    }
+
+    // Iterate over Breakpoints and shift start/end for removed chars
+    int sline = getLineAt(aStart).getIndex(), eline = getLineAt(aStart+len).getIndex(), dline = eline - sline;
+    if(sline!=eline) for(Breakpoint bp : getBreakpoints().toArray(new Breakpoint[0])) {
+        int bline = bp.getLine();
+        if(sline<bline && eline<=bline) { bp.setLine(bline + dline);
+            getProjBreakpoints().writeFile(); }
+    }
+}
+
+/**
+ * Called when characters are removed.
+ */
+protected void didRemoveChars(int aStart, CharSequence theChars)
+{
+    // See if we need to shift BuildIssues
+    int endOld = aStart + theChars.length();
+    for(BuildIssue is : getBuildIssues()) {
+        int istart = is.getStart(), iend = is.getEnd(), start = istart, end = iend;
+        if(aStart<istart) start = istart - (Math.min(istart, endOld) - aStart);
+        if(aStart<iend) end = iend - (Math.min(iend, endOld) - aStart);
+        is.setStart(start); is.setEnd(end);
+    }
+    
+    // See if we need to remove Breakpoints
+    int sline = getLineAt(aStart).getIndex(), eline = getLineAt(endOld).getIndex(), dline = eline - sline;
+    if(sline!=eline) for(Breakpoint bp : getBreakpoints().toArray(new Breakpoint[0])) {
+        int bline = bp.getLine();
+        if(sline<bline && eline<=bline) { bp.setLine(bline - dline);
+            getProjBreakpoints().writeFile(); }
+        else if(sline<bline && eline>bline)
+            getProjBreakpoints().remove(bp);
+    }
+}
+
+/**
+ * Returns the project.
+ */
+public Project getProject()
+{
+    WebFile file = getSourceFile();
+    return file!=null? Project.get(file) : null;
+}
+
+/**
+ * Returns the top level project.
+ */
+public Project getRootProject()  { Project proj = getProject(); return proj!=null? proj.getRootProject() : null; }
+
+/**
+ * Returns BuildIssues from ProjectFile.
+ */
+public BuildIssue[] getBuildIssues()
+{
+    WebFile file = getSourceFile(); Project proj = getProject();
+    return proj!=null? proj.getBuildIssues().getIssues(file) : BuildIssues.NO_ISSUES;
+}
+
+/**
+ * Returns the project breakpoints.
+ */
+private Breakpoints getProjBreakpoints()  { Project p = getRootProject(); return p!=null? p.getBreakpoints() : null; }
+
+/**
+ * Returns Breakpoints from ProjectFile.
+ */
+public List <Breakpoint> getBreakpoints()
+{
+    WebFile file = getSourceFile(); Breakpoints bpnts = file!=null? getProjBreakpoints() : null;
+    return bpnts!=null? bpnts.get(file) : (List)Collections.emptyList();
+}
+
+/**
+ * Adds breakpoint at line.
+ */
+public void addBreakpoint(int aLine)
+{
+    WebFile file = getSourceFile();
+    Project proj = getRootProject(); if(proj==null) return;
+    proj.addBreakpoint(file, aLine);
+}
+
+/**
+ * Remove breakpoint.
+ */
+public void removeBreakpoint(Breakpoint aBP)
+{
+    WebFile file = getSourceFile();
+    Project proj = getRootProject(); if(proj==null) return;
+    proj.getBreakpoints().remove(aBP);
 }
 
 }

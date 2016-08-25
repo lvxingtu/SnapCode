@@ -77,12 +77,12 @@ protected List <Marker> createMarkers()
         getSuperMemberMarkers(cd, markers);
 
     // Add markers for BuildIssues
-    BuildIssue buildIssues[] = _textView.getTextBox().getBuildIssues();
+    BuildIssue buildIssues[] = _textView.getBuildIssues();
     for(BuildIssue issue : buildIssues)
         markers.add(new BuildIssueMarker(issue));
         
     // Add markers for breakpoints
-    for(Breakpoint bp : _textView.getTextBox().getBreakpoints())
+    for(Breakpoint bp : _textView.getBreakpoints())
         markers.add(new BreakpointMarker(bp));
     
     // Return markers
@@ -126,7 +126,7 @@ protected void processEvent(ViewEvent anEvent)
                 marker.mouseClicked(anEvent); return; }
             TextBoxLine line = _textView.getTextBox().getLineForY(anEvent.getY());
             int index = line.getIndex();
-            _textView.getTextBox().addBreakpoint(index);
+            _textView.addBreakpoint(index);
             resetAll();
             return;
         }
@@ -270,7 +270,7 @@ public class BreakpointMarker extends Marker <Breakpoint> {
     /** Handles MouseClicked. */
     public void mouseClicked(ViewEvent anEvent)
     {
-        if(anEvent.getClickCount()==2) _textView.getTextBox().removeBreakpoint(_target);
+        if(anEvent.getClickCount()==2) _textView.removeBreakpoint(_target);
         resetAll();
     }
 }

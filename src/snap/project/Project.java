@@ -32,6 +32,9 @@ public class Project extends SnapObject {
     // The ClassLoader for compiled class info
     ProjectClassLoader                 _clsLdr;
     
+    // The project that loaded us
+    Project                            _parent;
+    
     // The list of projects this project depends on
     Project                            _projects[];
 
@@ -60,7 +63,13 @@ protected void setSite(WebSite aSite)  { _site = aSite; _site.setProp(Project.cl
 /**
  * Returns a file for given path.
  */
-public WebFile getFile(String aPath)  { return _site.getFile(aPath); }
+public WebFile getFile(String aPath)
+{
+    WebFile file = _site.getFile(aPath); if(file!=null) return file;
+    for(Project p : getProjects()) {
+        file = p.getFile(aPath); if(file!=null) return file; }
+    return null;
+}
 
 /**
  * Creates a file for given path.
@@ -78,6 +87,16 @@ public WebFile getSourceDir()  { return getClassPath().getSourceDir(); }
 public WebFile getBuildDir()  { return getClassPath().getBuildDir(); }
 
 /**
+ * Returns the parent project for this project.
+ */
+public Project getParent()  { return _parent; }
+
+/**
+ * Returns the top most project.
+ */
+public Project getRootProject()  { return _parent!=null? _parent.getRootProject() : this; }
+
+/**
  * Returns the list of projects this project depends on.
  */
 public Project[] getProjects()
@@ -91,7 +110,7 @@ public Project[] getProjects()
         WebSite parSite = getSite().getURL().getSite(); // Get parent site
         WebURL projURL = parSite.getURL(path);
         WebSite projSite = projURL.getAsSite();
-        Project proj = Project.get(projSite, true);
+        Project proj = Project.get(projSite, true); proj._parent = this;
         projs.add(proj);
     }
     

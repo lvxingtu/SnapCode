@@ -6,8 +6,6 @@ import java.util.*;
 import snap.javaparse.*;
 import snap.javaparse.JavaParser.JavaTokenizer;
 import snap.parse.*;
-import snap.project.*;
-import snap.web.WebFile;
 import snap.gfx.*;
 
 /**
@@ -52,59 +50,12 @@ protected JFilePlus createJFile()
     JFile jfile = _parser.getJavaFile(getString());
     jfile.setSourceFile(getSourceFile());
     return new JFilePlus(this, jfile);
-} 
+}
 
 /**
  * Override to clear JFile.
  */
 public void setString(String aString)  { super.setString(aString); _jfile = null; }
-
-/**
- * Returns BuildIssues from ProjectFile.
- */
-public BuildIssue[] getBuildIssues()
-{
-    WebFile file = getSourceFile(); Project proj = file!=null? Project.get(file) : null;
-    return proj!=null? proj.getBuildIssues().getIssues(file) : BuildIssues.NO_ISSUES;
-}
-
-/**
- * Returns the project breakpoints.
- */
-public Breakpoints getProjBreakpoints()
-{
-    WebFile file = getSourceFile(); Project proj = file!=null? Project.get(file) : null;
-    return proj!=null? proj.getBreakpoints() : null;
-}
-
-/**
- * Returns Breakpoints from ProjectFile.
- */
-public List <Breakpoint> getBreakpoints()
-{
-    WebFile file = getSourceFile(); Breakpoints bpnts = file!=null? getProjBreakpoints() : null;
-    return bpnts!=null? bpnts.get(file) : (List)Collections.emptyList();
-}
-
-/**
- * Adds breakpoint at line.
- */
-public void addBreakpoint(int aLine)
-{
-    WebFile file = getSourceFile();
-    Project proj = file!=null? Project.get(file.getSite()) : null; if(proj==null) return;
-    proj.addBreakpoint(file, aLine);
-}
-
-/**
- * Remove breakpoint.
- */
-public void removeBreakpoint(Breakpoint aBP)
-{
-    WebFile file = getSourceFile();
-    Project proj = file!=null? Project.get(file.getSite()) : null; if(proj==null) return;
-    proj.getBreakpoints().remove(aBP);
-}
 
 /**
  * Returns the ProgramCounter line.
@@ -127,19 +78,7 @@ public JavaTextLine getLineAt(int anIndex)  { return (JavaTextLine)super.getLine
 public void updateLines(int aStart, int endOld, int endNew)
 {
     // Get whether update is Add or Remove
-    boolean isAdd = endNew>endOld, isRemove = endNew>endOld; int length = boxlen();
-    
-    // Handle Remove Chars: Iterate over breakpoints and shift start/end for removed chars
-    if(isRemove && getLineCount()>0) {
-        int sline = getLineAt(aStart).getIndex(), eline = getLineAt(endOld).getIndex(), dline = eline - sline;
-        if(sline!=eline) for(Breakpoint bp : getBreakpoints().toArray(new Breakpoint[0])) {
-            int bline = bp.getLine();
-            if(sline<bline && eline<=bline) { bp.setLine(bline - dline);
-                getProjBreakpoints().writeFile(); }
-            else if(sline<bline && eline>bline)
-                getProjBreakpoints().remove(bp);
-        }
-    }
+    boolean isAdd = endNew>endOld; int length = boxlen();
     
     // Get whether last line in update range has unterminated comment
     boolean utermComment = getLineCount()>0 && getLineAt(endOld).isUnterminatedComment();
@@ -151,36 +90,6 @@ public void updateLines(int aStart, int endOld, int endNew)
     if(utermComment!=getLineAt(endNew).isUnterminatedComment()) {
         int start = getLineAt(endNew).getEnd(), end = getText().indexOf("*/", start); if(end<0) end = length();
         super.updateLines(start, end, end);
-    }
-    
-    // Handle Add Chars
-    if(isAdd) {
-        
-        // Iterate over BuildIssues and shift start/end for removed chars
-        int len = endNew - endOld;
-        for(BuildIssue is : getBuildIssues()) {
-            int istart = is.getStart(), iend = is.getEnd();
-            if(aStart<=istart) is.setStart(istart + len);
-            if(aStart<iend) is.setEnd(iend + len);
-        }
-    
-        // Iterate over breakpoints and shift start/end for removed chars
-        int sline = getLineAt(aStart).getIndex(), eline = getLineAt(aStart+len).getIndex(), dline = eline - sline;
-        if(sline!=eline) for(Breakpoint bp : getBreakpoints().toArray(new Breakpoint[0])) {
-            int bline = bp.getLine();
-            if(sline<bline && eline<=bline) { bp.setLine(bline + dline);
-                getProjBreakpoints().writeFile(); }
-        }
-    }
-    
-    // Handle Remove Chars: Iterate over BuildIssues and shift start/end for removed chars
-    else {
-        for(BuildIssue is : getBuildIssues()) {
-            int istart = is.getStart(), iend = is.getEnd(), start = istart, end = iend;
-            if(aStart<istart) start = istart - (Math.min(istart, endOld) - aStart);
-            if(aStart<iend) end = iend - (Math.min(iend, endOld) - aStart);
-            is.setStart(start); is.setEnd(end);
-        }
     }
     
     // Update JFile
