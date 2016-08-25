@@ -129,7 +129,7 @@ protected void initUI()
     for(int i=0, iMax=_appPane.getSiteCount(); i<iMax; i++) { WebSite site = _appPane.getSite(i);
         _rootFiles.add(new AppFile(null,site.getRootDir())); }
     _filesTree.setItems(_rootFiles);
-    for(AppFile af : _rootFiles) _filesTree.expandItem(af);
+    _filesTree.expandItem(_rootFiles.get(0));
     
     // Enable events to get MouseClicked on TreeView
     enableEvents(_filesTree, MousePressed, MouseReleased, MouseClicked); enableEvents(_filesTree, DragEvents);
