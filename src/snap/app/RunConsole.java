@@ -106,7 +106,7 @@ String getSourceURL(String aPath)
         return "http://reportmill.com/jars/8u05/src.zip!" + aPath;
     if(aPath.startsWith("/javafx/"))
         return "http://reportmill.com/jars/8u05/javafx-src.zip!" + aPath;
-    Project proj = Project.get(_appPane.getSelectedSite()); if(proj==null) return aPath;
+    Project proj = Project.get(_appPane.getRootSite()); if(proj==null) return aPath;
     WebFile file = proj.getSourceFile(aPath, false, false);
     return file!=null? file.getURL().getString() : aPath;
 }
