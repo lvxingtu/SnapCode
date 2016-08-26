@@ -566,9 +566,6 @@ synchronized void notifyJDIEvent(JDIEventSet anES)
         case ModificationWatchpoint: wantsInterrupt = true; break;
     }
     
-    // Do catch all
-    if(_listener!=null) _listener.processJDIEvent(this, anES);
-    
     // Restart VM (unless stopping was part of event)
     if(interrupted && !wantsInterrupt)
         try { _vm.resume(); _paused = false; }
@@ -577,6 +574,9 @@ synchronized void notifyJDIEvent(JDIEventSet anES)
     // Otherwise, make interruption official
     else if(interrupted && !_paused) { _paused = true;
         notifyAppPaused(); }
+    
+    // Dispatch event to listener
+    if(_listener!=null) _listener.processJDIEvent(this, anES);
 }
 
 /**
