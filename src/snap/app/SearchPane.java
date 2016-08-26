@@ -26,6 +26,11 @@ public class SearchPane extends ViewOwner {
 public SearchPane(AppPane anAppPane)  { _appPane = anAppPane; }
 
 /**
+ * Returns the root project.
+ */
+public Project getRootProject()  { return Project.get(_appPane.getRootSite()); }
+
+/**
  * Returns the current search.
  */
 public Search getSearch()  { return _search; }
@@ -169,7 +174,7 @@ public void searchReference(WebFile aFile, List <Result> theResults, JavaDecl aD
     
     // Handle JavaFile
     else if(aFile.getType().equals("java")) {
-        Project proj = Project.get(aFile);
+        Project proj = getRootProject();
         JavaData jdata = JavaData.get(aFile);
         Set <JavaDecl> refs = jdata.getRefs();
         for(JavaDecl decl : refs) {
@@ -212,7 +217,7 @@ public void searchDeclaration(WebFile aFile, List <Result> theResults, JavaDecl 
     
     // Handle JavaFile
     else if(aFile.getType().equals("java")) {
-        Project proj = Project.get(aFile);
+        Project proj = getRootProject();
         JavaData jdata = JavaData.get(aFile);
         for(JavaDecl decl : jdata.getDecls())
             if(decl.matches(proj, aDecl)) {
