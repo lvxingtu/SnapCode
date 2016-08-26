@@ -4,7 +4,7 @@ import snap.gfx.*;
 import snap.javaparse.*;
 import snap.project.Project;
 import snap.view.*;
-import snap.web.WebFile;
+import snap.web.*;
 
 /**
  * A custom class.
@@ -101,7 +101,8 @@ public void respondUI(ViewEvent anEvent)
 public void search(String aString)
 {
     _search = new Search(); _search._string = aString;
-    search(_appPane.getSelectedSite().getRootDir(), _search._results, aString.toLowerCase());
+    for(WebSite site : _appPane.getSites())
+        search(site.getRootDir(), _search._results, aString.toLowerCase());
     resetLater();
 }
 
@@ -146,7 +147,8 @@ public void searchReference(JNode aNode)
 {
     JavaDecl decl = aNode.getDecl(); if(decl==null) { beep(); return; }
     _search = new Search(); _search._string = decl.getMatchName(); _search._kind = Search.Kind.Reference;
-    searchReference(_appPane.getSelectedSite().getRootDir(), _search._results, decl);
+    for(WebSite site : _appPane.getSites())
+        searchReference(site.getRootDir(), _search._results, decl);
     resetLater();
 }
     
@@ -188,7 +190,8 @@ public void searchDeclaration(JNode aNode)
 {
     JavaDecl decl = aNode.getDecl(); if(decl==null) { beep(); return; }
     _search = new Search(); _search._string = decl.getMatchName(); _search._kind = Search.Kind.Declaration;
-    searchDeclaration(_appPane.getSelectedSite().getRootDir(), _search._results, decl);
+    for(WebSite site : _appPane.getSites())
+        searchDeclaration(site.getRootDir(), _search._results, decl);
     resetLater();
 }
     
