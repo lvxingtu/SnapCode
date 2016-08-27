@@ -564,8 +564,14 @@ protected void didRemoveChars(int aStart, CharSequence theChars)
         is.setStart(start); is.setEnd(end);
     }
     
+    // Get number of newlines removed (in chars)
+    int nlc = 0; for(int i=0,iMax=theChars.length();i<iMax;i++) { char c = theChars.charAt(i);
+        if(c=='\r') { nlc++; if(i+1<iMax && theChars.charAt(i+1)=='\n') i++; }
+        else if(c=='\n') nlc++;
+    }
+    
     // See if we need to remove Breakpoints
-    int sline = getLineAt(aStart).getIndex(), eline = getLineAt(endOld).getIndex(), dline = eline - sline;
+    int sline = getLineAt(aStart).getIndex(), eline = sline + nlc, dline = eline - sline;
     if(sline!=eline) for(Breakpoint bp : getBreakpoints().toArray(new Breakpoint[0])) {
         int bline = bp.getLine();
         if(sline<bline && eline<=bline) { bp.setLine(bline - dline);
