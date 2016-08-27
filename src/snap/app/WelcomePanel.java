@@ -15,9 +15,6 @@ public class WelcomePanel extends ViewOwner {
     // The selected site
     WebSite                 _selectedSite;
     
-    // Whether welcome panel should exit on hide
-    boolean                 _exit;
-    
     // The Runnable to be called when app quits
     Runnable                _onQuit;
 
@@ -38,8 +35,8 @@ public static WelcomePanel getShared()
  */
 public void showPanel()
 {
-    getUI(); // This is bogus - if this isn't called, Window node get reset
-    getWindow().setVisible(true); //getTimeline().play();
+    getUI(); // This is bogus - if this isn't called, WindowView gets reset
+    getWindow().setVisible(true);
     resetLater();
 }
 
@@ -49,12 +46,11 @@ public void showPanel()
 public void hide()
 {
     // Hide window and stop animation
-    getWindow().setVisible(false); //getTimeline().stop();
+    getWindow().setVisible(false);
     
-    // Write current list of sites, flush prefs and mayb exit
-    writeSites();         // Write data file for open/selected sites
-    PrefsUtils.flush();    // Flush preferences
-    if(_exit) quitApp(); // If exit requested, quit app
+    // Write current list of sites, flush prefs
+    writeSites();
+    PrefsUtils.flush();
 }
 
 /**
@@ -149,7 +145,11 @@ public void setOnQuit(Runnable aRunnable)  { _onQuit = aRunnable; }
 /**
  * Called to quit app.
  */
-public void quitApp()  { _onQuit.run(); }
+public void quitApp()
+{
+    hide();
+    _onQuit.run();
+}
 
 /**
  * Reads sites from <SNAP_HOME>/UserLocal.settings.
@@ -277,12 +277,12 @@ public void respondUI(ViewEvent anEvent)
     }
 
     // Handle QuitButton
-    if(anEvent.equals("QuitButton")) {
-        _exit = true; hide(); }
+    if(anEvent.equals("QuitButton"))
+        quitApp();
         
     // Handle WinClosing
-    if(anEvent.isWinClosing()) {
-        _exit = true; hide(); }
+    if(anEvent.isWinClosing())
+        quitApp();
 }
 
 /**
