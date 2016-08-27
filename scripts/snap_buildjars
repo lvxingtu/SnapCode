@@ -11,6 +11,7 @@ echo "Codebase: *" >> MANIFEST.MF
 echo "Creating SnapCode1.jar"
 jar cmf MANIFEST.MF SnapCode1.jar snap \
     -C ../../RM15/bin com \
+    -C ../../SnapStudio/bin studio \
     -C ../../SnapKit/bin snap/data \
     -C ../../SnapKit/bin snap/gfx \
     -C ../../SnapKit/bin snap/javafx \
