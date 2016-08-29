@@ -146,7 +146,6 @@ public void setOnQuit(Runnable aRunnable)  { _onQuit = aRunnable; }
  */
 public void quitApp()
 {
-    System.err.println("QuitAppCalled");
     hide();
     _onQuit.run();
 }
