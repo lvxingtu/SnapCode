@@ -12,6 +12,9 @@ public class ClassPath extends SnapObject {
     // The project
     Project         _proj;
     
+    // The site
+    WebSite         _site;
+    
     // The web file
     WebFile         _file;
     
@@ -37,7 +40,7 @@ public class ClassPath extends SnapObject {
 /**
  * Creates a new ClassPathFile for project.
  */
-public ClassPath(Project aProj)  { _proj = aProj; }
+public ClassPath(Project aProj)  { _proj = aProj; _site = aProj.getSite(); }
 
 /**
  * Returns the file.
@@ -49,8 +52,8 @@ public WebFile getFile()  { return _file!=null? _file : (_file=getFileImpl()); }
  */
 protected WebFile getFileImpl()
 {
-    WebFile file = _proj.getSite().getFile(".classpath");
-    if(file==null) file = _proj.getSite().createFile(".classpath", false);
+    WebFile file = _site.getFile(".classpath");
+    if(file==null) file = _site.createFile(".classpath", false);
     return file;
 }
 
@@ -87,7 +90,7 @@ public String getSourcePath()
     String path = xml!=null? xml.getAttributeValue("path") : null;
     
     // If no path and /src exists, use it
-    if(path==null && _proj.getFile("/src")!=null) path = "src";
+    if(path==null && _site.getFile("/src")!=null) path = "src";
     return _srcPath = path;
 }
 
@@ -129,20 +132,18 @@ public String[] getProjectPaths()
 /**
  * Returns the build path.
  */
-public String getBuildPath()  { return _bldPath!=null? _bldPath : (_bldPath=getBuildPathImpl()); }
-
-/**
- * Returns the build path (not cached).
- */
-protected String getBuildPathImpl()
+public String getBuildPath()
 {
+    // If already set, just return
+    if(_bldPath!=null) return _bldPath;
+
     // Get source path from output classpathentry
     XMLElement xml = getBuildPathXML();
     String path = xml!=null? xml.getAttributeValue("path") : null;
     
     // If path not set, use bin
     if(path==null) path = "bin";
-    return path;
+    return _bldPath = path;
 }
 
 /**
@@ -170,10 +171,15 @@ public void setBuildPath(String aPath)
  */
 public WebFile getSourceDir()
 {
-    if(_srcDir==null) { String path = getSourcePath(); if(path!=null && !path.startsWith("/")) path = '/' + path;
-        _srcDir = path!=null? _proj.getFile(path) : _proj.getSite().getRootDir();
-        if(_srcDir==null) _srcDir = _proj.createFile(path, true); }
-    return _srcDir;
+    // If already set, just return
+    if(_srcDir!=null) return _srcDir;
+    
+    // Get from SourcePath and site
+    String path = getSourcePath();
+    if(path!=null && !path.startsWith("/")) path = '/' + path;
+    WebFile srcDir = path!=null? _site.getFile(path) : _site.getRootDir();
+    if(srcDir==null) srcDir = _site.createFile(path, true);
+    return _srcDir = srcDir;
 }
 
 /**
@@ -181,10 +187,15 @@ public WebFile getSourceDir()
  */
 public WebFile getBuildDir()
 {
-    if(_bldDir==null) { String path = getBuildPath(); if(path!=null && !path.startsWith("/")) path = '/' + path;
-        _bldDir = path!=null? _proj.getFile(path) : _proj.getSite().getRootDir();
-        if(_bldDir==null) _bldDir = _proj.createFile(path, true); }
-    return _bldDir;
+    // If already set, just return
+    if(_bldDir!=null) return _bldDir;
+    
+    // Get from BuildPath and site
+    String path = getBuildPath();
+    if(path!=null && !path.startsWith("/")) path = '/' + path;
+    WebFile bldDir = path!=null? _site.getFile(path) : _site.getRootDir();
+    if(bldDir==null) bldDir = _site.createFile(path, true);
+    return _bldDir = bldDir;
 }
 
 /**
@@ -313,7 +324,7 @@ public String[] getFullPaths()
     for(int i=0; i<fpaths.length; i++) { String path = fpaths[i];
         if(!path.startsWith("/"))
             path = fpaths[i] = getProjRootDirPath() + path;
-        if(path.endsWith("SnapCode1.jar") && _proj.getFile(path)==null) {
+        if(path.endsWith("SnapCode1.jar") && _site.getFile(path)==null) {
             path = fpaths[i] = getSnapJarPath(path); _useSnapRT = true; }
         if(!StringUtils.endsWithIC(path, ".jar") && !StringUtils.endsWithIC(path, ".zip") && !path.endsWith("/"))
             path = fpaths[i] = path + '/';
@@ -354,7 +365,7 @@ private String getRelativePath(String aPath)
  */
 private String getProjRootDirPath()
 {
-    String root = _proj.getSite().getRootDir().getStandardFile().getAbsolutePath();
+    String root = _site.getRootDir().getStandardFile().getAbsolutePath();
     if(File.separatorChar!='/') root = root.replace(File.separatorChar, '/');
     if(!root.endsWith("/")) root = root + '/'; if(!root.startsWith("/")) root = '/' + root;
     return root;

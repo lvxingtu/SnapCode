@@ -48,6 +48,7 @@ protected Project(WebSite aSite)
 {
     setSite(aSite);
     readSettings();
+    getProjects();
 }
 
 /**

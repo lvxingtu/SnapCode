@@ -47,7 +47,8 @@ public class Breakpoint implements Comparable<Breakpoint> {
 public Breakpoint initSourceLine(WebFile aFile, int aLine)
 {
     _type = Type.LineBreakpoint; setFile(aFile); setLine(aLine);
-    Project proj = Project.get(aFile); _className = proj.getClassName(aFile);
+    Project proj = Project.get(aFile);
+    _className = proj.getClassName(aFile);
     return this;
 }
 
