@@ -27,8 +27,7 @@ public class ExprEval {
 public static Object eval(DebugApp anApp, String anExpr)
 {
     _exprParser.setInput(anExpr);
-    StackFrame frame = anApp.getCurrentFrame();
-    ObjectReference oref = frame.thisObject();
+    ObjectReference oref = anApp.thisObject();
     JExpr expr = _exprParser.parseCustom(JExpr.class);
     Value value; try { value = eval(anApp, oref, expr); }
     catch(Exception e) { return e; }
@@ -79,15 +78,15 @@ static Value eval(DebugApp anApp, JExprLiteral aLiteral) throws Exception
  */
 static Value eval(DebugApp anApp, ObjectReference anOR, JExprId anId) throws Exception
 {
-    // Get identifier name and current StackFrame 
+    // Get identifier name 
     String name = anId.getName();
-    StackFrame frame = anApp.getCurrentFrame();
     
     // If name is "this", return Frame ThisObject
-    if(name.equals("this")) return frame.thisObject();
+    if(name.equals("this")) return anApp.thisObject();
     
     // Check for local variable
-    LocalVariable lvar = frame.visibleVariableByName(anId.getName());
+    StackFrame frame = anApp.getCurrentFrame();
+    LocalVariable lvar = frame.visibleVariableByName(name);
     if(lvar!=null)
         return frame.getValue(lvar);
     
@@ -106,17 +105,14 @@ static Value eval(DebugApp anApp, ObjectReference anOR, JExprId anId) throws Exc
  */
 static Value eval(DebugApp anApp, ObjectReference anOR, JExprMethodCall anExpr) throws Exception
 {
-    ThreadReference thread = anApp.getCurrentThread();
-    StackFrame frame = anApp.getCurrentFrame();
-    ObjectReference thisObj = frame.thisObject();
+    ObjectReference thisObj = anApp.thisObject();
     ReferenceType refType = anOR.referenceType();  // Thread invalid after invokeMethod which resumes thread
     List <Method> methods = methods(refType, anExpr.getName(), INSTANCE);
     List <Value> args = new ArrayList();
     for(JExpr arg : anExpr.getArgs())
         args.add(eval(anApp, thisObj, arg));
     Method method = method(methods, args);
-    Value val = anOR.invokeMethod(thread, method, args, 0);
-    return val;
+    return anApp.invokeMethod(anOR, method, args, ObjectReference.INVOKE_NONVIRTUAL);
 }
 
 /**
@@ -131,9 +127,7 @@ static Value eval(DebugApp anApp, ObjectReference anOR, JExprArrayIndex anExpr) 
     
     // Get Index
     JExpr indexExpr = anExpr.getIndexExpr();
-    ThreadReference thread = anApp.getCurrentThread();
-    StackFrame frame = anApp.getCurrentFrame();
-    ObjectReference thisObj = frame.thisObject();
+    ObjectReference thisObj = anApp.thisObject();
     val = eval(anApp, thisObj, indexExpr); if(!(val instanceof PrimitiveValue)) return null;
     PrimitiveValue pval = (PrimitiveValue)val;
     int index = pval.intValue();
@@ -220,7 +214,7 @@ static Value eval(DebugApp anApp, ObjectReference anOR, JExprMath anExpr) throws
 private static Value add(DebugApp anApp, Value aVal1, Value aVal2)
 {
     if(aVal1 instanceof StringReference || aVal2 instanceof StringReference)
-        return anApp._vm.mirrorOf(string(aVal1) + string(aVal2));
+        return anApp._vm.mirrorOf(anApp.toString(aVal1) + anApp.toString(aVal2));
     if(aVal1 instanceof PrimitiveValue && aVal2 instanceof PrimitiveValue) {
         double result = ((PrimitiveValue)aVal1).doubleValue() + ((PrimitiveValue)aVal2).doubleValue();
         return value(anApp, result, aVal1, aVal2);
@@ -340,14 +334,6 @@ private static Value value(DebugApp anApp, double aValue, Value aVal1, Value aVa
     if(type1 instanceof IntegerType || type2 instanceof IntegerType)
         return anApp._vm.mirrorOf((int)aValue);
     throw new RuntimeException("Can't discern value type for " + aVal1 + " and " + aVal2);
-}
-
-/**
- * Return string for given value.
- */
-private static String string(Value aVal)
-{
-    return aVal instanceof StringReference? ((StringReference)aVal).value() : aVal!=null? aVal.toString(): "(null)";
 }
 
 /**

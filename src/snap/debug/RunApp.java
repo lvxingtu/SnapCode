@@ -327,8 +327,8 @@ public interface AppListener {
     // FrameChanged
     void frameChanged(DebugApp anApp);
 
-    // JDIEvent
-    void processJDIEvent(DebugApp anApp, JDIEventSet e);
+    // DebugEvent
+    void processDebugEvent(DebugApp anApp, DebugEvent e);
     
     // Notifications for Breakpoints, Watchpoints and Exception points.
     void requestSet(BreakpointReq e);
@@ -355,8 +355,8 @@ public static class AppAdapter implements AppListener {
     // FrameChanged
     public void frameChanged(DebugApp anApp)  { }
     
-    // JDIEvent
-    public void processJDIEvent(DebugApp anApp, JDIEventSet e)  { }
+    // DebugEvent
+    public void processDebugEvent(DebugApp anApp, DebugEvent e)  { }
     
     // Notifications for Breakpoints, Watchpoints and Exception points.
     public void requestSet(BreakpointReq e)  { }

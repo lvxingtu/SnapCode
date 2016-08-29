@@ -32,6 +32,12 @@ public class DebugApp extends RunApp {
     // Event source thread
     JDIEventDispatcher            _eventDispatchThread;
     
+    // Whether to print events
+    boolean                       _printEVs;
+    
+    // Whether app is invoking methods
+    boolean                       _invoking;
+    
 /**
  * Creates a new DebugApp.
  */
@@ -163,13 +169,21 @@ public synchronized void pause()
 /**
  * Resume the app.
  */
-public synchronized void resume()
+public void resume()
+{
+    resumeQuiet();
+    notifyAppResumed();
+}
+
+/**
+ * Resume the app.
+ */
+public synchronized void resumeQuiet()
 {
     try {
         ensureActiveSession(); _paused = false;
         setCurrentThread(_currentThread, -1);
         _vm.resume();
-        notifyAppResumed();
     }
     
     // Failure  //catch(VMNotInterruptedException e) { notice("Target VM is already running."); } //### failure?
@@ -179,51 +193,36 @@ public synchronized void resume()
 /**
  * Step into line.
  */
-public void stepIntoLine()
-{
-    ThreadReference thread = getCurrentThread(); if(thread==null) { failure("No current thread."); return; }
-    try { generalStep(thread, StepRequest.STEP_LINE, StepRequest.STEP_INTO); }
-    catch(Exception e) { failure("Failure to step into line: " + e.getMessage()); }
-}
+public void stepIntoLine()  { generalStep(StepRequest.STEP_LINE, StepRequest.STEP_INTO); }
 
 /**
  * Step into instruction.
  */
-public void stepIntoInstruction()
-{
-    ThreadReference thread = getCurrentThread(); if(thread==null) { failure("No current thread."); return; }
-    try { generalStep(thread, StepRequest.STEP_MIN, StepRequest.STEP_INTO); }
-    catch(Exception e) { failure("Failure to step into instruction: " + e.getMessage()); }
-}
+public void stepIntoInstruction()  { generalStep(StepRequest.STEP_MIN, StepRequest.STEP_INTO); }
 
 /**
  * Step out.
  */
-public void stepOverLine()
-{
-    ThreadReference thread = getCurrentThread(); if(thread==null) { failure("No current thread."); return; }
-    try { generalStep(thread, StepRequest.STEP_LINE, StepRequest.STEP_OVER); }
-    catch(Exception e) { failure("Failure to step over line: " + e.getMessage()); }
-}
+public void stepOverLine()  { generalStep(StepRequest.STEP_LINE, StepRequest.STEP_OVER); }
 
 /**
  * Step out.
  */
-public void stepOverInstruction()
-{
-    ThreadReference thread = getCurrentThread(); if(thread==null) { failure("No current thread."); return; }
-    try { generalStep(thread, StepRequest.STEP_MIN, StepRequest.STEP_OVER); }
-    catch(Exception e) { failure("Failure to step over instruction: " + e.getMessage()); }
-}
+public void stepOverInstruction()  { generalStep(StepRequest.STEP_MIN, StepRequest.STEP_OVER); }
 
 /**
  * Step out.
  */
-public void stepOut()
+public void stepOut()  { generalStep(StepRequest.STEP_MIN, StepRequest.STEP_OUT); }
+
+/**
+ * General purpose step method.
+ */
+private void generalStep(int size, int depth) 
 {
     ThreadReference thread = getCurrentThread(); if(thread==null) { failure("No current thread."); return; }
-    try { generalStep(thread, StepRequest.STEP_MIN, StepRequest.STEP_OUT); }
-    catch(Exception e) { failure("Failure to step out: " + e.getMessage()); }
+    try { generalStep(thread, size, depth); }
+    catch(Exception e) { failure("Failure to step: " + e.getMessage()); }
 }
 
 /**
@@ -231,7 +230,7 @@ public void stepOut()
  */
 private synchronized void generalStep(ThreadReference thread, int size, int depth) throws NoSessionException 
 {
-    ensureActiveSession();
+    ensureActiveSession(); _paused = false;
 
     // Create step request
     clearPreviousStep(thread);
@@ -243,9 +242,7 @@ private synchronized void generalStep(ThreadReference thread, int size, int dept
     request.enable();
     
     // Resume
-    setCurrentThread(_currentThread, -1);
-    _vm.resume(); _paused = false;
-    notifyAppResumed();
+    resumeQuiet();
 }
 
 /**
@@ -264,6 +261,55 @@ void clearPreviousStep(ThreadReference thread)
     for(StepRequest request : requests)
         if(request.thread().equals(thread)) {
             mgr.deleteEventRequest(request); break; }
+}
+
+/**
+ * Returns the current 'this' object.
+ */
+public ObjectReference thisObject()
+{
+    StackFrame frame = getCurrentFrame();
+    ObjectReference thisObj = frame.thisObject();
+    return thisObj;
+}
+
+/**
+ * Invoke method.
+ */
+public Value invokeMethod(ObjectReference anOR, Method method, List<Value> args, int aStyle) throws Exception
+{
+    ThreadReference thread = getCurrentThread(); if(thread==null) { failure("No current thread."); return null; }
+    
+    try {
+        _invoking = true;
+        Value val = anOR.invokeMethod(thread, method, args, aStyle);
+        return val;
+    }
+    catch(Exception e) {
+        System.out.println("DebugApp.invokeMethod: Error invoking method: " + e + ", " + _paused);
+        _paused = true; return null;
+    }
+    finally { _invoking = false; }
+}
+
+/**
+ * ToString.
+ */
+public String toString(Value aVal)
+{
+    if(aVal instanceof StringReference) return ((StringReference)aVal).value();
+    if(aVal==null) return "(null)";
+    
+    try {
+        _invoking = true;
+        String str = aVal.toString();
+        return str;
+    }
+    catch(Exception e) {
+        System.out.println("DebugApp.toString: Error on toString: " + e + ", " + _paused);
+        _paused = true; return null;
+    }
+    finally { _invoking = false; }
 }
 
 /**
@@ -294,7 +340,7 @@ private DebugThread getThread(ThreadReference aTR)
 } Map <String,DebugThread> _threads = new HashMap(); ThreadReference EMPTY_THREADREFS[] = new ThreadReference[0];
 
 /**
- * Return a list of ThreadReference objects corresponding to the threads that are currently active in the VM.
+ * Returns a list of ThreadReference objects corresponding to the threads that are currently active in the VM.
  * A thread is removed from the list just before the thread terminates.
  */
 public List <ThreadReference> allThreads()
@@ -311,9 +357,7 @@ public List <ThreadReference> allThreads()
     catch(Exception e) { return Collections.emptyList(); }
 }
 
-/** Return a list of ThreadGroupReference objects corresponding to top-level threadgroups that are currently active. */
 //public List topLevelThreadGroups() throws NoSessionException{ensureActiveSession();return _vm.topLevelThreadGroups();}
-/** Return the system threadgroup. */
 //public ThreadGroupReference systemThreadGroup() throws NoSessionException
 //{ ensureActiveSession(); return _vm.topLevelThreadGroups().get(0);}
 
@@ -537,46 +581,50 @@ protected void notifyDeleted(BreakpointReq aBP)  { _listener.requestDeleted(aBP)
 protected void notifyError(BreakpointReq aBP)  { error("Failed to set BP: " + aBP); _listener.requestError(aBP); }
 
 /**
- * JDI EventSet notifications (runs in Application EventDispatch Thread).
+ * Handle DebugEvents from EventDispatch thread.
  */
-synchronized void notifyJDIEvent(JDIEventSet anES)
+synchronized void dispatchEvent(DebugEvent anEvent)
 {
     // Notify listeners
-    boolean interrupted = anES.suspendedAll(), wantsInterrupt = false;
+    boolean wasPaused = anEvent.suspendedAll(), wantsPause = false;
+    if(_printEVs) System.out.println("JDIEvent: " + anEvent);
 
     // Handle event types (VMStart, VMDeath, VMDisconnect, ThreadStart, ThreadDeath, ClassPrepare, ClassUnload)
-    switch(anES._type) {
+    switch(anEvent._type) {
     
+        // Handle Class prepare
+        case ClassPrepare: resolve(anEvent.getReferenceType()); break;
+            
         // Handle VMDisconnect
-        case VMDisconnect: {
-            endSession(); break; }
+        case VMDisconnect: endSession(); break;
         
         // Handle LocationTrigger
-        case LocationTrigger: { wantsInterrupt = true;
-            setCurrentThread(anES.getThread(), 0); break; }
+        case LocationTrigger: setCurrentThread(anEvent.getThread(), 0); wantsPause = true; break;
         
         // Handle Exception
-        case Exception: { wantsInterrupt = true;
-            setCurrentThread(anES.getThread(), 0); break; }
+        case Exception: setCurrentThread(anEvent.getThread(), 0); wantsPause = true; break;
         
         // Handle AccessWatchpoint
-        case AccessWatchpoint: wantsInterrupt = true; break;
+        case AccessWatchpoint: wantsPause = true; break;
         
         // Handle ModificationWatchpoint
-        case ModificationWatchpoint: wantsInterrupt = true; break;
+        case ModificationWatchpoint: wantsPause = true; break;
     }
     
     // Restart VM (unless stopping was part of event)
-    if(interrupted && !wantsInterrupt)
-        try { _vm.resume(); _paused = false; }
-        catch(VMDisconnectedException ee) { }
+    if(wasPaused && !wantsPause)
+        resumeQuiet();
     
     // Otherwise, make interruption official
-    else if(interrupted && !_paused) { _paused = true;
+    else if(wasPaused && !_paused) { _paused = true;
         notifyAppPaused(); }
     
+    // Shouldn't need to forward events while invoking
+    if(_invoking)
+        return;
+    
     // Dispatch event to listener
-    if(_listener!=null) _listener.processJDIEvent(this, anES);
+    if(_listener!=null) _listener.processDebugEvent(this, anEvent);
 }
 
 /**
@@ -592,33 +640,19 @@ public class JDIEventDispatcher extends Thread {
     /** Override for thread meat. */
     public void run()
     {
-        try { runLoop(); }
-        catch(Exception exc) { } // Do something different for InterruptedException??? // just exit
+        try { while(true) {
+            EventSet jdiEvents = _queue.remove();
+            DebugEvent event = new DebugEvent(jdiEvents);
+            dispatchEvent(event);
+            if(event.getType()==DebugEvent.Type.VMDisconnect) break; // Quit on VMDisconnect
+        }}
+        
+        // Handle Exceptions
+        catch(InterruptedException e) { }
+        catch(Exception e) { }
+        
+        // Set everything stopped
         _running = false; _paused = false; _terminated = true;
-    }
-    
-    /** Run Loop. */
-    private void runLoop() throws InterruptedException
-    {
-        while(true) {
-            
-            // Dequeue event and create JDIEventSet
-            EventSet jdiEventSet = _queue.remove();
-            final JDIEventSet eventSet = new JDIEventSet(jdiEventSet); //_interrupted = eventSet.suspendedAll();
-            
-            // Handle Class prepare
-            if(eventSet._type==JDIEventSet.Type.ClassPrepare) {
-                resolve(eventSet.getReferenceType());
-                try { _vm.resume(); _paused = false; }
-                catch(VMDisconnectedException ee) { }
-            }
-            
-            // Dispatch event - in JavaFX thread
-            else snap.view.ViewEnv.getEnv().runLater(() -> notifyJDIEvent(eventSet));
-            
-            // Quit on VMDisconnect
-            if(eventSet.getType()==JDIEventSet.Type.VMDisconnect) break;
-        }
     }
 }
 

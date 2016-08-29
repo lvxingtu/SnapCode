@@ -190,7 +190,7 @@ public void appExited(RunApp aProc)
 /**
  * Called when DebugApp gets notice of things like VM start/death, thread start/death, breakpoints, etc.
  */
-public void processJDIEvent(DebugApp aProc, JDIEventSet anEvent)
+public void processDebugEvent(DebugApp aProc, DebugEvent anEvent)
 {
     switch(anEvent.getType()) {
     
@@ -202,12 +202,20 @@ public void processJDIEvent(DebugApp aProc, JDIEventSet anEvent)
         
         // Handle LocationTrigger
         case LocationTrigger: {
-            getEnv().activateApp(getUI());
-            getDebugVarsPane().resetVarTable();
-            getDebugExprsPane().resetVarTable();
+            runLater(() -> handleLocationTrigger());
             break;
         }
     }
+}
+
+/**
+ * Called when Debug LocationTrigger is encountered.
+ */
+protected void handleLocationTrigger()
+{
+    getEnv().activateApp(getUI());
+    getDebugVarsPane().resetVarTable();
+    getDebugExprsPane().resetVarTable();
 }
 
 /**
