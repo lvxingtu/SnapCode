@@ -55,9 +55,9 @@ public AppPaneToolBar(AppPane anAppPane)  { _appPane = anAppPane; }
 public AppPane getAppPane()  { return _appPane; }
 
 /**
- * Returns the SelectedSite.
+ * Returns the RootSite.
  */
-public WebSite getSelectedSite()  { return getAppPane().getSelectedSite(); }
+public WebSite getRootSite()  { return getAppPane().getRootSite(); }
 
 /**
  * Notification that a file was opened/selected by AppPane.
@@ -215,7 +215,7 @@ public void respondUI(ViewEvent anEvent)
     // Handle RunConfigMenuItems
     if(anEvent.getName().endsWith("RunConfigMenuItem")) {
         String name = anEvent.getName().replace("RunConfigMenuItem", "");
-        RunConfigs rconfs = RunConfigs.get(getSelectedSite());
+        RunConfigs rconfs = RunConfigs.get(getRootSite());
         RunConfig rconf = rconfs.getRunConfig(name);
         if(rconf!=null) {
             rconfs.getRunConfigs().remove(rconf);
@@ -270,7 +270,7 @@ private List <MenuItem> getRunMenuButtonItems()
     List <MenuItem> items = new ArrayList(); MenuItem mi;
     
     // Add RunConfigs MenuItems
-    List <RunConfig> rconfs = RunConfigs.get(getSelectedSite()).getRunConfigs();
+    List <RunConfig> rconfs = RunConfigs.get(getRootSite()).getRunConfigs();
     for(RunConfig rconf : rconfs) { String name = rconf.getName();
         mi = new MenuItem(); mi.setName(name + "RunConfigMenuItem"); mi.setText(name); items.add(mi); }
     if(rconfs.size()>0) items.add(new MenuItem()); //new SeparatorMenuItem()

@@ -25,12 +25,12 @@ public AppPane getAppPane()  { return _appPane; }
 /**
  * Returns the site.
  */
-public WebSite getSite()  { return getAppPane().getSelectedSite(); }
+public WebSite getSite()  { return getAppPane().getRootSite(); }
 
 /**
  * Returns the data site.
  */
-public DataSite getDataSite()  { return DataSite.get(getAppPane().getSelectedSite()); }
+public DataSite getDataSite()  { return DataSite.get(getSite()); }
 
 /**
  * Creates the UI.

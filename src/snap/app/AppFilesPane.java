@@ -285,11 +285,11 @@ public void respondUI(ViewEvent anEvent)
     
     // Handle CleanProjectMenuItem
     if(anEvent.equals("CleanProjectMenuItem"))
-        SitePane.get(getSelectedSite()).cleanSite();
+        SitePane.get(getRootSite()).cleanSite();
     
     // Handle BuildProjectMenuItem
     if(anEvent.equals("BuildProjectMenuItem"))
-        SitePane.get(getSelectedSite()).buildSite(false);
+        SitePane.get(getRootSite()).buildSite(false);
     
     // Handle ImportDataMenuItem
     //if(anEvent.equals("ImportDataMenuItem"))
@@ -314,7 +314,7 @@ public void respondUI(ViewEvent anEvent)
 boolean addFiles(List <File> theFiles)
 {
     // Get target (selected) directory
-    WebSite site = _appPane.getSelectedSite();
+    WebSite site = getSelectedSite();
     WebFile sfile = _appPane.getSelectedFile(); if(sfile.getSite()!=site) sfile = site.getRootDir();
     WebFile sdir = sfile.isDir()? sfile : sfile.getParent();
     
@@ -439,7 +439,7 @@ public void removeFile(WebFile aFile)
  */
 public void saveAllFiles()
 {
-    saveFiles(getSelectedSite().getRootDir(), true);
+    saveFiles(getRootSite().getRootDir(), true);
 }
 
 /**
@@ -553,7 +553,7 @@ public void showNewFilePanel()
     boolean isDir = extension.equals(".dir"); if(isDir) extension = "";
     
     // Get suggested "Untitled.xxx" path for AppPane.SelectedFile and extension
-    WebSite site = _appPane.getSelectedSite();
+    WebSite site = getSelectedSite();
     WebFile sfile = _appPane.getSelectedFile(); if(sfile.getSite()!=site) sfile = site.getRootDir();
     WebFile sdir = sfile.isDir()? sfile : sfile.getParent();
     String path = sdir.getDirPath() + "Untitled" + extension;

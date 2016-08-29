@@ -15,9 +15,9 @@ public class HomePage extends WebPage {
 public AppBrowser getBrowser()  { return (AppBrowser)super.getBrowser(); }
 
 /**
- * Returns the AppPane SelectedSite.
+ * Returns the AppPane RootSite.
  */
-public WebSite getSelectedSite()  { return getBrowser().getAppPane().getSelectedSite(); }
+public WebSite getRootSite()  { return getBrowser().getAppPane().getRootSite(); }
 
 /**
  * Override to put in Page pane.
@@ -60,13 +60,13 @@ public void respondUI(ViewEvent anEvent)
     
     // Handle MakeStarterProject
     if(anEvent.equals("MakeStarterProject") && anEvent.isMouseClicked()) {
-        WebFile studioFile = makeStudioProject(getSelectedSite());
+        WebFile studioFile = makeStudioProject(getRootSite());
         getBrowser().setFile(studioFile);
     }
 
     // Handle NewJavaFile
     if(anEvent.equals("NewJavaFile") && anEvent.isMouseClicked()) {
-        WebFile file = getSelectedSite().createFile("/Untitled.java", false);
+        WebFile file = getRootSite().createFile("/Untitled.java", false);
         WebPage page = getBrowser().createPage(file);
         file = page.showNewFilePanel(getBrowser());
         if(file!=null) try {
@@ -79,7 +79,7 @@ public void respondUI(ViewEvent anEvent)
     
     // Handle NewJavaFXFile
     if(anEvent.equals("NewJavaFXFile") && anEvent.isMouseClicked()) {
-        WebFile file = getSelectedSite().createFile("/Untitled.jfx", false);
+        WebFile file = getRootSite().createFile("/Untitled.jfx", false);
         WebPage page = getBrowser().createPage(file);
         file = page.showNewFilePanel(getBrowser());
         if(file!=null) try {
@@ -91,7 +91,7 @@ public void respondUI(ViewEvent anEvent)
     
     // Handle NewDataTable
     if(anEvent.equals("NewDataTable") && anEvent.isMouseClicked()) {
-        WebFile file = getSelectedSite().createFile("/Untitled.table", false);
+        WebFile file = getRootSite().createFile("/Untitled.table", false);
         WebPage page = getBrowser().createPage(file);
         file = page.showNewFilePanel(getBrowser());
         if(file!=null) try {
@@ -103,7 +103,7 @@ public void respondUI(ViewEvent anEvent)
     
     // Handle NewReport
     if(anEvent.equals("NewReport") && anEvent.isMouseClicked()) {
-        WebFile file = getSelectedSite().createFile("/Untitled.rpt", false);
+        WebFile file = getRootSite().createFile("/Untitled.rpt", false);
         WebPage page = getBrowser().createPage(file);
         file = page.showNewFilePanel(getBrowser());
         if(file!=null) try {

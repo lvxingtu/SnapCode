@@ -25,7 +25,7 @@ public AppPane getAppPane()  { return getBrowser().getAppPane(); }
 /**
  * Returns the Project.
  */
-public WebSite getSelectedSite()  { return getAppPane().getSelectedSite(); }
+public WebSite getSelectedSite()  { return getAppPane().getRootSite(); }
 
 /**
  * Returns the List of RunConfigs.

@@ -29,7 +29,7 @@ public AppPane getAppPane()  { return _appPane; }
 /**
  * Returns the project.
  */
-public Project getProject()  { return _proj!=null? _proj : (_proj=Project.get(_appPane.getSelectedSite())); }
+public Project getProject()  { return _proj!=null? _proj : (_proj=Project.get(_appPane.getRootSite())); }
 
 /**
  * Returns the list of Breakpoints.

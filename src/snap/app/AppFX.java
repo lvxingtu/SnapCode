@@ -88,7 +88,7 @@ private static class AppleAppHandler implements PreferencesHandler, QuitHandler 
     public void handlePreferences(PreferencesEvent arg0)
     {
         AppPane appPane = AppPane.getOpenAppPane(); if(appPane==null) return;
-        appPane.getBrowser().setFile(appPane.getSelectedSite().getRootDir());
+        appPane.getBrowser().setFile(appPane.getRootSite().getRootDir());
     }
 
     /** Handle QuitRequest. */
