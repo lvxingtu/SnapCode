@@ -35,7 +35,6 @@ public static WelcomePanel getShared()
  */
 public void showPanel()
 {
-    getUI(); // This is bogus - if this isn't called, WindowView gets reset
     getWindow().setVisible(true);
     resetLater();
 }
@@ -147,6 +146,7 @@ public void setOnQuit(Runnable aRunnable)  { _onQuit = aRunnable; }
  */
 public void quitApp()
 {
+    System.err.println("QuitAppCalled");
     hide();
     _onQuit.run();
 }

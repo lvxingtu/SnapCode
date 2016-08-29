@@ -289,7 +289,7 @@ public void setRunMenuButtonItems()
 {
     MenuButton rmb = getView("RunMenuButton", MenuButton.class);
     rmb.setItems(getRunMenuButtonItems());
-    for(MenuItem mi : rmb.getItems()) initUI(mi);
+    for(MenuItem mi : rmb.getItems()) mi.setOwner(this);
 }
 
 /**
@@ -308,8 +308,8 @@ public void buildFileTabs()
     
     // Iterate over OpenFiles, create FileTabs, init and add
     for(WebFile file : _openFiles) {
-        Label bm = new FileTab(file);
-        initUI(bm); enableEvents(bm, MouseEvents);
+        Label bm = new FileTab(file); bm.setOwner(this);
+        enableEvents(bm, MouseEvents);
         hbox.addChild(bm);
     }
     

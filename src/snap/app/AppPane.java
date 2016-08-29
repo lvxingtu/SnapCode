@@ -433,7 +433,7 @@ protected MenuBar createMenuBar()
     helpMenu.addItem(createMenuItem("SupportPageMenuItem", "Support Page", null));
     helpMenu.addItem(createMenuItem("JavaDocMenuItem", "Tutorial", null));
     helpMenu.addItem(createMenuItem("ShowJavaHomeMenuItem", "Show Java Home", null));
-    initUI(mbar);
+    mbar.setOwner(this);
     return mbar;
 }
 

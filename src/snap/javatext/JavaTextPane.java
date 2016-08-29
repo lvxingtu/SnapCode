@@ -119,7 +119,7 @@ public void resetUI()
         Label label = new Label(); label.setText(part.getNodeString()); label.setFont(font);
         label.setName("NodePathLabel"); label.setProp("JNode", part);
         if(part==spart) label.setFill(Color.LIGHTGRAY);
-        nodePathBox.addChild(label,1); initUI(label); enableEvents(label, MouseClicked);
+        nodePathBox.addChild(label,1); label.setOwner(this); enableEvents(label, MouseClicked);
         Label div = new Label(); div.setText(" \u2022 "); div.setFont(font); if(part.getParent()==null) break;
         nodePathBox.addChild(div,1);
     }
@@ -289,8 +289,7 @@ protected Menu createContextMenu()
     MenuItem mi1 = new MenuItem(); mi1.setText("Open Declaration"); mi1.setName("OpenDeclarationMenuItem");
     MenuItem mi2 = new MenuItem(); mi2.setText("Show References"); mi2.setName("ShowReferencesMenuItem");
     MenuItem mi3 = new MenuItem(); mi3.setText("Show Declarations"); mi3.setName("ShowDeclarationsMenuItem");
-    cm.addItem(mi1); cm.addItem(mi2); cm.addItem(mi3);
-    initUI(cm);
+    cm.addItem(mi1); cm.addItem(mi2); cm.addItem(mi3); cm.setOwner(this);
     return cm;
 }
 

@@ -170,7 +170,7 @@ protected void addListView(View aPrevNode, Object theItems[])
     
     ScrollView spane = new ScrollView(lview); spane.setShowVBar(true);
     _hbox.addChild(spane);
-    initUI(lview);
+    lview.setOwner(this);
     
     // Make sure new ListView is visible
     runLaterDelayed(50, () -> spane.scrollToVisible(lview.getBoundsInside()));

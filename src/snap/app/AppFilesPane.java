@@ -179,7 +179,7 @@ public void respondUI(ViewEvent anEvent)
             List <MenuItem> mitems = getView("MenuButton", MenuButton.class).getItems();
             List <MenuItem> mitems2 = ViewUtils.copyMenuItems(mitems);
             Menu menu = new Menu(); for(MenuItem mi : mitems2) menu.addItem(mi);
-            initUI(menu);
+            menu.setOwner(this);
             PopupWindow popup = menu.getPopup(); popup.show(anEvent.getView(), anEvent.getX(), anEvent.getY());
         }
         
