@@ -142,7 +142,7 @@ protected void search(WebFile aFile, List <Result> theResults, String aString)
 protected boolean isSearchTextFile(WebFile aFile)
 {
     String type = aFile.getType();
-    return type.equals("java") || type.equals("rib") || type.equals("jfx") || type.equals("txt");
+    return type.equals("java") || type.equals("snp") || type.equals("rib") || type.equals("txt");
 }
 
 /**

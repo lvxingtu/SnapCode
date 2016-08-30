@@ -536,7 +536,7 @@ public void showNewFilePanel()
     // Define options
     String options[][] = {
         { "Java Programming File", ".java" },
-        { "Graphics + UI File", ".jfx" },
+        { "Graphics + UI File", ".snp" },
         { "Sound File", ".wav" },
         { "Directory", ".dir" },
         { "ReportMill\u2122 Report Template", ".rpt" } };

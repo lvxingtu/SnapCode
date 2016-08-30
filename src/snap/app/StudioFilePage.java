@@ -114,7 +114,7 @@ public void respondUI(ViewEvent anEvent)
     
     // Handle ShowBackgroundButton
     if(anEvent.equals("ShowBackgroundButton")) {
-        String fname = '/' + getMainScene().getClass().getSimpleName() + ".jfx";
+        String fname = '/' + getMainScene().getClass().getSimpleName() + ".snp";
         WebFile file = getSite().getFile(fname);
         if(file==null) {
             file = getSite().createFile(fname, false);

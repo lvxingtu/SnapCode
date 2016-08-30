@@ -79,7 +79,7 @@ public void respondUI(ViewEvent anEvent)
     
     // Handle NewJavaFXFile
     if(anEvent.equals("NewJavaFXFile") && anEvent.isMouseClicked()) {
-        WebFile file = getRootSite().createFile("/Untitled.jfx", false);
+        WebFile file = getRootSite().createFile("/Untitled.snp", false);
         WebPage page = getBrowser().createPage(file);
         file = page.showNewFilePanel(getBrowser());
         if(file!=null) try {
