@@ -1,35 +1,35 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<panel width="630" height="28">
+<HBox PrefHeight="28" Padding="0,15,0,4" Spacing="3">
   <font name="Arial" size="11" />
-  <jbutton name="SaveButton" x="3" y="3" width="22" height="22" ttip="Save" image="/com/reportmill/app/pkg.images/File_Save.png" align="center" ShowBorder="false" margin="0" />
-  <jseparator x="26" y="6" width="13" height="18" orientation="1" />
-  <jbutton name="CutButton" x="39" y="3" width="22" height="22" ttip="Cut" image="/com/reportmill/app/pkg.images/Edit_Cut.png" align="center" ShowBorder="false" margin="0" />
-  <jbutton name="CopyButton" x="61" y="3" width="22" height="22" ttip="Copy" image="/com/reportmill/app/pkg.images/Edit_Copy.png" align="center" ShowBorder="false" margin="0" />
-  <jbutton name="PasteButton" x="83" y="3" width="22" height="22" ttip="Paste" image="/com/reportmill/app/pkg.images/Edit_Paste.png" align="center" ShowBorder="false" margin="0" />
-  <jbutton name="DeleteButton" x="105" y="3" width="22" height="22" ttip="Delete" image="/com/reportmill/app/pkg.images/Edit_Delete.png" align="center" ShowBorder="false" margin="0" />
-  <jseparator x="128" y="6" width="13" height="18" orientation="1" />
-  <jbutton name="UndoButton" x="141" y="3" width="22" height="22" ttip="Undo" image="/com/reportmill/app/pkg.images/Edit_Undo.png" align="center" ShowBorder="false" margin="0">
+  <jbutton name="SaveButton" PrefWidth="22" PrefHeight="22" ttip="Save" image="/snap/viewx/pkg.images/File_Save.png" ShowBorder="false" />
+  <jseparator PrefHeight="18" Vertical="true" />
+  <jbutton name="CutButton" PrefWidth="22" PrefHeight="22" ttip="Cut" image="/snap/viewx/pkg.images/Edit_Cut.png" ShowBorder="false" />
+  <jbutton name="CopyButton" PrefWidth="22" PrefHeight="22" ttip="Copy" image="/snap/viewx/pkg.images/Edit_Copy.png" ShowBorder="false" />
+  <jbutton name="PasteButton" PrefWidth="22" PrefHeight="22" ttip="Paste" image="/snap/viewx/pkg.images/Edit_Paste.png" ShowBorder="false" />
+  <jbutton name="DeleteButton" PrefWidth="22" PrefHeight="22" ttip="Delete" image="/snap/viewx/pkg.images/Edit_Delete.png" ShowBorder="false" />
+  <jseparator PrefHeight="18" Vertical="true" />
+  <jtextfield name="FontSizeText" PrefWidth="32" PrefHeight="22" />
+  <jbutton name="IncreaseFontButton" PrefWidth="22" PrefHeight="22" ttip="Increase Font Size" image="/snap/viewx/pkg.images/Font_Increase.png" ShowBorder="false" />
+  <jbutton name="DecreaseFontButton" PrefWidth="22" PrefHeight="22" ttip="Decrease Font Size" image="/snap/viewx/pkg.images/Font_Decrease.png" ShowBorder="false" />
+  <jseparator PrefHeight="18" Vertical="true" />
+  <jbutton name="UndoButton" PrefWidth="22" PrefHeight="22" ttip="Undo" image="/snap/viewx/pkg.images/Edit_Undo.png" ShowBorder="false">
     <binding aspect="Enabled" key="TextView.Undoer.hasUndos" />
   </jbutton>
-  <jbutton name="RedoButton" x="163" y="3" width="22" height="22" ttip="Redo" image="/com/reportmill/app/pkg.images/Edit_Redo.png" align="center" ShowBorder="false" margin="0">
+  <jbutton name="RedoButton" PrefWidth="22" PrefHeight="22" ttip="Redo" image="/snap/viewx/pkg.images/Edit_Redo.png" ShowBorder="false">
     <binding aspect="Enabled" key="TextView.Undoer.hasRedos" />
   </jbutton>
-  <jseparator x="186" y="6" width="13" height="18" orientation="1" />
-  <jtextfield name="FontSizeText" x="199" y="3" width="32" height="22" />
-  <jbutton name="DecreaseFontButton" x="231" y="3" width="22" height="22" ttip="Decrease Font Size" image="/com/reportmill/app/pkg.images/Format_DecreaseFont.png" align="center" ShowBorder="false" margin="0" />
-  <jbutton name="IncreaseFontButton" x="253" y="3" width="22" height="22" ttip="Increase Font Size" image="/com/reportmill/app/pkg.images/Format_IncreaseFont.png" align="center" ShowBorder="false" margin="0" />
-  <jseparator x="277" y="6" width="13" height="18" orientation="1" />
-  <jtextfield name="FindText" x="290" y="3" width="172" height="22">
+  <jseparator PrefHeight="18" Vertical="true" />
+  <jtextfield name="FindText" PrefWidth="172" PrefHeight="22">
     <font name="Arial" size="11" />
   </jtextfield>
-  <jcheckbox name="IgnoreCaseCheckBox" x="464" y="2" width="42" height="22" asize="--~,--~" text="IC" align="left" selected="true">
+  <jcheckbox name="IgnoreCaseCheckBox" PrefWidth="47" PrefHeight="22" text="IC" selected="true">
     <font name="Arial" size="11" />
   </jcheckbox>
-  <jseparator x="506" y="6" width="13" height="18" orientation="1" />
-  <jbutton name="CodeBuilderButton" x="519" y="3" width="22" height="22" image="Code.png" ttip="Code Builder" />
-  <jbutton name="JavaDocButton" x="422" y="3" width="116" height="22" asize="~--,--~" text="Documentation" align="center">
+  <jseparator PrefHeight="18" Vertical="true" />
+  <jbutton name="CodeBuilderButton" PrefWidth="22" PrefHeight="22" image="Code.png" ttip="Code Builder" />
+  <jbutton name="JavaDocButton" PrefWidth="116" PrefHeight="22" LeanX="RIGHT" text="Documentation">
     <binding aspect="Visible" key="JavaDocURL" />
     <binding aspect="Text" key="JavaDocText" />
   </jbutton>
-  <jbutton name="SnapCodeButton" x="540" y="3" width="75" height="22" asize="~--,--~" ttip="Snap Code" text="SnapCode" align="center" />
-</panel>
+  <jbutton name="SnapCodeButton" PrefWidth="75" PrefHeight="22" ttip="Snap Code" text="SnapCode" />
+</HBox>
