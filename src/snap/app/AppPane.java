@@ -296,7 +296,7 @@ public void deepChange(PropChangeListener aSource, PropChange anEvent)
  */
 protected View createUI()
 {
-    View view = super.createUI(); view.setGrowHeight(true); view.setPrefSize(958, 684);
+    View view = super.createUI();
     VBox vbox = new VBox(); vbox.setFillWidth(true);
     vbox.setChildren(_toolBar.getUI(), view);
     return vbox;
@@ -313,8 +313,7 @@ protected void initUI()
     _browser.addPropChangeListener(this);
     
     // Add the FilesPane, ProcPane
-    SplitView fspane = getView("FilesSplitView", SplitView.class); fspane.setPrefWidth(220);
-    fspane.setBorder(null);
+    SplitView fspane = getView("FilesSplitView", SplitView.class); fspane.setBorder(null);
     View filesPaneUI = _filesPane.getUI(); filesPaneUI.setGrowHeight(true);
     View procPaneUI = _procPane.getUI(); procPaneUI.setPrefHeight(250);
     fspane.setChildren(filesPaneUI, procPaneUI);
