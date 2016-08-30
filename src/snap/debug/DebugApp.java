@@ -523,7 +523,7 @@ public List <ReferenceType> allClasses() throws NoSessionException
  * class name is specified, else return null if there is none. In general, we must return a list of types, because
  * multiple class loaders could have loaded a class with the same fully-qualified name.
  */
-public List findClassesByName(String name) throws NoSessionException
+public List <ReferenceType> findClassesByName(String name) throws NoSessionException
 {
     ensureActiveSession();
     return _vm.classesByName(name);
@@ -534,7 +534,7 @@ public List findClassesByName(String name) throws NoSessionException
  * pattern.  The pattern syntax is open to some future revision, but currently consists of a fully-qualified class name
  * in which the first component may optionally be a "*" character, designating an arbitrary prefix.
  */
-public List findClassesMatchingPattern(String aPattern) throws NoSessionException
+public List <ReferenceType> findClassesMatchingPattern(String aPattern) throws NoSessionException
 {
     ensureActiveSession();
 
@@ -544,7 +544,7 @@ public List findClassesMatchingPattern(String aPattern) throws NoSessionExceptio
         List result = new ArrayList();  //### Is default size OK?
         List <ReferenceType> classes = _vm.allClasses();
         for(ReferenceType type : classes)
-            if (type.name().endsWith(pattern))
+            if(type.name().endsWith(pattern))
                 result.add(type);
         return result;
     }
