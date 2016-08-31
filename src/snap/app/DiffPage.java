@@ -99,7 +99,6 @@ TextView getText(WebFile aFile)
     
     // Handle normal TextFile
     TextView ta = new DiffTextView();
-    ta.setRichText(false);
     ta.setFont(getDefaultFont());
     ta.setText(aFile.getText());
     return ta;
