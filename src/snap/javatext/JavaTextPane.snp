@@ -1,35 +1,30 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <HBox PrefHeight="28" Padding="0,15,0,4" Spacing="3">
-  <font name="Arial" size="11" />
-  <jbutton name="SaveButton" PrefWidth="22" PrefHeight="22" ttip="Save" image="/snap/viewx/pkg.images/File_Save.png" ShowBorder="false" />
-  <jseparator PrefHeight="18" Vertical="true" />
-  <jbutton name="CutButton" PrefWidth="22" PrefHeight="22" ttip="Cut" image="/snap/viewx/pkg.images/Edit_Cut.png" ShowBorder="false" />
-  <jbutton name="CopyButton" PrefWidth="22" PrefHeight="22" ttip="Copy" image="/snap/viewx/pkg.images/Edit_Copy.png" ShowBorder="false" />
-  <jbutton name="PasteButton" PrefWidth="22" PrefHeight="22" ttip="Paste" image="/snap/viewx/pkg.images/Edit_Paste.png" ShowBorder="false" />
-  <jbutton name="DeleteButton" PrefWidth="22" PrefHeight="22" ttip="Delete" image="/snap/viewx/pkg.images/Edit_Delete.png" ShowBorder="false" />
-  <jseparator PrefHeight="18" Vertical="true" />
-  <jtextfield name="FontSizeText" PrefWidth="32" PrefHeight="22" />
-  <jbutton name="IncreaseFontButton" PrefWidth="22" PrefHeight="22" ttip="Increase Font Size" image="/snap/viewx/pkg.images/Font_Increase.png" ShowBorder="false" />
-  <jbutton name="DecreaseFontButton" PrefWidth="22" PrefHeight="22" ttip="Decrease Font Size" image="/snap/viewx/pkg.images/Font_Decrease.png" ShowBorder="false" />
-  <jseparator PrefHeight="18" Vertical="true" />
-  <jbutton name="UndoButton" PrefWidth="22" PrefHeight="22" ttip="Undo" image="/snap/viewx/pkg.images/Edit_Undo.png" ShowBorder="false">
+  <Button Name="SaveButton" PrefWidth="22" PrefHeight="22" ToolTip="Save" image="/snap/viewx/pkg.images/File_Save.png" ShowBorder="false" />
+  <Separator PrefHeight="18" Vertical="true" />
+  <Button Name="CutButton" PrefWidth="22" PrefHeight="22" ToolTip="Cut" image="/snap/viewx/pkg.images/Edit_Cut.png" ShowBorder="false" />
+  <Button Name="CopyButton" PrefWidth="22" PrefHeight="22" ToolTip="Copy" image="/snap/viewx/pkg.images/Edit_Copy.png" ShowBorder="false" />
+  <Button Name="PasteButton" PrefWidth="22" PrefHeight="22" ToolTip="Paste" image="/snap/viewx/pkg.images/Edit_Paste.png" ShowBorder="false" />
+  <Button Name="DeleteButton" PrefWidth="22" PrefHeight="22" ToolTip="Delete" image="/snap/viewx/pkg.images/Edit_Delete.png" ShowBorder="false" />
+  <Separator PrefHeight="18" Vertical="true" />
+  <TextField Name="FontSizeText" PrefWidth="32" PrefHeight="22" />
+  <Button Name="IncreaseFontButton" PrefWidth="22" PrefHeight="22" ToolTip="Increase Font Size" image="/snap/viewx/pkg.images/Font_Increase.png" ShowBorder="false" />
+  <Button Name="DecreaseFontButton" PrefWidth="22" PrefHeight="22" ToolTip="Decrease Font Size" image="/snap/viewx/pkg.images/Font_Decrease.png" ShowBorder="false" />
+  <Separator PrefHeight="18" Vertical="true" />
+  <Button Name="UndoButton" PrefWidth="22" PrefHeight="22" ToolTip="Undo" image="/snap/viewx/pkg.images/Edit_Undo.png" ShowBorder="false">
     <binding aspect="Enabled" key="TextView.Undoer.hasUndos" />
-  </jbutton>
-  <jbutton name="RedoButton" PrefWidth="22" PrefHeight="22" ttip="Redo" image="/snap/viewx/pkg.images/Edit_Redo.png" ShowBorder="false">
+  </Button>
+  <Button Name="RedoButton" PrefWidth="22" PrefHeight="22" ToolTip="Redo" image="/snap/viewx/pkg.images/Edit_Redo.png" ShowBorder="false">
     <binding aspect="Enabled" key="TextView.Undoer.hasRedos" />
-  </jbutton>
-  <jseparator PrefHeight="18" Vertical="true" />
-  <jtextfield name="FindText" PrefWidth="172" PrefHeight="22">
-    <font name="Arial" size="11" />
-  </jtextfield>
-  <jcheckbox name="IgnoreCaseCheckBox" PrefWidth="47" PrefHeight="22" text="IC" selected="true">
-    <font name="Arial" size="11" />
-  </jcheckbox>
-  <jseparator PrefHeight="18" Vertical="true" />
-  <jbutton name="CodeBuilderButton" PrefWidth="22" PrefHeight="22" image="Code.png" ttip="Code Builder" />
-  <jbutton name="JavaDocButton" PrefWidth="116" PrefHeight="22" LeanX="RIGHT" text="Documentation">
+  </Button>
+  <Separator PrefHeight="18" Vertical="true" />
+  <TextField Name="FindText" PrefWidth="172" PrefHeight="22" />
+  <CheckBox Name="IgnoreCaseCheckBox" PrefWidth="47" PrefHeight="22" text="IC" Selected="true" />
+  <Separator PrefHeight="18" Vertical="true" />
+  <Button Name="CodeBuilderButton" PrefWidth="22" PrefHeight="22" ToolTip="Code Builder" image="Code.png" />
+  <Button Name="JavaDocButton" PrefWidth="116" PrefHeight="22" LeanX="RIGHT" text="Documentation">
     <binding aspect="Visible" key="JavaDocURL" />
     <binding aspect="Text" key="JavaDocText" />
-  </jbutton>
-  <jbutton name="SnapCodeButton" PrefWidth="75" PrefHeight="22" ttip="Snap Code" text="SnapCode" />
+  </Button>
+  <Button Name="SnapCodeButton" PrefWidth="75" PrefHeight="22" ToolTip="Snap Code" text="SnapCode" />
 </HBox>

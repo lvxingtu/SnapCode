@@ -1,18 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<panel width="630" height="28">
-  <font name="Arial" size="11" />
-  <jbutton name="SaveButton" x="3" y="3" width="22" height="22" ttip="Save" image="/com/reportmill/app/pkg.images/File_Save.png" align="center" ShowBorder="false" margin="0" />
-  <jseparator x="26" y="6" width="13" height="18" orientation="1" />
-  <jbutton name="CutButton" x="39" y="3" width="22" height="22" ttip="Cut" image="/com/reportmill/app/pkg.images/Edit_Cut.png" align="center" ShowBorder="false" margin="0" />
-  <jbutton name="CopyButton" x="61" y="3" width="22" height="22" ttip="Copy" image="/com/reportmill/app/pkg.images/Edit_Copy.png" align="center" ShowBorder="false" margin="0" />
-  <jbutton name="PasteButton" x="83" y="3" width="22" height="22" ttip="Paste" image="/com/reportmill/app/pkg.images/Edit_Paste.png" align="center" ShowBorder="false" margin="0" />
-  <jbutton name="DeleteButton" x="105" y="3" width="22" height="22" ttip="Delete" image="/com/reportmill/app/pkg.images/Edit_Delete.png" align="center" ShowBorder="false" margin="0" />
-  <jseparator x="128" y="6" width="13" height="18" orientation="1" />
-  <jbutton name="UndoButton" x="141" y="3" width="22" height="22" ttip="Undo" image="/com/reportmill/app/pkg.images/Edit_Undo.png" align="center" ShowBorder="false" margin="0">
+<SpringView width="630" height="28" PrefWidth="630" PrefHeight="28">
+  <Button Name="SaveButton" x="3" y="3" width="22" height="22" ToolTip="Save" image="/snap/viewx/pkg.images/File_Save.png" ShowBorder="false" />
+  <Separator x="26" y="6" width="13" height="18" />
+  <Button Name="CutButton" x="39" y="3" width="22" height="22" ToolTip="Cut" image="/snap/viewx/pkg.images/Edit_Cut.png" ShowBorder="false" />
+  <Button Name="CopyButton" x="61" y="3" width="22" height="22" ToolTip="Copy" image="/snap/viewx/pkg.images/Edit_Copy.png" ShowBorder="false" />
+  <Button Name="PasteButton" x="83" y="3" width="22" height="22" ToolTip="Paste" image="/snap/viewx/pkg.images/Edit_Paste.png" ShowBorder="false" />
+  <Button Name="DeleteButton" x="105" y="3" width="22" height="22" ToolTip="Delete" image="/snap/viewx/pkg.images/Edit_Delete.png" ShowBorder="false" />
+  <Separator x="128" y="6" width="13" height="18" />
+  <Button Name="UndoButton" x="141" y="3" width="22" height="22" ToolTip="Undo" image="/snap/viewx/pkg.images/Edit_Undo.png" ShowBorder="false">
     <binding aspect="Enabled" key="JavaView.Undoer.hasUndos" />
-  </jbutton>
-  <jbutton name="RedoButton" x="163" y="3" width="22" height="22" ttip="Redo" image="/com/reportmill/app/pkg.images/Edit_Redo.png" align="center" ShowBorder="false" margin="0">
+  </Button>
+  <Button Name="RedoButton" x="163" y="3" width="22" height="22" ToolTip="Redo" image="/snap/viewx/pkg.images/Edit_Redo.png" ShowBorder="false">
     <binding aspect="Enabled" key="JavaView.Undoer.hasRedos" />
-  </jbutton>
-  <jbutton name="JavaButton" x="535" y="3" width="80" height="22" asize="~--,--~" ttip="Java Code" text="Java Code" align="center" />
-</panel>
+  </Button>
+  <Button Name="JavaButton" x="535" y="3" width="80" height="22" LeanX="RIGHT" ToolTip="Java Code" text="Java Code" />
+</SpringView>
