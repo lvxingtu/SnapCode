@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<DocView version="14">
-  <PageView width="400" height="220">
-    <animator max-time="5000" loop="true" />
-    <ImageView width="400" height="220" resource="1902610833" PreserveRatio="false">
+<DocView Align="CENTER">
+  <PageView width="400" height="220" PrefWidth="400" PrefHeight="220">
+    <effect type="shadow" radius="10" dx="0" dy="0" />
+    <ImageView width="400" height="220" resource="1902610833">
       <effect type="emboss" altitude="90" />
     </ImageView>
-    <TextViewBase x="11" y="1" width="380" height="140" valign="middle">
+    <TextViewBase x="11" y="1" width="380" height="140" Align="CENTER_LEFT" Rich="true" Editable="false">
       <effect type="blur" radius="12" />
       <RichText>
         <font name="Arial Black" size="70" />
@@ -14,7 +14,7 @@
         <string>SnapCode</string>
       </RichText>
     </TextViewBase>
-    <TextViewBase x="11" y="-1" width="380" height="140" valign="middle">
+    <TextViewBase x="11" y="-1" width="380" height="140" Align="CENTER_LEFT" Rich="true" Editable="false">
       <effect type="emboss" radius="5" />
       <RichText>
         <font name="Arial Black" size="70" />
@@ -26,9 +26,9 @@
         <string>Code</string>
       </RichText>
     </TextViewBase>
-    <polygon x="333" y="147" width="45" height="66" roll="40">
-      <stroke />
-      <fill color="#e0e0f5" />
+    <PathView x="333" y="147" width="45" height="66" Rotate="40">
+      <LineBorder />
+      <color value="#e0e0f5" />
       <effect type="emboss" radius="5" />
       <KeyFrame time="1000">
         <KeyValue key="Roll" value="40" />
@@ -88,8 +88,8 @@
         <cv cp1x="15" cp1y="-6.075" cp2x="10.075" cp2y="-11" x="4" y="-11" />
         <cl />
       </path>
-    </polygon>
-    <TextViewBase x="73" y="145" width="264" height="38" WrapText="true">
+    </PathView>
+    <TextViewBase x="73" y="145" width="264" height="38" Rich="true" Editable="false" WrapText="true">
       <effect type="blur" radius="5" />
       <RichText>
         <font name="Arial Bold" size="14" />
@@ -97,7 +97,7 @@
         <string>A Rich Application Workbench for learning, teaching, creating, exploring</string>
       </RichText>
     </TextViewBase>
-    <TextViewBase x="73" y="141" width="264" height="38" WrapText="true">
+    <TextViewBase x="73" y="141" width="264" height="38" Rich="true" Editable="false" WrapText="true">
       <RichText>
         <font name="Arial Bold" size="14" />
         <color value="#ffffff" />
@@ -105,7 +105,7 @@
         <string>A Rich Application Workbench for learning, teaching, creating, exploring</string>
       </RichText>
     </TextViewBase>
-    <TextViewBase name="JVMText" x="73" y="180" width="264" height="15">
+    <TextViewBase Name="JVMText" x="73" y="180" width="264" height="15" Rich="true" Editable="false">
       <RichText>
         <font name="Arial Bold" size="10" />
         <color value="#ffffff" />
@@ -113,7 +113,7 @@
         <string>JVM: XXX</string>
       </RichText>
     </TextViewBase>
-    <TextViewBase name="BuildText" x="73" y="191" width="264" height="15">
+    <TextViewBase Name="BuildText" x="73" y="191" width="264" height="15" Rich="true" Editable="false">
       <RichText>
         <font name="Arial Bold" size="10" />
         <color value="#ffffff" />
@@ -121,9 +121,9 @@
         <string>Build: XXX</string>
       </RichText>
     </TextViewBase>
-    <polygon x="36" y="130" width="19" height="82" roll="-35">
-      <stroke />
-      <fill color="#e0e0f5" />
+    <PathView x="36" y="130" width="19" height="82" Rotate="-35">
+      <LineBorder />
+      <color value="#e0e0f5" />
       <effect type="emboss" radius="5" />
       <KeyFrame time="1760">
         <KeyValue key="Roll" value="-35" />
@@ -179,7 +179,7 @@
         <ln x="43" y="0" />
         <cl />
       </path>
-    </polygon>
+    </PathView>
   </PageView>
   <resource name="1902610833" rm-byte-encoding="Ascii85">
     <![CDATA[

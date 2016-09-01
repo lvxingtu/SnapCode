@@ -1,51 +1,50 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<VBox PrefWidth="500" PrefHeight="500" Padding="16,16,16,16" Spacing="10">
-  <font name="Arial" size="11" />
+<VBox PrefWidth="500" PrefHeight="500" Padding="16" Spacing="10">
   <HBox Spacing="5">
-    <jlabel text="Home Page:" />
-    <jtextfield PrefWidth="255">
+    <Label text="Home Page:" />
+    <TextField PrefWidth="255">
       <binding aspect="Text" key="SitePane.HomePageURLString" />
-    </jtextfield>
-    <jbutton name="ResetHomePageButton" PrefWidth="47" text="Reset" />
+    </TextField>
+    <Button Name="ResetHomePageButton" PrefWidth="47" text="Reset" />
   </HBox>
   <HBox Spacing="5">
-    <jlabel text="Source Directory:" />
-    <jtextfield PrefWidth="255">
+    <Label text="Source Directory:" />
+    <TextField PrefWidth="255">
       <binding aspect="Text" key="Project.ClassPath.SourcePath" />
-    </jtextfield>
+    </TextField>
   </HBox>
   <HBox Spacing="5">
-    <jlabel text="Build Directory:" />
-    <jtextfield PrefWidth="255">
+    <Label text="Build Directory:" />
+    <TextField PrefWidth="255">
       <binding aspect="Text" key="Project.ClassPath.BuildPath" />
-    </jtextfield>
+    </TextField>
   </HBox>
-  <jlabel text="Dependencies:" />
-  <jtabbedpane PrefWidth="360" PrefHeight="160">
-    <border type="bevel" bevel-type="lowered" />
-    <Box Padding="3,3,3,3" FillWidth="true" FillHeight="true" title="    Jars    ">
-      <jscrollpane>
+  <Label text="Dependencies:" />
+  <TabView PrefWidth="360" PrefHeight="160">
+    <BevelBorder />
+    <Box Padding="3" FillWidth="true" FillHeight="true" title="    Jars    ">
+      <ScrollView>
         <font name="Arial" size="12" />
-        <jlist name="JarPathsList">
+        <ListView Name="JarPathsList">
           <binding aspect="Items" key="JarPaths" />
           <binding aspect="SelectedItem" key="SelectedJarPath" />
-        </jlist>
-      </jscrollpane>
+        </ListView>
+      </ScrollView>
     </Box>
-    <Box Padding="3,3,3,3" FillWidth="true" FillHeight="true" title="  Projects  ">
-      <jscrollpane>
+    <Box Padding="3" FillWidth="true" FillHeight="true" title="  Projects  ">
+      <ScrollView>
         <font name="Arial" size="12" />
-        <jlist name="ProjectPathsList">
+        <ListView Name="ProjectPathsList">
           <binding aspect="Items" key="ProjectPaths" />
           <binding aspect="SelectedItem" key="SelectedProjectPath" />
-        </jlist>
-      </jscrollpane>
+        </ListView>
+      </ScrollView>
     </Box>
-  </jtabbedpane>
-  <jcheckbox text="Build Project Automatically">
+  </TabView>
+  <CheckBox text="Build Project Automatically">
     <binding aspect="Selected" key="SitePane.AutoBuild" />
-  </jcheckbox>
-  <jcheckbox text="Open Source Files in SnapCode Editor">
+  </CheckBox>
+  <CheckBox text="Open Source Files in SnapCode Editor">
     <binding aspect="Selected" key="SitePane.UseSnapEditor" />
-  </jcheckbox>
+  </CheckBox>
 </VBox>

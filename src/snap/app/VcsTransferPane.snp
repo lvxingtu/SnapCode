@@ -1,17 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <VBox PrefWidth="420" PrefHeight="500" Padding="5,10,5,5" GrowHeight="true" Spacing="8" FillWidth="true">
   <font name="Arial" size="12" />
-  <jlabel text="Transfer Files:" align="left">
+  <Label text="Transfer Files:">
     <font name="Arial" size="16" />
-  </jlabel>
-  <jsplitpane name="SplitView" GrowHeight="true" Vertical="true">
-    <jscrollpane GrowHeight="true">
-      <jlist name="FilesList">
+  </Label>
+  <SplitView Name="SplitView" Vertical="true" GrowHeight="true">
+    <ScrollView GrowHeight="true">
+      <ListView Name="FilesList">
         <binding aspect="Items" key="Files" />
-      </jlist>
-    </jscrollpane>
-    <jscrollpane PrefHeight="120">
-      <jtextarea name="CommentText" WrapText="true" RichText="false" />
-    </jscrollpane>
-  </jsplitpane>
+      </ListView>
+    </ScrollView>
+    <ScrollView PrefHeight="120">
+      <TextView Name="CommentText" WrapText="true">
+        <font name="Arial" size="11" />
+      </TextView>
+    </ScrollView>
+  </SplitView>
 </VBox>

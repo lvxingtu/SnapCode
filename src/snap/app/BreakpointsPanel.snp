@@ -1,22 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<panel width="640" height="480">
-  <font name="Arial" size="11" />
-  <jscrollpane x="2" y="30" width="636" height="419" asize="-~-,-~-">
+<SpringView width="640" height="480" PrefWidth="640" PrefHeight="480">
+  <ScrollView x="2" y="30" width="636" height="419" GrowWidth="true" GrowHeight="true">
     <font name="Arial" size="12" />
-    <jlist name="BreakpointList" width="617" height="415" selection="single-interval" ItemKey="Descriptor">
+    <ListView Name="BreakpointList" ItemKey="Descriptor">
       <binding aspect="Items" key="Breakpoints" />
-    </jlist>
-  </jscrollpane>
-  <jbutton name="DeleteButton" x="453" y="4" width="80" height="22" asize="~--,--~" text="Delete" align="center">
-    <font name="Arial" size="11" />
+    </ListView>
+  </ScrollView>
+  <Button Name="DeleteButton" x="453" y="4" width="80" height="22" LeanX="RIGHT" text="Delete">
     <binding aspect="Enabled" key="SelectedBreakpoint" />
-  </jbutton>
-  <jbutton name="DeleteAllButton" x="540" y="4" width="80" height="22" asize="~--,--~" text="Delete All" align="center">
-    <font name="Arial" size="11" />
-  </jbutton>
-  <jcheckbox x="2" y="452" width="182" height="22" asize="--~,~--" text="Breakpoint Enabled" align="left">
-    <font name="Arial" size="11" />
+  </Button>
+  <Button Name="DeleteAllButton" x="540" y="4" width="80" height="22" LeanX="RIGHT" text="Delete All" />
+  <CheckBox x="2" y="452" width="182" height="22" LeanY="BOTTOM" text="Breakpoint Enabled">
     <binding aspect="Selected" key="SelectedBreakpoint.Enabled" />
     <binding aspect="Enabled" key="SelectedBreakpoint" />
-  </jcheckbox>
-</panel>
+  </CheckBox>
+</SpringView>
