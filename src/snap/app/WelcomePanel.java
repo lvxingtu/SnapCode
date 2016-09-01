@@ -404,12 +404,9 @@ void handleOpenButtonAlt()
 }
 
 /**
- * A viewer owner to load/view WelcomePanel animation from WelcomePanelAnim.rpt.
+ * A viewer owner to load/view WelcomePanel animation from WelcomePanelAnim.snp.
  */
-private static class WelcomePanelAnim extends ViewOwner {  //RMViewerOwner {
-
-    /** Needed since file is rpt instead of jfx. */
-    public Object getUISource() { return WebURL.getURL(getClass(), "WelcomePanelAnim.rpt"); }
+private static class WelcomePanelAnim extends ViewOwner {
 
     /** Initialize some fields. */
     protected void initUI()

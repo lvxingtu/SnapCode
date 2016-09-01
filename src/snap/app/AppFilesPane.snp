@@ -8,7 +8,6 @@
   <jbutton name="AllFilesButton" x="5" y="5" width="22" height="20" asize="--~,--~" image="FilesTree.png" align="center" bgroup="FBG" Selected="true" ttip="Toggle Files Tree/List" />
   <jbutton name="NewFileButton" x="155" y="5" width="20" height="20" asize="~--,--~" image="Add.png" align="center" />
   <menubutton name="MenuButton" x="177" y="5" width="20" height="20" asize="~--,--~" align="center">
-    <border type="bevel" bevel-type="raised" />
     <jmenuitem name="NewFileMenuItem" text="New File..." />
     <jmenuitem name="RemoveFileMenuItem" text="Remove File(s)..." />
     <jmenuitem name="RenameFileMenuItem" text="Rename File..." />
