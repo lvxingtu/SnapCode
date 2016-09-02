@@ -452,7 +452,7 @@ Menu createMenu(String aName, String theText)
 MenuItem createMenuItem(String aName, String theText, String aKey)
 {
     MenuItem mi = new MenuItem(); mi.setText(theText); mi.setName(aName);
-    if(aKey!=null) mi.setAccelerator(aKey);
+    if(aKey!=null) mi.setShortcut(aKey);
     return mi;
 }
 
