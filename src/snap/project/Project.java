@@ -318,7 +318,7 @@ public String[] getClassPaths()
 {
     List <String> paths = new ArrayList();
     paths.add(getBuildDir().getStandardFile().getAbsolutePath());
-    ListUtils.addAllUnique(paths, getClassPath().getNativePaths());
+    ListUtils.addAllUnique(paths, getClassPath().getLibPathsNative());
     for(Project p : getProjects()) ListUtils.addAllUnique(paths, p.getClassPaths());
     return paths.toArray(new String[paths.size()]);
 }

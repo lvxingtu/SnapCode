@@ -228,7 +228,7 @@ void fileSaved(WebFile aFile)
 /**
  * Returns the list of jar paths.
  */
-public String[] getJarPaths()  { return getProject().getClassPath().getPaths(); }
+public String[] getJarPaths()  { return getProject().getClassPath().getLibPaths(); }
 
 /**
  * Returns the selected JarPath.

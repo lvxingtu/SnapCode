@@ -75,9 +75,9 @@ protected List <String> getOptions()
 protected String getClassPath()
 {
     StringBuffer cp = new StringBuffer();
-    for(String p : getProject().getClassPath().getNativePaths()) cp.append(p).append(File.pathSeparator);
+    for(String p : getProject().getClassPath().getLibPathsNative()) cp.append(p).append(File.pathSeparator);
     for(Project p : getProject().getProjects())
-        for(String p2 : p.getClassPath().getNativePaths()) cp.append(p2).append(File.pathSeparator);
+        for(String p2 : p.getClassPath().getLibPathsNative()) cp.append(p2).append(File.pathSeparator);
     return cp.toString();
 }
 

@@ -257,7 +257,7 @@ public void removeSrcPath(String aPath)
 /**
  * Returns the paths.
  */
-public String[] getPaths()
+public String[] getLibPaths()
 {
     // If already set, just return
     if(_libPaths!=null) return _libPaths;
@@ -313,11 +313,11 @@ public void removeLibPath(String aPath)
 }
 
 /**
- * Returns the full paths.
+ * Returns the library paths as absolute paths.
  */
-public String[] getFullPaths()
+public String[] getLibPathsAbsolute()
 {
-    String fpaths[] = Arrays.copyOf(getPaths(), getPaths().length);
+    String fpaths[] = Arrays.copyOf(getLibPaths(), getLibPaths().length);
     for(int i=0; i<fpaths.length; i++) { String path = fpaths[i];
         if(!path.startsWith("/"))
             path = fpaths[i] = getProjRootDirPath() + path;
@@ -328,12 +328,12 @@ public String[] getFullPaths()
 }
 
 /**
- * Returns the full paths using platform native File separator char.
+ * Returns the library paths using platform native File separator char.
  */
-public String[] getNativePaths()
+public String[] getLibPathsNative()
 {
-    if(File.separatorChar=='/') return getFullPaths();
-    String fpaths[] = getFullPaths(), npaths[] = new String[fpaths.length];
+    if(File.separatorChar=='/') return getLibPathsAbsolute();
+    String fpaths[] = getLibPathsAbsolute(), npaths[] = new String[fpaths.length];
     for(int i=0; i<fpaths.length; i++) npaths[i] = fpaths[i].replace('/', File.separatorChar);
     return npaths;
 }
