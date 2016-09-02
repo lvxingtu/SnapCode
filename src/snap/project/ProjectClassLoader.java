@@ -56,8 +56,8 @@ public void close() throws IOException
 private static ClassLoader getURLClassLoader(Project aProj)
 {
     // Get Project URLs
-    List <URL> ulist = new ArrayList(); //if(aProj.getUseSnapRuntime()) urlList.add(ProjectUtils.getSnapJarURL());
-    for(String p : aProj.getClassPathPaths()) { URL u = WebURL.getURL(p).getURL(); ulist.add(u); }
+    List <URL> ulist = new ArrayList();
+    for(String p : aProj.getClassPaths()) { URL u = WebURL.getURL(p).getURL(); ulist.add(u); }
     URL urls[] = ulist.toArray(new URL[ulist.size()]);
     
     // Create ClassLoader for URLs and return

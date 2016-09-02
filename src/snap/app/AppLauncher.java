@@ -123,18 +123,16 @@ protected List <String> getCommand()
     
     // Get Class path and add to list
     List <String> cpaths = new ArrayList();
-    Collections.addAll(cpaths, _proj.getClassPathPaths());
+    Collections.addAll(cpaths, _proj.getClassPaths());
     String cpath = ListUtils.joinStrings(cpaths, File.pathSeparator);
     commands.add("-cp"); commands.add(cpath);
 
-    // If using Snap Runtime, add main class
-    if(_proj.getUseSnapRuntime() || !getURLString().endsWith(".class")) {
-        commands.add("snap.swing.SnapApp");
-        commands.add("file"); commands.add(getURLString()); // Add test file path
-    }
+    // If using Snap Runtime, add main class, otherwise ...
+    //if(_proj.getUseSnapRuntime() || !getURLString().endsWith(".class")) {
+    //    commands.add("snap.swing.SnapApp"); commands.add("file"); commands.add(getURLString()); } else
     
-    // Otherwise, add class name
-    else commands.add(_proj.getClassName(getURL().getFile()));
+    // Add class name
+    commands.add(_proj.getClassName(getURL().getFile()));
     
     // Add App Args
     if(getAppArgs()!=null && getAppArgs().length()>0)

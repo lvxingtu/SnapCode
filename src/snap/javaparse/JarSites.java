@@ -30,15 +30,8 @@ public JarSites(Project aProj)
     WebSite javart = WebURL.getURL(List.class).getSite(); _jarSites.add(javart);
     WebSite jfxrt = WebURL.getURL(javafx.scene.Node.class).getSite(); _jarSites.add(jfxrt);
     
-    // Add Snap Runtime
-    //if(aProj.getUseSnapRuntime()) { WebSite snaprt = WebURL.getURL(WebFile.class).getSite(); _jarSites.add(snaprt); }
-    
-    // Add project site
-    WebSite projSite = _proj.getBuildDir().getURL().getAsSite();
-    _jarSites.add(projSite);
-    
-    // Add project jar path sites
-    for(String jar : aProj.getClassPath().getFullPaths())
+    // Add project class path sites
+    for(String jar : aProj.getClassPaths())
         _jarSites.add(WebURL.getURL(jar).getAsSite());
 }
 
@@ -204,6 +197,11 @@ public void propertyChange(PropChange anEvent)
         _proj.getClassPath().removePropChangeListener(this);
     }
 }
+
+/**
+ * Standard toString implementation.
+ */
+public String toString()  { return getClass().getSimpleName() + ": " + getJarSites(); }
 
 /**
  * Returns the JarSites for a JNode.

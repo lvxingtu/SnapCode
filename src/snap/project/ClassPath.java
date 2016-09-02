@@ -71,8 +71,6 @@ protected XMLElement createXML()
     if(file!=null && file.getExists())
         return XMLElement.getElement(file);
     XMLElement xml = new XMLElement("classpath");
-    XMLElement snap = new XMLElement("classpathentry");
-    snap.add("kind", "lib"); snap.add("path", "SnapCode1.jar"); xml.addElement(snap);
     return xml;
 }
 
@@ -319,13 +317,10 @@ public void removeLibPath(String aPath)
  */
 public String[] getFullPaths()
 {
-    _useSnapRT = false;
     String fpaths[] = Arrays.copyOf(getPaths(), getPaths().length);
     for(int i=0; i<fpaths.length; i++) { String path = fpaths[i];
         if(!path.startsWith("/"))
             path = fpaths[i] = getProjRootDirPath() + path;
-        if(path.endsWith("SnapCode1.jar") && _site.getFile(path)==null) {
-            path = fpaths[i] = getSnapJarPath(path); _useSnapRT = true; }
         if(!StringUtils.endsWithIC(path, ".jar") && !StringUtils.endsWithIC(path, ".zip") && !path.endsWith("/"))
             path = fpaths[i] = path + '/';
     }
@@ -342,11 +337,6 @@ public String[] getNativePaths()
     for(int i=0; i<fpaths.length; i++) npaths[i] = fpaths[i].replace('/', File.separatorChar);
     return npaths;
 }
-
-/**
- * Returns whether ClassPath contains Snap runtime.
- */
-public boolean getUseSnapRuntime()  { getFullPaths(); return _useSnapRT; } boolean _useSnapRT;
 
 /**
  * Returns a relative path for given path and directory file.
@@ -422,22 +412,6 @@ private XMLElement getBuildPathXML()
         if("output".equals(child.getAttributeValue("kind")))
             return child;
     return null;
-}
-
-/**
- * Returns the Snap jar path.
- */
-public static String getSnapJarPath(String aPath)
-{
-    // If path already exists, just return
-    if(WebURL.getURL(aPath).getFile()!=null) return aPath;
-    
-    // Get path to Jar for this class and return
-    String path = WebURL.getURL(WebURL.class).getSiteURL().getPath();
-    if(path.endsWith(".pack.gz")) { // Should never happen unless in JavaWebStart
-        path = FileUtils.unpack(new java.io.File(path), FileUtils.getTempDir()).getAbsolutePath();
-        if(File.separatorChar!='/') path = path.replace(File.separatorChar, '/'); }
-    return path;
 }
 
 /**

@@ -312,21 +312,16 @@ public Class getClassForFile(WebFile aFile)
 public ClassPath getClassPath()  { return ClassPath.get(this); }
 
 /**
- * Returns the class that keeps track of class paths.
+ * Returns the paths needed to compile/run project.
  */
-public String[] getClassPathPaths()
+public String[] getClassPaths()
 {
     List <String> paths = new ArrayList();
     paths.add(getBuildDir().getStandardFile().getAbsolutePath());
-    Collections.addAll(paths, getClassPath().getNativePaths());
-    for(Project p : getProjects()) Collections.addAll(paths, p.getClassPathPaths());
+    ListUtils.addAllUnique(paths, getClassPath().getNativePaths());
+    for(Project p : getProjects()) ListUtils.addAllUnique(paths, p.getClassPaths());
     return paths.toArray(new String[paths.size()]);
 }
-
-/**
- * Returns whether to use Snap runtime.
- */
-public boolean getUseSnapRuntime()  { return getClassPath().getUseSnapRuntime(); }
 
 /**
  * Returns the breakpoints.
