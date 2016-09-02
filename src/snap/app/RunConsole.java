@@ -125,9 +125,8 @@ protected void initUI()
             break; }
 
     // Get output text
-    _tview = getView("OutputText", RCTextView.class);
-    _tview._rpanel = this;
-    _tview.setFont(defaultFont);
+    _tview = getView("OutputText", RCTextView.class); _tview._rpanel = this;
+    _tview.setFont(defaultFont); _tview.setRich(true);
 }
 
 /**
