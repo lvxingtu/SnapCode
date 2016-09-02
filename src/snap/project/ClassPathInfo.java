@@ -1,44 +1,48 @@
-package snap.javaparse;
+package snap.project;
 import java.util.*;
-import snap.project.*;
 import snap.util.*;
 import snap.web.*;
 
 /**
- * A class to return class file info for Project jars.
+ * A class to return class file info for Project class paths.
  */
-public class JarSites implements PropChangeListener {
+public class ClassPathInfo implements PropChangeListener {
 
     // The Project
     Project             _proj;
 
-    // The shared list of JarSites
-    List <WebSite>      _jarSites = new ArrayList();
+    // The shared list of class path sites
+    List <WebSite>      _sites = new ArrayList();
     
     // The list of all package files and class files
     List <WebFile>      _apkgs, _acls;
     
 /**
- * Creates a new new JarSites for project jars (and system jars).
+ * Creates a new new ClassPathInfo for project class paths.
  */
-public JarSites(Project aProj)
+public ClassPathInfo(Project aProj)
 {
     // Set project
     _proj = aProj;
     
     // Add system jar sites
-    WebSite javart = WebURL.getURL(List.class).getSite(); _jarSites.add(javart);
-    WebSite jfxrt = WebURL.getURL(javafx.scene.Node.class).getSite(); _jarSites.add(jfxrt);
+    WebSite javart = WebURL.getURL(List.class).getSite(); _sites.add(javart);
+    WebSite jfxrt = WebURL.getURL(javafx.scene.Node.class).getSite(); _sites.add(jfxrt);
     
     // Add project class path sites
     for(String jar : aProj.getClassPaths())
-        _jarSites.add(WebURL.getURL(jar).getAsSite());
+        _sites.add(WebURL.getURL(jar).getAsSite());
 }
 
 /**
- * Returns the JarSites.
+ * Returns the project.
  */
-public List <WebSite> getJarSites()  { return _jarSites; }
+public Project getProject()  { return _proj; }
+
+/**
+ * Returns the class path sites.
+ */
+public List <WebSite> getSites()  { return _sites; }
 
 /**
  * Returns class names for prefix.
@@ -105,7 +109,7 @@ private List <String> getPackageNames(List <WebFile> theFiles)
 public WebFile getPackageDir(String aName)
 {
     String path = "/" + aName.replace('.', '/');
-    List <WebSite> sites = getJarSites();
+    List <WebSite> sites = getSites();
     for(WebSite site : sites) { WebFile file = site.getFile(path);
         if(file!=null) return file; }
     return null;
@@ -150,7 +154,7 @@ public List <WebFile> getAllClasses()  { if(_acls==null) createAll(); return _ac
 protected void createAll()
 {
     _acls = new ArrayList(); _apkgs = new ArrayList();
-    for(WebSite site : getJarSites()) getAll(site.getRootDir(), _acls, _apkgs);
+    for(WebSite site : getSites()) getAll(site.getRootDir(), _acls, _apkgs);
 }
 
 private void getAll(WebFile aDir, List <WebFile> theClasses, List <WebFile> thePkgs)
@@ -188,12 +192,12 @@ private static boolean isInterestingPath(String aPath)
 }
 
 /**
- * Watches Project.ClassPath for JarPaths change to reset JarSites.
+ * Watches Project.ClassPath for JarPaths change to reset ClassPathInfo.
  */
 public void propertyChange(PropChange anEvent)
 {
     if(anEvent.getPropertyName()==ClassPath.JarPaths_Prop) {
-        _proj.getSite().setProp("JarSites", null);
+        _proj.getSite().setProp("ClassPathInfo", null);
         _proj.getClassPath().removePropChangeListener(this);
     }
 }
@@ -201,21 +205,20 @@ public void propertyChange(PropChange anEvent)
 /**
  * Standard toString implementation.
  */
-public String toString()  { return getClass().getSimpleName() + ": " + getJarSites(); }
+public String toString()  { return getClass().getSimpleName() + ": " + getSites(); }
 
 /**
- * Returns the JarSites for a JNode.
+ * Returns the ClassPathInfo for a JNode.
  */
-public static JarSites get(JNode aNode)
+public static ClassPathInfo get(WebSite aSite)
 {
-    WebFile file = aNode.getFile().getSourceFile(); WebSite site = file!=null? file.getSite() : null;
-    JarSites jsites = (JarSites)site.getProp("JarSites");
-    if(jsites==null) {
-        Project proj = site!=null? Project.get(site) : null;
-        site.setProp("JarSites", jsites = new JarSites(proj));
-        proj.getClassPath().addPropChangeListener(jsites);
+    ClassPathInfo cpinfo = (ClassPathInfo)aSite.getProp("ClassPathInfo");
+    if(cpinfo==null) {
+        Project proj = Project.get(aSite);
+        aSite.setProp("ClassPathInfo", cpinfo = new ClassPathInfo(proj));
+        proj.getClassPath().addPropChangeListener(cpinfo);
     }
-    return jsites;
+    return cpinfo;
 }
 
 }

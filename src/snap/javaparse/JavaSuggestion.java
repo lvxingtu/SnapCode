@@ -4,8 +4,9 @@
 package snap.javaparse;
 import java.lang.reflect.*;
 import java.util.*;
-import snap.project.Project;
+import snap.project.*;
 import snap.util.*;
+import snap.web.*;
 
 /**
  * A class to represent a completion suggestion for a given prefix.
@@ -39,11 +40,11 @@ public static JavaDecl[] getSuggestions(JNode aNode)
  */
 private static void getSuggestions(JType aJType, List <JavaDecl> theSuggestions)
 {
-    JarSites jsites = JarSites.get(aJType);
-    Project proj = jsites._proj;
+    ClassPathInfo cpinfo = getClassPathInfo(aJType);
+    Project proj = cpinfo.getProject();
     String name = aJType.getName();
     if(name!=null) {
-        List <String> cnames = jsites.getAllClassNames(name);
+        List <String> cnames = cpinfo.getAllClassNames(name);
         for(String cname : cnames) {
             if(aJType.getParent() instanceof JExprAlloc) {
                 Class cls = ClassUtils.getClass(cname, proj.getClassLoader());
@@ -64,8 +65,8 @@ private static void getSuggestions(JExprId anId, List <JavaDecl> theSuggestions)
 {
     // Get prefix string
     String prefix = anId.getName();
-    JarSites jsites = JarSites.get(anId);
-    Project proj = jsites._proj;
+    ClassPathInfo cpinfo = getClassPathInfo(anId);
+    Project proj = cpinfo.getProject();
     
     // If there is a parent expression, work from it
     JExpr parExpr = anId.getParentExpr();
@@ -74,9 +75,9 @@ private static void getSuggestions(JExprId anId, List <JavaDecl> theSuggestions)
         // Handle parent is Package: Add packages and classes with prefix
         if(parExpr instanceof JExprId && ((JExprId)parExpr).isPackageName()) { JExprId parId = (JExprId)parExpr;
             String parPkg = parId.getPackageName();
-            for(String cname : jsites.getPackageClassNames(parPkg, prefix))
+            for(String cname : cpinfo.getPackageClassNames(parPkg, prefix))
                 theSuggestions.add(new JavaDecl(cname, null, null, null));
-            for(String pname : jsites.getPackageChildrenNames(parPkg, prefix))
+            for(String pname : cpinfo.getPackageChildrenNames(parPkg, prefix))
                 theSuggestions.add(new JavaDecl(JavaDecl.Type.Package, pname));
         }
         
@@ -111,7 +112,7 @@ private static void getSuggestions(JExprId anId, List <JavaDecl> theSuggestions)
         }
 
         // Add classes with prefix that are public
-        List <String> cnames = jsites.getAllClassNames(prefix);
+        List <String> cnames = cpinfo.getAllClassNames(prefix);
         for(String cname : cnames) {
             Class cls = ClassUtils.getClass(cname, proj.getClassLoader());
             if(cls==null || !Modifier.isPublic(cls.getModifiers())) continue;
@@ -119,7 +120,7 @@ private static void getSuggestions(JExprId anId, List <JavaDecl> theSuggestions)
         }
 
         // Add packages with prefix
-        List <String> pnames = jsites.getAllPackageNames(prefix);
+        List <String> pnames = cpinfo.getAllPackageNames(prefix);
         for(String name : pnames)
             theSuggestions.add(new JavaDecl(JavaDecl.Type.Package, name));
     }
@@ -152,6 +153,14 @@ private static Class getReceivingClass(JNode aNode)
 
     // Return null since no assignment type found for class
     return null;
+}
+
+/** Returns ClassPathInfo for JNode. */
+private static ClassPathInfo getClassPathInfo(JNode aNode)
+{
+    WebFile file = aNode.getFile().getSourceFile(); if(file==null) return null;
+    WebSite site = file.getSite();
+    return ClassPathInfo.get(site);
 }
 
 /** Returns the method call parent of given node, if available. */
