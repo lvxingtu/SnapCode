@@ -10,7 +10,7 @@ import org.eclipse.jgit.transport.*;
 import org.eclipse.jgit.treewalk.TreeWalk;
 import snap.util.TaskMonitor;
 import snap.web.*;
-import snap.util.StringUtils;
+import snap.util.FilePathUtils;
 
 /**
  * A class to perform git operations for a git directory.
@@ -275,7 +275,7 @@ public class GitBranch {
     public String getName()  { return _name; }
     
     /** Returns the simple branch name. */
-    public String getSimpleName()  { return StringUtils.getPathFileName(_name); }
+    public String getSimpleName()  { return FilePathUtils.getFileName(_name); }
     
     /** Returns the plain branch name (no refs/heads or ref/remotes prefix). */
     public String getPlainName()  { return getName().replace("refs/heads/", "").replace("refs/remotes/", ""); }
@@ -319,7 +319,7 @@ public class GitFile <T extends RevObject> {
     public String getPath()  { return _path; }
     
     /** Returns the resource name. */
-    public String getName()  { return StringUtils.getPathFileName(getPath()); }
+    public String getName()  { return FilePathUtils.getFileName(getPath()); }
     
     /** Returns whether file is directory. */
     public boolean isDir()  { return false; }
@@ -517,7 +517,7 @@ public class GitIndex {
         public String getPath()  { return _path; }
         
         /** Returns the name. */
-        public String getName()  { return StringUtils.getPathFileName(_path); }
+        public String getName()  { return FilePathUtils.getFileName(_path); }
         
         /** Returns whether entry is directory. */
         public boolean isDir()  { return _entry==null; }
