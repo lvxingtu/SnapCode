@@ -181,7 +181,7 @@ public static class VarTreeItem implements Comparable <VarTreeItem> {
     
         if(value instanceof ObjectReference) { ObjectReference or = (ObjectReference)value;
             JExprMethodCall mc = new JExprMethodCall(new JExprId("toString"), Collections.emptyList());
-            StringReference sref = null; try { sref = (StringReference)ExprEval.eval(getApp(), or, mc); }
+            StringReference sref = null; try { sref = (StringReference)ExprEval.evalExpr(getApp(), or, mc); }
             catch(Exception e) { e.printStackTrace(); return e.toString(); }
             return sref!=null? sref.value() : "(null)";
         }

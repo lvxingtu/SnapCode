@@ -29,7 +29,7 @@ public static Object eval(DebugApp anApp, String anExpr)
     _exprParser.setInput(anExpr);
     ObjectReference oref = anApp.thisObject();
     JExpr expr = _exprParser.parseCustom(JExpr.class);
-    Value value; try { value = eval(anApp, oref, expr); }
+    Value value; try { value = evalExpr(anApp, oref, expr); }
     catch(Exception e) { return e; }
     return value;
 }
@@ -37,27 +37,27 @@ public static Object eval(DebugApp anApp, String anExpr)
 /**
  * Evaluate JExpr.
  */
-public static Value eval(DebugApp anApp, ObjectReference anOR, JExpr anExpr) throws Exception
+public static Value evalExpr(DebugApp anApp, ObjectReference anOR, JExpr anExpr) throws Exception
 {
     if(anExpr instanceof JExprLiteral)
-        return eval(anApp, (JExprLiteral)anExpr);
+        return evalLiteral(anApp, (JExprLiteral)anExpr);
     if(anExpr instanceof JExprId)
-        return eval(anApp, anOR, (JExprId)anExpr);
+        return evalIdentifier(anApp, anOR, (JExprId)anExpr);
     if(anExpr instanceof JExprMethodCall)
-        return eval(anApp, anOR, (JExprMethodCall)anExpr);
+        return evalMethod(anApp, anOR, (JExprMethodCall)anExpr);
     if(anExpr instanceof JExprMath)
-        return eval(anApp, anOR, (JExprMath)anExpr);
+        return evalMathExpr(anApp, anOR, (JExprMath)anExpr);
     if(anExpr instanceof JExprArrayIndex)
-        return eval(anApp, anOR, (JExprArrayIndex)anExpr);
+        return evalArrayIndex(anApp, anOR, (JExprArrayIndex)anExpr);
     if(anExpr instanceof JExprChain)
-        return eval(anApp, anOR, (JExprChain)anExpr);
+        return evalExprChain(anApp, anOR, (JExprChain)anExpr);
     return null;
 }
 
 /**
  * Evaluate JLiteral.
  */
-static Value eval(DebugApp anApp, JExprLiteral aLiteral) throws Exception
+static Value evalLiteral(DebugApp anApp, JExprLiteral aLiteral) throws Exception
 {
     VirtualMachine aVM = anApp._vm;
     switch(aLiteral.getLiteralType()) {
@@ -76,7 +76,7 @@ static Value eval(DebugApp anApp, JExprLiteral aLiteral) throws Exception
 /**
  * Evaluate JIdentifier.
  */
-static Value eval(DebugApp anApp, ObjectReference anOR, JExprId anId) throws Exception
+static Value evalIdentifier(DebugApp anApp, ObjectReference anOR, JExprId anId) throws Exception
 {
     // Get identifier name 
     String name = anId.getName();
@@ -103,14 +103,14 @@ static Value eval(DebugApp anApp, ObjectReference anOR, JExprId anId) throws Exc
 /**
  * Evaluate JMethodCall.
  */
-static Value eval(DebugApp anApp, ObjectReference anOR, JExprMethodCall anExpr) throws Exception
+static Value evalMethod(DebugApp anApp, ObjectReference anOR, JExprMethodCall anExpr) throws Exception
 {
     ObjectReference thisObj = anApp.thisObject();
     ReferenceType refType = anOR.referenceType();  // Thread invalid after invokeMethod which resumes thread
     List <Method> methods = methods(refType, anExpr.getName(), INSTANCE);
     List <Value> args = new ArrayList();
     for(JExpr arg : anExpr.getArgs())
-        args.add(eval(anApp, thisObj, arg));
+        args.add(evalExpr(anApp, thisObj, arg));
     Method method = method(methods, args);
     return anApp.invokeMethod(anOR, method, args, ObjectReference.INVOKE_NONVIRTUAL);
 }
@@ -118,17 +118,17 @@ static Value eval(DebugApp anApp, ObjectReference anOR, JExprMethodCall anExpr) 
 /**
  * Evaluate JExprArrayIndex.
  */
-static Value eval(DebugApp anApp, ObjectReference anOR, JExprArrayIndex anExpr) throws Exception
+static Value evalArrayIndex(DebugApp anApp, ObjectReference anOR, JExprArrayIndex anExpr) throws Exception
 {
     // Get Array
     JExpr arrayExpr = anExpr.getArrayExpr();
-    Value val = eval(anApp, anOR, arrayExpr); if(!(val instanceof ArrayReference)) return null;
+    Value val = evalExpr(anApp, anOR, arrayExpr); if(!(val instanceof ArrayReference)) return null;
     ArrayReference aref = (ArrayReference)val;
     
     // Get Index
     JExpr indexExpr = anExpr.getIndexExpr();
     ObjectReference thisObj = anApp.thisObject();
-    val = eval(anApp, thisObj, indexExpr); if(!(val instanceof PrimitiveValue)) return null;
+    val = evalExpr(anApp, thisObj, indexExpr); if(!(val instanceof PrimitiveValue)) return null;
     PrimitiveValue pval = (PrimitiveValue)val;
     int index = pval.intValue();
     
@@ -139,11 +139,11 @@ static Value eval(DebugApp anApp, ObjectReference anOR, JExprArrayIndex anExpr) 
 /**
  * Evaluate JExprChain.
  */
-static Value eval(DebugApp anApp, ObjectReference anOR, JExprChain anExpr) throws Exception
+static Value evalExprChain(DebugApp anApp, ObjectReference anOR, JExprChain anExpr) throws Exception
 {
     ObjectReference or = anOR; Value val = null;
     for(int i=0, iMax=anExpr.getExprCount(); i<iMax; i++) { JExpr expr = anExpr.getExpr(i);
-        val = eval(anApp, or, expr);
+        val = evalExpr(anApp, or, expr);
         if(val instanceof ObjectReference) or = (ObjectReference)val;
     }
     return val;
@@ -152,12 +152,12 @@ static Value eval(DebugApp anApp, ObjectReference anOR, JExprChain anExpr) throw
 /**
  * Evaluate JExprMath.
  */
-static Value eval(DebugApp anApp, ObjectReference anOR, JExprMath anExpr) throws Exception
+static Value evalMathExpr(DebugApp anApp, ObjectReference anOR, JExprMath anExpr) throws Exception
 {
     // Get first value
     JExprMath.Op op = anExpr.getOp(); int opCount = anExpr.getOperandCount();
     JExpr expr1 = anExpr.getOperand(0);
-    Value val1 = eval(anApp, anOR, expr1);
+    Value val1 = evalExpr(anApp, anOR, expr1);
     
     // Handle Unary
     if(opCount==1) {
@@ -181,7 +181,7 @@ static Value eval(DebugApp anApp, ObjectReference anOR, JExprMath anExpr) throws
     // Handle Binary
     else if(opCount==2) {
         JExpr expr2 = anExpr.getOperand(1);
-        Value val2 = eval(anApp, anOR, expr2);
+        Value val2 = evalExpr(anApp, anOR, expr2);
         switch(op) {
             case Add: return add(anApp, val1, val2);
             case Subtract: return subtract(anApp, val1, val2);
@@ -201,7 +201,7 @@ static Value eval(DebugApp anApp, ObjectReference anOR, JExprMath anExpr) throws
         if(!(val1 instanceof PrimitiveValue)) throw new RuntimeException("Ternary conditional expr not bool: " + expr1);
         boolean result = ((PrimitiveValue)val1).booleanValue();
         JExpr expr = result? anExpr.getOperand(1) : anExpr.getOperand(2);
-        return eval(anApp, anOR, expr);
+        return evalExpr(anApp, anOR, expr);
     }
     
     // Complain
