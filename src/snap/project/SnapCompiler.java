@@ -2,11 +2,11 @@
  * Copyright (c) 2010, ReportMill Software. All rights reserved.
  */
 package snap.project;
-import java.io.File;
 import java.io.StringWriter;
 import java.util.*;
 import javax.tools.*;
 import javax.tools.JavaCompiler.CompilationTask;
+import snap.util.FilePathUtils;
 import snap.web.WebFile;
 
 /**
@@ -64,21 +64,12 @@ protected List <String> getOptions()
     options.add("-g");
     options.add("-source"); options.add("1.8"); options.add("-target"); options.add("1.8");
     
-    // Add ClassPath and return
-    options.add("-cp"); options.add(getClassPath());
+    // Add class path from project library paths and return
+    String libPaths[] = _proj.getLibPaths();
+    String libPathsNtv[] = FilePathUtils.getNativePaths(libPaths);
+    String cpath = FilePathUtils.getJoinedPath(libPathsNtv);
+    options.add("-cp"); options.add(cpath);
     return options;
-}
-
-/**
- * Returns the class path string: JavaFX jar path + Snap runtime jar path (optional) + Project.JarPaths.
- */
-protected String getClassPath()
-{
-    StringBuffer cp = new StringBuffer();
-    for(String p : getProject().getClassPath().getLibPathsNative()) cp.append(p).append(File.pathSeparator);
-    for(Project p : getProject().getProjects())
-        for(String p2 : p.getClassPath().getLibPathsNative()) cp.append(p2).append(File.pathSeparator);
-    return cp.toString();
 }
 
 /**

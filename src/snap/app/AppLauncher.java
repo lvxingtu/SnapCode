@@ -122,9 +122,8 @@ protected List <String> getCommand()
     commands.add(java);
     
     // Get Class path and add to list
-    List <String> cpaths = new ArrayList();
-    Collections.addAll(cpaths, _proj.getClassPaths());
-    String cpath = ListUtils.joinStrings(cpaths, File.pathSeparator);
+    String cpaths[] = _proj.getClassPaths(), cpathsNtv[] = FilePathUtils.getNativePaths(cpaths);
+    String cpath = FilePathUtils.getJoinedPath(cpathsNtv);
     commands.add("-cp"); commands.add(cpath);
 
     // If using Snap Runtime, add main class, otherwise ...

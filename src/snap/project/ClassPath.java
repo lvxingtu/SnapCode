@@ -313,33 +313,48 @@ public void removeLibPath(String aPath)
 }
 
 /**
+ * Returns the source path as absolute path.
+ */
+public String getSourcePathAbsolute()  { return getAbsolutePath(getSourcePath()); }
+
+/**
+ * Returns the build path as absolute path.
+ */
+public String getBuildPathAbsolute()  { return getAbsolutePath(getBuildPath()); }
+
+/**
  * Returns the library paths as absolute paths.
  */
 public String[] getLibPathsAbsolute()
 {
-    String fpaths[] = Arrays.copyOf(getLibPaths(), getLibPaths().length);
-    for(int i=0; i<fpaths.length; i++) { String path = fpaths[i];
-        if(!path.startsWith("/"))
-            path = fpaths[i] = getProjRootDirPath() + path;
-        if(!StringUtils.endsWithIC(path, ".jar") && !StringUtils.endsWithIC(path, ".zip") && !path.endsWith("/"))
-            path = fpaths[i] = path + '/';
-    }
-    return fpaths;
+    String lpaths[] = getLibPaths(), apaths[] = new String[lpaths.length];
+    for(int i=0; i<lpaths.length; i++) apaths[i] = addDirChar(getAbsolutePath(lpaths[i]));
+    return apaths;
 }
 
 /**
- * Returns the library paths using platform native File separator char.
+ * Returns an absolute path for given relative path with option to add .
  */
-public String[] getLibPathsNative()
+private String getAbsolutePath(String aPath)
 {
-    if(File.separatorChar=='/') return getLibPathsAbsolute();
-    String fpaths[] = getLibPathsAbsolute(), npaths[] = new String[fpaths.length];
-    for(int i=0; i<fpaths.length; i++) npaths[i] = fpaths[i].replace('/', File.separatorChar);
-    return npaths;
+    String path = aPath;
+    if(!path.startsWith("/"))
+        path = getProjRootDirPath() + path;
+    return path;
 }
 
 /**
- * Returns a relative path for given path and directory file.
+ * Adds a directory char to end of path if needed.
+ */
+private String addDirChar(String aPath)
+{
+    if(!StringUtils.endsWithIC(aPath, ".jar") && !StringUtils.endsWithIC(aPath, ".zip") && !aPath.endsWith("/"))
+        aPath = aPath + '/';
+    return aPath;
+}
+
+/**
+ * Returns a relative path for given path.
  */
 private String getRelativePath(String aPath)
 {

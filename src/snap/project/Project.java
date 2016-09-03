@@ -317,9 +317,22 @@ public ClassPath getClassPath()  { return ClassPath.get(this); }
 public String[] getClassPaths()
 {
     List <String> paths = new ArrayList();
-    paths.add(getBuildDir().getStandardFile().getAbsolutePath());
-    ListUtils.addAllUnique(paths, getClassPath().getLibPathsNative());
+    paths.add(getClassPath().getBuildPathAbsolute());
+    String libPaths[] = getClassPath().getLibPathsAbsolute();
+    ListUtils.addAllUnique(paths, libPaths);
     for(Project p : getProjects()) ListUtils.addAllUnique(paths, p.getClassPaths());
+    return paths.toArray(new String[paths.size()]);
+}
+
+/**
+ * Returns the paths needed to compile/run project.
+ */
+public String[] getLibPaths()
+{
+    List <String> paths = new ArrayList();
+    String libPaths[] = getClassPath().getLibPathsAbsolute();
+    ListUtils.addAllUnique(paths, libPaths);
+    for(Project p : getProjects()) ListUtils.addAllUnique(paths, p.getLibPaths());
     return paths.toArray(new String[paths.size()]);
 }
 

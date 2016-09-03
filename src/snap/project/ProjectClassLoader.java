@@ -6,6 +6,7 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.net.*;
 import java.util.*;
+import snap.util.FilePathUtils;
 import snap.web.*;
 
 /**
@@ -55,9 +56,10 @@ public void close() throws IOException
  */
 private static ClassLoader getURLClassLoader(Project aProj)
 {
-    // Get Project URLs
-    List <URL> ulist = new ArrayList();
-    for(String p : aProj.getClassPaths()) { URL u = WebURL.getURL(p).getURL(); ulist.add(u); }
+    // Get Project URLs from native class paths
+    String cpaths[] = aProj.getClassPaths();
+    String cpathsNtv[] = FilePathUtils.getNativePaths(cpaths);
+    List <URL> ulist = new ArrayList(); for(String p : cpathsNtv) { URL u = WebURL.getURL(p).getURL(); ulist.add(u); }
     URL urls[] = ulist.toArray(new URL[ulist.size()]);
     
     // Create ClassLoader for URLs and return
