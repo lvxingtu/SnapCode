@@ -6,18 +6,26 @@ import java.io.*;
 import java.lang.reflect.*;
 import java.util.*;
 import snap.project.Project;
-import snap.util.*;
+import snap.util.ClassUtils;
 import snap.web.*;
 
 /**
  * A file to represent a Java class.
  */
-public class ClassData extends WebFileData {
+public class ClassData {
+
+    // The class file
+    WebFile        _file;
+
+/**
+ * Creates a new ClassData for given file.
+ */
+public ClassData(WebFile aFile)  { _file = aFile; }
 
 /**
  * Returns the project.
  */
-private Project getProj()  { return Project.get(getSite()); }
+private Project getProj()  { return Project.get(_file); }
 
 /**
  * Returns the sets of JavaDecls that this class declares and (externally) references.
@@ -25,15 +33,15 @@ private Project getProj()  { return Project.get(getSite()); }
 public void getDeclsAndRefs(Set <JavaDecl> theDecls, Set <JavaDecl> theRefs)
 {
     // Get bytes
-    if(getBytes()==null) return;
+    if(_file.getBytes()==null) return;
     
     // Get ClassFile reader and read
     ClassFileData cfd = new ClassFileData();
-    try { cfd.read(new DataInputStream(getInputStream())); }
+    try { cfd.read(new DataInputStream(_file.getInputStream())); }
     catch(Exception e) { System.err.println(e); return; }
     
     // Iterate over constants and add to set top level class names
-    String cname = getRootClassName(getProj().getClassName(getSourceFile()));
+    String cname = getRootClassName(getProj().getClassName(_file));
     for(int i=1, iMax=cfd.getConstantCount(); i<=iMax; i++) { ClassFileData.Constant constant = cfd.getConstant(i);
         if(constant.isClass() && (isInRootClassName(cname, constant.getClassName()) ||
             ClassUtils.isPrimitiveClassName(constant.getClassName())))
@@ -43,7 +51,7 @@ public void getDeclsAndRefs(Set <JavaDecl> theDecls, Set <JavaDecl> theRefs)
     }
     
     // Get class and make sure TypeParameters, superclass and interfaces are in refs
-    Class cls = getProj().getClassForFile(getSourceFile());
+    Class cls = getProj().getClassForFile(_file);
     theDecls.add(new JavaDecl(cls));
     for(TypeVariable tp : cls.getTypeParameters()) addClassRef(tp, theRefs);
     addClassRef(cls.getGenericSuperclass(), theRefs);
@@ -51,7 +59,7 @@ public void getDeclsAndRefs(Set <JavaDecl> theDecls, Set <JavaDecl> theRefs)
     
     // Fields: add JavaDecl for each declared field - also make sure field type is in references
     Field fields[]; try { fields = cls.getDeclaredFields(); }
-    catch(Throwable e) { System.err.println(e + " in " + getSourceURL().getPath()); return; }
+    catch(Throwable e) { System.err.println(e + " in " + _file); return; }
     for(Field field : fields) {
         theDecls.add(new JavaDecl(field));
         addClassRef(field.getGenericType(), theRefs);
@@ -59,7 +67,7 @@ public void getDeclsAndRefs(Set <JavaDecl> theDecls, Set <JavaDecl> theRefs)
     
     // Constructors: Add JavaDecl for each constructor - also make sure parameter types are in references
     Constructor constrs[]; try { constrs = cls.getDeclaredConstructors(); }
-    catch(Throwable e) { System.err.println(e + " in " + getSourceURL().getPath()); return; }
+    catch(Throwable e) { System.err.println(e + " in " + _file); return; }
     for(Constructor constr : constrs) {
         if(constr.isSynthetic()) continue;
         theDecls.add(new JavaDecl(constr));
@@ -68,7 +76,7 @@ public void getDeclsAndRefs(Set <JavaDecl> theDecls, Set <JavaDecl> theRefs)
     
     // Methods: Add JavaDecl for each declared method - also make sure return type and parameter types are in references
     Method methods[]; try { methods = cls.getDeclaredMethods(); }
-    catch(Throwable e) { System.err.println(e + " in " + getSourceURL().getPath()); return; }
+    catch(Throwable e) { System.err.println(e + " in " + _file); return; }
     for(Method meth : methods) {
         if(meth.isSynthetic()) continue;
         theDecls.add(new JavaDecl(meth));
@@ -136,7 +144,7 @@ private final void addClassRef(Class aClass, Set <JavaDecl> theRefs)
     while(aClass.isArray()) aClass = aClass.getComponentType();
     if(aClass.isAnonymousClass() || aClass.isPrimitive() || aClass.isSynthetic()) return;
     JavaDecl ref; try { ref = new JavaDecl(aClass); ref._modifier = 0; }
-    catch(Throwable e) { System.err.println(e + " in " + getSourceURL().getPath()); return; }
+    catch(Throwable e) { System.err.println(e + " in " + _file); return; }
     theRefs.add(ref);
 }
 
@@ -155,6 +163,11 @@ private static boolean isInRootClassName(String aRoot, String aChild)
 /**
  * Returns the ClassData for given file.
  */
-public static ClassData get(WebFile aFile)  { return get(aFile, ClassData.class); }
+public static ClassData get(WebFile aFile)
+{
+    ClassData data = (ClassData)aFile.getProp(ClassData.class.getName());
+    if(data==null) aFile.setProp(ClassData.class.getName(), data = new ClassData(aFile));
+    return data;
+}
 
 }

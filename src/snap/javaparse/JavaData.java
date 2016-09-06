@@ -2,13 +2,15 @@ package snap.javaparse;
 import java.util.*;
 import snap.parse.*;
 import snap.project.*;
-import snap.util.*;
 import snap.web.WebFile;
 
 /**
  * A file object for managing Java files.
  */
-public class JavaData extends WebFileData {
+public class JavaData {
+
+    // The java file
+    WebFile          _file;
 
     // The set of declarations in this JavaFile
     Set <JavaDecl>   _decls = new HashSet();
@@ -25,6 +27,11 @@ public class JavaData extends WebFileData {
     // The parsed version of this JavaFile
     JFile            _jfile;
     
+/**
+ * Creates a new JavaData for given file.
+ */
+public JavaData(WebFile aFile)  { _file = aFile; }
+
 /**
  * Returns the declarations in this JavaFile.
  */
@@ -57,7 +64,7 @@ public Set <WebFile> updateDependencies()
 {
     // Get new declarations and refs
     Set <JavaDecl> ndecls = new HashSet(), nrefs = new HashSet(); _dset = true; _jfile = null;
-    WebFile jfile = getSourceFile();
+    WebFile jfile = _file;
     Project proj = Project.get(jfile);
     WebFile cfiles[] = proj.getClassFiles(jfile);
     if(cfiles!=null) {
@@ -119,8 +126,7 @@ public Set <WebFile> updateDependencies()
  */
 public void removeDependencies()
 {
-    WebFile file = getSourceFile();
-    for(WebFile dep : _dependencies) JavaData.get(dep)._dependents.remove(file);
+    for(WebFile dep : _dependencies) JavaData.get(dep)._dependents.remove(_file);
     _dependencies.clear(); _decls.clear(); _refs.clear(); _dset = false;
 }
 
@@ -135,10 +141,10 @@ public JFile getJFile()  { return _jfile!=null? _jfile : (_jfile=createJFile());
 protected JFile createJFile()
 {
     // Get Java string and parser and generate JavaFile
-    String string = getSourceFile().getText();
+    String string = _file.getText();
     JavaParser javaParser = JavaParser.getShared();
     JFile jfile = javaParser.getJavaFile(string);
-    jfile.setSourceFile(getSourceFile());
+    jfile.setSourceFile(_file);
     return jfile;
 }
 
@@ -147,7 +153,7 @@ protected JFile createJFile()
  */
 public List <BuildIssue> getUnusedImports()
 {
-    String string = getSourceFile().getText();
+    String string = _file.getText();
     Parser ip = JavaParser.getShared().getImportsParser();
     ParseNode node = null; try { node = string!=null && string.length()>0? ip.parse(string) : null; }
     catch(ParseException e) { System.err.println("JavaData.getUnusedImports Parse Exception"); e.printStackTrace(); }
@@ -155,7 +161,7 @@ public List <BuildIssue> getUnusedImports()
     
     // Set JFile
     JFile jfile = node!=null? node.getCustomNode(JFile.class) : new JFile();
-    jfile.setSourceFile(getSourceFile());
+    jfile.setSourceFile(_file);
     List <JImportDecl> imports = jfile.getImportDecls(); if(imports.size()==0) return Collections.EMPTY_LIST;
     Set <JImportDecl> iset = new HashSet(imports);
     
@@ -185,7 +191,7 @@ public List <BuildIssue> getUnusedImports()
     // Create BuildIssues and return
     List <BuildIssue> issues = new ArrayList();
     for(JImportDecl idecl : iset)
-        issues.add(new BuildIssue().init(getSourceFile(), BuildIssue.Kind.Warning,
+        issues.add(new BuildIssue().init(_file, BuildIssue.Kind.Warning,
             "The import " + idecl.getName() + " is never used",
             idecl.getLineIndex(), 0, idecl.getStart(), idecl.getEnd()));
     return issues;
@@ -194,6 +200,11 @@ public List <BuildIssue> getUnusedImports()
 /**
  * Returns the JavaData for given file.
  */
-public static JavaData get(WebFile aFile)  { return get(aFile, JavaData.class); }
+public static JavaData get(WebFile aFile)
+{
+    JavaData data = (JavaData)aFile.getProp(JavaData.class.getName());
+    if(data==null) aFile.setProp(JavaData.class.getName(), data = new JavaData(aFile));
+    return data;
+}
 
 }
