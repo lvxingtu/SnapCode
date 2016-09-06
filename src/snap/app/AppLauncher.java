@@ -122,7 +122,7 @@ protected List <String> getCommand()
     commands.add(java);
     
     // Get Class path and add to list
-    String cpaths[] = _proj.getClassPaths(), cpathsNtv[] = FilePathUtils.getNativePaths(cpaths);
+    String cpaths[] = _proj.getProjectSet().getClassPaths(), cpathsNtv[] = FilePathUtils.getNativePaths(cpaths);
     String cpath = FilePathUtils.getJoinedPath(cpathsNtv);
     commands.add("-cp"); commands.add(cpath);
 

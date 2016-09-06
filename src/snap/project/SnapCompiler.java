@@ -65,7 +65,7 @@ protected List <String> getOptions()
     options.add("-source"); options.add("1.8"); options.add("-target"); options.add("1.8");
     
     // Add class path from project library paths and return
-    String libPaths[] = _proj.getLibPaths();
+    String libPaths[] = _proj.getProjectSet().getLibPaths();
     String libPathsNtv[] = FilePathUtils.getNativePaths(libPaths);
     String cpath = FilePathUtils.getJoinedPath(libPathsNtv);
     options.add("-cp"); options.add(cpath);
@@ -123,7 +123,7 @@ public void report(Diagnostic aDiagnostic)
  */
 protected void report(BuildIssue anIssue)
 {
-    _proj.getBuildIssues().add(anIssue);
+    _proj.getRootProject().getBuildIssues().add(anIssue);
     if(anIssue.getKind()==BuildIssue.Kind.Error) _errorCount++;
 }
 

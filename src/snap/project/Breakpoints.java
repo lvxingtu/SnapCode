@@ -77,7 +77,7 @@ protected List <Breakpoint> readFile()
         String type = scanner.next();
         String path = scanner.next();
         int line = scanner.nextInt();
-        WebFile f = _proj.getFile(path);
+        WebFile f = _proj.getProjectSet().getFile(path);
         if(f!=null)
             list.add(new Breakpoint().initSourceLine(f, line));
     }

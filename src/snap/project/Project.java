@@ -35,9 +35,9 @@ public class Project extends SnapObject {
     // The project that loaded us
     Project                            _parent;
     
-    // The list of projects this project depends on
-    Project                            _projects[];
-
+    // The set of projects this project depends on
+    ProjectSet                         _projSet = new ProjectSet(this);
+    
     // Constants for Project Settings
     public static final String         RemoteURL = "RemoteSourceURL";
     
@@ -64,13 +64,7 @@ protected void setSite(WebSite aSite)  { _site = aSite; _site.setProp(Project.cl
 /**
  * Returns a file for given path.
  */
-public WebFile getFile(String aPath)
-{
-    WebFile file = _site.getFile(aPath); if(file!=null) return file;
-    for(Project p : getProjects()) {
-        file = p.getFile(aPath); if(file!=null) return file; }
-    return null;
-}
+public WebFile getFile(String aPath)  { return _site.getFile(aPath); }
 
 /**
  * Creates a file for given path.
@@ -100,42 +94,12 @@ public Project getRootProject()  { return _parent!=null? _parent.getRootProject(
 /**
  * Returns the list of projects this project depends on.
  */
-public Project[] getProjects()
-{
-    // If already set, just return
-    if(_projects!=null) return _projects;
-    
-    // Create list of projects from ClassPath.ProjectPaths
-    List <Project> projs = new ArrayList();
-    for(String path : getClassPath().getProjectPaths()) {
-        WebSite parSite = getSite().getURL().getSite(); // Get parent site
-        WebURL projURL = parSite.getURL(path);
-        WebSite projSite = projURL.getAsSite();
-        Project proj = Project.get(projSite, true); proj._parent = this;
-        projs.add(proj);
-    }
-    
-    // Return list
-    return _projects = projs.toArray(new Project[projs.size()]);
-}
+public Project[] getProjects()  { return _projSet.getProjects(); }
 
 /**
- * Adds a dependent project.
+ * Returns the set of projects this project depends on.
  */
-public void addProject(String aPath)
-{
-    getClassPath().addSrcPath(aPath);
-    _projects = null;
-}
-
-/**
- * Removes a dependent project.
- */
-public void removeProject(String aPath)
-{
-    getClassPath().removeSrcPath(aPath);
-    _projects = null;
-}
+public ProjectSet getProjectSet()  { return _projSet; }
 
 /**
  * Returns the source file for given path.
@@ -147,11 +111,6 @@ public WebFile getSourceFile(String aPath, boolean doCreate, boolean isDir)
     if(bpath.length()>1 && path.startsWith(bpath)) path = path.substring(bpath.length() - 1);
     if(spath.length()>1 && !path.startsWith(spath)) path = spath + path;
     WebFile file = getSite().getFile(path);
-    
-    // Look for file in dependent child projects
-    if(file==null)
-        for(Project proj : getProjects())
-            if((file=proj.getSourceFile(aPath, false, isDir))!=null) break;
     
     // If file still not found, maybe create and return
     if(file==null && doCreate) file = getSite().createFile(path, isDir);
@@ -168,11 +127,6 @@ public WebFile getBuildFile(String aPath, boolean doCreate, boolean isDir)
     if(spath.length()>1 && path.startsWith(spath)) path = path.substring(spath.length() - 1);
     if(bpath.length()>1 && !path.startsWith(bpath)) path = bpath + path;
     WebFile file = getBuildDir().getSite().getFile(path);
-    
-    // Look for file in dependent child projects
-    if(file==null)
-        for(Project proj : getProjects())
-            if((file=proj.getBuildFile(aPath, false, isDir))!=null) break;
     
     // If file still not found, maybe create and return
     if(file==null && doCreate) file = getBuildDir().getSite().createFile(path, isDir);
@@ -316,25 +270,15 @@ public ClassPath getClassPath()  { return ClassPath.get(this); }
  */
 public String[] getClassPaths()
 {
-    List <String> paths = new ArrayList();
-    paths.add(getClassPath().getBuildPathAbsolute());
-    String libPaths[] = getClassPath().getLibPathsAbsolute();
-    ListUtils.addAllUnique(paths, libPaths);
-    for(Project p : getProjects()) ListUtils.addAllUnique(paths, p.getClassPaths());
-    return paths.toArray(new String[paths.size()]);
+    String bpath = getClassPath().getBuildPathAbsolute();
+    String libPaths[] = getLibPaths(); if(libPaths.length==0) return new String[] { bpath };
+    return ArrayUtils.add(libPaths, bpath, 0);
 }
 
 /**
  * Returns the paths needed to compile/run project.
  */
-public String[] getLibPaths()
-{
-    List <String> paths = new ArrayList();
-    String libPaths[] = getClassPath().getLibPathsAbsolute();
-    ListUtils.addAllUnique(paths, libPaths);
-    for(Project p : getProjects()) ListUtils.addAllUnique(paths, p.getLibPaths());
-    return paths.toArray(new String[paths.size()]);
-}
+public String[] getLibPaths()  { return getClassPath().getLibPathsAbsolute(); }
 
 /**
  * Returns the breakpoints.
@@ -366,9 +310,8 @@ public Date getBuildDate()  { return _buildDate; }
  */
 public boolean buildProject(TaskMonitor aTM)
 {
-    // Build dependent projects first
-    for(Project p : getProjects())
-        p.buildProject(aTM);
+    System.out.println("Project.buildProject: " + getSite().getName() + " " +
+        FilePathUtils.getJoinedPath(getProjectSet().getLibPaths()));
     
     // Clear classloader
     clearClassLoader();
@@ -423,12 +366,7 @@ public ProjectFileBuilder getFileBuilder(WebFile aFile)
 /**
  * Adds a build file.
  */
-public void addBuildFilesAll()
-{
-    addBuildFile(getSourceDir());
-    for(Project p : getProjects())
-        p.addBuildFilesAll();
-}
+public void addBuildFilesAll()  { addBuildFile(getSourceDir()); }
 
 /**
  * Adds a build file.

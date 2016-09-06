@@ -38,10 +38,8 @@ public SnapCompilerFM(SnapCompiler aCompiler, JavaFileManager aFileManager)
     super(aFileManager); _compiler = aCompiler; _proj = _compiler._proj;
 }
 
-/**
- * Override to return class loader.
- */
-public ClassLoader getClassLoader(JavaFileManager.Location aLocation)  { return _proj.getSite().getClassLoader(); }
+/** Override to return class loader. */
+//public ClassLoader getClassLoader(JavaFileManager.Location aLocation){ return _proj.getSite().getClassLoader(); }
 
 /**
  * Return a FileObject for a given location from which compiler can obtain source or byte code.

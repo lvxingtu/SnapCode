@@ -30,7 +30,7 @@ public ClassPathInfo(Project aProj)
     WebSite jfxrt = WebURL.getURL(javafx.scene.Node.class).getSite(); _sites.add(jfxrt);
     
     // Add project class path sites
-    for(String jar : aProj.getClassPaths())
+    for(String jar : aProj.getProjectSet().getClassPaths())
         _sites.add(WebURL.getURL(jar).getAsSite());
 }
 

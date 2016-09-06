@@ -320,7 +320,7 @@ public String getSourcePathAbsolute()  { return getAbsolutePath(getSourcePath())
 /**
  * Returns the build path as absolute path.
  */
-public String getBuildPathAbsolute()  { return getAbsolutePath(getBuildPath()); }
+public String getBuildPathAbsolute()  { return addDirChar(getAbsolutePath(getBuildPath())); }
 
 /**
  * Returns the library paths as absolute paths.

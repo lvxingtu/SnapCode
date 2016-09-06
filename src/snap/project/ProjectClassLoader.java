@@ -20,9 +20,9 @@ public class ProjectClassLoader extends WebClassLoader implements Closeable {
 /**
  * Creates a new AppClassLoader.
  */
-public ProjectClassLoader(Project aProject)
+public ProjectClassLoader(Project aProj)
 {
-    super(getURLClassLoader(aProject), aProject.getSite());  _proj = aProject;
+    super(getURLClassLoader(aProj), aProj.getSite());  _proj = aProj;
 }
 
 /**
@@ -57,7 +57,7 @@ public void close() throws IOException
 private static ClassLoader getURLClassLoader(Project aProj)
 {
     // Get Project URLs from native class paths
-    String cpaths[] = aProj.getClassPaths();
+    String cpaths[] = aProj.getProjectSet().getClassPaths();
     String cpathsNtv[] = FilePathUtils.getNativePaths(cpaths);
     List <URL> ulist = new ArrayList(); for(String p : cpathsNtv) { URL u = WebURL.getURL(p).getURL(); ulist.add(u); }
     URL urls[] = ulist.toArray(new URL[ulist.size()]);

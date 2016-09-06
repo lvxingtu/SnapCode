@@ -25,6 +25,9 @@ public class ProjectPane extends ViewOwner {
     // The project
     Project             _proj;
     
+    // The project set
+    ProjectSet          _projSet;
+    
     // Whether to auto build project when files change
     boolean             _autoBuild = true;
 
@@ -46,7 +49,7 @@ public class ProjectPane extends ViewOwner {
 public ProjectPane(SitePane aSitePane)
 {
     _sitePane = aSitePane; _site = aSitePane.getSite(); _site.setProp(ProjectPane.class.getName(), this);
-    _proj = Project.get(_site);
+    _proj = Project.get(_site); _projSet = _proj.getProjectSet();
 }
 
 /**
@@ -164,8 +167,8 @@ public class BuildFilesRunner extends TaskRunner {
     /** BuildFiles. */
     public Object run()
     {
-        if(_addFiles) { _addFiles = false; _proj.addBuildFilesAll(); }
-        _proj.buildProject(this);
+        if(_addFiles) { _addFiles = false; _projSet.addBuildFilesAll(); }
+        _projSet.buildProjects(this);
         return true;
     }
     public void beginTask(final String aTitle, int theTotalWork)  { setActivity(aTitle); }
@@ -180,6 +183,7 @@ public class BuildFilesRunner extends TaskRunner {
     void setActivity(String aStr)  { if(_appPane!=null) _appPane.getBrowser().setActivity(aStr); }
     public void failure(final Exception e)
     {
+        e.printStackTrace();
         runLater(() -> DialogBox.showExceptionDialog(null, "Build Failed", e));
         _runAgain = false;
     }
@@ -368,7 +372,7 @@ public void respondUI(ViewEvent anEvent)
         DialogBox dbox = new DialogBox("Add Project Dependency"); dbox.setQuestionMessage("Enter Project Name:");
         String pname = dbox.showInputDialog(getUI(), null); if(pname==null || pname.length()==0) return;
         if(!pname.startsWith("/")) pname = '/' + pname;
-        _proj.addProject(pname);
+        _proj.getProjectSet().addProject(pname);
     }
     
     // Handle DeleteAction
@@ -376,7 +380,7 @@ public void respondUI(ViewEvent anEvent)
         if(getView("JarPathsList").isFocused())
             getProject().getClassPath().removeLibPath(getSelectedJarPath());
         else if(getView("ProjectPathsList").isFocused())
-            getProject().removeProject(getSelectedProjectPath());
+            getProject().getProjectSet().removeProject(getSelectedProjectPath());
     }
 }
 
