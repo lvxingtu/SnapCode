@@ -310,9 +310,6 @@ public Date getBuildDate()  { return _buildDate; }
  */
 public boolean buildProject(TaskMonitor aTM)
 {
-    System.out.println("Project.buildProject: " + getSite().getName() + " " +
-        FilePathUtils.getJoinedPath(getProjectSet().getLibPaths()));
-    
     // Clear classloader
     clearClassLoader();
     
