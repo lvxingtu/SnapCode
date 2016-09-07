@@ -2,6 +2,8 @@
  * Copyright (c) 2010, ReportMill Software. All rights reserved.
  */
 package snap.project;
+import java.io.Closeable;
+import java.net.*;
 import java.util.*;
 import snap.util.*;
 import snap.web.*;
@@ -30,7 +32,7 @@ public class Project extends SnapObject {
     Breakpoints                        _bpoints;
 
     // The ClassLoader for compiled class info
-    ProjectClassLoader                 _clsLdr;
+    ClassLoader                        _clsLdr;
     
     // The project that loaded us
     Project                            _parent;
@@ -231,14 +233,26 @@ public String getPackageName(WebFile aFile)
 /**
  * Returns the project class loader.
  */
-public ProjectClassLoader getClassLoader()  { return _clsLdr!=null? _clsLdr : (_clsLdr=new ProjectClassLoader(this)); }
+public ClassLoader getClassLoader()
+{
+    // If already set, just return
+    if(_clsLdr!=null) return _clsLdr;
+    
+    // Create ClassLoader for ProjectSet.ClassPath URLs and SystemClassLoader.Parent and return
+    String cpaths[] = getProjectSet().getClassPaths();
+    URL urls[] = FilePathUtils.getURLs(cpaths);
+    ClassLoader cldr = ClassLoader.getSystemClassLoader().getParent();
+    return _clsLdr = new URLClassLoader(urls, cldr);
+}
 
 /**
  * Clears the class loader.
  */
 protected void clearClassLoader()
 {
-    if(_clsLdr!=null) try { _clsLdr.close(); } catch(Exception e) { throw new RuntimeException(e); }
+    if(_clsLdr instanceof Closeable)
+        try { ((Closeable)_clsLdr).close(); }
+        catch(Exception e) { throw new RuntimeException(e); }
     _clsLdr = null;
 }
 

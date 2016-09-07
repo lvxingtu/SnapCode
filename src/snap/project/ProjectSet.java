@@ -163,4 +163,14 @@ public boolean buildProjects(TaskMonitor aTM)
     return _proj.buildProject(aTM);
 }
     
+/**
+ * Returns a Java file for class name.
+ */
+public WebFile getJavaFile(String aClassName)
+{
+    WebFile file = _proj.getJavaFile(aClassName); if(file!=null) return file;
+    for(Project p : getProjects()) { file = p.getJavaFile(aClassName); if(file!=null) return file; }
+    return null;
+}
+
 }

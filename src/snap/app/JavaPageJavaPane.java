@@ -91,7 +91,7 @@ public void openDecl(JavaDecl aDecl)
 
     // Open decl in project file
     Project proj = Project.get(getSite()); if(proj==null) return;
-    WebFile file = proj.getJavaFile(cname); if(file==null) return;
+    WebFile file = proj.getProjectSet().getJavaFile(cname); if(file==null) return;
     JavaData jdata = JavaData.get(file);
     JNode node = JavaDecl.getDeclMatch(proj, jdata.getJFile(), aDecl);
     String urls = file.getURL().getString();
