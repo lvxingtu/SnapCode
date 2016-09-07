@@ -20,6 +20,9 @@ public class SnapCompiler implements DiagnosticListener {
     // The shared compiler
     JavaCompiler            _compiler;
     
+    // The options for compile
+    List <String>           _options;
+    
     // The shared file manager for any project compile
     SnapCompilerFM          _fm;
     
@@ -45,18 +48,30 @@ public Project getProject()  { return _proj; }
 /**
  * Returns the java compiler.
  */
-public JavaCompiler getCompiler()  { return _compiler!=null? _compiler : (_compiler=getCompilerImpl()); }
-
-/**
- * Returns the java compiler.
- */
-private JavaCompiler getCompilerImpl()  { return getSystemCompiler(); }
+public JavaCompiler getCompiler()
+{
+    // If already set, just return
+    if(_compiler!=null) return _compiler;
+    
+    // Get System Java compiler - just return if found
+    _compiler = ToolProvider.getSystemJavaCompiler();
+    if(_compiler!=null)
+        return _compiler;
+    
+    // Get compiler class and instance and return
+    try { Class cls = Class.forName("com.sun.tools.javac.api.JavacTool", true, getClass().getClassLoader());
+        return _compiler = (JavaCompiler)cls.newInstance(); }
+    catch(Exception e)  { throw new RuntimeException(e); }
+}
 
 /**
  * Returns the options list.
  */
 protected List <String> getOptions()
 {
+    // If already set, just return
+    if(_options!=null) return _options;
+    
     // Create Options list, add debug flag and source/target flag for Java 1.5
     List <String> options = new ArrayList();
     options.add("-Xlint:all,-serial,-rawtypes,-unchecked,-fallthrough,-dep-ann");
@@ -66,24 +81,23 @@ protected List <String> getOptions()
     
     // Add class path from project library paths and return
     String libPaths[] = _proj.getProjectSet().getLibPaths();
-    String libPathsNtv[] = FilePathUtils.getNativePaths(libPaths);
-    String cpath = FilePathUtils.getJoinedPath(libPathsNtv);
-    options.add("-cp"); options.add(cpath);
-    return options;
+    if(libPaths.length>0) {
+        String libPathsNtv[] = FilePathUtils.getNativePaths(libPaths);
+        String cpath = FilePathUtils.getJoinedPath(libPathsNtv);
+        options.add("-cp"); options.add(cpath);
+    }
+    
+    return _options = options;
 }
 
 /**
  * Returns the compiler file manager.
  */
-public SnapCompilerFM getFileManaer()  { return _fm!=null? _fm : (_fm=createFileManager()); }
-
-/**
- * Creates the compiler file manager.
- */
-SnapCompilerFM createFileManager()
+public SnapCompilerFM getFileManaer()
 {
+    if(_fm!=null) return _fm;
     StandardJavaFileManager sfm = getCompiler().getStandardFileManager(null, null, null);
-    return new SnapCompilerFM(this, sfm);
+    return _fm = new SnapCompilerFM(this, sfm);
 }
 
 /**
@@ -175,22 +189,5 @@ public Set <WebFile> getCompiledJavaFiles()  { return _compJFs; }
  * Returns the Set of source files that had class files modified by the compile.
  */
 public Set <WebFile> getModifiedJavaFiles()  { return _modJFs; }
-
-/**
- * Returns the java compiler.
- */
-public JavaCompiler getSystemCompiler()
-{
-    // Get java compiler - just return if found
-    JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
-    if(compiler!=null)
-        return compiler;
-    
-    // Get compiler class and instance and return
-    try {
-        Class cclass = Class.forName("com.sun.tools.javac.api.JavacTool", true, getClass().getClassLoader());
-        return (JavaCompiler)cclass.newInstance();
-    } catch(Exception e)  { throw new RuntimeException(e); }
-}
 
 }
