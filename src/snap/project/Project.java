@@ -431,7 +431,7 @@ public void fileAdded(WebFile aFile)
 public void fileRemoved(WebFile aFile)
 {
     removeBuildFile(aFile); // Remove build files
-    getBuildIssues().remove(aFile); // Remove BuildIssues for file
+    getRootProject().getBuildIssues().remove(aFile); // Remove BuildIssues for file
 }
 
 /**

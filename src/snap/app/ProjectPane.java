@@ -232,7 +232,7 @@ void fileSaved(WebFile aFile)
 /**
  * Returns the list of jar paths.
  */
-public String[] getJarPaths()  { return getProject().getClassPath().getLibPaths(); }
+public String[] getJarPaths()  { return _proj.getClassPath().getLibPaths(); }
 
 /**
  * Returns the selected JarPath.
@@ -251,7 +251,7 @@ public void setSelectedJarPath(String aJarPath)  { _jarPath = aJarPath; }
 /**
  * Returns the list of dependent project paths.
  */
-public String[] getProjectPaths()  { return getProject().getClassPath().getProjectPaths(); }
+public String[] getProjectPaths()  { return _proj.getClassPath().getProjectPaths(); }
 
 /**
  * Returns the selected Project Path.
@@ -326,7 +326,7 @@ protected void notifyBuildIssueRemoved(BuildIssue aBI)
 protected void handleBuildCompleted()
 {
     // Get final error count and see if problems pane should show or hide
-    int ecount = _proj.getBuildIssues().getErrorCount();
+    int ecount = _proj.getRootProject().getBuildIssues().getErrorCount();
     if(ecount>0 && getAppPane().getSupportTrayIndex()!=0)
         getAppPane().setSupportTrayIndex(0);
     if(ecount==0 && _appPane.getSupportTrayIndex()==SupportTray.PROBLEMS_PANE)
@@ -361,7 +361,7 @@ public void respondUI(ViewEvent anEvent)
         if(anEvent.isDragDropEvent()) {
             List <File> files = anEvent.getDropFiles(); if(files==null || files.size()==0) return;
             for(File file : files) { String path = file.getAbsolutePath(); //if(StringUtils.endsWithIC(path, ".jar"))
-                getProject().getClassPath().addLibPath(path); }
+                _proj.getClassPath().addLibPath(path); }
             _sitePane.buildSite(false);
             anEvent.dropComplete();
         }
@@ -378,9 +378,9 @@ public void respondUI(ViewEvent anEvent)
     // Handle DeleteAction
     if(anEvent.equals("DeleteAction") || anEvent.equals("BackSpaceAction")) {
         if(getView("JarPathsList").isFocused())
-            getProject().getClassPath().removeLibPath(getSelectedJarPath());
+            _proj.getClassPath().removeLibPath(getSelectedJarPath());
         else if(getView("ProjectPathsList").isFocused())
-            getProject().getProjectSet().removeProject(getSelectedProjectPath());
+            _proj.getProjectSet().removeProject(getSelectedProjectPath());
     }
 }
 

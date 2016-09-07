@@ -600,7 +600,7 @@ public Project getRootProject()  { Project proj = getProject(); return proj!=nul
  */
 public BuildIssue[] getBuildIssues()
 {
-    WebFile file = getSourceFile(); Project proj = getProject();
+    WebFile file = getSourceFile(); Project proj = getRootProject();
     return proj!=null? proj.getBuildIssues().getIssues(file) : BuildIssues.NO_ISSUES;
 }
 

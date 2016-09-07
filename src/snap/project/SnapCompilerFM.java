@@ -218,7 +218,7 @@ class SnapFileJFO extends SimpleJavaFileObject {
     {
         if(_str!=null) return _str;
         _str = _file.getText();
-        _proj.getBuildIssues().remove(_file);
+        _proj.getRootProject().getBuildIssues().remove(_file);
         return _str;
     }
     

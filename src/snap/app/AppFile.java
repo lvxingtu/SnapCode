@@ -173,7 +173,7 @@ public View getGraphic()
     View grf = new ImageView(img); grf.setPrefSize(18,18);
     
     // If error/warning add Error/Warning badge as composite icon
-    BuildIssue.Kind status = _proj!=null? _proj.getBuildIssues().getBuildStatus(_file) : null;
+    BuildIssue.Kind status = _proj!=null? _proj.getRootProject().getBuildIssues().getBuildStatus(_file) : null;
     if(status!=null) {
        Image badge = status==BuildIssue.Kind.Error? ErrorBadge : WarningBadge;
        ImageView bview = new ImageView(badge); bview.setLean(Pos.BOTTOM_LEFT);
