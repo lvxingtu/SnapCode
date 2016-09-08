@@ -126,6 +126,10 @@ public boolean buildFiles(TaskMonitor aTaskMonitor)
         // Add Compiler.CompiledFiles to CompiledFiles
         compiledFiles.addAll(compiler.getCompiledJavaFiles());
         
+        // If there were modified files, clear Project.ClassLoader
+        if(compiler.getModifiedJavaFiles().size()>0)
+            _proj.clearClassLoader();
+        
         // Iterate over JavaFiles for modified ClassFiles and update
         for(WebFile jfile : compiler.getModifiedJavaFiles()) {
             

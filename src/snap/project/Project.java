@@ -328,9 +328,6 @@ public Date getBuildDate()  { return _buildDate; }
  */
 public boolean buildProject(TaskMonitor aTM)
 {
-    // Clear classloader
-    clearClassLoader();
-    
     // Build files
     _building = true;
     boolean buildSuccess = _javaFileBuilder.buildFiles(aTM);
