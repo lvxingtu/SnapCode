@@ -122,7 +122,7 @@ public boolean matches(ReferenceType aRefType)
     
     // Ignore matches for ProjectClassLoader. TODO: Need better way to resolve duplicate classes
     if(match)
-        if(aRefType.classLoader().type().name().contains("ProjectClassLoader"))
+        if(aRefType.classLoader().type().name().endsWith("ProjectClassLoaderX"))
             match = false;
     return match;
 }

@@ -242,8 +242,12 @@ public ClassLoader getClassLoader()
     String cpaths[] = getProjectSet().getClassPaths();
     URL urls[] = FilePathUtils.getURLs(cpaths);
     ClassLoader cldr = ClassLoader.getSystemClassLoader().getParent();
-    return _clsLdr = new URLClassLoader(urls, cldr);
+    return _clsLdr = new ProjectClassLoaderX(urls, cldr);
 }
+
+/** Needs unique name so that when debugging SnapCode, we can ignore classes loaded by Project. */
+public static class ProjectClassLoaderX extends URLClassLoader {
+    public ProjectClassLoaderX(URL urls[], ClassLoader aPar) { super(urls, aPar); } }
 
 /**
  * Clears the class loader.
