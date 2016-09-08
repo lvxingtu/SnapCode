@@ -136,11 +136,6 @@ public void respondUI(ViewEvent anEvent)
 }
 
 /**
- * Provide hook for subclasses to provide PC.
- */
-protected int getProgramCounterLine()  { return -1; } 
-
-/**
  * Override to create custom JavaTextView.
  */
 @Override
@@ -168,10 +163,6 @@ protected class SnapJavaText extends JavaTextBox {
         super.updateLines(aStart, endOld, endNew);
         if(_codePane.getShowSnapCode()) _editorPane.rebuildLater();
     }
-
-    /** Override to get from SnapJavaPane. */
-    @Override
-    public int getProgramCounterLine()  { return SnapJavaPane.this.getProgramCounterLine(); }
 }
 
 }

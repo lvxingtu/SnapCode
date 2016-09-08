@@ -58,11 +58,6 @@ protected JFilePlus createJFile()
 public void setString(String aString)  { super.setString(aString); _jfile = null; }
 
 /**
- * Returns the ProgramCounter line.
- */
-public int getProgramCounterLine()  { return -1; }
-
-/**
  * Override to return JavaTextLine.
  */
 public JavaTextLine getLine(int anIndex)  { return (JavaTextLine)super.getLine(anIndex); }

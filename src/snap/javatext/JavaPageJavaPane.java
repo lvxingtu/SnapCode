@@ -3,7 +3,6 @@ import snap.app.AppBrowser;
 import snap.app.AppPane;
 import snap.app.SupportTray;
 import snap.javaparse.*;
-import snap.javasnap.SnapJavaPane;
 import snap.project.Project;
 import snap.viewx.*;
 import snap.web.*;
@@ -11,7 +10,7 @@ import snap.web.*;
 /**
  * A JavaTextPane for a Snap JavaFile.
  */
-public class JavaPageJavaPane extends SnapJavaPane implements WebFile.Updater {
+public class JavaPageJavaPane extends JavaTextPane implements WebFile.Updater {
 
     // The BrowserPage
     WebPage        _page;
@@ -45,15 +44,6 @@ public WebFile getFile()  { return getTextView().getTextBox().getSourceFile(); }
  * Return site for JavaFile.
  */
 public WebSite getSite()  { return getFile().getSite(); }
-
-/**
- * Override to set TextView.File from page.
- */
-protected void initUI()
-{
-    super.initUI();
-    getTextView().setSource(_page.getFile());
-}
 
 /**
  * Override to set selection using browser.
@@ -148,8 +138,7 @@ public void setTextModified(boolean aFlag)
 public void updateFile(WebFile aFile)  { getFile().setText(getTextView().getText()); }
 
 /** Override to get ProgramCounter from ProcPane. */
-@Override
-protected int getProgramCounterLine()
+public int getProgramCounterLine()
 {
     if(getAppPane()==null) return -1;
     return getAppPane().getProcPane().getProgramCounter(getFile());

@@ -1,8 +1,6 @@
 package snap.javatext;
-import snap.app.SitePane;
 import snap.gfx.TextBoxLine;
 import snap.javaparse.*;
-import snap.javasnap.SnapCodePane;
 import snap.project.*;
 import snap.util.*;
 import snap.view.View;
@@ -14,33 +12,32 @@ import snap.web.*;
  */
 public class JavaPage extends WebPage {
 
-    // The pane that shows the visual code editor
-    SnapCodePane           _snapCodePane = createCodePane();
+    // The JavaTextPane
+    JavaTextPane           _jtextPane = new JavaTextPane();
 
 /**
  * Returns the JavaTextView.
  */
-public JavaTextPane getTextPane()  { return _snapCodePane.getJavaPane(); }
+public JavaTextPane getTextPane()  { return _jtextPane; }
 
 /**
  * Returns the JavaTextView.
  */
-public JavaTextView getTextView()  { return getTextPane().getTextView(); }
+public JavaTextView getTextView()  { getUI(); return getTextPane().getTextView(); }
 
 /**
  * Creates UI panel.
  */
-protected View createUI()  { return _snapCodePane.getUI(); }
+protected View createUI()  { return _jtextPane.getUI(); }
 
 /**
  * Init UI.
  */
 protected void initUI()
 {
-    // Do normal version
     super.initUI();
-    
-    if(!_snapCodePane.getShowSnapCodeDefault()) setFirstFocus(getTextView());
+    getTextView().setSource(getFile());
+    setFirstFocus(getTextView());
 }
 
 /**
@@ -107,27 +104,6 @@ protected WebFile createNewFile(String aPath)
     sb.append("public class ").append(file.getSimpleName()).append(" extends Object {\n\n\n\n}");
     file.setText(sb.toString());
     return file;
-}
-
-/**
- * Creates the SnapCodePane.
- */
-protected SnapCodePane createCodePane()  { return new CodePane(); }
-
-/**
- * A SnapCodePane for JavaPage.
- */
-public class CodePane extends SnapCodePane {
-
-    /** Creates the TextPane. */
-    protected JavaPageJavaPane createJavaPane()  { return new JavaPageJavaPane(JavaPage.this); }
-    
-    /** Returns the ShowSnapCodeDefault. */
-    public boolean getShowSnapCodeDefault()
-    {
-        SitePane spane = SitePane.get(getSite());
-        return spane!=null && spane.getUseSnapEditor();
-    }
 }
 
 }

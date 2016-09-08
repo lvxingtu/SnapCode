@@ -313,7 +313,7 @@ protected void paintBack(Painter aPntr)
     }
     
     // Paint program counter
-    int progCounterLine = getTextBox().getProgramCounterLine();
+    int progCounterLine = getProgramCounterLine();
     if(progCounterLine>=0) {
         TextBoxLine line = getLine(progCounterLine);
         aPntr.setPaint(new Color(199,218,175,200));
@@ -636,6 +636,15 @@ public void removeBreakpoint(Breakpoint aBP)
     WebFile file = getSourceFile();
     Project proj = getRootProject(); if(proj==null) return;
     proj.getBreakpoints().remove(aBP);
+}
+
+/**
+ * Returns the ProgramCounter line.
+ */
+public int getProgramCounterLine()
+{
+    JavaTextPane tpane = getTextPane();
+    return tpane!=null? tpane.getProgramCounterLine() : -1;
 }
 
 }

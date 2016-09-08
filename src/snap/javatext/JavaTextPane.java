@@ -328,4 +328,9 @@ public void showReferences(JNode aNode)  { }
  */
 public void showDeclarations(JNode aNode)  { }
 
+/**
+ * Returns the ProgramCounter line.
+ */
+public int getProgramCounterLine()  { return -1; }
+
 }
