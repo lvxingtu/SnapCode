@@ -214,6 +214,11 @@ public void respondUI(ViewEvent anEvent)
         JNode part = (JNode)anEvent.getView().getProp("JNode"), dnode = getTextView()._deepNode;
         getTextView().setSel(part.getStart(), part.getEnd()); getTextView()._deepNode = dnode;
     }
+    
+    // Handle SnapCodeButton
+    else if(anEvent.equals("SnapCodeButton")) {
+        
+    }
 }
 
 /**
