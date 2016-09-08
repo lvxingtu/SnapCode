@@ -44,6 +44,9 @@ public class ProjectPane extends ViewOwner {
     // The selected ProjectPath
     String              _projPath;
     
+    // Runnable for build later
+    Runnable            _buildLaterRun;
+    
 /**
  * Creates a new ProjectPane for given project.
  */
@@ -120,7 +123,7 @@ public void openSite()
 {
     // Kick off site build
     if(_sitePane.isAutoBuildEnabled())
-        runLater(() -> buildProject(true));
+        buildProjectLater(true);
 }
 
 /**
@@ -137,7 +140,27 @@ public void deleteProject(View aView)
 /**
  * Build project.
  */
-public void buildProject(boolean doAddFiles)  { getBuildFilesRunner(doAddFiles); }
+public void buildProjectLater(boolean doAddFiles)
+{
+    // If not root ProjectPane, forward on to it
+    Project rootProj = _proj.getRootProject();
+    ProjectPane rootProjPane = _proj!=rootProj? ProjectPane.get(rootProj.getSite()) : this;
+    if(this!=rootProjPane) {
+        rootProjPane.buildProjectLater(doAddFiles); return; }
+    
+    // If not already set, register for buildLater run
+    if(_buildLaterRun!=null) return;
+    runLater(_buildLaterRun = () -> buildProject(doAddFiles));
+}
+
+/**
+ * Build project.
+ */
+public void buildProject(boolean doAddFiles)
+{
+    getBuildFilesRunner(doAddFiles);
+    _buildLaterRun = null;
+}
 
 /**
  * Returns the build files runner.
@@ -207,7 +230,7 @@ void fileAdded(WebFile aFile)
 {
     if(_proj.getBuildDir().contains(aFile)) return;
     _proj.fileAdded(aFile);
-    if(_sitePane.isAutoBuild() && _sitePane.isAutoBuildEnabled()) buildProject(false);
+    if(_sitePane.isAutoBuild() && _sitePane.isAutoBuildEnabled()) buildProjectLater(false);
 }
 
 /**
@@ -217,7 +240,7 @@ void fileRemoved(WebFile aFile)
 {
     if(_proj.getBuildDir().contains(aFile)) return;
     _proj.fileRemoved(aFile);
-    if(_sitePane.isAutoBuild() && _sitePane.isAutoBuildEnabled()) buildProject(false);
+    if(_sitePane.isAutoBuild() && _sitePane.isAutoBuildEnabled()) buildProjectLater(false);
 }
 
 /**
@@ -227,7 +250,7 @@ void fileSaved(WebFile aFile)
 {
     if(_proj.getBuildDir().contains(aFile)) return;
     _proj.fileSaved(aFile);
-    if(_sitePane.isAutoBuild() && _sitePane.isAutoBuildEnabled()) buildProject(false);
+    if(_sitePane.isAutoBuild() && _sitePane.isAutoBuildEnabled()) buildProjectLater(false);
 }
 
 /**

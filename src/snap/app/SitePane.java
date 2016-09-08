@@ -204,7 +204,7 @@ public void deleteSite(View aView)
 public void buildSite(boolean doAddFiles)
 {
     if(_projPane!=null)
-        _projPane.buildProject(doAddFiles);
+        _projPane.buildProjectLater(doAddFiles);
 }
 
 /**

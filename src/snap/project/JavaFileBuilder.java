@@ -138,9 +138,13 @@ public boolean buildFiles(TaskMonitor aTaskMonitor)
             
             // Update dependencies and get files that need to be updated
             Set <WebFile> updateFiles = JavaData.get(jfile).updateDependencies();
-            for(WebFile ufile : updateFiles)
-                if(!compiledFiles.contains(ufile) && !ListUtils.containsId(files, ufile))
-                    files.add(ufile);
+            for(WebFile ufile : updateFiles) {
+                Project proj = Project.get(ufile);
+                if(proj==_proj) {
+                    if(!compiledFiles.contains(ufile) && !ListUtils.containsId(files, ufile))
+                        files.add(ufile); }
+                else proj.addBuildFileForce(ufile);
+            }
         }
     }
     

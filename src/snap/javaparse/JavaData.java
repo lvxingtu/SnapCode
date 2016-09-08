@@ -65,7 +65,8 @@ public Set <WebFile> updateDependencies()
     // Get new declarations and refs
     Set <JavaDecl> ndecls = new HashSet(), nrefs = new HashSet(); _dset = true; _jfile = null;
     WebFile jfile = _file;
-    Project proj = Project.get(jfile);
+    Project proj = Project.get(jfile), rootProj = proj.getRootProject();
+    ProjectSet projSet = rootProj.getProjectSet();
     WebFile cfiles[] = proj.getClassFiles(jfile);
     if(cfiles!=null) {
         for(WebFile cfile : cfiles) {
@@ -99,7 +100,7 @@ public Set <WebFile> updateDependencies()
         String cname = ref.getRootClassName();
         if(cname.startsWith("java") && (cname.startsWith("java.") || cname.startsWith("javax.") ||
             cname.startsWith("javafx"))) continue;
-        WebFile file = proj.getJavaFile(cname);
+        WebFile file = projSet.getJavaFile(cname);
         if(file!=null && file!=jfile && !_dependencies.contains(file)) {
             _dependencies.add(file);
             JavaData.get(file)._dependents.add(jfile);
@@ -110,7 +111,7 @@ public Set <WebFile> updateDependencies()
     for(JavaDecl ref : refsRemoved) {
         if(!ref.isClass()) continue;
         String cname = ref.getRootClassName();
-        WebFile file = proj.getJavaFile(cname);
+        WebFile file = projSet.getJavaFile(cname);
         if(file!=null && _dependencies.contains(file)) {
             _dependencies.remove(file);
             JavaData.get(file)._dependents.remove(jfile);

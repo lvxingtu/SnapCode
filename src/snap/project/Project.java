@@ -404,6 +404,15 @@ public void addBuildFile(WebFile aFile)
 }
 
 /**
+ * Adds a build file.
+ */
+public void addBuildFileForce(WebFile aFile)
+{
+    ProjectFileBuilder fileBuilder = getFileBuilder(aFile); if(fileBuilder==null) return;
+    fileBuilder.addBuildFile(aFile);
+}
+
+/**
  * Removes a build file.
  */
 protected void removeBuildFile(WebFile aFile)
