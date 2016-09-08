@@ -1,4 +1,5 @@
-package snap.javatext;
+package snap.javasnap;
+import snap.javatext.JavaTextView;
 import snap.view.*;
 
 /**

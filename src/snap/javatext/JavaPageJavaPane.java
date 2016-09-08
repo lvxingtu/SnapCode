@@ -1,6 +1,9 @@
-package snap.app;
+package snap.javatext;
+import snap.app.AppBrowser;
+import snap.app.AppPane;
+import snap.app.SupportTray;
 import snap.javaparse.*;
-import snap.javatext.SnapJavaPane;
+import snap.javasnap.SnapJavaPane;
 import snap.project.Project;
 import snap.viewx.*;
 import snap.web.*;

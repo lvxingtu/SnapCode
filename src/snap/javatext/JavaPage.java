@@ -1,7 +1,8 @@
-package snap.app;
+package snap.javatext;
+import snap.app.SitePane;
 import snap.gfx.TextBoxLine;
 import snap.javaparse.*;
-import snap.javatext.*;
+import snap.javasnap.SnapCodePane;
 import snap.project.*;
 import snap.util.*;
 import snap.view.View;

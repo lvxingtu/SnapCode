@@ -1,4 +1,4 @@
-package snap.javatext;
+package snap.javasnap;
 import snap.javaparse.JNode;
 import snap.view.*;
 

@@ -1,4 +1,4 @@
-package snap.javatext;
+package snap.javasnap;
 import java.util.*;
 import snap.gfx.*;
 import snap.javaparse.*;

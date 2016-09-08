@@ -1,6 +1,9 @@
-package snap.javatext;
+package snap.javasnap;
 import snap.gfx.*;
 import snap.javaparse.*;
+import snap.javatext.JavaTextBox;
+import snap.javatext.JavaTextPane;
+import snap.javatext.JavaTextView;
 import snap.view.ViewEvent;
 
 /**

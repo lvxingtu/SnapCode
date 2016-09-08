@@ -2,6 +2,7 @@ package snap.app;
 import java.util.*;
 import snap.debug.*;
 import snap.gfx.*;
+import snap.javatext.JavaPage;
 import snap.util.*;
 import snap.view.*;
 import snap.viewx.WebPage;

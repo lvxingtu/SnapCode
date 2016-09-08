@@ -1,6 +1,6 @@
-package snap.javatext;
+package snap.javasnap;
 import snap.javaparse.*;
-import snap.javatext.SnapPartPane.Seg;
+import snap.javasnap.SnapPartPane.Seg;
 import snap.view.View;
 
 /**

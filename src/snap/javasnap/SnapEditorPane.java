@@ -1,7 +1,8 @@
-package snap.javatext;
+package snap.javasnap;
 import java.util.*;
 import snap.gfx.*;
 import snap.javaparse.*;
+import snap.javatext.JavaTextView;
 import snap.view.*;
 
 /**
