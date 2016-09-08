@@ -19,6 +19,9 @@ public class JavaTextPane extends TextPane {
     // The SplitView
     SplitView             _splitView;
     
+    // The JavaPage - we just need this to switch to SnapCodePage
+    JavaPage              _javaPage;
+    
 /**
  * Returns the JavaTextView.
  */
@@ -217,8 +220,7 @@ public void respondUI(ViewEvent anEvent)
     
     // Handle SnapCodeButton
     else if(anEvent.equals("SnapCodeButton")) {
-        
-    }
+        if(_javaPage!=null) _javaPage.openAsSnapCode(); }
 }
 
 /**

@@ -27,6 +27,9 @@ public class SnapEditorPane extends ViewOwner {
 
     // Whether to rebuild CodeArea
     boolean             _rebuild = true;
+    
+    // The SnapEditorPage - we only need this to switch to Java text
+    SnapEditorPage      _snapPage;
 
 /**
  * Creates a new SnapEditorPane for given JavaTextPane.
@@ -245,9 +248,9 @@ protected View createUI()
     // Create SnapCodeArea
     _editor = new SnapEditor() {
         protected void updateSelectedPart(SnapPart aPart)  { SnapEditorPane.this.updateSelectedPart(aPart); }
-        public void insertNode(JNode aBsNd, JNode aNwNd, int aPos)  { insertNode(aBsNd, aNwNd, aPos); }
-        public void replaceJNode(JNode aNode, String aString)  { replaceJNode(aNode, aString); }
-        public void removeNode(JNode aNode) { removeNode(aNode); }
+        public void insertNode(JNode aBsNd, JNode aNwNd, int aPos) { SnapEditorPane.this.insertNode(aBsNd,aNwNd,aPos); }
+        public void replaceJNode(JNode aNode, String aString)  { SnapEditorPane.this.replaceJNode(aNode, aString); }
+        public void removeNode(JNode aNode) { SnapEditorPane.this.removeNode(aNode); }
     };
 
     // Add to Editor.UI to ScrollView
@@ -327,6 +330,9 @@ protected void respondUI(ViewEvent anEvent)
     // Handle UndoButton, RedoButton
     if(anEvent.equals("UndoButton")) undo();
     if(anEvent.equals("RedoButton")) redo();
+    
+    // Handle JavaButton
+    if(anEvent.equals("JavaButton")) _snapPage.openAsJavaText();
 }
 
 /**

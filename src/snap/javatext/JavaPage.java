@@ -4,7 +4,7 @@ import snap.javaparse.*;
 import snap.project.*;
 import snap.util.*;
 import snap.view.View;
-import snap.viewx.WebPage;
+import snap.viewx.*;
 import snap.web.*;
 
 /**
@@ -14,6 +14,11 @@ public class JavaPage extends WebPage {
 
     // The JavaTextPane
     JavaTextPane           _jtextPane = new JavaTextPane();
+
+/**
+ * Creates a new JavaPage.
+ */
+public JavaPage()  { _jtextPane._javaPage = this; }
 
 /**
  * Returns the JavaTextView.
@@ -86,6 +91,17 @@ public void setResponse(WebResponse aResp)
         if(id!=null)
             getTextView().setSel(id.getStart(), id.getEnd());
     }
+}
+
+/**
+ * Reopen this page as SnapCodePage.
+ */
+public void openAsSnapCode()
+{
+    WebFile file = getFile(); WebURL url = file.getURL();
+    WebPage page = new snap.javasnap.SnapEditorPage(this); page.setFile(file);
+    WebBrowser browser = getBrowser(); browser.setPage(url, page);
+    browser.setURL(file.getURL());
 }
 
 /**
