@@ -23,9 +23,14 @@ public class SupportPane extends ViewOwner {
     Parser             _exprParser = JavaParser.getShared().getExprParser();
 
 /**
- * Returns the editor.
+ * Returns the editor pane.
  */
 public SnapEditorPane getEditorPane()  { return _editorPane; }
+
+/**
+ * Returns the editor.
+ */
+public SnapEditor getEditor()  { return _editorPane.getEditor(); }
 
 /**
  * Create UI.
@@ -90,7 +95,7 @@ protected void respondUI(ViewEvent anEvent)
 public void rebuildUI()
 {
     // Get class for SnapPart.JNode
-    Class cls = getEditorPane().getSelectedPartEnclClass();
+    Class cls = getEditor().getSelectedPartEnclClass();
     
     ScrollView spane = (ScrollView)getUI(TabView.class).getTabContent(0);
     VBox pane = (VBox)spane.getContent();

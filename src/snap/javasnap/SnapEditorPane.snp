@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<SpringView width="630" height="28" PrefWidth="630" PrefHeight="28">
-  <Button Name="SaveButton" x="3" y="3" width="22" height="22" ToolTip="Save" image="/snap/viewx/pkg.images/File_Save.png" ShowBorder="false" />
-  <Separator x="26" y="6" width="13" height="18" />
-  <Button Name="CutButton" x="39" y="3" width="22" height="22" ToolTip="Cut" image="/snap/viewx/pkg.images/Edit_Cut.png" ShowBorder="false" />
-  <Button Name="CopyButton" x="61" y="3" width="22" height="22" ToolTip="Copy" image="/snap/viewx/pkg.images/Edit_Copy.png" ShowBorder="false" />
-  <Button Name="PasteButton" x="83" y="3" width="22" height="22" ToolTip="Paste" image="/snap/viewx/pkg.images/Edit_Paste.png" ShowBorder="false" />
-  <Button Name="DeleteButton" x="105" y="3" width="22" height="22" ToolTip="Delete" image="/snap/viewx/pkg.images/Edit_Delete.png" ShowBorder="false" />
-  <Separator x="128" y="6" width="13" height="18" />
-  <Button Name="UndoButton" x="141" y="3" width="22" height="22" ToolTip="Undo" image="/snap/viewx/pkg.images/Edit_Undo.png" ShowBorder="false">
+<HBox Padding="3" Spacing="1">
+  <Button Name="SaveButton" PrefWidth="22" PrefHeight="22" ToolTip="Save" image="/snap/viewx/pkg.images/File_Save.png" ShowBorder="false" />
+  <Separator PrefWidth="13" PrefHeight="18" Vertical="true" />
+  <Button Name="CutButton" PrefWidth="22" PrefHeight="22" ToolTip="Cut" image="/snap/viewx/pkg.images/Edit_Cut.png" ShowBorder="false" />
+  <Button Name="CopyButton" PrefWidth="22" PrefHeight="22" ToolTip="Copy" image="/snap/viewx/pkg.images/Edit_Copy.png" ShowBorder="false" />
+  <Button Name="PasteButton" PrefWidth="22" PrefHeight="22" ToolTip="Paste" image="/snap/viewx/pkg.images/Edit_Paste.png" ShowBorder="false" />
+  <Button Name="DeleteButton" PrefWidth="22" PrefHeight="22" ToolTip="Delete" image="/snap/viewx/pkg.images/Edit_Delete.png" ShowBorder="false" />
+  <Separator PrefWidth="13" PrefHeight="18" Vertical="true" />
+  <Button Name="UndoButton" PrefWidth="22" PrefHeight="22" ToolTip="Undo" image="/snap/viewx/pkg.images/Edit_Undo.png" ShowBorder="false">
     <binding aspect="Enabled" key="JavaView.Undoer.hasUndos" />
   </Button>
-  <Button Name="RedoButton" x="163" y="3" width="22" height="22" ToolTip="Redo" image="/snap/viewx/pkg.images/Edit_Redo.png" ShowBorder="false">
+  <Button Name="RedoButton" PrefWidth="22" PrefHeight="22" ToolTip="Redo" image="/snap/viewx/pkg.images/Edit_Redo.png" ShowBorder="false">
     <binding aspect="Enabled" key="JavaView.Undoer.hasRedos" />
   </Button>
-  <Button Name="JavaButton" x="535" y="3" width="80" height="22" LeanX="RIGHT" ToolTip="Java Code" text="Java Code" />
-</SpringView>
+  <Button Name="JavaButton" PrefWidth="80" PrefHeight="22" LeanX="RIGHT" ToolTip="Java Code" text="Java Code" />
+</HBox>
