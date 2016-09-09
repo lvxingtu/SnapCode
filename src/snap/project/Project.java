@@ -333,10 +333,15 @@ public boolean buildProject(TaskMonitor aTM)
     boolean buildSuccess = _javaFileBuilder.buildFiles(aTM);
     buildSuccess |= _defaultFileBuilder.buildFiles(aTM);
     _buildDate = new Date(); _building = false;
-    
+
     // Return build success
     return buildSuccess;
 }
+
+/**
+ * Finds unused imports from last set of compiled files.
+ */
+public void findUnusedImports()  { _javaFileBuilder.findUnusedImports(); }
 
 /**
  * Interrupts build.

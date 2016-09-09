@@ -157,10 +157,17 @@ public void addBuildFilesAll()
  */
 public boolean buildProjects(TaskMonitor aTM)
 {
+    boolean success = true;
     for(Project p : getProjects())
-        if(!p.buildProject(aTM))
-            return false;
-    return _proj.buildProject(aTM);
+        if(!p.buildProject(aTM)) {
+            success = false; break; }
+    if(success)
+        success = _proj.buildProject(aTM);
+    
+    // Find unused imports
+    _proj.findUnusedImports();
+    for(Project p : getProjects()) p.findUnusedImports();
+    return success;
 }
     
 /**

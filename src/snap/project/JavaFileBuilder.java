@@ -21,6 +21,12 @@ public class JavaFileBuilder implements ProjectFileBuilder {
     // Whether to interrupt current build
     boolean                  _interrupt;
     
+    // The SnapCompiler used for last compiles
+    SnapCompiler             _compiler;
+    
+    // The final set of compiled files
+    Set <WebFile>            _compiledFiles, _errorFiles;
+    
 /**
  * Creates a new JavaFileBuilder for given Project.
  */
@@ -148,15 +154,28 @@ public boolean buildFiles(TaskMonitor aTaskMonitor)
         }
     }
     
-    // Add Unused imports for compile files
+    // Finalize TaskMonitor
     aTaskMonitor.beginTask("Build Completed", -1); aTaskMonitor.endTask();
-    for(WebFile cfile : compiledFiles) { JavaData jdata = JavaData.get(cfile); if(errorFiles.contains(cfile)) continue;
-        for(BuildIssue bissue : jdata.getUnusedImports())
-            compiler.report(bissue); }
+    
+    // Set compiler/files for findUnusedImports
+    _compiler = compiler; _compiledFiles = compiledFiles; _errorFiles = errorFiles;
     
     // Finalize ActivityText and return
     //System.out.println("Build time: " + (System.currentTimeMillis()-time)/1000f + " seconds");
     return compileSuccess;
+}
+
+/**
+ * Checks last set of compiled files for unused imports.
+ */
+public void findUnusedImports()
+{
+    if(_compiler==null) return;
+    for(WebFile cfile : _compiledFiles) { JavaData jdata = JavaData.get(cfile);
+        if(_errorFiles.contains(cfile)) continue;
+        for(BuildIssue bissue : jdata.getUnusedImports())
+            _compiler.report(bissue); }
+    _compiler = null; _compiledFiles = _errorFiles = null;
 }
 
 /**
