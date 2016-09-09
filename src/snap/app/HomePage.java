@@ -44,12 +44,12 @@ public void initUI()
  */
 public void respondUI(ViewEvent anEvent)
 {
-    // Register for animation on MouseEntered and MouseExited
-    //if(anEvent.isMouseEntered()) getAnimator(anEvent.getView()).scaleTo(1.15,1.15,200).play();
-    //if(anEvent.isMouseExited() || anEvent.isMouseClicked()) getAnimator(anEvent.getView()).scaleTo(1,1,200).play();
-    if(anEvent.isMouseEntered()) new Anim(anEvent.getView(), "Scale", null, 1.15, 200).play();
-    if(anEvent.isMouseExited() || anEvent.isMouseClicked()) new Anim(anEvent.getView(), "Scale",null,1,200).play();
-    
+    // Trigger animations on main buttons for MouseEntered/MouseExited
+    if(anEvent.isMouseEntered())
+        anEvent.getView().getAnim(0).clear().getAnim(200).setScale(1.15).getRoot(1000).setRotate(180).play();
+    if(anEvent.isMouseExited())
+        anEvent.getView().getAnim(0).clear().getAnim(200).setScale(1).getRoot(1000).setRotate(0).play();
+
     // Handle WatchVideos
     if(anEvent.equals("WatchVideos") && anEvent.isMouseClicked())
         getBrowser().setURLString("http://www.reportmill.com/snap/gallery/AddressBook/index.html");
