@@ -213,7 +213,7 @@ protected void initUI()
 {
     // Add WelcomePaneAnim node
     WelcomePanelAnim anim = new WelcomePanelAnim();
-    getUI(ChildView.class).addChild(anim.getUI()); anim.getUI().getAnimator(true).play();
+    getUI(ChildView.class).addChild(anim.getUI()); anim.getUI().playAnimDeep();
     
     // Enable SitesTable MouseClicked
     TableView sitesTable = getView("SitesTable", TableView.class);
