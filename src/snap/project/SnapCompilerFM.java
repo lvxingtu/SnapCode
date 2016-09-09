@@ -66,10 +66,12 @@ public JavaFileObject getJavaFileForInput(Location aLoc, String aClassName, Kind
  */
 public JavaFileObject getJavaFileForOutput(Location aLoc, String aClassName, Kind kind, FileObject aSblg)
 {
+    WebFile jfile = ((SnapFileJFO)aSblg).getFile();
+    Project proj = Project.get(jfile);
     String cpath = "/" + aClassName.replace('.', '/') + ".class";
-    WebFile cfile = _proj.getBuildFile(cpath, true, false);
+    WebFile cfile = proj.getBuildFile(cpath, true, false);
     SnapFileJFO jfo = getJFO(cfile.getPath(), cfile);
-    jfo._sourceFile = ((SnapFileJFO)aSblg).getFile();
+    jfo._sourceFile = jfile;
     return jfo;
 }
 
