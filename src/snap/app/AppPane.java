@@ -97,8 +97,8 @@ public void setSupportTrayVisible(boolean aValue)
     SplitView spane = getBrowserBox();
     
     // Add/remove SupportTrayUI with animator
-    if(aValue) spane.addChildWithAnim(supTrayUI, 240);
-    else spane.removeChildWithAnim(supTrayUI);
+    if(aValue) spane.addItemWithAnim(supTrayUI, 240);
+    else spane.removeItemWithAnim(supTrayUI);
     
     // Update ShowTrayButton
     setViewText("ShowTrayButton", aValue? "Hide Tray" : "Show Tray");
@@ -316,7 +316,7 @@ protected void initUI()
     SplitView fspane = getView("FilesSplitView", SplitView.class); fspane.setBorder(null);
     View filesPaneUI = _filesPane.getUI(); filesPaneUI.setGrowHeight(true);
     View procPaneUI = _procPane.getUI(); procPaneUI.setPrefHeight(250);
-    fspane.setChildren(filesPaneUI, procPaneUI);
+    fspane.setItems(filesPaneUI, procPaneUI);
     
     // Get browser box
     _browserBox = getView("BrowserBox", SplitView.class);

@@ -43,7 +43,7 @@ protected void initUI()
     _rtext = getText(rfile);
     
     // Get DiffPane and install texts
-    _splitView.setChildren(_ltext, _rtext);
+    _splitView.setItems(_ltext, _rtext);
     
     // Get ranges lists
     List <TextSel> lranges, rranges;

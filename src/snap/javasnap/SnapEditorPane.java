@@ -88,7 +88,7 @@ protected View createUI()
     
     // Create SplitView, configure and return
     SplitView spane = new SplitView();
-    spane.setChildren(sview, _supportPane.getUI());
+    spane.setItems(sview, _supportPane.getUI());
     
     // Create NodePath and add to bottom
     _nodePathBox = new HBox(); _nodePathBox.setPadding(2,2,2,2);

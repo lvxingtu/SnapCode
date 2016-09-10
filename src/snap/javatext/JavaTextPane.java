@@ -58,13 +58,13 @@ public void setCodeBuilderVisible(boolean aFlag)
     
     // If showing CodeBuilder, add to SplitView (animated)
     if(aFlag) {
-        _splitView.addChildWithAnim(codeBuildrPane, 260);
+        _splitView.addItemWithAnim(codeBuildrPane, 260);
         getCodeBuilder().setCodeBlocks();
     }
     
     // If hiding CodeBuilder, remove from SplitView (animated)
     else if(_splitView.getItemCount()>1)
-        _splitView.removeChildWithAnim(codeBuildrPane);
+        _splitView.removeItemWithAnim(codeBuildrPane);
 }
 
 /**
@@ -96,7 +96,7 @@ protected void initUI()
     
     // Get SplitView and add ScrollView and CodeBuilder
     _splitView = new SplitView();
-    _splitView.addChild(spane);
+    _splitView.addItem(spane);
     getUI(BorderView.class).setCenter(_splitView);
     
     // Get OverviewPane and set JavaTextView

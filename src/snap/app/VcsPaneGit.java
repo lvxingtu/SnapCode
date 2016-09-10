@@ -70,10 +70,8 @@ protected View createUI()
     _hbox = new HBox(); _hbox.setPrefHeight(300); _hbox.setFillHeight(true);
     ScrollView spane = new ScrollView(_hbox); spane.setPrefHeight(300); spane.setFitHeight(true);
     
-    // Add content node
-    _topSplit.addChild(spane);
-    
-    // Return UI
+    // Add content view and return UI
+    _topSplit.addItem(spane);
     return superUI;
 }
 

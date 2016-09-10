@@ -58,7 +58,7 @@ protected View createUI()
     
     // Create SplitView with VarTable and VarText
     ScrollView varTreeScroll = new ScrollView(_varTree); varTreeScroll.setGrowHeight(true);
-    SplitView split = new SplitView(); split.setChildren(varTreeScroll, textScroll);
+    SplitView split = new SplitView(); split.setItems(varTreeScroll, textScroll);
     split.setVertical(true); split.setGrowHeight(true);
     split.setChildRatio(0,.8);
     

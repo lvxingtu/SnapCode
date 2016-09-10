@@ -94,7 +94,7 @@ protected void initUI()
     filesList.setCellConfigure(this :: configureFilesListCell);
     if(getOp()!=Op.Commit) {
         View commentText = getView("CommentText"), sview = commentText.getParent(ScrollView.class);
-        getView("SplitView", SplitView.class).removeChild(sview);
+        getView("SplitView", SplitView.class).removeItem(sview);
     }
 }
 
