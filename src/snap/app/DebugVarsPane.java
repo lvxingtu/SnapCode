@@ -60,7 +60,6 @@ protected View createUI()
     ScrollView varTreeScroll = new ScrollView(_varTree); varTreeScroll.setGrowHeight(true);
     SplitView split = new SplitView(); split.setItems(varTreeScroll, textScroll);
     split.setVertical(true); split.setGrowHeight(true);
-    split.setChildRatio(0,.8);
     
     // Add to VBox with padding
     VBox vbox = new VBox(); vbox.setFillWidth(true); vbox.setPadding(2,2,2,2);

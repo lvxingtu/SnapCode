@@ -69,7 +69,6 @@ protected View createUI()
     ScrollView varTreeScroll = new ScrollView(_varTree); varTreeScroll.setGrowHeight(true);
     SplitView split = new SplitView(); split.setItems(varTreeScroll, textScroll);
     split.setVertical(true); split.setGrowHeight(true);
-    split.setChildRatio(0, .8);
     
     // Create Buttons
     Label label = new Label("Expr: "); label.setPadding(0,0,0,5);

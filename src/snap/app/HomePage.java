@@ -46,9 +46,9 @@ public void respondUI(ViewEvent anEvent)
 {
     // Trigger animations on main buttons for MouseEntered/MouseExited
     if(anEvent.isMouseEntered())
-        anEvent.getView().getAnim(0).clear().getAnim(200).setScale(1.15).getRoot(1000).setRotate(180).play();
+        anEvent.getView().getAnimCleared(200).setScale(1.15).getRoot(1000).setRotate(180).play();
     if(anEvent.isMouseExited())
-        anEvent.getView().getAnim(0).clear().getAnim(200).setScale(1).getRoot(1000).setRotate(0).play();
+        anEvent.getView().getAnimCleared(200).setScale(1).getRoot(1000).setRotate(0).play();
 
     // Handle WatchVideos
     if(anEvent.equals("WatchVideos") && anEvent.isMouseClicked())
