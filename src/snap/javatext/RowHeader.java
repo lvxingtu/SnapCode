@@ -161,11 +161,11 @@ protected void paintFront(Painter aPntr)
 /**
  * Override to return tool tip text.
  */
-public String getToolTipText(ViewEvent anEvent)
+public String getToolTip(ViewEvent anEvent)
 {
     for(Marker marker : getMarkers())
         if(marker.contains(_mx, _my))
-            return marker.getToolTipText();
+            return marker.getToolTip();
     return null;
 }
 
@@ -184,7 +184,7 @@ public abstract static class Marker<T> extends Rect {
     public Marker(T aTarget)  { _target = aTarget; setRect(-2, 0, WIDTH, WIDTH); }
     
     /** Returns a tooltip. */
-    public abstract String getToolTipText();
+    public abstract String getToolTip();
     
     /** Handles MouseClicked. */
     public abstract void mouseClicked(ViewEvent anEvent);
@@ -212,7 +212,7 @@ public class SuperMemberMarker extends Marker <JMemberDecl> {
     public boolean isInterface()  { return _interface; }
     
     /** Returns a tooltip. */
-    public String getToolTipText()
+    public String getToolTip()
     {
         String cname = _superDecl.getClassName();
         return (isInterface()? "Implements " : "Overrides ") + cname + '.' + _target.getName();
@@ -244,7 +244,7 @@ public class BuildIssueMarker extends Marker <BuildIssue> {
     }
     
     /** Returns a tooltip. */
-    public String getToolTipText()  { return _target.getText(); }
+    public String getToolTip()  { return _target.getText(); }
     
     /** Handles MouseClicked. */
     public void mouseClicked(ViewEvent anEvent)  { setTextSelection(_target.getStart(), _target.getEnd()); }
@@ -265,7 +265,7 @@ public class BreakpointMarker extends Marker <Breakpoint> {
     }
 
     /** Returns a tooltip. */
-    public String getToolTipText()  { return _target.toString(); }
+    public String getToolTip()  { return _target.toString(); }
     
     /** Handles MouseClicked. */
     public void mouseClicked(ViewEvent anEvent)

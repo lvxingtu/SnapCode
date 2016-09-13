@@ -33,11 +33,6 @@ public OverviewPane()
     enableEvents(MouseMoved, MouseClicked);
     setToolTipEnabled(true);
     setPrefWidth(14);
-    //Tooltip.install(this, _toolTip); //Tooltip             _toolTip = new Tooltip();
-    //_toolTip.setOnShowing(new EventHandler<WindowEvent>() { public void handle(WindowEvent arg0) {
-    //    _toolTip.setText(getToolTipText()); }});
-    //setOnMouseClicked(new EventHandler<MouseEvent>() { public void handle(MouseEvent e) { mouseClicked(e); }});
-    //setOnMouseMoved(new EventHandler<MouseEvent>() { public void handle(MouseEvent e) { mouseMoved(e); }});
 }
 
 /**
@@ -103,7 +98,7 @@ protected void processEvent(ViewEvent anEvent)
     
     // Handle MouseMoved
     if(anEvent.isMouseMoved()) {
-        _mx = anEvent.getX(); _my = anEvent.getY(); //if(_toolTip.isShowing()) _toolTip.setText(getToolTipText());
+        _mx = anEvent.getX(); _my = anEvent.getY();
         for(Marker m : getMarkers())
             if(m.contains(_mx, _my)) {
                 setCursor(Cursor.HAND); return; }
@@ -128,11 +123,11 @@ protected void paintFront(Painter aPntr)
 /**
  * Override to return tool tip text.
  */
-public String getToolTipText(ViewEvent anEvent)
+public String getToolTip(ViewEvent anEvent)
 {
     for(Marker marker : getMarkers())
         if(marker.contains(_mx, _my))
-            return marker.getToolTipText();
+            return marker.getToolTip();
     TextBoxLine line = _textView.getTextBox().getLineForY(_my/getHeight()*_textView.getHeight());
     return "Line: " + (line.getIndex()+1);
 }
@@ -162,7 +157,7 @@ public abstract static class Marker <T> extends Rect {
     public abstract int getSelEnd();
     
     /** Returns a tooltip. */
-    public abstract String getToolTipText();
+    public abstract String getToolTip();
 }
 
 /**
@@ -191,7 +186,7 @@ public class BuildIssueMarker extends Marker <BuildIssue> {
     public int getSelEnd()  { return _target.getEnd(); }
     
     /** Returns a tooltip. */
-    public String getToolTipText()  { return _target.getText(); }
+    public String getToolTip()  { return _target.getText(); }
 }
 
 /**
@@ -220,7 +215,7 @@ public class TokenMarker extends Marker <TextBoxToken> {
     public int getSelEnd()  { return _target.getLine().getStart() + _target.getEnd(); }
     
     /** Returns a tooltip. */
-    public String getToolTipText()  { return "Occurrence of \'" + _target.getString() + "\'"; }
+    public String getToolTip()  { return "Occurrence of \'" + _target.getString() + "\'"; }
 }
 
 }
