@@ -174,6 +174,7 @@ protected void initUI()
     _searchText = getView("SearchText", TextField.class);
     _searchText.setPromptText("Search"); _searchText.getLabel().setImage(Image.get(TextPane.class, "Find.png"));
     enableEvents(_searchText, KeyReleased);
+    TextField.setBackLabelAlignAnimatedOnFocused(_searchText, true);
     
     // Enable events on buttons
     String bnames[] = { "HomeButton", "BackButton", "NextButton", "RefreshButton", "RunButton" };
