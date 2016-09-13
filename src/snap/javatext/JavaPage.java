@@ -36,7 +36,7 @@ public JavaTextPane getTextPane()  { return _jtextPane; }
 /**
  * Returns the JavaTextView.
  */
-public JavaTextView getTextView()  { getUI(); return getTextPane().getTextView(); }
+public JavaTextView getTextView()  { return getTextPane().getTextView(); }
 
 /**
  * Creates UI panel.
@@ -60,6 +60,9 @@ public void setResponse(WebResponse aResp)
 {
     // Do normal version
     super.setResponse(aResp);
+    
+    // Load UI
+    getUI();
     
     // Look for LineNumber
     WebURL aURL = aResp.getRequestURL();
