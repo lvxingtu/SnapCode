@@ -1,17 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<SpringView width="640" height="480" PrefWidth="640" PrefHeight="480">
-  <ScrollView x="2" y="30" width="636" height="419" GrowWidth="true" GrowHeight="true">
+<VBox PrefWidth="640" PrefHeight="480" Padding="4,2,2,2" Spacing="3" FillWidth="true">
+  <HBox Padding="0,16,0,0" Spacing="8">
+    <Button Name="DeleteButton" PrefWidth="80" PrefHeight="22" LeanX="RIGHT" text="Delete">
+      <binding aspect="Enabled" key="SelectedBreakpoint" />
+    </Button>
+    <Button Name="DeleteAllButton" PrefWidth="80" PrefHeight="22" text="Delete All" />
+  </HBox>
+  <ScrollView GrowHeight="true">
     <font name="Arial" size="12" />
     <ListView Name="BreakpointList" ItemKey="Descriptor">
       <binding aspect="Items" key="Breakpoints" />
     </ListView>
   </ScrollView>
-  <Button Name="DeleteButton" x="453" y="4" width="80" height="22" LeanX="RIGHT" text="Delete">
-    <binding aspect="Enabled" key="SelectedBreakpoint" />
-  </Button>
-  <Button Name="DeleteAllButton" x="540" y="4" width="80" height="22" LeanX="RIGHT" text="Delete All" />
-  <CheckBox x="2" y="452" width="182" height="22" LeanY="BOTTOM" text="Breakpoint Enabled">
-    <binding aspect="Selected" key="SelectedBreakpoint.Enabled" />
-    <binding aspect="Enabled" key="SelectedBreakpoint" />
-  </CheckBox>
-</SpringView>
+</VBox>
