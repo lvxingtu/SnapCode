@@ -11,21 +11,21 @@
         <LineBorder />
         <fill type="image" resource="354017466" />
       </RectView>
-      <TextViewBase x="4" y="6.547" width="242" height="117.842" Align="CENTER_LEFT" Rich="true" Editable="false" WrapText="true">
+      <TextView x="4" y="6.547" width="242" height="117.842" Align="CENTER_LEFT" Rich="true" Editable="false" WrapText="true">
         <effect type="shadow" radius="5" dx="2" dy="2" color="#00000086" />
         <RichText>
           <font name="Arial Bold" size="24" />
           <pgraph align="center" />
           <string>New JavaFX File</string>
         </RichText>
-      </TextViewBase>
+      </TextView>
     </SpringView>
     <SpringView Name="MakeStarterProject" x="36" y="165" width="255" height="130" PrefWidth="255" PrefHeight="130">
       <RectView width="255" height="130" GrowWidth="true" GrowHeight="true" LeanX="CENTER" LeanY="CENTER">
         <LineBorder />
         <fill type="image" resource="354017466" />
       </RectView>
-      <TextViewBase x="13" y="12.547" width="201" height="100.453" Align="CENTER_LEFT" Rich="true" Editable="false" WrapText="true">
+      <TextView x="13" y="12.547" width="201" height="100.453" Align="CENTER_LEFT" Rich="true" Editable="false" WrapText="true">
         <effect type="shadow" radius="5" dx="2" dy="2" color="#00000086" />
         <RichText>
           <font name="Arial Bold" size="24" />
@@ -33,7 +33,7 @@
           <string>Make Starter&#10;</string>
           <string>Studio Project</string>
         </RichText>
-      </TextViewBase>
+      </TextView>
       <ImageView x="197" y="37.5" width="48" height="87">
         <effect type="shadow" radius="6" dx="2" dy="2" color="#00000086" />
       </ImageView>
@@ -43,49 +43,49 @@
         <LineBorder />
         <fill type="image" resource="354017466" />
       </RectView>
-      <TextViewBase x="7" y="6.547" width="242" height="117.842" Align="CENTER_LEFT" Rich="true" Editable="false" WrapText="true">
+      <TextView x="7" y="6.547" width="242" height="117.842" Align="CENTER_LEFT" Rich="true" Editable="false" WrapText="true">
         <effect type="shadow" radius="5" dx="2" dy="2" color="#00000086" />
         <RichText>
           <font name="Arial Bold" size="24" />
           <pgraph align="center" />
           <string>Watch Getting Started Videos</string>
         </RichText>
-      </TextViewBase>
+      </TextView>
     </SpringView>
     <SpringView Name="CreateFile" x="36" y="469" width="255" height="130" PrefWidth="255" PrefHeight="130">
       <RectView width="255" height="130" GrowWidth="true" GrowHeight="true" LeanX="CENTER" LeanY="CENTER">
         <LineBorder />
         <fill type="image" resource="354017466" />
       </RectView>
-      <TextViewBase x="4" y="6.547" width="242" height="117.842" Align="CENTER_LEFT" Rich="true" Editable="false" WrapText="true">
+      <TextView x="4" y="6.547" width="242" height="117.842" Align="CENTER_LEFT" Rich="true" Editable="false" WrapText="true">
         <effect type="shadow" radius="5" dx="2" dy="2" color="#00000086" />
         <RichText>
           <font name="Arial Bold" size="24" />
           <pgraph align="center" />
           <string>Create New File</string>
         </RichText>
-      </TextViewBase>
+      </TextView>
     </SpringView>
     <SpringView Name="NewDataTable" x="321" y="469" width="255" height="130" PrefWidth="255" PrefHeight="130">
       <RectView width="255" height="130" GrowWidth="true" GrowHeight="true" LeanX="CENTER" LeanY="CENTER">
         <LineBorder />
         <fill type="image" resource="354017466" />
       </RectView>
-      <TextViewBase x="7" y="6.547" width="242" height="117.842" Align="CENTER_LEFT" Rich="true" Editable="false" WrapText="true">
+      <TextView x="7" y="6.547" width="242" height="117.842" Align="CENTER_LEFT" Rich="true" Editable="false" WrapText="true">
         <effect type="shadow" radius="5" dx="2" dy="2" color="#00000086" />
         <RichText>
           <font name="Arial Bold" size="24" />
           <pgraph align="center" />
           <string>New Data Table</string>
         </RichText>
-      </TextViewBase>
+      </TextView>
     </SpringView>
     <SpringView Name="NewReport" x="36" y="621" width="255" height="130" PrefWidth="255" PrefHeight="130">
       <RectView width="255" height="130" GrowWidth="true" GrowHeight="true" LeanX="CENTER" LeanY="CENTER">
         <LineBorder />
         <fill type="image" resource="354017466" />
       </RectView>
-      <TextViewBase x="4" y="6.547" width="242" height="117.842" Align="CENTER_LEFT" Rich="true" Editable="false" WrapText="true">
+      <TextView x="4" y="6.547" width="242" height="117.842" Align="CENTER_LEFT" Rich="true" Editable="false" WrapText="true">
         <effect type="shadow" radius="5" dx="2" dy="2" color="#00000086" />
         <RichText>
           <font name="Arial Bold" size="24" />
@@ -93,9 +93,9 @@
           <string>New ReportMill&#10;</string>
           <string>Report</string>
         </RichText>
-      </TextViewBase>
+      </TextView>
     </SpringView>
-    <TextViewBase x="36" y="43" width="540" height="99" Rich="true" Editable="false" WrapText="true">
+    <TextView x="36" y="43" width="540" height="99" Rich="true" Editable="false" WrapText="true">
       <effect type="shadow" radius="5" dx="2" dy="2" color="#00000086" />
       <RichText>
         <font name="Arial Bold" size="48" />
@@ -109,13 +109,13 @@
         <color value="#ffffff" />
         <string>Home Page</string>
       </RichText>
-    </TextViewBase>
+    </TextView>
     <SpringView Name="SnapSchool" x="321" y="318" width="255" height="130" PrefWidth="255" PrefHeight="130">
       <RectView width="255" height="130" GrowWidth="true" GrowHeight="true" LeanX="CENTER" LeanY="CENTER">
         <LineBorder />
         <fill type="image" resource="354017466" />
       </RectView>
-      <TextViewBase x="7" y="6.547" width="242" height="117.842" Align="CENTER_LEFT" Rich="true" Editable="false" WrapText="true">
+      <TextView x="7" y="6.547" width="242" height="117.842" Align="CENTER_LEFT" Rich="true" Editable="false" WrapText="true">
         <effect type="shadow" radius="5" dx="2" dy="2" color="#00000086" />
         <RichText>
           <font name="Arial Bold" size="24" />
@@ -123,21 +123,21 @@
           <string>Go to&#10;</string>
           <string>Snap School!</string>
         </RichText>
-      </TextViewBase>
+      </TextView>
     </SpringView>
     <SpringView Name="ServerSettings" x="321" y="621" width="255" height="130" PrefWidth="255" PrefHeight="130">
       <RectView width="255" height="130" GrowWidth="true" GrowHeight="true" LeanX="CENTER" LeanY="CENTER">
         <LineBorder />
         <fill type="image" resource="354017466" />
       </RectView>
-      <TextViewBase x="4" y="6.547" width="242" height="117.842" Align="CENTER_LEFT" Rich="true" Editable="false" WrapText="true">
+      <TextView x="4" y="6.547" width="242" height="117.842" Align="CENTER_LEFT" Rich="true" Editable="false" WrapText="true">
         <effect type="shadow" radius="5" dx="2" dy="2" color="#00000086" />
         <RichText>
           <font name="Arial Bold" size="24" />
           <pgraph align="center" />
           <string>ReportMill User Guide</string>
         </RichText>
-      </TextViewBase>
+      </TextView>
     </SpringView>
   </PageView>
   <resource name="2079114672" rm-byte-encoding="Ascii85">
