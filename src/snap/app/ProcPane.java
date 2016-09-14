@@ -302,9 +302,10 @@ protected void initUI()
 protected void resetUI()
 {
     // Reset items, auto expand threads
-    _procTree.setItems(getProcs());
-    for(RunApp app : getProcs()) _procTree.expandItem(app);
-    _procTree.updateItems();
+    List <RunApp> apps = getProcs();
+    _procTree.setItems(apps);
+    for(RunApp app : apps) _procTree.expandItem(app);
+    if(apps.size()>0) _procTree.updateItems();
     
     // If current proc is Debug with suspended thread, select current frame
     RunApp proc = getSelApp();
