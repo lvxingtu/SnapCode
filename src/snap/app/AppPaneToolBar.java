@@ -373,16 +373,38 @@ public void handleSearchText(ViewEvent anEvent)
  */
 private void handleSearchTextKeyFinished(ViewEvent anEvent)
 {
-    PopupList <WebFile> searchMenu = getSearchMenu();
     if(anEvent.isDownArrow() || anEvent.isUpArrow()) return;
-    if(anEvent.isEscapeKey()) setViewValue(_searchText, "");
-    String prefix = anEvent.getStringValue(); if(prefix.equals("nulltest")) searchMenu = null;
+    if(anEvent.isEscapeKey()) { handleSearchTextEscapeKey(); return; }
+    
+    
+    String prefix = anEvent.getStringValue();
     List <WebFile> files = getFilesForPrefix(anEvent.getStringValue());
+    PopupList <WebFile> searchMenu = getSearchMenu();
     searchMenu.setItems(files);
     if(files.size()>0)
         searchMenu.setSelectedIndex(0);
     if(files.size()==0) searchMenu.hide();
     else if(!searchMenu.isShowing()) searchMenu.show(_searchText, 0, _searchText.getHeight());
+}
+
+/**
+ * Called when SearchText gets Escape key.
+ */
+private void handleSearchTextEscapeKey()
+{
+    // If text present, clear it
+    if(_searchText.length()>0)
+        _searchText.setText("");
+        
+    // Otherwise try to pass off to page.FirstFocus
+    else {
+        AppPane appPane = getAppPane();
+        WebPage page = appPane.getBrowser().getPage(); if(page==null) return;
+        Object firstFoc = page.getFirstFocus();
+        if(firstFoc!=null)
+            page.requestFocus(firstFoc);
+        else page.getUI().requestFocus();
+    }
 }
 
 /**
