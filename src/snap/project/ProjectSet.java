@@ -83,36 +83,26 @@ public WebFile getFile(String aPath)
 /**
  * Returns the source file for given path.
  */
-public WebFile getSourceFile(String aPath, boolean doCreate, boolean isDir)
+public WebFile getSourceFile(String aPath)
 {
-    // Look for file in source dir
-    WebFile file = _proj.getSourceFile(aPath, false, isDir);
-    
-    // Look for file in dependent child projects
+    // Look for file in root project, then dependent projects
+    WebFile file = _proj.getSourceFile(aPath, false, false);
     if(file==null)
         for(Project proj : getProjects())
-            if((file=proj.getSourceFile(aPath, false, isDir))!=null) break;
-    
-    // If file still not found, maybe create and return
-    if(file==null && doCreate) file = _proj.getSourceFile(aPath, true, isDir);
+            if((file=proj.getSourceFile(aPath, false, false))!=null) break;
     return file;
 }
 
 /**
  * Returns the build file for given path.
  */
-public WebFile getBuildFile(String aPath, boolean doCreate, boolean isDir)
+public WebFile getBuildFile(String aPath)
 {
-    // Look for file in root project
-    WebFile file = _proj.getBuildFile(aPath, false, isDir);
-    
-    // Look for file in dependent child projects
+    // Look for file in root project, then dependent projects
+    WebFile file = _proj.getBuildFile(aPath, false, false);
     if(file==null)
         for(Project proj : getProjects())
-            if((file=proj.getBuildFile(aPath, false, isDir))!=null) break;
-    
-    // If file still not found, maybe create and return
-    if(file==null && doCreate) file = _proj.getBuildFile(aPath, true, isDir);;
+            if((file=proj.getBuildFile(aPath, false, false))!=null) break;
     return file;
 }
 
