@@ -39,7 +39,8 @@ public SnapCompilerFM(SnapCompiler aCompiler, JavaFileManager aFileManager)
 }
 
 /** Override to return class loader. */
-//public ClassLoader getClassLoader(JavaFileManager.Location aLocation){ return _proj.getSite().getClassLoader(); }
+public ClassLoader getClassLoader(Location aLoc)  { return _cldr!=null? _cldr : (_cldr=_proj.createLibClassLoader()); }
+ClassLoader _cldr;
 
 /**
  * Return a FileObject for a given location from which compiler can obtain source or byte code.
@@ -67,12 +68,20 @@ public JavaFileObject getJavaFileForInput(Location aLoc, String aClassName, Kind
 public JavaFileObject getJavaFileForOutput(Location aLoc, String aClassName, Kind kind, FileObject aSblg)
 {
     WebFile jfile = ((SnapFileJFO)aSblg).getFile();
-    Project proj = Project.get(jfile);
     String cpath = "/" + aClassName.replace('.', '/') + ".class";
-    WebFile cfile = proj.getBuildFile(cpath, true, false);
+    WebFile cfile = _proj.getBuildFile(cpath, true, false);
     SnapFileJFO jfo = getJFO(cfile.getPath(), cfile);
     jfo._sourceFile = jfile;
     return jfo;
+}
+
+/**
+ * Returns whether we have location.
+ */
+public boolean hasLocation(Location aLoc)
+{
+    if(aLoc==StandardLocation.SOURCE_PATH) return true;
+    return super.hasLocation(aLoc);
 }
 
 /**
@@ -89,47 +98,60 @@ public String inferBinaryName(Location aLoc, JavaFileObject aFile)
  */
 public boolean isSameFile(FileObject a, FileObject b)
 {
-    if(a instanceof SnapFileJFO && b instanceof SnapFileJFO)
-        return ((SnapFileJFO)a)._file==((SnapFileJFO)b)._file;
-    if(a instanceof SnapFileJFO || b instanceof SnapFileJFO) return false;
+    if(a==b) return true;
+    //if(a instanceof SnapFileJFO || b instanceof SnapFileJFO) return false;
     return super.isSameFile(a, b);
 }
 
 /**
- * Override to return Snap/ReportMill files.
+ * Override to return project src/bin files.
  */
 public Iterable<JavaFileObject> list(Location aLoc, String aPkgName, Set<Kind> kinds, boolean doRcrs) throws IOException
 {
-    // Do normal version - just return if system package (package files were found)
+    // Do normal version
     Iterable <JavaFileObject> iterable = super.list(aLoc, aPkgName, kinds, doRcrs);
-    if(aLoc!=StandardLocation.CLASS_PATH || aPkgName.length()>0 && iterable.iterator().hasNext())
+    
+    // If not CLASS_PATH or SOURCE_PATH, just return
+    if(aLoc!=StandardLocation.CLASS_PATH && aLoc!=StandardLocation.SOURCE_PATH)
+        return iterable;
+        
+    // If system path (package files were found), just return
+    if(aPkgName.length()>0 && iterable.iterator().hasNext())
+        return iterable;
+        
+    // If known system path (java., javax., etc.), just return
+    if(aPkgName.startsWith("java.") || aPkgName.startsWith("javax") || aPkgName.startsWith("javafx") ||
+        aPkgName.startsWith("com.sun") || aPkgName.startsWith("sun.") || aPkgName.startsWith("org.xml"))
         return iterable;
     
     // Get list from cache or load/cache from real version
     Iterable <JavaFileObject> list = _pkgFiles.get(aPkgName);
-    if(list==null)
-        _pkgFiles.put(aPkgName, list=list2(aLoc, aPkgName, kinds, doRcrs));
+    if(list==null) _pkgFiles.put(aPkgName, list=listImpl(aPkgName, kinds));
     return list;
 }
 
 /**
- * Override to return Snap/ReportMill files.
+ * Returns project src/bin files for package.
  */
-Iterable <JavaFileObject> list2(Location aLoc, String aPkgName, Set<Kind> kinds, boolean doRcrs) throws IOException
+Iterable <JavaFileObject> listImpl(String aPkgName, Set <Kind> theKinds)
 {
     // Add CLASS files
     List files = new ArrayList();
-    WebFile pkgDir = getBuildDir(aPkgName);
-    if(pkgDir!=null)
-        for(WebFile file : pkgDir.getFiles()) {
-            if(file.getType().equals("class")) files.add(getJFO(file.getPath(), file)); }
+    if(theKinds.contains(Kind.CLASS)) {
+        WebFile pkgDir = getBuildDir(aPkgName);
+        if(pkgDir!=null)
+            for(WebFile file : pkgDir.getFiles()) {
+                if(file.getType().equals("class")) files.add(getJFO(file.getPath(), file)); }
+    }
     
     // Add Source files
-    pkgDir = getSourceDir(aPkgName);
-    if(pkgDir!=null)
-        for(WebFile file : pkgDir.getFiles()) {
-            if(isJavaFile(file)) files.add(getJFO(file.getPath(), file)); }
-    
+    if(theKinds.contains(Kind.SOURCE)) {
+        WebFile pkgDir = getSourceDir(aPkgName);
+        if(pkgDir!=null)
+            for(WebFile file : pkgDir.getFiles()) {
+                if(isJavaFile(file)) files.add(getJFO(file.getPath(), file)); }
+    }
+            
     // Return files
     return files;
 }

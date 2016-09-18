@@ -250,6 +250,18 @@ public static class ProjectClassLoaderX extends URLClassLoader {
     public ProjectClassLoaderX(URL urls[], ClassLoader aPar) { super(urls, aPar); } }
 
 /**
+ * Returns the project class loader.
+ */
+public ClassLoader createLibClassLoader()
+{
+    // Create ClassLoader for ProjectSet.ClassPath URLs and SystemClassLoader.Parent and return
+    String cpaths[] = getProjectSet().getLibPaths();
+    URL urls[] = FilePathUtils.getURLs(cpaths);
+    ClassLoader cldr = ClassLoader.getSystemClassLoader().getParent();
+    return new ProjectClassLoaderX(urls, cldr);
+}
+
+/**
  * Clears the class loader.
  */
 protected void clearClassLoader()

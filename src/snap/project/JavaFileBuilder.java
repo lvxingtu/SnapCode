@@ -100,9 +100,6 @@ public boolean buildFiles(TaskMonitor aTaskMonitor)
     compiler.getFileManaer()._buildFiles.addAll(files);
     _interrupt = false;
     
-    // Sort build files by dependencies
-    if(files.size()>20) sortBuildFiles(files);
-    
     // Iterate over build files and compile
     boolean compileSuccess = true; //long time = System.currentTimeMillis();
     for(int i=0; i<files.size(); i++) { WebFile file = files.get(i);
@@ -191,112 +188,6 @@ private void deleteZombieClassFiles(WebFile aJavaFile)
             catch(Exception e) { throw new RuntimeException(e); }
         }
     }
-}
-
-/**
- * Does a Topological Sort of given project files by their dependencies.
- */
-public void sortBuildFiles(List <WebFile> theItems)
-{
-    // S <- Set of all nodes with no incoming edges
-    Set <Node> S = new HashSet<Node>();
-    
-    // Load all nodes
-    Map <WebFile,Node> allNodesMap = new HashMap();
-    for(WebFile file : theItems) {
-        Node n = allNodesMap.get(file); if(n==null) allNodesMap.put(file, n=new Node(file));
-        Set <WebFile> dps = JavaData.get(file).getDependencies();
-        for(WebFile dpfile : dps) {
-            Node m = allNodesMap.get(dpfile); if(m==null) allNodesMap.put(dpfile, m=new Node(dpfile));
-            n.addEdge(m);
-        }
-        if(n.outEdges.size()==0) S.add(n);
-    }
-    
-    // Get AllNodes Set
-    Set <Node> allNodes = new HashSet(allNodesMap.values());
-    allNodes.removeAll(S);
-    
-    // If S set empty, add small cycle
-    if(S.isEmpty() && !allNodes.isEmpty()) {
-        Set <Node> smallCycle = getSmallCycle(allNodes);
-        S.addAll(smallCycle); allNodes.removeAll(smallCycle);
-    }
-
-    // L <- Empty list that will contain the sorted elements
-    List<Node> L = new ArrayList<Node>();
-    
-    // While S is non-empty do
-    while(!S.isEmpty()) {
-        
-        // Remove a node n from S and add to L
-        Node n = S.iterator().next();
-        S.remove(n);
-        L.add(n); //System.out.println(L.size() + ". " + n.item);
-
-        // Clear node OutEdges
-        if(n.outEdges.size()>0) for(Iterator<Node> it = n.outEdges.iterator(); it.hasNext();) { Node m = it.next();
-            it.remove(); m.inEdges.remove(n); }
-        
-        // Clear node InEdges
-        for(Iterator<Node> it = n.inEdges.iterator(); it.hasNext();) { Node m = it.next();
-            it.remove(); m.outEdges.remove(n);
-            if(m.outEdges.isEmpty()) {  // If dependent has no other dependencies then add to S
-                S.add(m); allNodes.remove(m); }
-        }
-        
-        // If S set empty, add small cycle
-        if(S.isEmpty() && !allNodes.isEmpty()) {
-            Set <Node> smallestCycle = getSmallCycle(allNodes);
-            S.addAll(smallestCycle); allNodes.removeAll(smallestCycle);
-        }
-    }
-    
-    // Reset Items with new ordering
-    theItems.clear();
-    for(Node n : L) theItems.add((WebFile)n.item);
-    if(allNodes.size()>0) throw new RuntimeException("TopoSort: Items left!");
-}
-
-/**
- * Returns a small cycle in given node set.
- */
-private static Set <Node> getSmallCycle(Set <Node> theNodes)
-{
-    Set <Node> cycle = new HashSet(), small = null;
-    for(Node n : theNodes) {
-        getCycle(n, cycle);
-        if(small==null || cycle.size()<small.size()) { small = cycle; cycle = new HashSet(); } else cycle.clear();
-        if(small.size()<50) break;  // We don't need the smallest cycle
-    }
-        
-    //System.out.println("Cycle:"); for(Node p : small) System.out.println("    " + p);
-    //System.out.println("Cycle: " + small.size() + " from " + theNodes.size());
-    return small;
-}
-
-/**
- * Returns the smallest cycle in given node set.
- */
-private static void getCycle(Node aNode, Set <Node> theNodes)
-{
-    theNodes.add(aNode);
-    for(Node e : (Set<Node>)aNode.outEdges)
-        if(!theNodes.contains(e))
-            getCycle(e, theNodes);
-}
-
-/**
- * A class for node.
- */
-private static class Node <T> {
-    public final T item;
-    public final Set<Node> inEdges = new HashSet<Node>(), outEdges = new HashSet<Node>();
-    public Node(T anItem)  { this.item = anItem; }
-    public Node addEdge(Node node)  { outEdges.add(node); node.inEdges.add(this); return this; }
-    public int hashCode()  { return item.hashCode(); }
-    public boolean equals(Object obj)  { Node other = (Node)obj; return item.equals(other.item); }
-    public String toString() { return this.item.toString(); }
 }
 
 }
