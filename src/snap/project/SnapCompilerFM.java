@@ -99,7 +99,7 @@ public String inferBinaryName(Location aLoc, JavaFileObject aFile)
 public boolean isSameFile(FileObject a, FileObject b)
 {
     if(a==b) return true;
-    //if(a instanceof SnapFileJFO || b instanceof SnapFileJFO) return false;
+    if(a instanceof SnapFileJFO || b instanceof SnapFileJFO) return false;
     return super.isSameFile(a, b);
 }
 

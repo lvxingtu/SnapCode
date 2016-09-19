@@ -113,7 +113,8 @@ public boolean compile(WebFile aFile)
     SnapCompilerFM fman = getFileManaer();
     
     // Get JFOs
-    List <SnapCompilerFM.SnapFileJFO> jfos = Arrays.asList(fman.getJFO(aFile.getPath(), aFile));
+    JavaFileObject jfo = fman.getJFO(aFile.getPath(), aFile);
+    List <JavaFileObject> jfos = Arrays.asList(jfo);
     
     // Get task, call and return _succeeded
     CompilationTask task = compiler.getTask(new StringWriter(), fman, this, getOptions(), null, jfos);
