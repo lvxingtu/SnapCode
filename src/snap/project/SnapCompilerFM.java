@@ -23,9 +23,6 @@ public class SnapCompilerFM extends ForwardingJavaFileManager<JavaFileManager> {
     // A map of previously accessed SnapFileObjects for paths
     Map <String,SnapFileJFO>  _jfos = new HashMap();
     
-    // A map cache of package files
-    Map <String,Iterable<JavaFileObject>>  _pkgFiles = new HashMap();
-    
     // Bogus flag to indicate we should use JavaFiles instead of ClassFiles when available
     Set <WebFile>            _buildFiles = new HashSet();
     
@@ -124,20 +121,9 @@ public Iterable<JavaFileObject> list(Location aLoc, String aPkgName, Set<Kind> k
         aPkgName.startsWith("com.sun") || aPkgName.startsWith("sun.") || aPkgName.startsWith("org.xml"))
         return iterable;
     
-    // Get list from cache or load/cache from real version
-    Iterable <JavaFileObject> list = _pkgFiles.get(aPkgName);
-    if(list==null) _pkgFiles.put(aPkgName, list=listImpl(aPkgName, kinds));
-    return list;
-}
-
-/**
- * Returns project src/bin files for package.
- */
-Iterable <JavaFileObject> listImpl(String aPkgName, Set <Kind> theKinds)
-{
-    // Add CLASS files
+    // Add Class files
     List files = new ArrayList();
-    if(theKinds.contains(Kind.CLASS)) {
+    if(kinds.contains(Kind.CLASS)) {
         WebFile pkgDir = getBuildDir(aPkgName);
         if(pkgDir!=null)
             for(WebFile file : pkgDir.getFiles()) {
@@ -145,7 +131,7 @@ Iterable <JavaFileObject> listImpl(String aPkgName, Set <Kind> theKinds)
     }
     
     // Add Source files
-    if(theKinds.contains(Kind.SOURCE)) {
+    if(kinds.contains(Kind.SOURCE)) {
         WebFile pkgDir = getSourceDir(aPkgName);
         if(pkgDir!=null)
             for(WebFile file : pkgDir.getFiles()) {
@@ -271,13 +257,8 @@ class SnapFileJFO extends SimpleJavaFileObject {
                 
                 // If file was modified or a real compile file, save
                 if(modified || _file.getLastModifiedTime()<_sourceFile.getLastModifiedTime()) {
-                    boolean exists = _file.getExists();
                     try { _file.save(); }
                     catch(Exception e) { throw new RuntimeException(e); }
-                    if(!exists) {
-                        List list = (List)_pkgFiles.get(_proj.getPackageName(_sourceFile));
-                        list.add(SnapFileJFO.this);
-                    }
                 }
             }  
         };
