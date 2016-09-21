@@ -24,6 +24,9 @@ public static void main(String args[])
     // Hook to run as SnapApp instead
     if(args.length>0 && args[0].equals("-snap")) { snap.javafx.SnapApp.main(args); return; }
     
+    // Install JavaFX
+    JFXViewEnv.set();
+    
     // Mac specific stuff
     if(SnapUtils.isMac) new AppleAppHandler().init();
 
@@ -39,9 +42,6 @@ public void start(Stage aStage)
     // Set App and App Prefs class
     SnapUtils.isApp = true;
     PrefsUtils.setPrefsClass(App.class);
-    
-    // Install JavaFX
-    JFXViewEnv.set();
     
     // Install Exception reporter
     ExceptionReporter er = new ExceptionReporter();
