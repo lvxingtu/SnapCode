@@ -2,7 +2,7 @@
 <VBox PrefWidth="200" PrefHeight="180" Padding="0,0,2,0" FillWidth="true">
   <HBox>
     <font name="Arial Bold" size="12" />
-    <Label text=" Processes" />
+    <Label name="ProcessesLabel" text=" Processes" PrefWidth="160" />
     <Button Name="DebugButton" PrefWidth="24" PrefHeight="24" LeanX="RIGHT" image="Debug.gif" ShowBorder="false" />
   </HBox>
   <HBox Padding="0,0,0,18" Spacing="4">

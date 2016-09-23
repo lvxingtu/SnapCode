@@ -291,9 +291,14 @@ public void setProgramCounter(WebFile aFile, int aLine)
  */
 protected void initUI()
 {
+    // Get and configure ProcTree
     _procTree = getView("ProcTree", TreeView.class);
     _procTree.setResolver(new ProcTreeResolver());
     _procTree.setRowHeight(20);
+    
+    // Add this so clicking on Processes label causes resetLater
+    View plabel = getView("ProcessesLabel"); enableEvents(plabel, MousePressed);
+    plabel.addEventHandler(e -> plabel.getAnimCleared(200).setTransX(30).getAnim(400).setTransX(0).play(), MousePressed);
 }
 
 /**
