@@ -2,6 +2,8 @@ package snap.app;
 import java.io.File;
 import java.util.*;
 import snap.debug.*;
+import snap.javaparse.JavaData;
+import snap.javaparse.JavaDecl;
 import snap.project.*;
 import snap.util.*;
 import snap.web.*;
@@ -61,6 +63,10 @@ public void runFile(AppPane anAppPane, RunConfig aConfig, WebFile aFile, boolean
     
     // Set last run file
     _lastRunFile = aFile;
+    
+    // If TeaVM (links against jar and activates TVViewEnv), generate tea files and open in browser
+    if(isTeaVM(_proj, aFile)) {
+        runTea(anAppPane); return; }
     
     // Run/debug file
     if(isDebug) debugApp(anAppPane);
@@ -145,6 +151,103 @@ protected List <String> getCommand()
  * Returns an array of args.
  */
 protected List <String> getDebugCommand()  { List <String> cmd = getCommand(); cmd.remove(0); return cmd; }
+
+/**
+ * Returns whether this is TeaVM launch.
+ */
+public boolean isTeaVM(Project aProj, WebFile aFile)
+{
+    // If class path doesn't include TeaVM jar, return false
+    String cpath = FilePathUtils.getJoinedPath(aProj.getProjectSet().getLibPaths());
+    if(!cpath.contains("teavm-")) return false;
+    
+    // If main class contains TVViewEnv, return true
+    Set <JavaDecl> decls = JavaData.get(aFile).getRefs(); for(JavaDecl decl : decls) {
+        if(decl.getName().equals("snaptea.TVViewEnv"))
+            return true; }
+    return false;
+}
+
+/**
+ * Runs the provided file as straight app.
+ */
+void runTea(AppPane anAppPane)
+{
+    // Get run command as string array
+    List <String> commands = getTeaCommand();
+    String command[] = commands.toArray(new String[commands.size()]);
+    
+    // Print run command to console
+    System.err.println(ListUtils.joinStrings(ListUtils.newList((Object[])command), " "));
+    
+    // Create RunApp
+    RunApp proc = new RunApp(getURL(), command);
+    anAppPane.getProcPane().addProc(proc);
+    anAppPane.getProcPane().setSelApp(proc);
+    anAppPane.setSupportTrayIndex(1);
+    proc.exec();
+    proc.addListener(new RunApp.AppAdapter() {
+        public void appExited(RunApp ra) { teaExited(); }});
+}
+
+/**
+ * Returns an array of args.
+ */
+protected List <String> getTeaCommand()
+{
+    // Get basic run command and add to list
+    List <String> commands = new ArrayList();
+    String java = System.getProperty("java.home") + File.separator + "bin" + File.separator + "java";
+    commands.add(java);
+    
+    // Get Class path and add to list
+    String cpaths[] = _proj.getProjectSet().getClassPaths();
+    cpaths = ArrayUtils.add(cpaths, "/Temp/teavm/*");
+    String cpathsNtv[] = FilePathUtils.getNativePaths(cpaths);
+    String cpath = FilePathUtils.getJoinedPath(cpathsNtv);
+    commands.add("-cp"); commands.add(cpath);
+    
+    // Add runner and class name
+    commands.add("org.teavm.cli.TeaVMRunner");
+    commands.add(_proj.getClassName(getURL().getFile()));
+    
+    // Add output dir
+    String bpath = _proj.getClassPath().getBuildPathAbsolute() + "/tea";
+    String bpathNtv = FilePathUtils.getNativePath(bpath);
+    commands.add("-d"); commands.add(bpathNtv);
+    
+    // Add other options
+    commands.add("-S"); commands.add("-D");
+    
+    // Add App Args
+    if(getAppArgs()!=null && getAppArgs().length()>0)
+        commands.add(getAppArgs());
+    
+    // Return commands
+    return commands;
+}
+
+/**
+ * Called when tea Exited.
+ */
+public void teaExited()
+{
+    WebURL html = WebURL.getURL(_proj.getClassPath().getBuildPathAbsolute() + "/tea/index.html");
+    WebFile htmlFile = html.getFile();
+    if(htmlFile==null) {
+        htmlFile = html.createFile(false);
+        String s1 = "<!DOCTYPE html>\n<html>\n<head>\n<title>SnapTea</title>\n";
+        String s2 = "<meta http-equiv=\"Content-Type\" content=\"text/html;charset=utf-8\">\n";
+        String s3 = "<script type=\"text/javascript\" charset=\"utf-8\" src=\"runtime.js\"></script>\n";
+        String s4 = "<script type=\"text/javascript\" charset=\"utf-8\" src=\"classes.js\"></script>\n";
+        String s5 = "</head>\n<body onload=\"main()\">\n";
+        String s6 = "<canvas id=\"myCanvas\" width=\"800\" height=\"600\" style=\"border:1px solid #999999;\"></canvas>\n";
+        String s7 = "</body>\n</html>";
+        htmlFile.setText(s1+s2+s3+s4+s5+s6+s7);
+        htmlFile.save();
+    }
+    snap.gfx.GFXEnv.getEnv().openFile(htmlFile.getStandardFile());
+}
 
 /**
  * Returns the last run file.

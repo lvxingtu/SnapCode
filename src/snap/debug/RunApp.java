@@ -48,6 +48,7 @@ public class RunApp {
     
     // The listener
     AppListener        _listener;
+    List <AppListener> _lsnrs = new ArrayList();
 
 /**
  * Creates a new RunApp for AppPane and args.
@@ -262,7 +263,8 @@ OutputListener _diagnostics = new OutputListener() {
 protected void appendOut(String aStr)
 {
     _output.add(new Output(aStr, false));
-    _listener.appendOut(this, aStr);
+    for(AppListener lsnr : _lsnrs)
+        lsnr.appendOut(this, aStr);
 }
 
 /**
@@ -271,13 +273,18 @@ protected void appendOut(String aStr)
 protected void appendErr(String aStr)
 {
     _output.add(new Output(aStr, true));
-    _listener.appendErr(this, aStr);
+    for(AppListener lsnr : _lsnrs)
+        lsnr.appendErr(this, aStr);
 }
 
 /**
  * Called when process exited.
  */
-protected void notifyAppExited()  { _listener.appExited(this); }
+protected void notifyAppExited()
+{
+    for(AppListener lsnr : _lsnrs)
+        lsnr.appExited(this);
+}
 
 /**
  * Returns whether process had error.
@@ -297,7 +304,16 @@ public void removeBreakpoint(Breakpoint aBP)  { }
 /**
  * Sets listener.
  */
-public void setListener(AppListener aListener)  { _listener = aListener; }
+public void addListener(AppListener aListener)  { _lsnrs.add(aListener); }
+
+/**
+ * Sets listener.
+ */
+public void setListener(AppListener aListener)
+{
+    _listener = aListener;
+    _lsnrs.add(aListener);
+}
 
 /**
  * An interface for objects providing input.
