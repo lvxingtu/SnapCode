@@ -163,7 +163,7 @@ public boolean isTeaVM(Project aProj, WebFile aFile)
     
     // If main class contains TVViewEnv, return true
     Set <JavaDecl> decls = JavaData.get(aFile).getRefs(); for(JavaDecl decl : decls) {
-        if(decl.getName().equals("snaptea.TVViewEnv"))
+        if(decl.getName().startsWith("snaptea.TV"))
             return true; }
     return false;
 }
@@ -201,10 +201,9 @@ protected List <String> getTeaCommand()
     commands.add(java);
     
     // Get Class path and add to list
-    String cpaths[] = _proj.getProjectSet().getClassPaths();
-    cpaths = ArrayUtils.add(cpaths, "/Temp/teavm/*");
+    String cpaths[] = _proj.getProjectSet().getClassPaths(); //cpaths = ArrayUtils.add(cpaths, "/Temp/teavm/*");
     String cpathsNtv[] = FilePathUtils.getNativePaths(cpaths);
-    String cpath = FilePathUtils.getJoinedPath(cpathsNtv);
+    String cpath = FilePathUtils.getJoinedPath(cpathsNtv); cpath = cpath.replace("teavm-jso-0.4.3.jar", "*");
     commands.add("-cp"); commands.add(cpath);
     
     // Add runner and class name
@@ -241,7 +240,7 @@ public void teaExited()
         String s3 = "<script type=\"text/javascript\" charset=\"utf-8\" src=\"runtime.js\"></script>\n";
         String s4 = "<script type=\"text/javascript\" charset=\"utf-8\" src=\"classes.js\"></script>\n";
         String s5 = "</head>\n<body onload=\"main()\">\n";
-        String s6 = "<canvas id=\"myCanvas\" width=\"800\" height=\"600\" style=\"border:1px solid #999999;\"></canvas>\n";
+        String s6 = "";//"<canvas id=\"myCanvas\" width=\"800\" height=\"600\" style=\"border:1px solid #999999;\"></canvas>\n";
         String s7 = "</body>\n</html>";
         htmlFile.setText(s1+s2+s3+s4+s5+s6+s7);
         htmlFile.save();
