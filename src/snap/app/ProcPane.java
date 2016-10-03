@@ -298,7 +298,15 @@ protected void initUI()
     
     // Add this so clicking on Processes label causes resetLater
     View plabel = getView("ProcessesLabel"); enableEvents(plabel, MousePressed);
-    plabel.addEventHandler(e -> plabel.getAnimCleared(200).setTransX(30).getAnim(400).setTransX(0).play(), MousePressed);
+    plabel.addEventHandler(e -> doProcLabelClick(plabel), MousePressed);
+}
+
+/** Bogus debug hook. */
+private void doProcLabelClick(View plabel)
+{
+    plabel.getAnimCleared(200).setTransX(30).getAnim(400).setTransX(0).play();
+    DebugApp dapp = getSelDebugApp(); if(dapp==null) return;
+    dapp.reset();
 }
 
 /**

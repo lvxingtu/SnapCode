@@ -12,15 +12,6 @@ public class ExprEval {
     // A parser to parse expressions
     static Parser         _exprParser = JavaParser.getShared().getExprParser();
     
-    // Constants for method types
-    static final int STATIC = 0;
-    static final int INSTANCE = 1;
-    
-    // Constants for method matching
-    static final int SAME = 0;
-    static final int ASSIGNABLE = 1;
-    static final int DIFFERENT = 2;
-    
 /**
  * Evaluate expression.
  */
@@ -106,13 +97,10 @@ static Value evalIdentifier(DebugApp anApp, ObjectReference anOR, JExprId anId) 
 static Value evalMethod(DebugApp anApp, ObjectReference anOR, JExprMethodCall anExpr) throws Exception
 {
     ObjectReference thisObj = anApp.thisObject();
-    ReferenceType refType = anOR.referenceType();  // Thread invalid after invokeMethod which resumes thread
-    List <Method> methods = methods(refType, anExpr.getName(), INSTANCE);
     List <Value> args = new ArrayList();
     for(JExpr arg : anExpr.getArgs())
         args.add(evalExpr(anApp, thisObj, arg));
-    Method method = method(methods, args);
-    return anApp.invokeMethod(anOR, method, args, ObjectReference.INVOKE_NONVIRTUAL);
+    return anApp.invokeMethod(anOR, anExpr.getName(), args);
 }
 
 /**
@@ -335,183 +323,5 @@ private static Value value(DebugApp anApp, double aValue, Value aVal1, Value aVa
         return anApp._vm.mirrorOf((int)aValue);
     throw new RuntimeException("Can't discern value type for " + aVal1 + " and " + aVal2);
 }
-
-/**
- * Returns a list of methods for a given ReferenceType, name and kind.
- */
-private static List <Method> methods(ReferenceType refType, String aName, int kind)
-{
-    List<Method> list = refType.methodsByName(aName); Iterator<Method> iter = list.iterator();
-    while (iter.hasNext()) {
-        Method method = iter.next();
-        boolean isStatic = method.isStatic();
-        if((kind==STATIC && !isStatic) || (kind==INSTANCE && isStatic)) { iter.remove(); }
-    }
-    return list;
-}
-
-/**
- * Returns a method for given args. 
- */
-static Method method(List <Method> overloads, List<Value> arguments)
-{
-    // If there is only one method to call, we'll just choose that without looking at the args.  If they aren't right
-    // the invoke will return a better error message than we could generate here.
-    if(overloads.size()==1)
-        return overloads.get(0);
-
-    // Resolving overloads is beyond the scope of this exercise. So, we will look for a method that matches exactly the
-    // types of the arguments.  If we can't find one, then if there is exactly one method whose param types are
-    // assignable from the arg types, we will use that.  Otherwise, it is an error.  We won't guess which of multiple
-    // possible methods to call. And, since casts aren't implemented, the user can't use them to pick a particular
-    // overload to call. IE, the user is out of luck in this case.
-    Method retVal = null; int assignableCount = 0;
-    for (Method mm : overloads) {
-
-        // This probably won't happen for the method that we are really supposed to call.
-        List<Type> argTypes; try { argTypes = mm.argumentTypes(); }
-        catch (ClassNotLoadedException ee) { continue; }
-        
-        //
-        int compare = argumentsMatch(argTypes, arguments);
-        if(compare == SAME)
-            return mm;
-        if (compare == DIFFERENT)
-            continue;
-
-        // Else, it is assignable.  Remember it.
-        retVal = mm;
-        assignableCount++;
-    }
-
-    // At this point, we didn't find an exact match, but we found one for which the args are assignable.
-    if(retVal != null) {
-        if(assignableCount == 1)
-            return retVal;
-        throw new RuntimeException("Arguments match multiple methods");
-    }
-    throw new RuntimeException("Arguments match no method");
-}
-
-/**
- * Return SAME, DIFFERENT or ASSIGNABLE.
- * SAME means each arg type is the same as type of the corr. arg.
- * ASSIGNABLE means that not all the pairs are the same, but
- * for those that aren't, at least the argType is assignable from the type of the argument value.
- * DIFFERENT means that in at least one pair, the argType is not assignable from the type of the argument value.
- * IE, one is an Apple and the other is an Orange.
- */
-private static int argumentsMatch(List<Type> argTypes, List<Value> arguments)
-{
-    if (argTypes.size() != arguments.size())
-        return DIFFERENT;
-
-    Iterator<Type> typeIter = argTypes.iterator();
-    Iterator<Value> valIter = arguments.iterator();
-    int result = SAME;
-
-    // If any pair aren't the same, change the
-    // result to ASSIGNABLE.  If any pair aren't
-    // assignable, return DIFFERENT
-    while (typeIter.hasNext()) {
-        Type argType = typeIter.next();
-        Value value = valIter.next();
-        if (value == null) {
-            // Null values can be passed to any non-primitive argument
-            if(primitiveTypeNames.contains(argType.name()))
-                return DIFFERENT;
-            // Else, we will assume that a null value
-            // exactly matches an object type.
-        }
-        if (!value.type().equals(argType)) {
-            if(isAssignableTo(value.type(), argType))
-                result = ASSIGNABLE;
-            else return DIFFERENT;
-        }
-    }
-    return result;
-}
-
-/**
- * Returns whether fromType is assignable toType.
- */
-private static boolean isAssignableTo(Type fromType, Type toType)
-{
-    if(fromType.equals(toType))
-        return true;
-
-    // If one is boolean, so must be the other.
-    if(fromType instanceof BooleanType)
-        return toType instanceof BooleanType;
-    if(toType instanceof BooleanType)
-        return false;
-
-    // Other primitive types are intermixable only with each other.
-    if(fromType instanceof PrimitiveType)
-        return toType instanceof PrimitiveType;
-    if(toType instanceof PrimitiveType)
-        return false;
-
-    // neither one is primitive.
-    if(fromType instanceof ArrayType)
-        return isArrayAssignableTo((ArrayType)fromType, toType);
-    
-    List<InterfaceType> interfaces;
-    if(fromType instanceof ClassType) {
-        ClassType superclazz = ((ClassType)fromType).superclass();
-        if(superclazz!=null && isAssignableTo(superclazz, toType))
-            return true;
-        interfaces = ((ClassType)fromType).interfaces();
-    }
-    
-    // fromType must be an InterfaceType
-    else interfaces = ((InterfaceType)fromType).superinterfaces();
-
-    for(InterfaceType interfaze : interfaces)
-        if(isAssignableTo(interfaze, toType))
-            return true;
-    return false;
-}
-
-/**
- * Returns whether fromType is assignable toType (for ArrayType).
- */
-private static boolean isArrayAssignableTo(ArrayType fromType, Type toType)
-{
-    if(toType instanceof ArrayType) {
-        try {
-            Type toComponentType = ((ArrayType)toType).componentType();
-            return isComponentAssignable(fromType.componentType(), toComponentType);
-        }
-        
-        // One or both component types has not yet been loaded => can't assign
-        catch (ClassNotLoadedException e) { return false; }
-    }
-    
-    // Only valid InterfaceType assignee is Cloneable
-    if(toType instanceof InterfaceType)
-        return toType.name().equals("java.lang.Cloneable");
-
-    // Only valid ClassType assignee is Object
-    return toType.name().equals("java.lang.Object");
-}
-
-/**
- * Returns whether fromType is assignable toType (for ArrayType).
- */
-private static boolean isComponentAssignable(Type fromType, Type toType)
-{
-    // Assignment of primitive arrays requires identical component types
-    if(fromType instanceof PrimitiveType)
-        return fromType.equals(toType);
-    if(toType instanceof PrimitiveType)
-        return false;
-    // Assignment of object arrays requires availability of widening conversion of component types
-    return isAssignableTo(fromType, toType);
-}
-
-/** PrimitiveTypeNames. */
-private static String ptnames[] = { "boolean", "byte", "char", "short", "int", "long", "float", "double" };
-private static List <String> primitiveTypeNames = Arrays.asList(ptnames);
 
 }

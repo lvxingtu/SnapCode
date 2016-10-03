@@ -3,8 +3,6 @@ import com.sun.jdi.*;
 import java.util.*;
 import snap.debug.*;
 import snap.gfx.*;
-import snap.javaparse.*;
-import snap.util.SnapUtils;
 import snap.view.*;
 
 /**
@@ -167,25 +165,9 @@ public static class VarTreeItem implements Comparable <VarTreeItem> {
     /** Return value. */
     public String getValueToString()
     {
-        Object value = _value;
-        if(value instanceof ArrayReference) {
-            StringBuffer sb = new StringBuffer("[");
-            for(VarTreeItem chld : getChildren()) sb.append(chld.getValueToString()).append(", ");
-            if(getChildCount()>0) sb.delete(sb.length()-2, sb.length());
-            return sb.append(']').toString();
-        }
-        
-        if(value instanceof StringReference) { StringReference sref = (StringReference)value;
-            return sref.value(); }
-    
-        if(value instanceof ObjectReference) { ObjectReference or = (ObjectReference)value;
-            JExprMethodCall mc = new JExprMethodCall(new JExprId("toString"), Collections.emptyList());
-            StringReference sref = null; try { sref = (StringReference)ExprEval.evalExpr(getApp(), or, mc); }
-            catch(Exception e) { e.printStackTrace(); return e.toString(); }
-            return sref!=null? sref.value() : "(null)";
-        }
-        
-        return value!=null? value.toString() : "(null)";
+        if(_value instanceof Value)
+            return getApp().toString((Value)_value);
+        return _value!=null? _value.toString() : "(null)";
     }
     
     /** Return value class. */
@@ -214,22 +196,25 @@ public static class VarTreeItem implements Comparable <VarTreeItem> {
         ObjectReference or = (ObjectReference)_value;
         ReferenceType rt = or.referenceType();
         
+        // Handle Arrays
         if(or instanceof ArrayReference) { ArrayReference aref = (ArrayReference)or; int i = 0;
             for(Value value : aref.getValues())
                 list.add(new VarTreeItem(getApp(), "[" + (i++) + ']', value));
         }
         
-        // Get fields or ReferenceType and iterate over each to create VarTableItem
-        List <Field> fields = rt.allFields();
-        for(Field field : fields) {
-            if(field.isStatic() || field.isEnumConstant()) continue;
-            String name = field.name(); Value value = null;
-            try { value = or.getValue(field); } catch(Exception e) { name = e.toString(); }
-            list.add(new VarTreeItem(getApp(), name, value));
+        // Handle anything else: Iterate over fields for ReferenceType to create VarTableItems
+        else {
+            List <Field> fields = rt.allFields();
+            for(Field field : fields) {
+                if(field.isStatic() || field.isEnumConstant()) continue;
+                String name = field.name(); Value value = null;
+                try { value = or.getValue(field); } catch(Exception e) { name = e.toString(); }
+                list.add(new VarTreeItem(getApp(), name, value));
+            }
+            Collections.sort(list);
         }
         
-        // Sort list and return
-        Collections.sort(list);
+        // Get array, set parents and return
         _children = list.toArray(new VarTreeItem[0]);
         for(VarTreeItem item : _children) item._parent = this;
         return _children;
@@ -242,16 +227,12 @@ public static class VarTreeItem implements Comparable <VarTreeItem> {
         return _name.compareTo(anItem._name);
     }
     
+    /** Standard Equals implementation. */
+    //public boolean equals(Object anObj) {
+    //    VarTreeItem other = anObj instanceof VarTreeItem? (VarTreeItem)anObj : null; if(other==null) return false;
+    //    if(!SnapUtils.equals(_name,other._name)) return false; return SnapUtils.equals(_value, other._value);  }
     /** Standard hashCode implementation. */
-    public int hashCode()  { return (_name!=null? _name.hashCode() : 0) + (_value!=null? _value.hashCode() : 0); }
-    
-    /** Equals. */
-    public boolean equals(Object anObj)
-    {
-        VarTreeItem other = anObj instanceof VarTreeItem? (VarTreeItem)anObj : null; if(other==null) return false;
-        if(!SnapUtils.equals(_name,other._name)) return false;
-        return SnapUtils.equals(_value, other._value);
-    }
+    //public int hashCode()  { return (_name!=null? _name.hashCode() : 0) + (_value!=null? _value.hashCode() : 0); }
 }
 
 /**
