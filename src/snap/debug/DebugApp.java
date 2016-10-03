@@ -3,6 +3,7 @@ import java.io.*;
 import java.util.*;
 import snap.debug.Exceptions.*;
 import snap.project.Breakpoint;
+import snap.util.ArrayUtils;
 import snap.web.WebURL;
 import com.sun.jdi.*;
 import com.sun.jdi.event.*;
@@ -27,7 +28,8 @@ public class DebugApp extends RunApp {
     boolean                       _paused;
 
     // all specs
-    List <BreakpointReq>          _eventRequestSpecs = Collections.synchronizedList(new ArrayList());
+    //List <BreakpointReq>          _eventRequestSpecs = Collections.synchronizedList(new ArrayList());
+    BreakpointReq                 _eventRequestSpecs[] = new BreakpointReq[0];
 
     // Event source thread
     JDIEventDispatcher            _eventDispatchThread;
@@ -171,7 +173,7 @@ protected void endSession()
 /**
  * Pause the app.
  */
-public synchronized void pause()
+public void pause()
 {
     try {
         ensureActiveSession(); setPaused(true);
@@ -195,7 +197,7 @@ public void resume()
 /**
  * Resume the app.
  */
-public synchronized void resumeQuiet()
+public void resumeQuiet()
 {
     try {
         ensureActiveSession(); setPaused(false);
@@ -251,7 +253,7 @@ private void generalStep(int size, int depth)
 /**
  * General purpose step method.
  */
-private synchronized void generalStep(ThreadReference thread, int size, int depth) throws NoSessionException 
+private void generalStep(ThreadReference thread, int size, int depth) throws NoSessionException 
 {
     ensureActiveSession(); setPaused(false);
 
@@ -504,15 +506,6 @@ private InputListener _appInput = new InputListener() {
 private void echoInputLine(String line)  { }
 
 /**
- * Returns the list of user defined EventRequests.
- */
-public List <BreakpointReq> getEventRequestSpecs()
-{
-    // We need to make a copy to avoid synchronization problems
-    synchronized(_eventRequestSpecs) { return new ArrayList(_eventRequestSpecs); }
-}
-
-/**
  * Adds a breakpoint.
  */
 public void addBreakpoint(Breakpoint aBP)
@@ -523,7 +516,7 @@ public void addBreakpoint(Breakpoint aBP)
 
     // Create new BreakpointReq and add
     BreakpointReq bpr = new BreakpointReq(this, aBP);
-    synchronized(_eventRequestSpecs) { _eventRequestSpecs.add(bpr); }  // Add request to list
+    _eventRequestSpecs = ArrayUtils.add(_eventRequestSpecs, bpr); // Add request to array
     if(_vm!=null && !_terminated)  // Have event resolve immediately
         bpr.install(_vm);
 }
@@ -538,7 +531,7 @@ public void removeBreakpoint(Breakpoint aBP)
     if(bpr==null) return;
     
     // Remove BreakpointReq
-    synchronized (_eventRequestSpecs) { _eventRequestSpecs.remove(bpr); }  // Remove event from list
+    _eventRequestSpecs = ArrayUtils.remove(_eventRequestSpecs, bpr); // Add request to array
     bpr.delete();  // Delete
 }
 
@@ -547,9 +540,8 @@ public void removeBreakpoint(Breakpoint aBP)
  */
 protected void resolve(ReferenceType refType)
 {
-    synchronized(_eventRequestSpecs) {
-        for(BreakpointReq ers : _eventRequestSpecs)
-            ers.attemptResolve(refType); }
+    for(BreakpointReq ers : _eventRequestSpecs)
+        ers.attemptResolve(refType);
 }
 
 /**
@@ -626,7 +618,7 @@ protected void notifyError(BreakpointReq aBP)  { error("Failed to set BP: " + aB
 /**
  * Handle DebugEvents from EventDispatch thread.
  */
-synchronized void dispatchEvent(DebugEvent anEvent)
+void dispatchEvent(DebugEvent anEvent)
 {
     // Notify listeners
     boolean eventPaused = anEvent.suspendedAll(), wantsPause = isPaused();
