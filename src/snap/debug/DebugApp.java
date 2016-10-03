@@ -623,7 +623,7 @@ void dispatchEvent(DebugEvent anEvent)
     // Notify listeners
     boolean eventPaused = anEvent.suspendedAll(), wantsPause = isPaused();
     if(_printEVs) System.out.println("JDIEvent: " + anEvent);
-
+    
     // Handle event types (VMStart, VMDeath, VMDisconnect, ThreadStart, ThreadDeath, ClassPrepare, ClassUnload)
     switch(anEvent._type) {
     
@@ -646,14 +646,22 @@ void dispatchEvent(DebugEvent anEvent)
         case ModificationWatchpoint: wantsPause = true; break;
     }
     
-    // If event paused VM unnecessarily, resume
-    if(eventPaused && !wantsPause)
-        resumeQuiet();
+    // If event paused VM either resume or make it official
+    if(eventPaused) {
+        
+        // If VM was invoking, do raw VM resume  and return
+        if(_invoking) {
+            try { _vm.resume(); return; }
+            catch(Exception e) { failure("Failed to resume: " + e.getMessage()); }
+        }
+        
+        // If we don't want pause, resume
+        else if(!wantsPause)
+            resumeQuiet();
     
-    // Otherwise, make interruption official
-    else if(eventPaused && !_paused) {
-        setPaused(true);
-        notifyAppPaused();
+        // Otherwise if pause not official, make official
+        else if(!_paused) {
+            setPaused(true); notifyAppPaused(); }
     }
     
     // Dispatch event to listener
