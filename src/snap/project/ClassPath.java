@@ -446,14 +446,30 @@ public void writeFile() throws Exception
 }
 
 /**
+ * Creates the ClassPath file for given project.
+ */
+public static void createFile(Project aProj)
+{
+    StringBuffer sb = new StringBuffer("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
+    sb.append("<classpath>\n");
+    sb.append("\t<classpathentry kind=\"src\" path=\"src\"/>\n");
+    sb.append("\t<classpathentry kind=\"con\" path=\"org.eclipse.jdt.launching.JRE_CONTAINER\"/>\n");
+    sb.append("\t<classpathentry kind=\"output\" path=\"bin\"/>\n");
+    sb.append("</classpath>\n");
+    WebSite site = aProj.getSite();
+    WebFile file = site.createFile(".classpath", false);
+    file.setText(sb.toString());
+    file.save();
+}
+
+/**
  * Returns the project for a given site.
  */
 public static synchronized ClassPath get(Project aProj)
 {
     WebSite site = aProj.getSite();
     ClassPath cpf = (ClassPath)site.getProp("snap.project.ClassPathFile");
-    if(cpf==null)
-        site.setProp("snap.project.ClassPathFile", cpf=new ClassPath(aProj));
+    if(cpf==null) site.setProp("snap.project.ClassPathFile", cpf=new ClassPath(aProj));
     return cpf;
 }
 

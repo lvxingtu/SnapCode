@@ -51,9 +51,13 @@ protected Project(WebSite aSite)
     // Set site
     setSite(aSite);
     
-    // If site doesn't exist, create root directory
-    if(!aSite.getExists())
+    // If site doesn't exist, create root directory, src, bin and default .classpath file
+    if(!aSite.getExists()) {
         aSite.getRootDir().save();
+        aSite.createFile("/src", true).save();
+        aSite.createFile("/bin", true).save();
+        ClassPath.createFile(this);
+    }
     
     // Load settings a dependent projects
     readSettings();
