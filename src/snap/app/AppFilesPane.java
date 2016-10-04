@@ -2,6 +2,7 @@ package snap.app;
 import java.io.File;
 import java.util.*;
 import snap.gfx.*;
+import snap.project.Project;
 import snap.util.*;
 import snap.view.*;
 import snap.viewx.*;
@@ -105,6 +106,25 @@ public void updateFile(WebFile aFile)
     _filesTree.updateItems(afiles.toArray(new AppFile[0]));
     _filesList.updateItems(afiles.toArray(new AppFile[0]));
     if(aFile.isDir()) resetLater();
+}
+
+/**
+ * Shows the given file in tree.
+ */
+public void showInTree(WebFile aFile)
+{
+    // Get AppFile and return if already visible
+    AppFile afile = getAppFile(aFile);
+    if(_filesTree.getItems().contains(afile))
+        return;
+        
+    // Make sure parent is showing and expand item for parent
+    showInTree(aFile.getParent());
+    _filesTree.expandItem(afile.getParent());
+    
+    // If file is SelectedFile, make FilesTree select it
+    if(aFile==getSelectedFile())
+        _filesTree.setSelectedItem(afile);
 }
 
 /**
@@ -552,10 +572,14 @@ public void showNewFilePanel()
     String extension = options[index][1];
     boolean isDir = extension.equals(".dir"); if(isDir) extension = "";
     
-    // Get suggested "Untitled.xxx" path for AppPane.SelectedFile and extension
+    // Get source dir
     WebSite site = getSelectedSite();
     WebFile sfile = _appPane.getSelectedFile(); if(sfile.getSite()!=site) sfile = site.getRootDir();
     WebFile sdir = sfile.isDir()? sfile : sfile.getParent();
+    if(extension.equals(".java") && sdir==site.getRootDir())
+        sdir = Project.get(site).getSourceDir();
+    
+    // Get suggested "Untitled.xxx" path for AppPane.SelectedFile and extension
     String path = sdir.getDirPath() + "Untitled" + extension;
     
     // Create suggested file and page
@@ -567,8 +591,9 @@ public void showNewFilePanel()
     try { file.save(); }
     catch(Exception e) { _appPane.getBrowser().showException(file.getURL(), e); return; }
 
-    // Select file
+    // Select file and show in tree
     _appPane.setSelectedFile(file);
+    showInTree(file);
 }
 
 /**
