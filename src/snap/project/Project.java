@@ -48,7 +48,14 @@ public class Project extends SnapObject {
  */
 protected Project(WebSite aSite)
 {
+    // Set site
     setSite(aSite);
+    
+    // If site doesn't exist, create root directory
+    if(!aSite.getExists())
+        aSite.getRootDir().save();
+    
+    // Load settings a dependent projects
     readSettings();
     getProjects();
 }

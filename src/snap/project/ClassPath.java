@@ -215,11 +215,8 @@ public String[] getSrcPaths()
  */
 public void addSrcPath(String aPath)
 {
-    // Update paths
-    String path = getRelativePath(aPath);
-    _srcPaths = null; _projPaths = null;
-    
     // Add XML for path
+    String path = getRelativePath(aPath);
     XMLElement xml = new XMLElement("classpathentry");
     xml.add("kind", "src"); xml.add("path", path);
     getXML().add(xml);
@@ -227,8 +224,9 @@ public void addSrcPath(String aPath)
     // Save file
     try { writeFile(); }
     catch(Exception e) { throw new RuntimeException(e); }
-    
-    // Fire property change
+
+    // Clear cached paths and Fire property change
+    _srcPaths = null; _projPaths = null;
     firePropChange(SrcPaths_Prop, null, path);
 }
 
