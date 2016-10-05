@@ -150,12 +150,12 @@ public void addProject(String aName, String aURLString)
 
     // Get site - if not present, create and clone
     WebSite site = WelcomePanel.getShared().getSite(aName);
-    if(site==null && aURLString!=null) {
-        site = WelcomePanel.getShared().createSite(aName, false);
+    if((site==null || !site.getExists()) && aURLString!=null) {
+        if(site==null) site = WelcomePanel.getShared().createSite(aName, false);
         VersionControl.setRemoteURLString(site, aURLString);
         VersionControl vc = VersionControl.create(site);
-        try { vc.checkout(new TaskMonitorPanel(view, "Cloning " + aName)); }
-        catch(Exception e) { DialogBox.showExceptionDialog(view, "Error Cloning Project", e); return; }
+        checkout(view, vc);
+        return;
     }
     
     // If site still null complain and return
@@ -165,6 +165,35 @@ public void addProject(String aName, String aURLString)
     // Add project for SnapKit        
     _proj.getProjectSet().addProject(aName);
     getAppPane().addSite(site);
+}
+
+/**
+ * Load all remote files into project directory.
+ */
+public void checkout(View aView, VersionControl aVC)
+{
+    WebSite site = aVC.getSite();
+    TaskMonitorPanel tpan = new TaskMonitorPanel(aView, "Cloning " + site.getName() + " from Github");
+        
+    TaskRunner runner = new TaskRunnerPanel(_appPane.getUI(), "Checkout from " + aVC.getRemoteURLString()) {
+        public Object run() throws Exception
+        {
+            aVC.checkout(tpan);
+            return null;
+        }
+        public void success(Object aRes)
+        {
+            _proj.getProjectSet().addProject(site.getName());
+            getAppPane().addSite(site);
+        }
+        public void failure(Exception e)
+        {
+            if(ClientUtils.setAccess(aVC.getRemoteSite())) checkout(aView, aVC);
+            else if(new LoginPage().showPanel(_appPane.getUI(), aVC.getRemoteSite())) checkout(aView, aVC);
+            else super.failure(e);
+        }
+    };
+    runner.start();
 }
 
 /**

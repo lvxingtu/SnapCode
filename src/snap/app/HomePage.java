@@ -1,8 +1,6 @@
 package snap.app;
 import snap.gfx.*;
-import snap.project.*;
 import snap.view.*;
-import snap.viewx.TaskMonitorPanel;
 import snap.viewx.WebPage;
 import snap.web.*;
 
@@ -57,8 +55,8 @@ public void respondUI(ViewEvent anEvent)
 {
     // Trigger animations on main buttons for MouseEntered/MouseExited
     if(anEvent.isMouseEntered()) {
-        if(_stupidAnim) anEvent.getView().getAnimCleared(200).setScale(1.15).getRoot(1000).setRotate(180).play();
-        else anEvent.getView().getAnimCleared(200).setScale(1.15).play(); }
+        if(_stupidAnim) anEvent.getView().getAnimCleared(200).setScale(1.12).getRoot(1000).setRotate(180).play();
+        else anEvent.getView().getAnimCleared(200).setScale(1.12).play(); }
     if(anEvent.isMouseExited()) {
         if(_stupidAnim) anEvent.getView().getAnimCleared(200).setScale(1).getRoot(1000).setRotate(0).play();
         else anEvent.getView().getAnimCleared(200).setScale(1).play(); }
@@ -70,11 +68,11 @@ public void respondUI(ViewEvent anEvent)
     }
 
     // Handle NewJavaFile
-    if(anEvent.equals("NewJavaFile") && anEvent.isMouseClicked())
+    if(anEvent.equals("NewJavaFile") && anEvent.isMouseReleased())
         getAppPane().showNewFilePanel();
     
     // Handle NewSnapFile
-    if(anEvent.equals("NewSnapFile") && anEvent.isMouseClicked()) {
+    if(anEvent.equals("NewSnapFile") && anEvent.isMouseReleased()) {
         WebFile file = getRootSite().createFile("/Untitled.snp", false);
         WebPage page = getBrowser().createPage(file);
         file = page.showNewFilePanel(getBrowser());
@@ -86,29 +84,29 @@ public void respondUI(ViewEvent anEvent)
     }
     
     // Handle AddSnapKit
-    if(anEvent.equals("AddSnapKit") && anEvent.isMouseClicked()) {
+    if(anEvent.equals("AddSnapKit") && anEvent.isMouseReleased()) {
         ProjectPane ppane = ProjectPane.get(getRootSite());
-        //ppane.addProject("SnapKit", "https://github.com/reportmill/SnapKit.git");
-        ppane.addProject("SillyTest", "https://github.com/reportmill/SillyTest.git");
+        ppane.addProject("SnapKit", "https://github.com/reportmill/SnapKit.git");
     }
 
     // Handle AddSnapKit
-    if(anEvent.equals("AddSnapTea") && anEvent.isMouseClicked()) {
+    if(anEvent.equals("AddSnapTea") && anEvent.isMouseReleased()) {
         ProjectPane ppane = ProjectPane.get(getRootSite());
-        ppane.addProject("SnapKit", "https://github.com/reportmill/SnapKit.git");
+        if(ppane.getProject().getProjectSet().getProject("SnapKit")==null)
+            ppane.addProject("SnapKit", "https://github.com/reportmill/SnapKit.git");
         ppane.addProject("SnapTea", "https://github.com/reportmill/SnapTea.git");
     }
 
     // Handle SnapDocs
-    if(anEvent.equals("SnapDocs") && anEvent.isMouseClicked())
+    if(anEvent.equals("SnapDocs") && anEvent.isMouseReleased())
         GFXEnv.getEnv().openURL("http://www.reportmill.com/snap1/javadoc");
 
     // Handle RMDocs
-    if(anEvent.equals("RMDocs") && anEvent.isMouseClicked())
+    if(anEvent.equals("RMDocs") && anEvent.isMouseReleased())
         GFXEnv.getEnv().openURL("http://www.reportmill.com/support");
     
     // Handle NewReport
-    if(anEvent.equals("NewReport") && anEvent.isMouseClicked()) {
+    if(anEvent.equals("NewReport") && anEvent.isMouseReleased()) {
         WebFile file = getRootSite().createFile("/Untitled.rpt", false);
         WebPage page = getBrowser().createPage(file);
         file = page.showNewFilePanel(getBrowser());
@@ -120,7 +118,7 @@ public void respondUI(ViewEvent anEvent)
     }
     
     // Handle RMUserGuide
-    if(anEvent.equals("RMUserGuide") && anEvent.isMouseClicked())
+    if(anEvent.equals("RMUserGuide") && anEvent.isMouseReleased())
         getBrowser().setURLString("http://www.reportmill.com/support/UserGuide.pdf");
 }
 

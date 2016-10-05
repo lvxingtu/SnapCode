@@ -62,7 +62,7 @@
         <RichText>
           <font name="Arial Bold" size="24" />
           <pgraph align="center" />
-          <string>Add SnapKit Project</string>
+          <string>Add SnapKit  Project</string>
         </RichText>
       </TextView>
     </SpringView>
