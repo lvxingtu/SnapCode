@@ -161,11 +161,6 @@ public void setUseSnapEditor(boolean aValue)  { _useSnapEditor = aValue; }
  */
 public void openSite()
 {
-    // Bogus SnapStudio stuff
-    WebFile studioFile = getSite().getFile("/Studio.proj");
-    if(studioFile!=null)
-        HomePage.makeStudioProject(getSite());
-
     // Activate VersionControlPane
     if(_vcp!=null)
         _vcp.openSite();

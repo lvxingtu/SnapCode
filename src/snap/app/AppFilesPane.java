@@ -550,7 +550,7 @@ public void showNewFilePanel()
 {
     // Get new FormBuilder and configure
     FormBuilder form = new FormBuilder(); form.setPadding(20, 5, 15, 5);
-    form.addLabel("Select file or resource type:           ").setFont(new snap.gfx.Font("Arial", 24));
+    form.addLabel("Select file type:           ").setFont(new snap.gfx.Font("Arial", 24));
     form.setSpacing(15);
     
     // Define options

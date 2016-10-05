@@ -53,7 +53,7 @@ public View createUI()
 {
     // Get pane and set Type=None
     SnapPartPane pane = (SnapPartPane)super.createUI(); pane.setType(SnapPartPane.Type.None);
-    pane.setFill(Color.GRAY); pane.setBorder(Border.createLineBorder(Color.LIGHTGRAY,1)); //Bevel
+    pane.setFill(Color.GRAY); pane.setBorder(Color.LIGHTGRAY, 1); //Bevel
     
     // Configure VBox special for file
     VBox vbox = pane.getVBox(); vbox.setPadding(0,10,10,10); vbox.setSpacing(25);

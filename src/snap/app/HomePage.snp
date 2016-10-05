@@ -2,25 +2,26 @@
 <DocView Align="CENTER">
   <PageView width="612" height="792" PrefWidth="612" PrefHeight="792">
     <effect type="shadow" radius="10" dx="0" dy="0" />
-    <RectView x="36" y="36" width="540" height="109">
+    <SpringView name="Header" x="36" y="36" width="540" height="109">
       <LineBorder />
       <fill type="image" resource="2079114672" />
-    </RectView>
-    <SpringView Name="NewJavaFXFile" x="36" y="318" width="255" height="130" PrefWidth="255" PrefHeight="130">
-      <RectView width="255" height="130" GrowWidth="true" GrowHeight="true" LeanX="CENTER" LeanY="CENTER">
-        <LineBorder />
-        <fill type="image" resource="354017466" />
-      </RectView>
-      <TextView x="4" y="6.547" width="242" height="117.842" Align="CENTER_LEFT" Rich="true" Editable="false" WrapText="true">
+      <TextView y="7" width="540" height="99" Rich="true" Editable="false" WrapText="true">
         <effect type="shadow" radius="5" dx="2" dy="2" color="#00000086" />
         <RichText>
-          <font name="Arial Bold" size="24" />
+          <font name="Arial Bold" size="48" />
+          <color value="#ffffff" />
           <pgraph align="center" />
-          <string>New JavaFX File</string>
+          <string>SnapCode</string>
+          <font name="Arial" size="12" />
+          <color value="#000000" />
+          <string>&#10;</string>
+          <font name="Arial Bold" size="24" />
+          <color value="#ffffff" />
+          <string>Home Page</string>
         </RichText>
       </TextView>
     </SpringView>
-    <SpringView Name="MakeStarterProject" x="36" y="165" width="255" height="130" PrefWidth="255" PrefHeight="130">
+    <SpringView Name="NewJavaFile" x="36" y="165" width="255" height="130" PrefWidth="255" PrefHeight="130">
       <RectView width="255" height="130" GrowWidth="true" GrowHeight="true" LeanX="CENTER" LeanY="CENTER">
         <LineBorder />
         <fill type="image" resource="354017466" />
@@ -30,15 +31,14 @@
         <RichText>
           <font name="Arial Bold" size="24" />
           <pgraph align="center" />
-          <string>Make Starter&#10;</string>
-          <string>Studio Project</string>
+          <string>New Java File</string>
         </RichText>
       </TextView>
       <ImageView x="197" y="37.5" width="48" height="87">
         <effect type="shadow" radius="6" dx="2" dy="2" color="#00000086" />
       </ImageView>
     </SpringView>
-    <SpringView Name="WatchVideos" x="321" y="165" width="255" height="130" PrefWidth="255" PrefHeight="130">
+    <SpringView Name="NewSnapFile" x="321" y="165" width="255" height="130" PrefWidth="255" PrefHeight="130">
       <RectView width="255" height="130" GrowWidth="true" GrowHeight="true" LeanX="CENTER" LeanY="CENTER">
         <LineBorder />
         <fill type="image" resource="354017466" />
@@ -48,11 +48,11 @@
         <RichText>
           <font name="Arial Bold" size="24" />
           <pgraph align="center" />
-          <string>Watch Getting Started Videos</string>
+          <string>New Snap UI File</string>
         </RichText>
       </TextView>
     </SpringView>
-    <SpringView Name="CreateFile" x="36" y="469" width="255" height="130" PrefWidth="255" PrefHeight="130">
+    <SpringView Name="AddSnapKit" x="36" y="318" width="255" height="130" PrefWidth="255" PrefHeight="130">
       <RectView width="255" height="130" GrowWidth="true" GrowHeight="true" LeanX="CENTER" LeanY="CENTER">
         <LineBorder />
         <fill type="image" resource="354017466" />
@@ -62,11 +62,11 @@
         <RichText>
           <font name="Arial Bold" size="24" />
           <pgraph align="center" />
-          <string>Create New File</string>
+          <string>Add SnapKit Project</string>
         </RichText>
       </TextView>
     </SpringView>
-    <SpringView Name="NewDataTable" x="321" y="469" width="255" height="130" PrefWidth="255" PrefHeight="130">
+    <SpringView Name="AddSnapTea" x="321" y="318" width="255" height="130" PrefWidth="255" PrefHeight="130">
       <RectView width="255" height="130" GrowWidth="true" GrowHeight="true" LeanX="CENTER" LeanY="CENTER">
         <LineBorder />
         <fill type="image" resource="354017466" />
@@ -76,7 +76,35 @@
         <RichText>
           <font name="Arial Bold" size="24" />
           <pgraph align="center" />
-          <string>New Data Table</string>
+          <string>Add SnapTea Project</string>
+        </RichText>
+      </TextView>
+    </SpringView>
+    <SpringView Name="SnapDocs" x="36" y="469" width="255" height="130" PrefWidth="255" PrefHeight="130">
+      <RectView width="255" height="130" GrowWidth="true" GrowHeight="true" LeanX="CENTER" LeanY="CENTER">
+        <LineBorder />
+        <fill type="image" resource="354017466" />
+      </RectView>
+      <TextView x="4" y="6.547" width="242" height="117.842" Align="CENTER_LEFT" Rich="true" Editable="false" WrapText="true">
+        <effect type="shadow" radius="5" dx="2" dy="2" color="#00000086" />
+        <RichText>
+          <font name="Arial Bold" size="24" />
+          <pgraph align="center" />
+          <string>SnapKit Docs</string>
+        </RichText>
+      </TextView>
+    </SpringView>
+    <SpringView Name="RMDocs" x="321" y="469" width="255" height="130" PrefWidth="255" PrefHeight="130">
+      <RectView width="255" height="130" GrowWidth="true" GrowHeight="true" LeanX="CENTER" LeanY="CENTER">
+        <LineBorder />
+        <fill type="image" resource="354017466" />
+      </RectView>
+      <TextView x="7" y="6.547" width="242" height="117.842" Align="CENTER_LEFT" Rich="true" Editable="false" WrapText="true">
+        <effect type="shadow" radius="5" dx="2" dy="2" color="#00000086" />
+        <RichText>
+          <font name="Arial Bold" size="24" />
+          <pgraph align="center" />
+          <string>ReportMill Docs</string>
         </RichText>
       </TextView>
     </SpringView>
@@ -95,37 +123,7 @@
         </RichText>
       </TextView>
     </SpringView>
-    <TextView x="36" y="43" width="540" height="99" Rich="true" Editable="false" WrapText="true">
-      <effect type="shadow" radius="5" dx="2" dy="2" color="#00000086" />
-      <RichText>
-        <font name="Arial Bold" size="48" />
-        <color value="#ffffff" />
-        <pgraph align="center" />
-        <string>SnapCode</string>
-        <font name="Arial" size="12" />
-        <color value="#000000" />
-        <string>&#10;</string>
-        <font name="Arial Bold" size="24" />
-        <color value="#ffffff" />
-        <string>Home Page</string>
-      </RichText>
-    </TextView>
-    <SpringView Name="SnapSchool" x="321" y="318" width="255" height="130" PrefWidth="255" PrefHeight="130">
-      <RectView width="255" height="130" GrowWidth="true" GrowHeight="true" LeanX="CENTER" LeanY="CENTER">
-        <LineBorder />
-        <fill type="image" resource="354017466" />
-      </RectView>
-      <TextView x="7" y="6.547" width="242" height="117.842" Align="CENTER_LEFT" Rich="true" Editable="false" WrapText="true">
-        <effect type="shadow" radius="5" dx="2" dy="2" color="#00000086" />
-        <RichText>
-          <font name="Arial Bold" size="24" />
-          <pgraph align="center" />
-          <string>Go to&#10;</string>
-          <string>Snap School!</string>
-        </RichText>
-      </TextView>
-    </SpringView>
-    <SpringView Name="ServerSettings" x="321" y="621" width="255" height="130" PrefWidth="255" PrefHeight="130">
+    <SpringView Name="RMUserGuide" x="321" y="621" width="255" height="130" PrefWidth="255" PrefHeight="130">
       <RectView width="255" height="130" GrowWidth="true" GrowHeight="true" LeanX="CENTER" LeanY="CENTER">
         <LineBorder />
         <fill type="image" resource="354017466" />

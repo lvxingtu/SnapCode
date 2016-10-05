@@ -58,7 +58,7 @@ protected SnapPartPane()
     
     // Create HBox
     _hbox = new HBox(); _hbox.setMinHeight(PieceHeight); _hbox.setSpacing(2);
-    //_hbox.setBorder(Border.createLineBorder(Color.RED,2));
+    //_hbox.setBorder(Color.RED, 2);
     
     // Create/set foreground
     _fg = new PathView(); _fg.setManaged(false); //_fg.setStroke(null); _fg.setMouseTransparent(true);
@@ -96,8 +96,7 @@ public Color getColor()  { return _color; }
 public void setColor(Color aColor)
 {
     _color = aColor;
-    _bg.setFill(aColor);
-    //_bg.setBorder(aColor!=null? Border.createLineBorder(aColor.darker(),2) : null);
+    _bg.setFill(aColor); //_bg.setBorder(aColor!=null? aColor.darker() : null, 2);
 }
 
 /**
