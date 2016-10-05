@@ -53,7 +53,7 @@ public class ProjectPane extends ViewOwner {
 public ProjectPane(SitePane aSitePane)
 {
     _sitePane = aSitePane; _site = aSitePane.getSite(); _site.setProp(ProjectPane.class.getName(), this);
-    _proj = Project.get(_site); _projSet = _proj.getProjectSet();
+    _proj = Project.get(_site, true); _projSet = _proj.getProjectSet();
 }
 
 /**
