@@ -173,12 +173,11 @@ public void addProject(String aName, String aURLString)
 public void checkout(View aView, VersionControl aVC)
 {
     WebSite site = aVC.getSite();
-    TaskMonitorPanel tpan = new TaskMonitorPanel(aView, "Cloning " + site.getName() + " from Github");
         
     TaskRunner runner = new TaskRunnerPanel(_appPane.getUI(), "Checkout from " + aVC.getRemoteURLString()) {
         public Object run() throws Exception
         {
-            aVC.checkout(tpan);
+            aVC.checkout(this);
             return null;
         }
         public void success(Object aRes)
