@@ -184,6 +184,9 @@ public void checkout(View aView, VersionControl aVC)
         {
             _proj.getProjectSet().addProject(site.getName());
             getAppPane().addSite(site);
+            Project proj = Project.get(site);
+            proj.addBuildFilesAll();
+            buildProjectLater(false);
         }
         public void failure(Exception e)
         {
