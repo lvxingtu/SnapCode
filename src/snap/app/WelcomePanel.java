@@ -259,7 +259,7 @@ public void respondUI(ViewEvent anEvent)
     // Handle NewButton
     if(anEvent.equals("NewButton")) {
         if(anEvent.isMouseClicked())  { if(anEvent.isAltDown()) handleNewButtonAlt(); return; }
-        createNewSite();
+        createSite();
     }
     
     // Handle OpenButton
@@ -287,34 +287,35 @@ public void respondUI(ViewEvent anEvent)
 /**
  * Creates a new Site.
  */
-protected void createNewSite()
+protected void createSite()
 {
-    // Get name for new project/site
+    // Get name for new project/site (just select and return if already exists)
     DialogBox dbox = new DialogBox("New Project Panel"); dbox.setMessage("Enter name of new project");
     String name = dbox.showInputDialog(getUI(), "Untitled"); if(name==null) return;
-
-    // If name already exists, select and return
     if(getSite(name)!=null) {
         setSelectedSite(getSite(name)); return; }
-    
-    // Create and configure new site
-    String urls = name.indexOf(':')<0? "local:/" + name : name;
-    WebSite site = WebURL.getURL(urls).getAsSite();
-   
-    // Add new site
-    addNewSite(site);
+
+    // Create new site for name
+    createSite(name, true);
 }
 
 /**
- * Adds a new site to welcome panel.
+ * Creates a new Site.
  */
-public WebSite addNewSite(WebSite aSite)
+protected WebSite createSite(String aName, boolean doSelect)
 {
-    addSite(aSite);
-    setSelectedSite(aSite);
+    // Create site for name
+    String urls = aName.indexOf(':')<0? "local:/" + aName : aName;
+    WebSite site = WebURL.getURL(urls).getAsSite();
+    
+    // Add and select site
+    addSite(site);
+    if(doSelect) setSelectedSite(site);
+
+    // Write sites, reset UI and return site    
     writeSites();
     resetLater();
-    return aSite;
+    return site;
 }
 
 /**

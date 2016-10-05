@@ -65,6 +65,11 @@ protected Project(WebSite aSite)
 }
 
 /**
+ * Returns the project name.
+ */
+public String getName()  { return _site.getName(); }
+
+/**
  * Returns the encapsulated WebSite.
  */
 public WebSite getSite()  { return _site; }

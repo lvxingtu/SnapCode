@@ -1,6 +1,8 @@
 package snap.app;
 import snap.gfx.*;
+import snap.project.*;
 import snap.view.*;
+import snap.viewx.TaskMonitorPanel;
 import snap.viewx.WebPage;
 import snap.web.*;
 
@@ -18,9 +20,14 @@ public class HomePage extends WebPage {
 public AppBrowser getBrowser()  { return (AppBrowser)super.getBrowser(); }
 
 /**
+ * Returns the AppPane.
+ */
+public AppPane getAppPane()  { return getBrowser().getAppPane(); }
+
+/**
  * Returns the AppPane RootSite.
  */
-public WebSite getRootSite()  { return getBrowser().getAppPane().getRootSite(); }
+public WebSite getRootSite()  { return getAppPane().getRootSite(); }
 
 /**
  * Override to put in Page pane.
@@ -64,7 +71,7 @@ public void respondUI(ViewEvent anEvent)
 
     // Handle NewJavaFile
     if(anEvent.equals("NewJavaFile") && anEvent.isMouseClicked())
-        getBrowser().getAppPane().showNewFilePanel();
+        getAppPane().showNewFilePanel();
     
     // Handle NewSnapFile
     if(anEvent.equals("NewSnapFile") && anEvent.isMouseClicked()) {
@@ -80,12 +87,16 @@ public void respondUI(ViewEvent anEvent)
     
     // Handle AddSnapKit
     if(anEvent.equals("AddSnapKit") && anEvent.isMouseClicked()) {
-        System.out.println("Add SnapKit");
+        ProjectPane ppane = ProjectPane.get(getRootSite());
+        //ppane.addProject("SnapKit", "https://github.com/reportmill/SnapKit.git");
+        ppane.addProject("SillyTest", "https://github.com/reportmill/SillyTest.git");
     }
 
     // Handle AddSnapKit
     if(anEvent.equals("AddSnapTea") && anEvent.isMouseClicked()) {
-        System.out.println("Add SnapTea");
+        ProjectPane ppane = ProjectPane.get(getRootSite());
+        ppane.addProject("SnapKit", "https://github.com/reportmill/SnapKit.git");
+        ppane.addProject("SnapTea", "https://github.com/reportmill/SnapTea.git");
     }
 
     // Handle SnapDocs

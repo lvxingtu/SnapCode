@@ -71,6 +71,18 @@ public WebSite getSelectedSite()  { return _appPane.getSelectedSite(); }
 public AppBrowser getBrowser()  { return _appPane.getBrowser(); }
 
 /**
+ * Returns the root files.
+ */
+public List <AppFile> getRootFiles()
+{
+    if(_rootFiles!=null) return _rootFiles;
+    _rootFiles = new ArrayList(_appPane.getSiteCount());
+    for(int i=0, iMax=_appPane.getSiteCount(); i<iMax; i++) { WebSite site = _appPane.getSite(i);
+        _rootFiles.add(new AppFile(null,site.getRootDir())); }
+    return _rootFiles;
+}
+
+/**
  * Returns an AppFile for given WebFile.
  */
 public AppFile getAppFile(WebFile aFile)
@@ -80,7 +92,7 @@ public AppFile getAppFile(WebFile aFile)
 
     // If root, search for file in RootFiles
     if(aFile.isRoot()) {
-        for(AppFile af : _rootFiles) if(aFile==af.getFile()) return af;
+        for(AppFile af : getRootFiles()) if(aFile==af.getFile()) return af;
         return null;
     }
 
@@ -145,11 +157,8 @@ protected void initUI()
     enableEvents(_filesList, MousePressed, MouseReleased, MouseClicked); enableEvents(_filesList, DragEvents);
     
     // Create RootFiles for TreeView (one for each open project)
-    _rootFiles = new ArrayList(_appPane.getSiteCount());
-    for(int i=0, iMax=_appPane.getSiteCount(); i<iMax; i++) { WebSite site = _appPane.getSite(i);
-        _rootFiles.add(new AppFile(null,site.getRootDir())); }
-    _filesTree.setItems(_rootFiles);
-    _filesTree.expandItem(_rootFiles.get(0));
+    _filesTree.setItems(getRootFiles());
+    _filesTree.expandItem(getRootFiles().get(0));
     
     // Enable events to get MouseClicked on TreeView
     enableEvents(_filesTree, MousePressed, MouseReleased, MouseClicked); enableEvents(_filesTree, DragEvents);
@@ -167,7 +176,7 @@ public void resetUI()
     // Repaint tree
     WebFile file = getAppPane().getSelectedFile();
     AppFile afile = getAppFile(file);
-    _filesTree.setItems(_rootFiles);
+    _filesTree.setItems(getRootFiles());
     _filesTree.setSelectedItem(afile);
     
     // Update FilesList

@@ -56,7 +56,8 @@ public Project[] getProjects()
  */
 public void addProject(String aPath)
 {
-    _proj.getClassPath().addSrcPath(aPath);
+    String path = aPath; if(!path.startsWith("/")) path = '/' + path;
+    _proj.getClassPath().addSrcPath(path);
     _projects = null; _cpaths = _lpaths = null;
 }
 
@@ -67,6 +68,18 @@ public void removeProject(String aPath)
 {
     _proj.getClassPath().removeSrcPath(aPath);
     _projects = null; _cpaths = _lpaths = null;
+}
+
+/**
+ * Returns the child project with given name.
+ */
+public Project getProject(String aName)
+{
+    String name = aName; if(name.startsWith("/")) name = name.substring(1);
+    for(Project proj : getProjects())
+        if(proj.getName().equals(name))
+            return proj;
+    return null;
 }
 
 /**

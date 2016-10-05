@@ -153,6 +153,10 @@ public void addSite(WebSite aSite)
     // Add dependent sites
     for(Project p : proj.getProjects())
         addSite(p.getSite());
+        
+    // Clear root files and Reset UI
+    _filesPane._rootFiles = null;
+    resetLater();
 }
 
 /**

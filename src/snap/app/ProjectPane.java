@@ -133,8 +133,38 @@ public void deleteProject(View aView)
 {
     _sitePane.setAutoBuild(false);
     try { _proj.deleteProject(new TaskMonitorPanel(aView, "Delete Project")); }
-    catch(Exception e) { DialogBox dbox = new DialogBox("Delete Project Failed"); dbox.setErrorMessage(e.toString());
-            dbox.showMessageDialog(aView); }
+    catch(Exception e) { DialogBox.showExceptionDialog(aView, "Delete Project Failed", e); }
+}
+
+/**
+ * Adds a project with given name.
+ */
+public void addProject(String aName, String aURLString)
+{
+    // Get View
+    View view = isUISet() && getUI().isShowing()? getUI() : getAppPane().getUI();
+    
+    // If already set, just return
+    if(_proj.getProjectSet().getProject(aName)!=null) {
+        DialogBox.showWarningDialog(view, "Error Adding Project", "Project already present"); return; }
+
+    // Get site - if not present, create and clone
+    WebSite site = WelcomePanel.getShared().getSite(aName);
+    if(site==null && aURLString!=null) {
+        site = WelcomePanel.getShared().createSite(aName, false);
+        VersionControl.setRemoteURLString(site, aURLString);
+        VersionControl vc = VersionControl.create(site);
+        try { vc.checkout(new TaskMonitorPanel(view, "Cloning " + aName)); }
+        catch(Exception e) { DialogBox.showExceptionDialog(view, "Error Cloning Project", e); return; }
+    }
+    
+    // If site still null complain and return
+    if(site==null) {
+        DialogBox.showErrorDialog(view, "Error Adding Project", "Project not found."); return; }
+
+    // Add project for SnapKit        
+    _proj.getProjectSet().addProject(aName);
+    getAppPane().addSite(site);
 }
 
 /**
@@ -395,8 +425,7 @@ public void respondUI(ViewEvent anEvent)
     if(anEvent.equals("ProjectPathsList") && anEvent.getClickCount()>1) {
         DialogBox dbox = new DialogBox("Add Project Dependency"); dbox.setQuestionMessage("Enter Project Name:");
         String pname = dbox.showInputDialog(getUI(), null); if(pname==null || pname.length()==0) return;
-        if(!pname.startsWith("/")) pname = '/' + pname;
-        _proj.getProjectSet().addProject(pname);
+        addProject(pname, null);
     }
     
     // Handle DeleteAction
