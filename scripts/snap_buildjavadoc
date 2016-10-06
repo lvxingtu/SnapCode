@@ -1,19 +1,18 @@
 
 rm -rf /tmp/javadoc
 
-cd /Temp/RM15/src
+cd /Temp/SnapKit/src
 
 javadoc -d /tmp/javadoc -windowtitle 'SnapCode API' \
 -header 'SnapCode API' \
 -footer 'SnapCode API' \
 -public \
-snap/javafx/*.java \
-snap/studio/*.java \
+snap/data/*.java \
+snap/gfx/*.java \
 snap/util/*.java \
-snap/web/*.java \
-com/reportmill/base/*.java \
-com/reportmill/graphics/*.java \
-com/reportmill/shape/*.java \
+snap/view/*.java \
+snap/viewx/*.java \
+snap/web/*.java
 
 echo "Zipping javadoc.zip"
 cd /tmp
