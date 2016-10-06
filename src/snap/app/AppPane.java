@@ -166,6 +166,8 @@ public void removeSite(WebSite aSite)
 {
     _sites.remove(aSite);
     aSite.removeDeepChangeListener(this);
+    _filesPane._rootFiles = null;
+    resetLater();
 }
 
 /**

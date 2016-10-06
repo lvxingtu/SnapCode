@@ -162,7 +162,7 @@ public void addProject(String aName, String aURLString)
     if(site==null) {
         DialogBox.showErrorDialog(view, "Error Adding Project", "Project not found."); return; }
 
-    // Add project for SnapKit        
+    // Add project for name        
     _proj.getProjectSet().addProject(aName);
     getAppPane().addSite(site);
 }
@@ -196,6 +196,24 @@ public void checkout(View aView, VersionControl aVC)
         }
     };
     runner.start();
+}
+
+/**
+ * Removes a project with given name.
+ */
+public void removeProject(String aName)
+{
+    // Get View
+    View view = isUISet() && getUI().isShowing()? getUI() : getAppPane().getUI();
+    
+    // Get named project
+    Project proj = _proj.getProjectSet().getProject(aName);
+    if(proj==null) { DialogBox.showWarningDialog(view, "Error Removing Project", "Project not found"); return; }
+    WebSite site = proj.getSite();
+
+    // Remove dependent project from root project and AppPane
+    _proj.getProjectSet().removeProject(aName);
+    getAppPane().removeSite(site);
 }
 
 /**
@@ -464,7 +482,7 @@ public void respondUI(ViewEvent anEvent)
         if(getView("JarPathsList").isFocused())
             _proj.getClassPath().removeLibPath(getSelectedJarPath());
         else if(getView("ProjectPathsList").isFocused())
-            _proj.getProjectSet().removeProject(getSelectedProjectPath());
+            removeProject(getSelectedProjectPath());
     }
 }
 
