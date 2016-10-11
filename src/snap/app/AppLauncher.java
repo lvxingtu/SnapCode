@@ -256,6 +256,7 @@ public void teaExited()
  */
 private void updateTeaFiles()
 {
+    updateTeaFiles(_proj.getSourceDir());
     for(Project proj : _proj.getProjects()) {
         WebFile file = proj.getSourceDir();
         if(proj.getName().equals("SnapKit")) file = proj.getFile("/src/snap/util/XMLParser.txt");
