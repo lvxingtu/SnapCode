@@ -173,6 +173,9 @@ public boolean isTeaVM(Project aProj, WebFile aFile)
  */
 void runTea(AppPane anAppPane)
 {
+    // Update Tea files
+    updateTeaFiles();
+    
     // Get run command as string array
     List <String> commands = getTeaCommand();
     String command[] = commands.toArray(new String[commands.size()]);
@@ -247,6 +250,45 @@ public void teaExited()
     }
     snap.gfx.GFXEnv.getEnv().openFile(htmlFile.getStandardFile());
 }
+
+/**
+ * Updates tea vm files.
+ */
+private void updateTeaFiles()
+{
+    for(Project proj : _proj.getProjects()) {
+        WebFile file = proj.getSourceDir();
+        if(proj.getName().equals("SnapKit")) file = proj.getFile("/src/snap/util/XMLParser.txt");
+        updateTeaFiles(file);
+    }
+}
+
+/**
+ * Updates tea vm files.
+ */
+private void updateTeaFiles(WebFile aFile)
+{
+    // If directory, just recurse
+    if(aFile.isDir()) for(WebFile file : aFile.getFiles()) updateTeaFiles(file);
+    
+    // Otherwise get tea build file and see if it needs to be updated
+    else if(isResourceFile(aFile)) {
+        String path = aFile.getPath(); if(path.startsWith("/src/")) path = path.substring(4);
+        WebURL url = WebURL.getURL(_proj.getClassPath().getBuildPathAbsolute() + "/tea" + path);
+        WebFile tfile = url.getFile();
+        if(tfile==null || aFile.getLastModifiedTime()>tfile.getLastModifiedTime()) {
+            System.out.println("Updating Tea Resource File: " + url.getPath());
+            if(tfile==null) tfile = url.createFile(false);
+            tfile.setBytes(aFile.getBytes());
+            tfile.save();
+        }
+    }
+}
+
+/**
+ * Returns whether given file is a resource file.
+ */
+public boolean isResourceFile(WebFile aFile)  { return !aFile.getType().equals("java"); }
 
 /**
  * Returns the last run file.
