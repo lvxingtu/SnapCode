@@ -154,14 +154,14 @@ protected void initUI()
     _filesList.setRowHeight(30);
     _filesList.setAltPaint(Color.WHITE);
     _filesList.setCellConfigure(this :: configureFilesListCell);
-    enableEvents(_filesList, MousePressed, MouseReleased, MouseClicked); enableEvents(_filesList, DragEvents);
+    enableEvents(_filesList, MousePressed, MouseReleased); enableEvents(_filesList, DragEvents);
     
     // Create RootFiles for TreeView (one for each open project)
     _filesTree.setItems(getRootFiles());
     _filesTree.expandItem(getRootFiles().get(0));
     
     // Enable events to get MouseClicked on TreeView
-    enableEvents(_filesTree, MousePressed, MouseReleased, MouseClicked); enableEvents(_filesTree, DragEvents);
+    enableEvents(_filesTree, MousePressed, MouseReleased); enableEvents(_filesTree, DragEvents);
     
     // Register for copy/paste
     addKeyActionEvent("CopyAction", "Shortcut+C");
@@ -213,8 +213,8 @@ public void respondUI(ViewEvent anEvent)
         }
         
         // Handle MouseClicked (double-click): RunSelectedFile
-        if(anEvent.isMouseClicked()) {
-            if(anEvent.getClickCount()==2 && getSelectedFile().isFile())
+        if(anEvent.isMouseReleased() && anEvent.getClickCount()==2) {
+            if(getSelectedFile().isFile())
                 run(null, getSelectedFile(), false); }
         
         // Handle DragEvent
@@ -228,7 +228,7 @@ public void respondUI(ViewEvent anEvent)
         }
         
         // Handle Selection event: Select file for tree selection
-        else { //if(anEvent.isSelectionEvent()) {
+        else if(anEvent.isActionEvent()) { //if(anEvent.isSelectionEvent()) {
             AppFile item = (AppFile)anEvent.getSelectedItem();
             WebFile file = item!=null? item.getFile() : null;
             _appPane.setSelectedFile(file);
