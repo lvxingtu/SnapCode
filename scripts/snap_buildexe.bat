@@ -2,10 +2,10 @@
 REM SET PATH=%PATH%;"C:\Program Files (x86)\Inno Setup 5"
 
 echo "Creating SnapCode.exe"
-pushd Z:\Temp\RM15
+pushd Z:\Temp\SnapCode
 "C:\Program Files\Java\jdk1.8.0_40\bin\javapackager" -deploy -native exe ^
 -outdir "C:\Users\Jeff\SnapApp" -outfile SnapCode -name SnapCode ^
--appclass snap.app.AppLoader -v -srcdir "Z:\Temp\RM15\bin" ^
+-appclass snap.app.AppLoader -v -srcdir "Z:\Temp\SnapCode\bin" ^
 -srcfiles AppLoader.jar;SnapCode1.jar;jgit.jar;jsch.jar;tools.jar;spell.jar;BuildInfo.txt
 
 echo "Signing SnapCode.exe"
