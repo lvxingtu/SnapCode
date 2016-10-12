@@ -6,9 +6,7 @@ import java.text.*;
 import java.util.*;
 import java.util.jar.*;
 import java.util.zip.GZIPInputStream;
-import javafx.application.Platform;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Alert.AlertType;
+import javax.swing.*;
 
 /**
  * This app 
@@ -127,7 +125,8 @@ private static void checkForUpdates() throws IOException, MalformedURLException
     updatePacked.delete();
     
     // Let the user know
-    Platform.runLater(()->showMessage("Update Available", "A new update is available. Restart application to apply."));
+    String msg = "A new update is available. Restart application to apply";
+    SwingUtilities.invokeLater(() -> showMessage("New Update Found", msg));
 }
 
 /**
@@ -149,9 +148,8 @@ private static File getAppDir()  { return getAppDataDir(AppDirName, true); }
 
 static void showMessage(String aTitle, String aMsg)
 {
-    Alert a = new Alert(AlertType.INFORMATION); a.setTitle(aTitle);
-    a.setHeaderText(aMsg);
-    a.showAndWait();
+    JOptionPane.showMessageDialog(null, aMsg, aTitle, JOptionPane.INFORMATION_MESSAGE);
+    //Alert a = new Alert(AlertType.INFORMATION); a.setTitle(aTitle); a.setHeaderText(aMsg); a.showAndWait();
 }
 
 /**
