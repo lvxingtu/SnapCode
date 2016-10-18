@@ -34,6 +34,9 @@ public class ProcPane extends ViewOwner implements RunApp.AppListener {
     // The current ProgramCounter line
     int                    _progCounterLine;
     
+    // The limit to the number of running processes
+    int                    _procLimit = 1;
+    
     // Images
     public static Image ProcImage = Image.get(ProcPane.class, "Process.png");
     public static Image ThreadImage = Image.get(ProcPane.class, "Thread.png");
@@ -70,11 +73,27 @@ public DebugExprsPane getDebugExprsPane()  { return _appPane.getDebugExprsPane()
 public List <RunApp> getProcs()  { return _apps; }
 
 /**
+ * Returns the number of processes.
+ */
+public int getProcCount()  { return _apps.size(); }
+
+/**
+ * Returns the process at given index.
+ */
+public RunApp getProc(int anIndex)  { return _apps.get(anIndex); }
+
+/**
  * Adds a new process.
  */
 public void addProc(RunApp aProc)
 {
-    for(RunApp p : _apps.toArray(new RunApp[0])) if(p.isTerminated()) removeProc(p);
+    // Remove procs that are terminated and procs beyond limit
+    for(RunApp p : _apps.toArray(new RunApp[0]))
+        if(p.isTerminated()) removeProc(p);
+    if(getProcCount()+1>_procLimit) { RunApp proc = getProc(0);
+        proc.terminate(); removeProc(proc); }
+
+    // Add new proc
     _apps.add(aProc);
     aProc.setListener(this);
     resetLater();
@@ -98,6 +117,28 @@ public int removeProc(RunApp aProcess)
     if(index>=0) removeProc(index);
     return index;
 }
+
+/**
+ * Executes a proc and adds it to list.
+ */
+public void execProc(RunApp aProc)
+{
+    setSelApp(null);
+    addProc(aProc);
+    setSelApp(aProc);
+    getAppPane().setSupportTrayIndex(1);
+    aProc.exec();
+}
+
+/**
+ * Returns the limit for number of active processes.
+ */
+public int getProcLimit()  { return _procLimit; }
+
+/**
+ * Sets the limit for number of active processes.
+ */
+public void setProcLimit(int aValue)  { _procLimit = aValue; }
 
 /**
  * Returns the selected app.
@@ -176,16 +217,24 @@ public void appResumed(DebugApp aProc)
  */
 public void appExited(RunApp aProc)
 {
+    // Only run on event thread
     if(!isEventThread()) { runLater(() -> appExited(aProc)); return; }
     
+    // Update proc items and reset UI
     _procTree.updateItems(aProc);
     resetLater();
-    if(_appPane.getSupportTrayIndex()==SupportTray.RUN_PANE && !aProc.hadError())
-        _appPane.setSupportTrayVisible(false);
     _appPane.resetLater();
-    getDebugVarsPane().resetVarTable();
-    getDebugExprsPane().resetVarTable();
-    setProgramCounter(null, 1);
+    
+    // If selected app, update SupportTray visible state
+    if(aProc==getSelApp() && _appPane.getSupportTrayIndex()==SupportTray.RUN_PANE && !aProc.hadError())
+        _appPane.setSupportTrayVisible(false);
+    
+    // If debug app, reset Debug vars, expressions and current line counter
+    if(aProc instanceof DebugApp) {
+        getDebugVarsPane().resetVarTable();
+        getDebugExprsPane().resetVarTable();
+        setProgramCounter(null, 1);
+    }
 }
 
 /**

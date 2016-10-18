@@ -1,5 +1,6 @@
 package snap.app;
 import java.util.*;
+import snap.project.Project;
 import snap.util.*;
 import snap.view.*;
 import snap.web.*;
@@ -242,6 +243,9 @@ public void resetUI()
     // Update OpenButton, RemoveButton
     setViewEnabled("OpenButton", getSelectedSites().size()>0);
     setViewEnabled("RemoveButton", getSelectedSites().size()>0);
+    
+    // Register for drag drop to look for Greenfoot files
+    enableEvents(getUI(), DragEvents);
 }
 
 /**
@@ -282,6 +286,10 @@ public void respondUI(ViewEvent anEvent)
     // Handle WinClosing
     if(anEvent.isWinClosing())
         quitApp();
+        
+    // Handle DragDrop events
+    if(anEvent.isDragDrop())
+        handleDragDrop(anEvent);
 }
 
 /**
@@ -402,6 +410,21 @@ void handleOpenButtonAlt()
     apane.addSite(site);
     apane.show();
     hide();
+}
+
+/** Handles a Drag drop event. */
+void handleDragDrop(ViewEvent anEvent)
+{
+    if(!anEvent.hasDragFiles()) return;
+    WebURL url = WebURL.getURL(anEvent.getDropFiles().get(0));
+    WebFile file = url.getFile(); if(file==null || !file.getType().equals("gfar")) return;
+    String pname = file.getName().substring(0, file.getPath().length() - 5);
+    String pname2 = DialogBox.showInputDialog(getUI(), "New Greenfoot Project", "Enter Project Name:", pname);
+    if(pname2==null) return;
+    
+    // Create new project
+    WebSite site = createSite(pname2, true);
+    Project proj = Project.get(site, true);
 }
 
 /**

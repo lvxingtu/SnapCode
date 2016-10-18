@@ -3,7 +3,7 @@ import java.util.*;
 import snap.data.*;
 import snap.util.StringUtils;
 import snap.view.*;
-import snap.viewx.TextConsole;
+import snap.viewx.ConsoleView;
 import snap.web.*;
 
 /**
@@ -14,8 +14,8 @@ public class AppConsole extends ViewOwner {
     // The AppPane
     AppPane            _appPane;
 
-    // The ConsoleText
-    ConsoleText        _consoleText;
+    // The ConsoleView
+    ConsoleView        _consoleText;
 
 /**
  * Returns the AppPane.
@@ -45,7 +45,7 @@ protected View createUI()
 /**
  * A text area for console processing.
  */
-public class ConsoleText extends TextConsole {
+public class ConsoleText extends ConsoleView {
 
     /** Executes command. */
     protected String executeCommandImpl(String aCommand)

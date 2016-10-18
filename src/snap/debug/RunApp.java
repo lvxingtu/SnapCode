@@ -31,6 +31,9 @@ public class RunApp {
     // The process
     Process            _process;
     
+    // The writer to process stdin
+    BufferedWriter     _stdInWriter;
+    
     // The readers
     StreamReader       _outReader, _errReader;
 
@@ -278,6 +281,25 @@ protected void appendErr(String aStr)
 }
 
 /**
+ * Sends input to process.
+ */
+public void sendInput(String aStr)
+{
+    // If writer not yet set, create and set
+    if(_stdInWriter==null) {
+        OutputStream stdin = _process.getOutputStream();
+        _stdInWriter = new BufferedWriter(new OutputStreamWriter(stdin));
+    }
+    
+    // Append to output
+    _output.add(new Output(aStr, false));
+    
+    // Write and flush
+    try { _stdInWriter.write(aStr); _stdInWriter.flush(); }
+    catch(Exception e) { appendErr("RunApp.sendInput: Failed to write to process: " + e); }
+}
+
+/**
  * Called when process exited.
  */
 protected void notifyAppExited()
@@ -398,11 +420,10 @@ private class StreamReader extends Thread
     {
         try {
             InputStreamReader isr = new InputStreamReader(_is);
-            BufferedReader br = new BufferedReader(isr);
-            for(String line=br.readLine(); line!=null; line=br.readLine()) {
-                if(_isErr) appendErr(line + '\n');
-                else appendOut(line + '\n');
-                if(line!=null && line.length()>0 && _isErr) _hadError = true;
+            BufferedReader br = new BufferedReader(isr); char chars[] = new char[1024];
+            for(int len=br.read(chars,0,1024); len>=0; len=br.read(chars,0,1024)) {
+                String line = new String(chars, 0, len); if(line.length()>0 && _isErr) _hadError = true;
+                if(_isErr) appendErr(line); else appendOut(line);
             }
             if(!_terminated) { _running = false; _terminated = true; notifyAppExited(); }
         }

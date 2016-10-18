@@ -1,8 +1,10 @@
 package snap.app;
+import snap.debug.RunApp;
 import snap.gfx.*;
 import snap.project.Project;
 import snap.util.SnapUtils;
 import snap.view.*;
+import snap.viewx.ConsoleView;
 import snap.web.WebFile;
 
 /**
@@ -148,12 +150,20 @@ public void respondUI(ViewEvent anEvent)
 /**
  * A TextView subclass to open links.
  */
-public static class RCTextView extends TextView {
+public static class RCTextView extends ConsoleView {
 
     RunConsole _rpanel;
 
     /** Override to open in browser. */
     protected void openLink(String aLink)  { _rpanel._appPane.getBrowser().setURLString(aLink); }
+    
+    /** Override to send to process. */
+    protected void processEnterAction()
+    {
+        RunApp proc = _rpanel.getProcPane().getSelApp(); if(proc==null) return;
+        String str = getInput();
+        proc.sendInput(str);
+    }
 }
 
 }

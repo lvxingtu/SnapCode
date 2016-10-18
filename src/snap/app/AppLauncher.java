@@ -85,12 +85,9 @@ void runApp(AppPane anAppPane)
     // Print run command to console
     System.err.println(ListUtils.joinStrings(ListUtils.newList((Object[])command), " "));
     
-    // Create RunApp
+    // Create RunApp and exec
     RunApp proc = new RunApp(getURL(), command);
-    anAppPane.getProcPane().addProc(proc);
-    anAppPane.getProcPane().setSelApp(proc);
-    anAppPane.setSupportTrayIndex(1);
-    proc.exec();
+    anAppPane.getProcPane().execProc(proc);
 }
 
 /**
@@ -111,10 +108,7 @@ void debugApp(AppPane anAppPane)
         proc.addBreakpoint(bp);
         
     // Add app to process pane and exec
-    anAppPane.getProcPane().addProc(proc);
-    anAppPane.getProcPane().setSelApp(proc);
-    anAppPane.setSupportTrayIndex(1);
-    proc.exec();
+    anAppPane.getProcPane().execProc(proc);
 }
 
 /**
@@ -185,10 +179,7 @@ void runTea(AppPane anAppPane)
     
     // Create RunApp
     RunApp proc = new RunApp(getURL(), command);
-    anAppPane.getProcPane().addProc(proc);
-    anAppPane.getProcPane().setSelApp(proc);
-    anAppPane.setSupportTrayIndex(1);
-    proc.exec();
+    anAppPane.getProcPane().execProc(proc);
     proc.addListener(new RunApp.AppAdapter() {
         public void appExited(RunApp ra) { teaExited(); }});
 }
