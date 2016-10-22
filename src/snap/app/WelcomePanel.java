@@ -1,6 +1,5 @@
 package snap.app;
 import java.util.*;
-import snap.project.Project;
 import snap.util.*;
 import snap.view.*;
 import snap.web.*;
@@ -415,17 +414,69 @@ void handleOpenButtonAlt()
 /** Handles a Drag drop event. */
 void handleDragDrop(ViewEvent anEvent)
 {
+    // Accept drags with files
     if(!anEvent.hasDragFiles()) return;
+    anEvent.acceptDrag();
+    if(!anEvent.isDragDrop()) return;
+    
     WebURL url = WebURL.getURL(anEvent.getDropFiles().get(0));
-    WebFile file = url.getFile(); if(file==null || !file.getType().equals("gfar")) return;
-    String pname = file.getName().substring(0, file.getPath().length() - 5);
+    runLater(() -> handleGreenfootArchiveDrop(url));
+}
+
+/** Handle new Greenfoot proj. */
+void handleGreenfootArchiveDrop(WebURL aGFAR)
+{
+    WebFile file = aGFAR.getFile(); if(file==null || !file.getType().equals("gfar")) return;
+    String pname = file.getName().substring(0, file.getName().length() - 5);
     String pname2 = DialogBox.showInputDialog(getUI(), "New Greenfoot Project", "Enter Project Name:", pname);
     if(pname2==null) return;
     
-    // Create new project
+    // Get directory for name
+    WebSite zipSite = aGFAR.getAsSite();
+    WebFile zipRoot = zipSite.getRootDir();
+    if(zipRoot.getFileCount()==1 && zipRoot.getFile(0).isDir())
+        zipRoot = zipRoot.getFile(0);
+    
+    // Create new site and get root dir (if files already exist, just return)
     WebSite site = createSite(pname2, true);
-    Project proj = Project.get(site, true);
+    WebFile destDir = site.getRootDir();
+    if(destDir.getExists() && destDir.getFileCount()>0) {
+        DialogBox.showErrorDialog(getUI(), "Error Creating Greenfoot Project", "Project Already Exists"); return; }
+    
+    // Copy zip files to new site
+    for(WebFile child : zipRoot.getFiles())
+        copyGreenfootFile(child, destDir);
+    
+    // Create ProjectPane and add SnapKit and Greenfoot
+    ProjectPane ppane = new ProjectPane(site);
+    ppane.addProject("SnapKit", "https://github.com/reportmill/SnapKit.git", getUI());
+    ppane.addProject("Greenfoot", "https://github.com/reportmill/Greenfoot.git", getUI());
 }
+
+/** Copies a greenfoot file to new site directory. */
+void copyGreenfootFile(WebFile aSrcFile, WebFile aDstFile)
+{
+    if(aSrcFile.getType().equals("class")) return;
+    if(aSrcFile.getType().equals("java")) {
+        String text = aSrcFile.getText(), cname = aSrcFile.getSimpleName();
+        text = text.replace("java.awt.", "snap.gfx.");
+        for(String c : colors) text = text.replace("Color." + c, "Color." + c.toUpperCase());
+        if(text.contains("extends World") && text.contains("public " + cname + "()")) {
+            int index = text.lastIndexOf('}');
+            StringBuffer sb = new StringBuffer("\n");
+            sb.append("public static void main(String args[])\n{\n");
+            sb.append("    //snaptea.TV.set();\n");
+            sb.append("    new ").append(cname).append("().setWindowVisible(true);\n");
+            sb.append("}\n\n}");
+            text = text.substring(0,index) + sb;
+        }
+        aSrcFile.setText(text);
+    }
+    WebUtils.copyFile(aSrcFile, aDstFile);
+}
+
+static String colors[] = { "black", "blue", "cyan", "darkGray", "gray", "green", "lightGray", "magenta", "orange",
+    "pink", "red", "white", "yellow" };
 
 /**
  * A viewer owner to load/view WelcomePanel animation from WelcomePanelAnim.snp.

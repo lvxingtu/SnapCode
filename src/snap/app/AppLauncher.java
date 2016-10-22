@@ -261,7 +261,10 @@ private void updateTeaFiles()
 private void updateTeaFiles(WebFile aFile)
 {
     // If directory, just recurse
-    if(aFile.isDir()) for(WebFile file : aFile.getFiles()) updateTeaFiles(file);
+    if(aFile.isDir()) {
+        String name = aFile.getName(); if(name.equals("bin") || name.equals("tea")) return;
+        for(WebFile file : aFile.getFiles()) updateTeaFiles(file);
+    }
     
     // Otherwise get tea build file and see if it needs to be updated
     else if(isResourceFile(aFile)) {

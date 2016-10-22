@@ -50,10 +50,20 @@ public class ProjectPane extends ViewOwner {
 /**
  * Creates a new ProjectPane for given project.
  */
+public ProjectPane(WebSite aSite)
+{
+    _site = aSite;
+    _proj = Project.get(_site, true); _projSet = _proj.getProjectSet();
+}
+
+/**
+ * Creates a new ProjectPane for given project.
+ */
 public ProjectPane(SitePane aSitePane)
 {
-    _sitePane = aSitePane; _site = aSitePane.getSite(); _site.setProp(ProjectPane.class.getName(), this);
-    _proj = Project.get(_site, true); _projSet = _proj.getProjectSet();
+    this(aSitePane.getSite());
+    _sitePane = aSitePane;
+    _site.setProp(ProjectPane.class.getName(), this);
 }
 
 /**
@@ -141,12 +151,18 @@ public void deleteProject(View aView)
  */
 public void addProject(String aName, String aURLString)
 {
-    // Get View
     View view = isUISet() && getUI().isShowing()? getUI() : getAppPane().getUI();
-    
+    addProject(aName, aURLString, view);
+}
+
+/**
+ * Adds a project with given name.
+ */
+public void addProject(String aName, String aURLString, View aView)
+{
     // If already set, just return
     if(_proj.getProjectSet().getProject(aName)!=null) {
-        DialogBox.showWarningDialog(view, "Error Adding Project", "Project already present"); return; }
+        DialogBox.showWarningDialog(aView, "Error Adding Project", "Project already present"); return; }
 
     // Get site - if not present, create and clone
     WebSite site = WelcomePanel.getShared().getSite(aName);
@@ -154,17 +170,18 @@ public void addProject(String aName, String aURLString)
         if(site==null) site = WelcomePanel.getShared().createSite(aName, false);
         VersionControl.setRemoteURLString(site, aURLString);
         VersionControl vc = VersionControl.create(site);
-        checkout(view, vc);
+        checkout(aView, vc);
         return;
     }
     
     // If site still null complain and return
     if(site==null) {
-        DialogBox.showErrorDialog(view, "Error Adding Project", "Project not found."); return; }
+        DialogBox.showErrorDialog(aView, "Error Adding Project", "Project not found."); return; }
 
     // Add project for name        
     _proj.getProjectSet().addProject(aName);
-    getAppPane().addSite(site);
+    if(_appPane!=null)
+        _appPane.addSite(site);
 }
 
 /**
@@ -182,8 +199,12 @@ public void checkout(View aView, VersionControl aVC)
         }
         public void success(Object aRes)
         {
+            // Add new project to root project
             _proj.getProjectSet().addProject(site.getName());
-            getAppPane().addSite(site);
+            if(_appPane==null) return;
+            
+            // Add new project site to app pane and build
+            _appPane.addSite(site);
             Project proj = Project.get(site);
             proj.addBuildFilesAll();
             buildProjectLater(false);
