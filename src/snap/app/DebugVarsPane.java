@@ -185,9 +185,6 @@ public static class VarTreeItem implements Comparable <VarTreeItem> {
         return !isLeaf;
     }
     
-    /** Returns the child count. */
-    public int getChildCount()  { return getChildren().length; }
-    
     /** Override to get ObjectReference children. */
     public VarTreeItem[] getChildren()
     {

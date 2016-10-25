@@ -376,13 +376,8 @@ public DebugThread[] getThreads()
 }
 
 /** Returns a DebugThread instance for given ThreadReference. */
-private DebugThread getThread(ThreadReference aTR)
-{
-    String name = aTR.name();
-    DebugThread dt = _threads.get(name);
-    if(dt==null) _threads.put(name, dt=new DebugThread(this,aTR)); else dt._tref = aTR;
-    return dt;
-} Map <String,DebugThread> _threads = new HashMap(); ThreadReference EMPTY_THREADREFS[] = new ThreadReference[0];
+private DebugThread getThread(ThreadReference aTR)  { return new DebugThread(this, aTR); }
+private static final ThreadReference EMPTY_THREADREFS[] = new ThreadReference[0];
 
 /**
  * Returns a list of ThreadReference objects corresponding to the threads that are currently active in the VM.
