@@ -250,8 +250,11 @@ private void updateTeaFiles()
     updateTeaFiles(_proj.getSourceDir());
     for(Project proj : _proj.getProjects()) {
         WebFile file = proj.getSourceDir();
-        if(proj.getName().equals("SnapKit")) file = proj.getFile("/src/snap/util/XMLParser.txt");
-        updateTeaFiles(file);
+        if(proj.getName().equals("SnapKit")) {
+            updateTeaFiles(proj.getFile("/src/snap/util/XMLParser.txt"));
+            updateTeaFiles(proj.getFile("/src/snap/viewx/JTokens.txt"));
+        }
+        else updateTeaFiles(file);
     }
 }
 
