@@ -230,6 +230,10 @@ public void respondUI(ViewEvent anEvent)
     // Handle RunConfigsMenuItem
     if(anEvent.equals("RunConfigsMenuItem"))
         appPane.getBrowser().setURL(WebURL.getURL(RunConfigsPage.class));
+        
+    // Show history
+    if(anEvent.equals("ShowHistoryMenuItem"))
+        showHistory();
     
     // Handle FileTab
     if(anEvent.equals("FileTab") && anEvent.isMouseReleased())
@@ -278,6 +282,7 @@ private List <MenuItem> getRunMenuButtonItems()
     
     // Add RunConfigsMenuItem
     mi = new MenuItem(); mi.setText("Run Configurations..."); mi.setName("RunConfigsMenuItem"); items.add(mi);
+    mi = new MenuItem(); mi.setText("Show History..."); mi.setName("ShowHistoryMenuItem"); items.add(mi);
     
     // Return MenuItems
     return items;
@@ -453,6 +458,21 @@ private void getFilesForPrefix(String aPrefix, WebFile aFile, List <WebFile> the
     // If file that starts with prefix, add to files
     else if(StringUtils.startsWithIC(aFile.getName(), aPrefix))
         theFiles.add(aFile);
+}
+
+/**
+ * Shows history.
+ */
+private void showHistory()
+{
+    WebBrowser browser = getAppPane().getBrowser();
+    WebBrowserHistory history = browser.getHistory();
+    StringBuffer sb = new StringBuffer();
+    for(WebURL url : history.getLastURLs())
+        sb.append(url.getString()).append('\n');
+    WebFile file = WebURL.getURL("/tmp/History.txt").createFile(false);
+    file.setText(sb.toString());
+    browser.setFile(file);
 }
 
 /**

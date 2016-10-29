@@ -59,7 +59,6 @@ protected void initUI()
     ListView <Result> resultsList = getView("ResultsList", ListView.class);
     resultsList.setCellConfigure(this::configureResultListCell);
     resultsList.setRowHeight(24);
-    enableEvents("ResultsList", MouseClicked);
 }
 
 /**
@@ -94,7 +93,7 @@ public void respondUI(ViewEvent anEvent)
         _search = null;
     
     // Handle ResultsList
-    if(anEvent.equals("ResultsList") && anEvent.isMouseClicked()) {
+    if(anEvent.equals("ResultsList")) {
         Result result = getSelectedResult();
         _appPane.getBrowser().setURLString(result.getURLString());
     }
