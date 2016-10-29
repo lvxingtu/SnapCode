@@ -73,6 +73,11 @@ public int compareTo(DebugThread anObj)
 }
 
 /**
+ * Standard hashCode implementation.
+ */
+public int hashCode()  { return _tref.hashCode(); }
+
+/**
  * Standard equals implementation.
  */
 public boolean equals(Object anObj)

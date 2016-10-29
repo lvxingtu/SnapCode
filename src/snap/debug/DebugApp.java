@@ -616,11 +616,22 @@ protected void notifyError(BreakpointReq aBP)  { error("Failed to set BP: " + aB
 void dispatchEvent(DebugEvent anEvent)
 {
     // Notify listeners
+    DebugEvent.Type type = anEvent._type;
     boolean eventPaused = anEvent.suspendedAll(), wantsPause = isPaused();
     if(_printEVs) System.out.println("JDIEvent: " + anEvent);
     
+    // If invoking a method, we just want to get back to business
+    if(_invoking) {
+        if(type==DebugEvent.Type.ClassPrepare)
+            resolve(anEvent.getReferenceType());
+        if(eventPaused)
+            try { _vm.resume(); return; }
+            catch(Exception e) { failure("Failed to resume: " + e.getMessage()); }
+        return;
+    }
+    
     // Handle event types (VMStart, VMDeath, VMDisconnect, ThreadStart, ThreadDeath, ClassPrepare, ClassUnload)
-    switch(anEvent._type) {
+    switch(type) {
     
         // Handle Class prepare
         case ClassPrepare: resolve(anEvent.getReferenceType()); break;
@@ -644,14 +655,8 @@ void dispatchEvent(DebugEvent anEvent)
     // If event paused VM either resume or make it official
     if(eventPaused) {
         
-        // If VM was invoking, do raw VM resume  and return
-        if(_invoking) {
-            try { _vm.resume(); return; }
-            catch(Exception e) { failure("Failed to resume: " + e.getMessage()); }
-        }
-        
         // If we don't want pause, resume
-        else if(!wantsPause)
+        if(!wantsPause)
             resumeQuiet();
     
         // Otherwise if pause not official, make official
@@ -660,7 +665,7 @@ void dispatchEvent(DebugEvent anEvent)
     }
     
     // Dispatch event to listener
-    if(_listener!=null && !_invoking)
+    if(_listener!=null)
         _listener.processDebugEvent(this, anEvent);
 }
 
