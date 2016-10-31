@@ -37,7 +37,7 @@ protected View createUI()  { return  new ScrollView(super.createUI()); }
  */
 public void initUI()
 {
-    enableEvents("Header", MouseClicked);
+    enableEvents("Header", MouseReleased);
     enableEvents("NewJavaFile", MouseEvents);
     enableEvents("NewSnapFile", MouseEvents);
     enableEvents("AddSnapKit", MouseEvents);

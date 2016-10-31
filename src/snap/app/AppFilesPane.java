@@ -160,7 +160,7 @@ protected void initUI()
     _filesTree.setItems(getRootFiles());
     _filesTree.expandItem(getRootFiles().get(0));
     
-    // Enable events to get MouseClicked on TreeView
+    // Enable events to get MouseUp on TreeView
     enableEvents(_filesTree, MousePressed, MouseReleased); enableEvents(_filesTree, DragEvents);
     
     // Register for copy/paste
@@ -212,8 +212,8 @@ public void respondUI(ViewEvent anEvent)
             PopupWindow popup = menu.getPopup(); popup.show(anEvent.getView(), anEvent.getX(), anEvent.getY());
         }
         
-        // Handle MouseClicked (double-click): RunSelectedFile
-        if(anEvent.isMouseReleased() && anEvent.getClickCount()==2) {
+        // Handle MouseClick (double-click): RunSelectedFile
+        if(anEvent.isMouseClick() && anEvent.getClickCount()==2) {
             if(getSelectedFile().isFile())
                 run(null, getSelectedFile(), false); }
         

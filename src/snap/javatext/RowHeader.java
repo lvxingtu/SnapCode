@@ -37,7 +37,7 @@ public class RowHeader extends View {
  */
 public RowHeader()
 {
-    enableEvents(MouseMoved, MouseClicked);
+    enableEvents(MouseMoved, MouseReleased);
     setToolTipEnabled(true);
     setFill(new Color(233,233,233));
     setPrefWidth(WIDTH);
@@ -112,8 +112,8 @@ protected void resetAll()  { _markers = null; repaint(); }
  */
 protected void processEvent(ViewEvent anEvent)
 {
-    // Handle MouseClicked
-    if(anEvent.isMouseClicked()) {
+    // Handle MouseClick
+    if(anEvent.isMouseClick()) {
         
         // Get reversed markers (so click effects top marker)
         List <Marker> markers = new ArrayList(getMarkers()); Collections.reverse(markers);
@@ -186,7 +186,7 @@ public abstract static class Marker<T> extends Rect {
     /** Returns a tooltip. */
     public abstract String getToolTip();
     
-    /** Handles MouseClicked. */
+    /** Handles MouseClick. */
     public abstract void mouseClicked(ViewEvent anEvent);
 }
 
@@ -218,7 +218,7 @@ public class SuperMemberMarker extends Marker <JMemberDecl> {
         return (isInterface()? "Implements " : "Overrides ") + cname + '.' + _target.getName();
     }
     
-    /** Handles MouseClicked. */
+    /** Handles MouseClick. */
     public void mouseClicked(ViewEvent anEvent)
     {
         JavaTextPane tp = _textView.getTextPane(); if(tp==null) return;
@@ -246,7 +246,7 @@ public class BuildIssueMarker extends Marker <BuildIssue> {
     /** Returns a tooltip. */
     public String getToolTip()  { return _target.getText(); }
     
-    /** Handles MouseClicked. */
+    /** Handles MouseClick. */
     public void mouseClicked(ViewEvent anEvent)  { setTextSelection(_target.getStart(), _target.getEnd()); }
 }
 
@@ -267,7 +267,7 @@ public class BreakpointMarker extends Marker <Breakpoint> {
     /** Returns a tooltip. */
     public String getToolTip()  { return _target.toString(); }
     
-    /** Handles MouseClicked. */
+    /** Handles MouseClick. */
     public void mouseClicked(ViewEvent anEvent)
     {
         if(anEvent.getClickCount()==2) _textView.removeBreakpoint(_target);

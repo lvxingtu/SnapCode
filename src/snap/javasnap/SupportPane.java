@@ -60,7 +60,7 @@ protected void initUI()
         //e.consume(); db.setDragView(_dragImage);
     });*/
     
-    enableEvents(getUI(), MouseClicked, DragGesture);
+    enableEvents(getUI(), MouseReleased, DragGesture);
 }
 
 /**
@@ -68,8 +68,8 @@ protected void initUI()
  */
 protected void respondUI(ViewEvent anEvent)
 {
-    // Handle MouseClicked (double click)
-    if(anEvent.isMouseClicked() && anEvent.getClickCount()==2) {
+    // Handle MouseClick (double click)
+    if(anEvent.isMouseClick() && anEvent.getClickCount()==2) {
         SnapPart part = getSnapPart(getUI(ParentView.class), anEvent.getX(), anEvent.getY());
         if(part!=null)
             getEditorPane().getSelectedPart().dropNode(part.getJNode());
@@ -190,7 +190,7 @@ protected SnapPart getSnapPart(ParentView aPar, double anX, double aY)
 private static String SnapActorPieces[] = { "moveBy(10);", "turnBy(10);", "scaleBy(.1);",
     "getX();", "getY();", "getWidth();", "getHeight();", "setXY(10,10);", "setSize(50,50);",
     "getRotate();", "setRotate(10);", "getScale();", "setScale(1);",
-    "getAngle(\"Mouse\");", "getDistance(\"Mouse\");", "isMouseDown();", "isMouseClicked();",
+    "getAngle(\"Mouse\");", "getDistance(\"Mouse\");", "isMouseDown();", "isMouseClick();",
     "isKeyDown(\"right\");", "isKeyClicked(\"right\");", "playSound(\"Beep.wav\");", "getScene();",
     "getPen();", "setPenColor(\"Random\");", "penDown();", "getAnimator();" };
 
@@ -199,7 +199,7 @@ private static String SnapPenPieces[] = { "down();", "up();", "clear();", "setCo
 
 /** Returns SnapScene pieces. */
 private static String SnapScenePieces[] = { "getWidth();", "getHeight();",
-    "isMouseDown();", "isMouseClicked();", "getMouseX();", "getMouseY();", "isKeyDown(\"right\");",
+    "isMouseDown();", "isMouseClick();", "getMouseX();", "getMouseY();", "isKeyDown(\"right\");",
     "isKeyClicked(\"right\");", "getActor(\"Cat1\");", "playSound(\"Beep.wav\");",
     "setColor(\"Random\");", "setShowCoords(true);" };
 

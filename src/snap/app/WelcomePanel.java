@@ -215,10 +215,10 @@ protected void initUI()
     WelcomePanelAnim anim = new WelcomePanelAnim();
     getUI(ChildView.class).addChild(anim.getUI()); anim.getUI().playAnimDeep();
     
-    // Enable SitesTable MouseClicked
+    // Enable SitesTable MouseReleased
     TableView sitesTable = getView("SitesTable", TableView.class);
     sitesTable.setRowHeight(24); //sitesTable.setStyle(new Style().setFontSize(10).toString());
-    enableEvents(sitesTable, MouseClicked);
+    enableEvents(sitesTable, MouseReleased);
     
     // Set preferred size
     getUI().setPrefSize(400,480);
@@ -228,10 +228,10 @@ protected void initUI()
     enableEvents(win, WinClosing);
     getView("OpenButton", Button.class).setDefaultButton(true);
     
-    // Register buttons for MouseClicked so we can look for alt-Down click
-    enableEvents("NewButton", MouseClicked);
-    enableEvents("OpenButton", MouseClicked);
-    enableEvents("RemoveButton", MouseClicked);
+    // Register buttons for MouseReleased so we can look for alt-Down click
+    enableEvents("NewButton", MouseReleased);
+    enableEvents("OpenButton", MouseReleased);
+    enableEvents("RemoveButton", MouseReleased);
 }
 
 /**
@@ -261,20 +261,20 @@ public void respondUI(ViewEvent anEvent)
     
     // Handle NewButton
     if(anEvent.equals("NewButton")) {
-        if(anEvent.isMouseClicked())  { if(anEvent.isAltDown()) handleNewButtonAlt(); return; }
+        if(anEvent.isMouseClick())  { if(anEvent.isAltDown()) handleNewButtonAlt(); return; }
         createSite();
     }
     
     // Handle OpenButton
     if(anEvent.equals("OpenButton")) {
-        if(anEvent.isMouseClicked()) { if(anEvent.isAltDown()) handleOpenButtonAlt(); return; }
+        if(anEvent.isMouseClick()) { if(anEvent.isAltDown()) handleOpenButtonAlt(); return; }
         hide();
         openSites();
     }
     
     // Handle RemoveButton
     if(anEvent.equals("RemoveButton")) {
-        if(anEvent.isMouseClicked())  { if(anEvent.isAltDown()) handleRemoveButtonAlt(); return; }
+        if(anEvent.isMouseClick())  { if(anEvent.isAltDown()) handleRemoveButtonAlt(); return; }
         showRemoveSitePanel();
     }
 

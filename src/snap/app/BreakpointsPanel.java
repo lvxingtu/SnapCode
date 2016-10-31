@@ -47,7 +47,7 @@ public Breakpoint getSelectedBreakpoint()  { return _bpList.getSelectedItem(); }
 protected void initUI()
 {
     _bpList = getView("BreakpointList", ListView.class);
-    enableEvents(_bpList, MouseClicked);
+    enableEvents(_bpList, MouseReleased);
     _bpList.setRowHeight(24);
     getBreakpoints().addPropChangeListener(pce -> resetLater());
 }

@@ -75,10 +75,10 @@ protected void initUI()
     // Do normal version
     super.initUI();
     
-    // Get TextView and start listening for events (KeyEvents, MouseClicked, DragOver/Exit/Drop)
+    // Get TextView and start listening for events (KeyEvents, MouseReleased, DragOver/Exit/Drop)
     _textView = getTextView(); _textView._textPane = this;
     _textView.setGrowWidth(true);
-    enableEvents(_textView, KeyPressed, KeyReleased, KeyTyped, MousePressed, MouseClicked, DragOver, DragExit,DragDrop);
+    enableEvents(_textView, KeyPressed, KeyReleased, KeyTyped, MousePressed, MouseReleased, DragOver, DragExit,DragDrop);
     
     // Reset TextView font
     float fontSize = PrefsUtils.prefs().getFloat("JavaFontSize", 12); if(fontSize<8) fontSize = 12;
@@ -122,7 +122,7 @@ public void resetUI()
         Label label = new Label(); label.setText(part.getNodeString()); label.setFont(font);
         label.setName("NodePathLabel"); label.setProp("JNode", part);
         if(part==spart) label.setFill(Color.LIGHTGRAY);
-        nodePathBox.addChild(label,1); label.setOwner(this); enableEvents(label, MouseClicked);
+        nodePathBox.addChild(label,1); label.setOwner(this); enableEvents(label, MouseReleased);
         Label div = new Label(); div.setText(" \u2022 "); div.setFont(font); if(part.getParent()==null) break;
         nodePathBox.addChild(div,1);
     }
@@ -162,8 +162,8 @@ public void respondUI(ViewEvent anEvent)
         else if(anEvent.isPopupTrigger()) { //anEvent.consume();
             Menu cmenu = createContextMenu(); cmenu.show(_textView, anEvent.getX(), anEvent.getY()); }
         
-        // Handle MouseClicked: If alt-down, open JavaDoc. If HoverNode, open declaration
-        else if(anEvent.isMouseClicked()) {
+        // Handle MouseClick: If alt-down, open JavaDoc. If HoverNode, open declaration
+        else if(anEvent.isMouseClick()) {
             
             // If alt is down and there is a JavaDoc URL, open it
             if(anEvent.isAltDown() && getJavaDocURL()!=null)
