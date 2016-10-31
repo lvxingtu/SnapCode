@@ -466,7 +466,7 @@ protected void initUI()
     addKeyActionEvent("DeleteAction", "DELETE");
     addKeyActionEvent("BackSpaceAction", "BACK_SPACE");
     enableEvents("JarPathsList", DragEvents);
-    enableEvents("ProjectPathsList", MouseReleased);
+    enableEvents("ProjectPathsList", MouseRelease);
 }
 
 /**

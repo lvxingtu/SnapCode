@@ -116,9 +116,9 @@ protected void respondUI(ViewEvent anEvent)
 {
     // Handle ListView KeyEvents to consume Up/Down arrow, Escape and EnterKey
     if(anEvent.isKeyEvent()) {
-        if(anEvent.isEscapeKey()) { if(anEvent.isKeyReleased()) getPopup().hide(); anEvent.consume(); }
+        if(anEvent.isEscapeKey()) { if(anEvent.isKeyRelease()) getPopup().hide(); anEvent.consume(); }
         if(anEvent.isEnterKey()) {
-            if(anEvent.isKeyReleased()) ((SnapPartExprEditor)_spart).fireTextFieldAction(); anEvent.consume(); }
+            if(anEvent.isKeyRelease()) ((SnapPartExprEditor)_spart).fireTextFieldAction(); anEvent.consume(); }
     }
 }
 

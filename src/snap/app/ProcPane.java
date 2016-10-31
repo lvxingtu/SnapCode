@@ -346,8 +346,8 @@ protected void initUI()
     _procTree.setRowHeight(20);
     
     // Add this so clicking on Processes label causes resetLater
-    View plabel = getView("ProcessesLabel"); enableEvents(plabel, MousePressed);
-    plabel.addEventHandler(e -> doProcLabelClick(plabel), MousePressed);
+    View plabel = getView("ProcessesLabel"); enableEvents(plabel, MousePress);
+    plabel.addEventHandler(e -> doProcLabelClick(plabel), MousePress);
 }
 
 /** Bogus debug hook. */

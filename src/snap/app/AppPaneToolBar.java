@@ -173,12 +173,12 @@ protected void initUI()
     // Get SearchText and Enable KeyReleased
     _searchText = getView("SearchText", TextField.class);
     _searchText.setPromptText("Search"); _searchText.getLabel().setImage(Image.get(TextPane.class, "Find.png"));
-    enableEvents(_searchText, KeyReleased);
+    enableEvents(_searchText, KeyRelease);
     TextField.setBackLabelAlignAnimatedOnFocused(_searchText, true);
     
     // Enable events on buttons
     String bnames[] = { "HomeButton", "BackButton", "NextButton", "RefreshButton", "RunButton" };
-    for(String name : bnames) enableEvents(name, MouseReleased, MouseEntered, MouseExited);
+    for(String name : bnames) enableEvents(name, MouseRelease, MouseEnter, MouseExit);
 }
 
 /**
@@ -190,27 +190,27 @@ public void respondUI(ViewEvent anEvent)
     AppPane appPane = getAppPane();
     
     // Make buttons glow
-    if(anEvent.isMouseEntered() && anEvent.getView()!=_selectedView) { View view = anEvent.getView();
+    if(anEvent.isMouseEnter() && anEvent.getView()!=_selectedView) { View view = anEvent.getView();
         _tempFill = view.getFill(); view.setFill(Color.WHITE); return; }
-    if(anEvent.isMouseExited() && anEvent.getView()!=_selectedView) { View view = anEvent.getView();
+    if(anEvent.isMouseExit() && anEvent.getView()!=_selectedView) { View view = anEvent.getView();
         view.setFill(_tempFill); return; }
     
     // Handle HomeButton
-    if(anEvent.equals("HomeButton") && anEvent.isMouseReleased())
+    if(anEvent.equals("HomeButton") && anEvent.isMouseRelease())
         appPane.showHomePage();
     
     // Handle LastButton, NextButton
-    if(anEvent.equals("BackButton") && anEvent.isMouseReleased())
+    if(anEvent.equals("BackButton") && anEvent.isMouseRelease())
         appPane.getBrowser().trackBack();
-    if(anEvent.equals("NextButton") && anEvent.isMouseReleased())
+    if(anEvent.equals("NextButton") && anEvent.isMouseRelease())
         appPane.getBrowser().trackForward();
     
     // Handle RefreshButton
-    if(anEvent.equals("RefreshButton") && anEvent.isMouseReleased())
+    if(anEvent.equals("RefreshButton") && anEvent.isMouseRelease())
         appPane.getBrowser().reloadPage();
     
     // Handle RunButton
-    if(anEvent.equals("RunButton") && anEvent.isMouseReleased())
+    if(anEvent.equals("RunButton") && anEvent.isMouseRelease())
         appPane._filesPane.run();
     
     // Handle RunConfigMenuItems
@@ -236,7 +236,7 @@ public void respondUI(ViewEvent anEvent)
         showHistory();
     
     // Handle FileTab
-    if(anEvent.equals("FileTab") && anEvent.isMouseReleased())
+    if(anEvent.equals("FileTab") && anEvent.isMouseRelease())
         handleFileTabClicked(anEvent);
 
     // Handle SearchText
@@ -346,7 +346,7 @@ public void handleSearchText(ViewEvent anEvent)
     PopupList <WebFile> searchMenu = getSearchMenu();
     
     // Handle KeyReleased: Let key do normal processing and call handleSearchTextKeyFinished()
-    if(anEvent.isKeyReleased() && !anEvent.isEnterKey())
+    if(anEvent.isKeyRelease() && !anEvent.isEnterKey())
         runLater(() -> handleSearchTextKeyFinished(anEvent));
     
     // Handle ActionEvent
@@ -506,7 +506,7 @@ protected class FileTab extends Label {
         // Add a close box graphic
         Polygon poly = new Polygon(0,2,2,0,5,3,8,0,10,2,7,5,10,8,8,10,5,7,2,10,0,8,3,5);
         ShapeView sview = new ShapeView(poly); sview.setBorder(TAB_CLOSE_BORDER1); sview.setPrefSize(11,11);
-        sview.addEventHandler(e->handleTabCloseBoxEvent(e), MouseEntered, MouseExited, MouseReleased);
+        sview.addEventHandler(e->handleTabCloseBoxEvent(e), MouseEnter, MouseExit, MouseRelease);
         setGraphicAfter(sview);
     }
     
@@ -517,9 +517,9 @@ protected class FileTab extends Label {
     private void handleTabCloseBoxEvent(ViewEvent anEvent)
     {
         View cbox = anEvent.getView();
-        if(anEvent.isMouseEntered()) { cbox.setFill(Color.CRIMSON); cbox.setBorder(TAB_CLOSE_BORDER2); }
-        else if(anEvent.isMouseExited()) { cbox.setFill(null); cbox.setBorder(TAB_CLOSE_BORDER1); }
-        else if(anEvent.isMouseReleased()) removeOpenFile(_file);
+        if(anEvent.isMouseEnter()) { cbox.setFill(Color.CRIMSON); cbox.setBorder(TAB_CLOSE_BORDER2); }
+        else if(anEvent.isMouseExit()) { cbox.setFill(null); cbox.setBorder(TAB_CLOSE_BORDER1); }
+        else if(anEvent.isMouseRelease()) removeOpenFile(_file);
         anEvent.consume();
     }
 

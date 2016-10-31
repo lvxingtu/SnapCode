@@ -74,21 +74,21 @@ protected void initUI()
 public void respondUI(ViewEvent anEvent)
 {
     // Handle MousePressed
-    if(anEvent.isMousePressed()) {
+    if(anEvent.isMousePress()) {
         _mx = anEvent.getX(); _my = anEvent.getY();
         _mactor = getMainScene().getActorAt(_mx, _my, null); if(_mactor==null) return;
         _mactor.setEffect(new ShadowEffect(8, Color.GRAY, 4, 4));
     }
     
     // Handle MouseDragged
-    if(anEvent.isMouseDragged() && _mactor!=null) {
+    if(anEvent.isMouseDrag() && _mactor!=null) {
         double mx = anEvent.getX(), my = anEvent.getY();
         _mactor.setX(_mactor.getX() + mx - _mx); _mx = mx;
         _mactor.setY(_mactor.getY() + my - _my); _my = my;
     }
     
     // Handle MouseReleased
-    if(anEvent.isMouseReleased() && _mactor!=null) {
+    if(anEvent.isMouseRelease() && _mactor!=null) {
         _mactor.setEffect(null);
         double nx = _mactor.getX(), nw = _mactor.getWidth(); 
         if(nx<-nw/2 || nx>_mactor.getParent().getWidth())

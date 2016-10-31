@@ -37,7 +37,7 @@ public class RowHeader extends View {
  */
 public RowHeader()
 {
-    enableEvents(MouseMoved, MouseReleased);
+    enableEvents(MouseMove, MouseRelease);
     setToolTipEnabled(true);
     setFill(new Color(233,233,233));
     setPrefWidth(WIDTH);
@@ -138,7 +138,7 @@ protected void processEvent(ViewEvent anEvent)
     }
 
     // Handle MouseMoved
-    else if(anEvent.isMouseMoved()) {
+    else if(anEvent.isMouseMove()) {
         _mx = anEvent.getX(); _my = anEvent.getY();
         for(Marker marker : getMarkers())
             if(marker.contains(_mx,_my)) {

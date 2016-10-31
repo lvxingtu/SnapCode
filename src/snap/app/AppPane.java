@@ -339,7 +339,7 @@ protected void initUI()
     getWindow().setMenuBar(getMenuBar());
     
     // Register for WelcomePanel on close
-    enableEvents(getWindow(), WinClosing);
+    enableEvents(getWindow(), WinClose);
 }
 
 /**
@@ -402,7 +402,7 @@ public void respondUI(ViewEvent anEvent)
     }
     
     // Handle WinClosing
-    if(anEvent.isWinClosing()) {
+    if(anEvent.isWinClose()) {
         hide(); runLater(() -> { PrefsUtils.flush(); WelcomePanel.getShared().showPanel(); }); }
 }
 

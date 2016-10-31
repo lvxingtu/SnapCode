@@ -154,14 +154,14 @@ protected void initUI()
     _filesList.setRowHeight(30);
     _filesList.setAltPaint(Color.WHITE);
     _filesList.setCellConfigure(this :: configureFilesListCell);
-    enableEvents(_filesList, MousePressed, MouseReleased); enableEvents(_filesList, DragEvents);
+    enableEvents(_filesList, MousePress, MouseRelease); enableEvents(_filesList, DragEvents);
     
     // Create RootFiles for TreeView (one for each open project)
     _filesTree.setItems(getRootFiles());
     _filesTree.expandItem(getRootFiles().get(0));
     
     // Enable events to get MouseUp on TreeView
-    enableEvents(_filesTree, MousePressed, MouseReleased); enableEvents(_filesTree, DragEvents);
+    enableEvents(_filesTree, MousePress, MouseRelease); enableEvents(_filesTree, DragEvents);
     
     // Register for copy/paste
     addKeyActionEvent("CopyAction", "Shortcut+C");
@@ -701,7 +701,7 @@ private void configureFilesListCell(ListCell <AppFile> aCell)
     
     ShapeView snode = new ShapeView(poly); snode.setProp("File", item.getFile());
     snode.setBorder(CLOSE_BOX_BORDER1); snode.setFill(Color.WHITE); snode.setPrefSize(11,11);
-    snode.addEventHandler(e->handleBookmarkEvent(e), MouseEntered, MouseExited, MouseReleased);
+    snode.addEventHandler(e->handleBookmarkEvent(e), MouseEnter, MouseExit, MouseRelease);
     aCell.setGraphicAfter(snode);
 }
 
@@ -711,9 +711,9 @@ private void configureFilesListCell(ListCell <AppFile> aCell)
 private void handleBookmarkEvent(ViewEvent anEvent)
 {
     View cbox = anEvent.getView();
-    if(anEvent.isMouseEntered()) { cbox.setFill(Color.CRIMSON); cbox.setBorder(CLOSE_BOX_BORDER2); }
-    else if(anEvent.isMouseExited()) { cbox.setFill(Color.WHITE); cbox.setBorder(CLOSE_BOX_BORDER1); }
-    else if(anEvent.isMouseReleased()) _appPane._toolBar.removeOpenFile((WebFile)cbox.getProp("File"));
+    if(anEvent.isMouseEnter()) { cbox.setFill(Color.CRIMSON); cbox.setBorder(CLOSE_BOX_BORDER2); }
+    else if(anEvent.isMouseExit()) { cbox.setFill(Color.WHITE); cbox.setBorder(CLOSE_BOX_BORDER1); }
+    else if(anEvent.isMouseRelease()) _appPane._toolBar.removeOpenFile((WebFile)cbox.getProp("File"));
     anEvent.consume();
 }
 

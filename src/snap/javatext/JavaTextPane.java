@@ -78,7 +78,7 @@ protected void initUI()
     // Get TextView and start listening for events (KeyEvents, MouseReleased, DragOver/Exit/Drop)
     _textView = getTextView(); _textView._textPane = this;
     _textView.setGrowWidth(true);
-    enableEvents(_textView, KeyPressed, KeyReleased, KeyTyped, MousePressed, MouseReleased, DragOver, DragExit,DragDrop);
+    enableEvents(_textView, KeyPress, KeyRelease, KeyType, MousePress, MouseRelease, DragOver, DragExit,DragDrop);
     
     // Reset TextView font
     float fontSize = PrefsUtils.prefs().getFloat("JavaFontSize", 12); if(fontSize<8) fontSize = 12;
@@ -122,7 +122,7 @@ public void resetUI()
         Label label = new Label(); label.setText(part.getNodeString()); label.setFont(font);
         label.setName("NodePathLabel"); label.setProp("JNode", part);
         if(part==spart) label.setFill(Color.LIGHTGRAY);
-        nodePathBox.addChild(label,1); label.setOwner(this); enableEvents(label, MouseReleased);
+        nodePathBox.addChild(label,1); label.setOwner(this); enableEvents(label, MouseRelease);
         Label div = new Label(); div.setText(" \u2022 "); div.setFont(font); if(part.getParent()==null) break;
         nodePathBox.addChild(div,1);
     }
@@ -145,13 +145,13 @@ public void respondUI(ViewEvent anEvent)
     if(anEvent.equals("TextView")) {
         
         // Handle KeyPressed/KeyReleased to watch for CONTROL/COMMAND press/release
-        if(anEvent.isKeyPressed() || anEvent.isKeyReleased()) { int kc = anEvent.getKeyCode();
+        if(anEvent.isKeyPress() || anEvent.isKeyRelease()) { int kc = anEvent.getKeyCode();
             if(kc==KeyCode.COMMAND || kc==KeyCode.CONTROL)
-                setTextViewHoverEnabled(anEvent.isKeyPressed());
+                setTextViewHoverEnabled(anEvent.isKeyPress());
         }
         
         // Handle KeyTyped: If PopupList not visible, ActivatePopupList
-        else if(anEvent.isKeyTyped()) { char ch = anEvent.getKeyChar();
+        else if(anEvent.isKeyType()) { char ch = anEvent.getKeyChar();
             if(getPopup().isShowing() || anEvent.isShortcutDown()) return;
             if(ch==KeyCode.CHAR_UNDEFINED) return;
             if(Character.isISOControl(ch)) return;
@@ -177,7 +177,7 @@ public void respondUI(ViewEvent anEvent)
         }
         
         // Handle MouseMoved
-        else if(anEvent.isMouseMoved()) {
+        else if(anEvent.isMouseMove()) {
             if(!anEvent.isShortcutDown()) { setTextViewHoverEnabled(false); return; }
             int index = _textView.getCharIndex(anEvent.getX(), anEvent.getY());
             JNode node = _textView.getJFile().getNodeAtCharIndex(index);
@@ -277,8 +277,8 @@ public String getJavaDocURL()
  */
 protected void setTextViewHoverEnabled(boolean isEnabled)
 {
-    if(isEnabled) enableEvents(_textView, MouseMoved);
-    else disableEvents(_textView, MouseMoved);
+    if(isEnabled) enableEvents(_textView, MouseMove);
+    else disableEvents(_textView, MouseMove);
     _textView.setHoverNode(null);
 }
 

@@ -30,7 +30,7 @@ public class OverviewPane extends View {
  */
 public OverviewPane()
 {
-    enableEvents(MouseMoved, MouseReleased);
+    enableEvents(MouseMove, MouseRelease);
     setToolTipEnabled(true);
     setPrefWidth(14);
 }
@@ -97,7 +97,7 @@ protected void processEvent(ViewEvent anEvent)
     }
     
     // Handle MouseMoved
-    if(anEvent.isMouseMoved()) {
+    if(anEvent.isMouseMove()) {
         _mx = anEvent.getX(); _my = anEvent.getY();
         for(Marker m : getMarkers())
             if(m.contains(_mx, _my)) {

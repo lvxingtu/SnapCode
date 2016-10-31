@@ -218,20 +218,20 @@ protected void initUI()
     // Enable SitesTable MouseReleased
     TableView sitesTable = getView("SitesTable", TableView.class);
     sitesTable.setRowHeight(24); //sitesTable.setStyle(new Style().setFontSize(10).toString());
-    enableEvents(sitesTable, MouseReleased);
+    enableEvents(sitesTable, MouseRelease);
     
     // Set preferred size
     getUI().setPrefSize(400,480);
     
     // Configure Window: Add WindowListener to indicate app should exit when close button clicked
     WindowView win = getWindow(); win.setTitle("Welcome"); win.setResizable(false);
-    enableEvents(win, WinClosing);
+    enableEvents(win, WinClose);
     getView("OpenButton", Button.class).setDefaultButton(true);
     
     // Register buttons for MouseReleased so we can look for alt-Down click
-    enableEvents("NewButton", MouseReleased);
-    enableEvents("OpenButton", MouseReleased);
-    enableEvents("RemoveButton", MouseReleased);
+    enableEvents("NewButton", MouseRelease);
+    enableEvents("OpenButton", MouseRelease);
+    enableEvents("RemoveButton", MouseRelease);
 }
 
 /**
@@ -283,7 +283,7 @@ public void respondUI(ViewEvent anEvent)
         quitApp();
         
     // Handle WinClosing
-    if(anEvent.isWinClosing())
+    if(anEvent.isWinClose())
         quitApp();
         
     // Handle DragDrop events

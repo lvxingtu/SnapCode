@@ -166,7 +166,7 @@ void rebuildNodePath()
         Label label = new Label(part.getPartString()); label.setFont(Font.Arial12);
         label.setName("NodePathLabel"); label.setProp("SnapPart", part);
         if(part==spart) label.setFill(Color.LIGHTGRAY);
-        _nodePathBox.addChild(label,0); label.setOwner(this); enableEvents(label, MouseReleased);
+        _nodePathBox.addChild(label,0); label.setOwner(this); enableEvents(label, MouseRelease);
         part = part.getParent(); if(part==null) break;
         Label div = new Label(" \u2022 "); div.setFont(Font.Arial12);
         _nodePathBox.addChild(div,0);

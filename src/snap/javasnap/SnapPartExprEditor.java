@@ -34,7 +34,7 @@ protected void configureHBox(HBox aHBox)
     
     // Create text field, configure and return
     _tfield = createTextField(str); _tfield.setName(TextFieldName); _tfield.setPrefHeight(18);
-    enableEvents(_tfield, KeyReleased); //enableEvents(_tfield, DragEvents);
+    enableEvents(_tfield, KeyRelease); //enableEvents(_tfield, DragEvents);
     aHBox.addChild(_tfield);
 }
 
@@ -47,7 +47,7 @@ void fireTextFieldAction()  { _tfield.fireActionEvent(); }
 protected void respondUI(ViewEvent anEvent)
 {
     // Handle KeyEvents
-    if(anEvent.isKeyReleased())
+    if(anEvent.isKeyRelease())
         runLater(() -> handleKeyFinished(anEvent));
     
     // Handle ExprText

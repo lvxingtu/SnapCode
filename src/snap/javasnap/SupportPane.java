@@ -60,7 +60,7 @@ protected void initUI()
         //e.consume(); db.setDragView(_dragImage);
     });*/
     
-    enableEvents(getUI(), MouseReleased, DragGesture);
+    enableEvents(getUI(), MouseRelease, DragGesture);
 }
 
 /**

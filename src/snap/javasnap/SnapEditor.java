@@ -36,7 +36,7 @@ public SnapEditor(JavaTextView aJTV)
     addChild(fpUI);
 
     // Configure mouse handling
-    enableEvents(MousePressed, MouseDragged, MouseReleased);
+    enableEvents(MousePress, MouseDrag, MouseRelease);
     rebuildUI();
 }
 
@@ -262,7 +262,7 @@ String getIndent(JNode aNode, int aPos)
 protected void processEvent(ViewEvent anEvent)
 {
     // Handle MousePressed
-    if(anEvent.isMousePressed()) {
+    if(anEvent.isMousePress()) {
         _mx = anEvent.getX(); _my = anEvent.getY();
         _mnode = ViewUtils.getDeepestChildAt(this, _mx, _my);
         _mpart = SnapPart.getSnapPart(_mnode);
@@ -272,7 +272,7 @@ protected void processEvent(ViewEvent anEvent)
     }
     
     // Handle MouseDragged
-    else if(anEvent.isMouseDragged()) {
+    else if(anEvent.isMouseDrag()) {
         if(_mpart==null) return;
         double mx = anEvent.getX(), my = anEvent.getY();
         _mnode.setTransX(_mnode.getTransX() + mx - _mx); _mx = mx;
@@ -280,7 +280,7 @@ protected void processEvent(ViewEvent anEvent)
     }
     
     // Handle MouseReleased
-    else if(anEvent.isMouseReleased()) {
+    else if(anEvent.isMouseRelease()) {
         if(_mpart==null) return;
         if(_mnode.getTransX()>150 && _mpart.getParent()!=null) removeNode(_mpart.getJNode());
         _mnode.setTransX(0); _mnode.setTransY(0);
