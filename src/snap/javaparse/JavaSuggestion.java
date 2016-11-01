@@ -4,15 +4,13 @@
 package snap.javaparse;
 import java.lang.reflect.*;
 import java.util.*;
-import snap.project.*;
 import snap.util.*;
-import snap.web.*;
 
 /**
  * A class to represent a completion suggestion for a given prefix.
  */
 public class JavaSuggestion {
-
+    
 /**
  * Returns completion for JNode (should be JType or JIdentifier).
  */
@@ -28,10 +26,9 @@ public static JavaDecl[] getSuggestions(JNode aNode)
         getSuggestions((JExprId)aNode, list);
     
     // Sort list and return
-    Project proj = Project.get(aNode.getFile().getSourceFile());
     Class reccls = getReceivingClass(aNode);
     JavaDecl decls[] = list.toArray(new JavaDecl[0]);
-    Arrays.sort(decls, new DeclCompare(proj, reccls));
+    Arrays.sort(decls, new DeclCompare(aNode.getClassLoader(), reccls));
     return decls;
 }
 
@@ -40,14 +37,13 @@ public static JavaDecl[] getSuggestions(JNode aNode)
  */
 private static void getSuggestions(JType aJType, List <JavaDecl> theSuggestions)
 {
-    ClassPathInfo cpinfo = getClassPathInfo(aJType);
-    Project proj = cpinfo.getProject();
+    ClassPathInfo cpinfo = ClassPathInfo.get(aJType);
     String name = aJType.getName();
     if(name!=null) {
         List <String> cnames = cpinfo.getAllClassNames(name);
         for(String cname : cnames) {
             if(aJType.getParent() instanceof JExprAlloc) {
-                Class cls = ClassUtils.getClass(cname, proj.getClassLoader());
+                Class cls = cpinfo.getClass(cname);
                 if(cls==null || !Modifier.isPublic(cls.getModifiers())) continue;
                 Constructor cstrs[] = null; try { cstrs = cls.getConstructors(); } catch(Throwable t) { }
                 if(cstrs!=null) for(Constructor cstr : cstrs)
@@ -65,8 +61,7 @@ private static void getSuggestions(JExprId anId, List <JavaDecl> theSuggestions)
 {
     // Get prefix string
     String prefix = anId.getName();
-    ClassPathInfo cpinfo = getClassPathInfo(anId);
-    Project proj = cpinfo.getProject();
+    ClassPathInfo cpinfo = ClassPathInfo.get(anId);
     
     // If there is a parent expression, work from it
     JExpr parExpr = anId.getParentExpr();
@@ -114,7 +109,7 @@ private static void getSuggestions(JExprId anId, List <JavaDecl> theSuggestions)
         // Add classes with prefix that are public
         List <String> cnames = cpinfo.getAllClassNames(prefix);
         for(String cname : cnames) {
-            Class cls = ClassUtils.getClass(cname, proj.getClassLoader());
+            Class cls = cpinfo.getClass(cname);
             if(cls==null || !Modifier.isPublic(cls.getModifiers())) continue;
             theSuggestions.add(new JavaDecl(cname, null, null, null));
         }
@@ -153,14 +148,6 @@ private static Class getReceivingClass(JNode aNode)
 
     // Return null since no assignment type found for class
     return null;
-}
-
-/** Returns ClassPathInfo for JNode. */
-private static ClassPathInfo getClassPathInfo(JNode aNode)
-{
-    WebFile file = aNode.getFile().getSourceFile(); if(file==null) return null;
-    WebSite site = file.getSite();
-    return ClassPathInfo.get(site);
 }
 
 /** Returns the method call parent of given node, if available. */
@@ -231,11 +218,11 @@ private static JVarDecl getVarDeclForInitializer(JNode aNode)
  */
 private static class DeclCompare implements Comparator<JavaDecl> {
 
-    // The project and the class type of node
-    Project _proj; Class _rclass = null;
+    // The ClassLoader and the class type of node
+    ClassLoader _cldr; Class _rclass = null;
     
     /** Creates a DeclCompare. */
-    DeclCompare(Project aProj, Class aRC)  { _proj = aProj; _rclass = aRC; }
+    DeclCompare(ClassLoader aClassLoader, Class aRC)  { _cldr = aClassLoader; _rclass = aRC; }
 
     /** Standard compare to method.  */
     public int compare(JavaDecl o1, JavaDecl o2)
@@ -251,17 +238,19 @@ private static class DeclCompare implements Comparator<JavaDecl> {
         // If either is member class, sort other first
         if(o1.isMemberClass()!=o2.isMemberClass()) return o2.isMemberClass()? -1 : 1; 
         
-        // Special ClassName support
+        // Make certain packages get preference
         if(o1.isClass()) {
             String s1 = o1.getClassName(), s2 = o2.getClassName();
-            if(s1.startsWith("java.lang.") && !s2.startsWith("java.lang.")) return -1;
-            if(s2.startsWith("java.lang.") && !s1.startsWith("java.lang.")) return 1;
-            if(s1.startsWith("java.util.") && !s2.startsWith("java.util.")) return -1;
-            if(s2.startsWith("java.util.") && !s1.startsWith("java.util.")) return 1;
-            if(s1.startsWith("java.") && !s2.startsWith("java.")) return -1;
-            if(s2.startsWith("java.") && !s1.startsWith("java.")) return 1;
+            for(String pp : PREF_PACKAGES) {
+                if(s1.startsWith(pp) && !s2.startsWith(pp)) return -1;
+                if(s2.startsWith(pp) && !s1.startsWith(pp)) return 1;
+            }
         }
+        
+        // If simple names are unique, return order
         int c = o1.getSimpleName().compareToIgnoreCase(o2.getSimpleName()); if(c!=0) return c;
+        
+        // Otherwise use full name
         return o1.getFullName().compareToIgnoreCase(o2.getFullName());
     }
 
@@ -270,9 +259,12 @@ private static class DeclCompare implements Comparator<JavaDecl> {
     {
         if(_rclass==null || aJD.isPackage()) return false;
         String tname = aJD.getTypeName(); if(tname==null) return false;
-        Class tcls = ClassUtils.getClass(tname, _proj.getClassLoader()); if(tcls==null) return false;
+        Class tcls = ClassUtils.getClass(tname, _cldr); if(tcls==null) return false;
         return _rclass.isAssignableFrom(tcls);
     }
 }
+
+/** List or preferred packages. */
+private static String PREF_PACKAGES[] = { "java.lang.", "java.util.", "snap.", "java." };
 
 }

@@ -1,5 +1,6 @@
-package snap.project;
+package snap.javaparse;
 import java.util.*;
+import snap.project.Project;
 import snap.util.*;
 import snap.web.*;
 
@@ -43,6 +44,15 @@ public Project getProject()  { return _proj; }
  * Returns the class path sites.
  */
 public List <WebSite> getSites()  { return _sites; }
+
+/**
+ * Returns a class for name.
+ */
+public Class getClass(String aName)
+{
+    ClassLoader cldr = _proj.getClassLoader();
+    return ClassUtils.getClass(aName, cldr);
+}
 
 /**
  * Returns class names for prefix.
@@ -196,7 +206,7 @@ private static boolean isInterestingPath(String aPath)
  */
 public void propertyChange(PropChange anEvent)
 {
-    if(anEvent.getPropertyName()==ClassPath.JarPaths_Prop) {
+    if(anEvent.getPropertyName()==snap.project.ClassPath.JarPaths_Prop) {
         _proj.getSite().setProp("ClassPathInfo", null);
         _proj.getClassPath().removePropChangeListener(this);
     }
@@ -206,6 +216,16 @@ public void propertyChange(PropChange anEvent)
  * Standard toString implementation.
  */
 public String toString()  { return getClass().getSimpleName() + ": " + getSites(); }
+
+/**
+ * Returns ClassPathInfo for JNode.
+ */
+public static ClassPathInfo get(JNode aNode)
+{
+    WebFile file = aNode.getFile().getSourceFile(); if(file==null) return null;
+    WebSite site = file.getSite();
+    return ClassPathInfo.get(site);
+}
 
 /**
  * Returns the ClassPathInfo for a JNode.
