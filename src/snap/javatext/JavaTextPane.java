@@ -268,6 +268,10 @@ public String getJavaDocURL()
     else if(className.startsWith("javafx."))
         url = "http://docs.oracle.com/javafx/2/api/index.html?" + className.replace('.', '/') + ".html";
     
+    // Handle Greenfoot classes
+    else if(className.startsWith("greenfoot."))
+        url = "https://www.greenfoot.org/files/javadoc/index.html?" + className.replace('.', '/') + ".html";
+    
     // Return url
     return url;
 }
