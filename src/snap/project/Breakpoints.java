@@ -44,7 +44,7 @@ public Breakpoint remove(int anIndex)
  */
 public void addBreakpoint(WebFile aFile, int aLine)
 {
-    Breakpoint bp = new Breakpoint().initSourceLine(aFile, aLine);
+    Breakpoint bp = new Breakpoint(aFile, aLine);
     int index = Collections.binarySearch(this, bp); if(index<0) index = -index-1; else return;
     add(index, bp);
 }
@@ -79,7 +79,7 @@ protected List <Breakpoint> readFile()
         int line = scanner.nextInt();
         WebFile f = _proj.getProjectSet().getFile(path);
         if(f!=null)
-            list.add(new Breakpoint().initSourceLine(f, line));
+            list.add(new Breakpoint(f, line));
     }
     scanner.close();
     

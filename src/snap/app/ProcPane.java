@@ -3,6 +3,7 @@ import java.util.*;
 import snap.debug.*;
 import snap.gfx.*;
 import snap.javatext.JavaPage;
+import snap.javatext.JavaTextView;
 import snap.util.*;
 import snap.view.*;
 import snap.viewx.WebPage;
@@ -421,6 +422,16 @@ protected void respondUI(ViewEvent anEvent)
     // Handle StepReturnButton
     else if(anEvent.equals("StepReturnButton"))
         dapp.stepOut();
+    
+    // Handle RunToLineButton
+    else if(anEvent.equals("RunToLineButton")) {
+        WebPage page = getAppPane().getBrowser().getPage();
+        JavaPage jpage = page instanceof JavaPage? (JavaPage)page : null; if(jpage==null) return;
+        JavaTextView tview = jpage.getTextView();
+        WebFile file = jpage.getFile();
+        int line = tview.getSel().getStartLine().getIndex();
+        dapp.runToLine(file, line);
+    }
     
     // Handle ProcTree
     else if(anEvent.equals("ProcTree")) {

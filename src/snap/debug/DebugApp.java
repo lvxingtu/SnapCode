@@ -4,6 +4,7 @@ import java.util.*;
 import snap.debug.Exceptions.*;
 import snap.project.Breakpoint;
 import snap.util.ArrayUtils;
+import snap.web.WebFile;
 import snap.web.WebURL;
 import com.sun.jdi.*;
 import com.sun.jdi.event.*;
@@ -39,6 +40,9 @@ public class DebugApp extends RunApp {
     
     // Whether app is invoking methods
     boolean                       _invoking;
+    
+    // The current RunToLine breakpoint
+    Breakpoint                    _runToLineBreak;
     
     // Constants for method types
     static final int STATIC = 0;
@@ -268,6 +272,16 @@ private void generalStep(ThreadReference thread, int size, int depth) throws NoS
     
     // Resume
     resumeQuiet();
+}
+
+/**
+ * Run to given line.
+ */
+public void runToLine(WebFile aFile, int aLine)
+{
+    _runToLineBreak = new Breakpoint(aFile, aLine);
+    addBreakpoint(_runToLineBreak);
+    resume();
 }
 
 /**
@@ -640,7 +654,10 @@ void dispatchEvent(DebugEvent anEvent)
         case VMDisconnect: endSession(); break;
         
         // Handle LocationTrigger
-        case LocationTrigger: setCurrentThread(anEvent.getThread(), 0); wantsPause = true; break;
+        case LocationTrigger:
+            if(_runToLineBreak!=null) {
+                removeBreakpoint(_runToLineBreak); _runToLineBreak = null; }
+            setCurrentThread(anEvent.getThread(), 0); wantsPause = true; break;
         
         // Handle Exception
         case Exception: setCurrentThread(anEvent.getThread(), 0); wantsPause = true; break;

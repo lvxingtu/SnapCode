@@ -5,7 +5,7 @@
     <Label name="ProcessesLabel" text=" Processes" PrefWidth="160" />
     <Button Name="DebugButton" PrefWidth="24" PrefHeight="24" LeanX="RIGHT" image="Debug.gif" ShowBorder="false" />
   </HBox>
-  <HBox Padding="0,0,0,18" Spacing="4">
+  <HBox Padding="0,0,2,8" Spacing="4">
     <Button Name="ResumeButton" PrefWidth="24" PrefHeight="24" image="Resume.gif" ShowBorder="false">
       <binding aspect="Enabled" key="Paused" />
     </Button>
@@ -23,6 +23,9 @@
       <binding aspect="Enabled" key="Paused" />
     </Button>
     <Button Name="StepReturnButton" PrefWidth="24" PrefHeight="24" image="StepReturn.gif" ShowBorder="false">
+      <binding aspect="Enabled" key="Paused" />
+    </Button>
+    <Button Name="RunToLineButton" PrefWidth="24" PrefHeight="24" image="RunToLine.png" ShowBorder="false">
       <binding aspect="Enabled" key="Paused" />
     </Button>
   </HBox>

@@ -42,51 +42,58 @@ public class Breakpoint implements Comparable<Breakpoint> {
     public enum Type { LineBreakpoint, MethodBreakpoint, Exception, AccessWatchpoint, ModificationWatchpoint };
 
 /**
- * Initializes a breakpoint for project, FilePath and Line.
+ * Creates a Breakpoint for project, FilePath and Line.
  */
-public Breakpoint initSourceLine(WebFile aFile, int aLine)
+protected Breakpoint()  { }
+
+/**
+ * Creates a Breakpoint for File and Line.
+ */
+public Breakpoint(WebFile aFile, int aLine)
 {
     _type = Type.LineBreakpoint; setFile(aFile); setLine(aLine);
     Project proj = Project.get(aFile);
     _className = proj.getClassName(aFile);
-    return this;
 }
 
 /**
- * Initializes a LineBreakpoint.
+ * Creates a Breakpoint for class name and Line.
  */
-public Breakpoint initClassLine(String aClsName, int line)
+public Breakpoint(String aClsName, int line)
 {
     _type = Type.LineBreakpoint; _className = aClsName; _line = line;
     if(_className!=null && _className.startsWith("*")) { _isWild = true; _className = _className.substring(1); }
-    return this;
 }
 
 /**
- * Initializes a MethodBreakpoint.
+ * Creates a Breakpoint for class name, method name and args.
  * For example: initMethod("snap.app.App", "main", Collections.singletonList("java.lang.String[]"));
  */
-public Breakpoint initMethod(String aClsName, String aMethod, List theArgs)
+public Breakpoint(String aClsName, String aMethod, List theArgs)
 {
-    _type = Type.MethodBreakpoint; _className = aClsName; _methodName = aMethod; _methodArgs = theArgs; return this;
+    _type = Type.MethodBreakpoint; _className = aClsName; _methodName = aMethod; _methodArgs = theArgs;
 }
 
 /**
  * Initializes a ExceptionIntercept.
  */
-public Breakpoint initException(String aClsName, boolean notifyCaught, boolean notifyUncaught)
+public static Breakpoint getExceptionBreak(String aClsName, boolean notifyCaught, boolean notifyUncaught)
 {
-    _type = Type.Exception; _className = aClsName; _notifyCaught = notifyCaught; _notifyUncaught = notifyUncaught;
-    return this;
+    Breakpoint bp = new Breakpoint();
+    bp._type = Type.Exception; bp._className = aClsName;
+    bp._notifyCaught = notifyCaught; bp._notifyUncaught = notifyUncaught;
+    return bp;
 }
 
 /**
  * Initializes a Watchpoint.
  */
-public Breakpoint createAccessWatchpoint(String aClsName, String fieldId, boolean isAccess)
+public static Breakpoint getAccessWatchpoint(String aClsName, String fieldId, boolean isAccess)
 {
-    _type = isAccess? Type.AccessWatchpoint : Type.ModificationWatchpoint; _className = aClsName;
-    _fieldId = fieldId; return this; //if(!isJavaIdentifier(fieldId)) throw new MalformedMemberNameException(fieldId);
+    Breakpoint bp = new Breakpoint();
+    bp._type = isAccess? Type.AccessWatchpoint : Type.ModificationWatchpoint; bp._className = aClsName;
+    bp._fieldId = fieldId; //if(!isJavaIdentifier(fieldId)) throw new MalformedMemberNameException(fieldId);
+    return bp;
 }
 
 /**
