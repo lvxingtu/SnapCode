@@ -144,7 +144,7 @@ public void respondUI(ViewEvent anEvent)
 
 public <T> T getParent(Class <T> aClass)
 {
-    List list = new ArrayList(_hbox.getChildren()); Collections.reverse(list);
+    List list = ArrayUtils.asArrayList(_hbox.getChildren()); Collections.reverse(list);
     for(ScrollView sp : (List<ScrollView>)list) { ListView ln = (ListView)sp.getContent();
         Object item = ln.getSelectedItem();
         if(aClass.isInstance(item))
@@ -158,8 +158,8 @@ public <T> T getParent(Class <T> aClass)
 protected void addListView(View aPrevNode, Object theItems[])
 {
     // If previous node provided, remove those after it
-    int i = ListUtils.indexOfId(_hbox.getChildren(), aPrevNode!=null? aPrevNode.getParent(ScrollView.class) : null);
-    while(i+1<_hbox.getChildCount()) _hbox.removeChild(_hbox.getChildren().size()-1);
+    int i = ArrayUtils.indexOfId(_hbox.getChildren(), aPrevNode!=null? aPrevNode.getParent(ScrollView.class) : null);
+    while(i+1<_hbox.getChildCount()) _hbox.removeChild(_hbox.getChildCount()-1);
 
     // Create list view and add
     ListView lview = new ListView(); lview.setName("ListView"); lview.setPrefWidth(200);
