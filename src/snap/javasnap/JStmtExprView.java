@@ -6,16 +6,16 @@ import snap.view.*;
 /**
  * SnapPartStmt subclass for JStmtExpression.
  */
-public class SnapPartStmtExpr <JNODE extends JStmtExpr> extends SnapPartStmt<JNODE> {
+public class JStmtExprView <JNODE extends JStmtExpr> extends JStmtView<JNODE> {
 
 /**
  * Override to return JFile child node owners.
  */
-protected List <SnapPart> createChildren()
+protected List <JNodeView> createChildren()
 {
     JStmtExpr stmt = getJNode(); JExpr expr = stmt.getExpr();
-    SnapPartExpr sexpr = SnapPartExpr.createSnapPart(expr);
-    List <SnapPart> children = new ArrayList(); children.add(sexpr);
+    JExprView sexpr = JExprView.createSnapPart(expr);
+    List <JNodeView> children = new ArrayList(); children.add(sexpr);
     return children;
 }
 
@@ -24,7 +24,7 @@ protected List <SnapPart> createChildren()
  */
 protected View createUI()
 {
-    SnapPartPane pane = (SnapPartPane)super.createUI(); pane.setColor(null);
+    JNodeViewBase pane = (JNodeViewBase)super.createUI(); pane.setColor(null);
     return pane;
 }
 
@@ -33,7 +33,7 @@ protected View createUI()
  */
 protected void configureHBox(HBox aHBox)
 {
-    for(SnapPart spart : getChildren()) aHBox.addChild(spart.getUI());
+    for(JNodeView spart : getChildren()) aHBox.addChild(spart.getUI());
     for(View child : aHBox.getChildren()) child.setGrowWidth(true);
 }
 

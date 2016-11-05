@@ -14,13 +14,13 @@ public class SnapEditor extends StackView {
     JavaTextView        _jtextView;
     
     // The scripts pane
-    SnapPartFile        _filePart;
+    JFileView        _filePart;
 
     // The selected part
-    SnapPart            _selPart;
+    JNodeView            _selPart;
     
     // The mouse node and X/Y during mouse drag
-    View                _mnode;  SnapPart _mpart; double _mx, _my;
+    View                _mnode;  JNodeView _mpart; double _mx, _my;
 
 /**
  * Creates a new SnapCodeArea.
@@ -31,7 +31,7 @@ public SnapEditor(JavaTextView aJTV)
     _jtextView = aJTV;
     
     // Create FilePart and add
-    _filePart = new SnapPartFile(); _filePart._codeArea = this;
+    _filePart = new JFileView(); _filePart._codeArea = this;
     View fpUI = _filePart.getUI(); fpUI.setGrowWidth(true); fpUI.setGrowHeight(true);
     addChild(fpUI);
 
@@ -53,12 +53,12 @@ public JavaTextView getJavaTextView()  { return _jtextView; }
 /**
  * Returns the selected part.
  */
-public SnapPart getSelectedPart()  { return _selPart; }
+public JNodeView getSelectedPart()  { return _selPart; }
 
 /**
  * Sets the selected parts.
  */
-public void setSelectedPart(SnapPart aPart)
+public void setSelectedPart(JNodeView aPart)
 {
     if(_selPart!=null) _selPart.setSelected(false);
     _selPart = aPart!=null? aPart : _filePart;
@@ -77,7 +77,7 @@ public void setSelectedPart(SnapPart aPart)
 /**
  * Returns the FilePart.
  */
-public SnapPartFile getFilePart()  { return _filePart; }
+public JFileView getFilePart()  { return _filePart; }
 
 /**
  * Returns the JFile JNode.
@@ -90,7 +90,7 @@ public JFile getJFile()  { return getJavaTextView().getJFile(); }
 public Class getSelectedPartClass()
 {
     // Get class for SnapPart.JNode
-    SnapPart spart = getSelectedPart(); if(spart==null) spart = getFilePart();
+    JNodeView spart = getSelectedPart(); if(spart==null) spart = getFilePart();
     JNode jnode = spart.getJNode(); Class cls = null;
     for(JNode jn=jnode; jn!=null && cls==null; jn=jn.getParent())
         cls = jn.getJClass();
@@ -103,7 +103,7 @@ public Class getSelectedPartClass()
 public Class getSelectedPartEnclClass()
 {
     // Get class for SnapPart.JNode
-    SnapPart spart = getSelectedPart(); if(spart==null) spart = getFilePart();
+    JNodeView spart = getSelectedPart(); if(spart==null) spart = getFilePart();
     JNode jnode = spart.getJNode(); Class cls = null;
     for(JNode jn=jnode; jn!=null && (cls==null || cls.isPrimitive()); jn=jn.getParent())
         cls = jn.getJClass();
@@ -126,19 +126,19 @@ protected void rebuildUI()
 void setSelectedPartFromTextArea()
 {
     int index = getJavaTextView().getSelStart();
-    SnapPart spart = getSnapPartAt(getFilePart(), index);
+    JNodeView spart = getSnapPartAt(getFilePart(), index);
     setSelectedPart(spart);
 }
 
 /**
  * Returns the snap part at given index.
  */
-public SnapPart getSnapPartAt(SnapPart aPart, int anIndex)
+public JNodeView getSnapPartAt(JNodeView aPart, int anIndex)
 {
     // Check children
-    List <SnapPart> children = aPart.getChildren();
-    for(SnapPart child : children) {
-        SnapPart part = getSnapPartAt(child, anIndex);
+    List <JNodeView> children = aPart.getChildren();
+    for(JNodeView child : children) {
+        JNodeView part = getSnapPartAt(child, anIndex);
         if(part!=null)
             return part;
     }
@@ -265,7 +265,7 @@ protected void processEvent(ViewEvent anEvent)
     if(anEvent.isMousePress()) {
         _mx = anEvent.getX(); _my = anEvent.getY();
         _mnode = ViewUtils.getDeepestChildAt(this, _mx, _my);
-        _mpart = SnapPart.getSnapPart(_mnode);
+        _mpart = JNodeView.getSnapPart(_mnode);
         if(_mpart==null) _mnode = null; else _mnode = _mpart.getUI();
         if(_mpart==_filePart) { setSelectedPart(null); _mpart = null; }
         setSelectedPart(_mpart);

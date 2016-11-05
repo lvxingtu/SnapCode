@@ -6,16 +6,16 @@ import snap.view.*;
 /**
  * SnapPartExpr subclass for JMethodCall.
  */
-public class SnapPartExprMethodCall <JNODE extends JExprMethodCall> extends SnapPartExpr <JNODE> {
+public class JExprMethodCallView <JNODE extends JExprMethodCall> extends JExprView <JNODE> {
 
 /**
  * Override to create children for method args.
  */
-protected List <SnapPart> createChildren()
+protected List <JNodeView> createChildren()
 {
     JExprMethodCall mc = getJNode(); List <JExpr> args = mc.getArgs();
     List children = new ArrayList();
-    if(args!=null) for(JExpr arg : args) { SnapPartExpr spe = new SnapPartExprEditor(); spe.setJNode(arg);
+    if(args!=null) for(JExpr arg : args) { JExprView spe = new JExprEditorView(); spe.setJNode(arg);
         children.add(spe); }
     return children;
 }
@@ -25,7 +25,7 @@ protected List <SnapPart> createChildren()
  */
 public View createUI()
 {
-    SnapPartPane pane = (SnapPartPane)super.createUI(); pane.setColor(PieceColor);
+    JNodeViewBase pane = (JNodeViewBase)super.createUI(); pane.setColor(PieceColor);
     return pane;
 }
 
@@ -40,7 +40,7 @@ protected void configureHBox(HBox aHBox)
     aHBox.addChild(label);
     
     // Add child UIs
-    for(SnapPart child : getChildren())
+    for(JNodeView child : getChildren())
         aHBox.addChild(child.getUI());
 }
 

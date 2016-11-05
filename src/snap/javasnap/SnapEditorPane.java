@@ -22,7 +22,7 @@ public class SnapEditorPane extends ViewOwner {
     HBox                _nodePathBox;
     
     // The deepest part of current NodePath (which is SelectedPart, unless NodePath changed SelectedPart)
-    SnapPart            _deepPart;
+    JNodeView            _deepPart;
 
     // Whether to rebuild CodeArea
     boolean             _rebuild = true;
@@ -62,12 +62,12 @@ public SupportPane getSupportPane()  { return _supportPane; }
 /**
  * Returns the selected part.
  */
-public SnapPart getSelectedPart()  { return _editor.getSelectedPart(); }
+public JNodeView getSelectedPart()  { return _editor.getSelectedPart(); }
 
 /**
  * Sets the selected parts.
  */
-public void setSelectedPart(SnapPart aPart)  { _editor.setSelectedPart(aPart); }
+public void setSelectedPart(JNodeView aPart)  { _editor.setSelectedPart(aPart); }
 
 /**
  * Create UI.
@@ -130,7 +130,7 @@ protected void respondUI(ViewEvent anEvent)
     // Handle NodePathLabel
     if(anEvent.equals("NodePathLabel")) {
         Label label = anEvent.getView(Label.class);
-        SnapPart part = (SnapPart)label.getProp("SnapPart"), dpart = _deepPart;
+        JNodeView part = (JNodeView)label.getProp("SnapPart"), dpart = _deepPart;
         setSelectedPart(part);
         _deepPart = dpart;
     }
@@ -162,7 +162,7 @@ void rebuildNodePath()
     _nodePathBox.removeChildren();
     
     // Iterate up from DeepPart and add parts
-    for(SnapPart part=_deepPart, spart=getSelectedPart(); part!=null;) {
+    for(JNodeView part=_deepPart, spart=getSelectedPart(); part!=null;) {
         Label label = new Label(part.getPartString()); label.setFont(Font.Arial12);
         label.setName("NodePathLabel"); label.setProp("SnapPart", part);
         if(part==spart) label.setFill(Color.LIGHTGRAY);
@@ -181,7 +181,7 @@ protected void rebuildLater()  { _rebuild = true; resetLater(); }
 /**
  * Sets the selected parts.
  */
-public void updateSelectedPart(SnapPart aPart)
+public void updateSelectedPart(JNodeView aPart)
 {
     _supportPane.rebuildUI();
     resetLater();
@@ -199,8 +199,8 @@ public void cut()  { copy(); delete(); }
 public void copy()
 {
     // Make sure statement is selected
-    if(!(getSelectedPart() instanceof SnapPartStmt)) {
-        SnapPartStmt stmt = (SnapPartStmt)getSelectedPart().getAncestor(SnapPartStmt.class); if(stmt==null) return;
+    if(!(getSelectedPart() instanceof JStmtView)) {
+        JStmtView stmt = (JStmtView)getSelectedPart().getAncestor(JStmtView.class); if(stmt==null) return;
         setSelectedPart(stmt);
     }
     
@@ -222,7 +222,7 @@ public void paste()
         try { node = _supportPane._exprParser.parseCustom(str, JNode.class); } catch(Exception e) { }
     
     // Get SelectedPart and drop node
-    SnapPart spart = getSelectedPart();
+    JNodeView spart = getSelectedPart();
     if(spart!=null && node!=null)
         spart.dropNode(node, spart.getWidth()/2, spart.getHeight());
 }
@@ -245,6 +245,6 @@ public void redo()  { getJavaTextView().redo(); rebuildLater(); }
 /**
  * Escape.
  */
-public void escape()  { SnapPart par = getSelectedPart().getParent(); if(par!=null) setSelectedPart(par); }
+public void escape()  { JNodeView par = getSelectedPart().getParent(); if(par!=null) setSelectedPart(par); }
 
 }

@@ -5,7 +5,7 @@ import snap.view.*;
 /**
  * A pane that draws background for puzzle pieces.
  */
-public class SnapPartPane extends VBox {
+public class JNodeViewBase extends VBox {
 
     // The type
     Type          _type = Type.Piece;
@@ -44,7 +44,7 @@ public class SnapPartPane extends VBox {
 /**
  * Create new background pane.
  */
-protected SnapPartPane()
+protected JNodeViewBase()
 {
     // Configure
     setAlign(Pos.TOP_LEFT); setFillWidth(true); //setSpacing(2);

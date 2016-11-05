@@ -11,7 +11,7 @@ import snap.view.*;
 public class SnapEditorPopup extends ViewOwner {
 
     // The expression part
-    SnapPart             _spart;
+    JNodeView             _spart;
     
     // The popup
     PopupWindow          _popup = getPopup();
@@ -33,7 +33,7 @@ public static SnapEditorPopup getShared()  { return _s!=null? _s : (_s=new SnapE
 /**
  * Activates the popup list (shows popup if multiple suggestions, does replace for one, does nothing for none).
  */
-public void activatePopupList(SnapPart aPart, String aString, int anIndex)
+public void activatePopupList(JNodeView aPart, String aString, int anIndex)
 {
     // Set current SnapPart
     _spart = aPart;
@@ -67,7 +67,7 @@ public void activatePopupList(SnapPart aPart, String aString, int anIndex)
 /**
  * Show Dialog.
  */
-public void showPopup(SnapPart aPart)
+public void showPopup(JNodeView aPart)
 {
     View ui = aPart.getUI();
     if(!getPopup().isShowing()) getPopup().show(ui, 0, ui.getHeight());
@@ -118,7 +118,7 @@ protected void respondUI(ViewEvent anEvent)
     if(anEvent.isKeyEvent()) {
         if(anEvent.isEscapeKey()) { if(anEvent.isKeyRelease()) getPopup().hide(); anEvent.consume(); }
         if(anEvent.isEnterKey()) {
-            if(anEvent.isKeyRelease()) ((SnapPartExprEditor)_spart).fireTextFieldAction(); anEvent.consume(); }
+            if(anEvent.isKeyRelease()) ((JExprEditorView)_spart).fireTextFieldAction(); anEvent.consume(); }
     }
 }
 

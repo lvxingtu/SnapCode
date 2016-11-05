@@ -5,7 +5,7 @@ import snap.view.*;
 /**
  * SnapPartStmt subclass for JStmtIf.
  */
-public class SnapPartStmtIf <JNODE extends JStmtIf> extends SnapPartStmt <JNODE> {
+public class JStmtIfView <JNODE extends JStmtIf> extends JStmtView <JNODE> {
 
 /**
  * Creates the UI for the top line.
@@ -13,7 +13,7 @@ public class SnapPartStmtIf <JNODE extends JStmtIf> extends SnapPartStmt <JNODE>
 protected void configureHBox(HBox theHBox)
 {
     JStmtIf istmt = getJNode(); JExpr cond = istmt.getConditional();
-    SnapPartExpr spart = new SnapPartExprEditor(); spart.setJNode(cond); spart._parent = this;
+    JExprView spart = new JExprEditorView(); spart.setJNode(cond); spart._parent = this;
     Label label = createLabel("if");
     theHBox.setChildren(label, spart.getUI());
 }

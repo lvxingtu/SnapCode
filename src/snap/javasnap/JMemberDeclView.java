@@ -5,14 +5,14 @@ import snap.view.*;
 /**
  * A SnapPart subclass for JMethodDecl.
  */
-public class SnapPartMemberDecl <JNODE extends JMemberDecl> extends SnapPart <JNODE> {
+public class JMemberDeclView <JNODE extends JMemberDecl> extends JNodeView <JNODE> {
 
 /**
  * Creates a SnapPart for a JNode.
  */
-public static SnapPart createSnapPart(JNode aNode)
+public static JNodeView createSnapPart(JNode aNode)
 {
-    SnapPart np = null;
+    JNodeView np = null;
     if(aNode instanceof JConstrDecl) np = new ConstructorDecl();
     else if(aNode instanceof JMethodDecl) np = new MethodDecl();
     else return null;
@@ -23,14 +23,14 @@ public static SnapPart createSnapPart(JNode aNode)
 /**
  * Subclass for JMethodDecl.
  */
-public static class MethodDecl <JNODE extends JMethodDecl> extends SnapPartMemberDecl <JNODE> {
+public static class MethodDecl <JNODE extends JMethodDecl> extends JMemberDeclView <JNODE> {
 
     /**
      * Override to configure SnapPartPane.
      */
     protected View createUI()
     {
-        SnapPartPane pane = (SnapPartPane)super.createUI(); pane.setType(SnapPartPane.Type.MemberDecl);
+        JNodeViewBase pane = (JNodeViewBase)super.createUI(); pane.setType(JNodeViewBase.Type.MemberDecl);
         pane.setColor(MemberDeclColor); pane.getHBox().setMinWidth(120);
         return pane;
     }

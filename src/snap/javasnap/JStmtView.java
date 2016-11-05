@@ -5,18 +5,18 @@ import snap.view.*;
 /**
  * A SnapPart for JStatement.
  */
-public class SnapPartStmt <JNODE extends JStmt> extends SnapPart <JNODE> {
+public class JStmtView <JNODE extends JStmt> extends JNodeView <JNODE> {
 
 /**
  * Creates a SnapPart for a JNode.
  */
-public static SnapPart createSnapPart(JNode aNode)
+public static JNodeView createSnapPart(JNode aNode)
 {
-    if(aNode instanceof JStmtExpr) return new SnapPartStmtExpr();
-    if(aNode instanceof JStmtWhile) return new SnapPartStmtWhile();
-    if(aNode instanceof JStmtIf) return new SnapPartStmtIf();
-    if(aNode instanceof JStmtFor) return new SnapPartStmtFor();
-    return new SnapPartStmt();
+    if(aNode instanceof JStmtExpr) return new JStmtExprView();
+    if(aNode instanceof JStmtWhile) return new JStmtWhileView();
+    if(aNode instanceof JStmtIf) return new JStmtIfView();
+    if(aNode instanceof JStmtFor) return new JStmtForView();
+    return new JStmtView();
 }
 
 /**
@@ -24,8 +24,8 @@ public static SnapPart createSnapPart(JNode aNode)
  */
 protected View createUI()
 {
-    SnapPartPane pane = (SnapPartPane)super.createUI();
-    pane.setType(isBlock()? SnapPartPane.Type.BlockStmt : SnapPartPane.Type.Piece);
+    JNodeViewBase pane = (JNodeViewBase)super.createUI();
+    pane.setType(isBlock()? JNodeViewBase.Type.BlockStmt : JNodeViewBase.Type.Piece);
     pane.setColor(isBlock()? BlockStmtColor : PieceColor);
     pane.getHBox().setMinWidth(120);
     return pane;

@@ -13,7 +13,7 @@ public class SupportPane extends ViewOwner {
     SnapEditorPane         _editorPane;
     
     // The SnapPart being dragged
-    static SnapPart        _dragSP;
+    static JNodeView        _dragSP;
     
     // The drag image
     static Image           _dragImage;
@@ -70,7 +70,7 @@ protected void respondUI(ViewEvent anEvent)
 {
     // Handle MouseClick (double click)
     if(anEvent.isMouseClick() && anEvent.getClickCount()==2) {
-        SnapPart part = getSnapPart(getUI(ParentView.class), anEvent.getX(), anEvent.getY());
+        JNodeView part = getSnapPart(getUI(ParentView.class), anEvent.getX(), anEvent.getY());
         if(part!=null)
             getEditorPane().getSelectedPart().dropNode(part.getJNode());
     }
@@ -115,7 +115,7 @@ public void updateTabView(Class aClass, ChildView aPane)
     if(strings==null) return;
     
     for(String str : strings) {
-        SnapPart move = createSnapPartStmt(str);
+        JNodeView move = createSnapPartStmt(str);
         aPane.addChild(move.getUI());
     }
 }
@@ -143,15 +143,15 @@ private View createBlocksPane()
     pane.setGrowWidth(true); pane.setGrowHeight(true); pane.setFill(Color.GRAY); //pane.setBorder(bevel);
     
     // Add node for while(true)
-    SnapPart ws = createSnapPartStmt("while(true) {\n}");
+    JNodeView ws = createSnapPartStmt("while(true) {\n}");
     pane.addChild(ws.getUI());
     
     // Add node for repeat(x)
-    SnapPart fs = createSnapPartStmt("for(int i=0; i<10; i++) {\n}");
+    JNodeView fs = createSnapPartStmt("for(int i=0; i<10; i++) {\n}");
     pane.addChild(fs.getUI());
     
     // Add node for if(expr)
-    SnapPart is =  createSnapPartStmt("if(true) {\n}");
+    JNodeView is =  createSnapPartStmt("if(true) {\n}");
     pane.addChild(is.getUI());
 
     // Wrap in ScrollView and return
@@ -162,24 +162,24 @@ private View createBlocksPane()
 /**
  * Returns a SnapPart for given string of code.
  */
-protected SnapPart createSnapPartStmt(String aString)
+protected JNodeView createSnapPartStmt(String aString)
 {
     JNode node = _stmtParser.parseCustom(aString, JNode.class);
-    return SnapPart.createSnapPart(node);
+    return JNodeView.createSnapPart(node);
 }
 
 /**
  * Returns the child of given class hit by coords.
  */
-protected SnapPart getSnapPart(ParentView aPar, double anX, double aY)
+protected JNodeView getSnapPart(ParentView aPar, double anX, double aY)
 {
     for(View child : aPar.getChildren()) {
         if(!child.isVisible()) continue;
         Point p = child.parentToLocal(anX, aY);
-        if(child.contains(p.getX(), p.getY()) && SnapPart.getSnapPart(child)!=null)
-            return SnapPart.getSnapPart(child);
+        if(child.contains(p.getX(), p.getY()) && JNodeView.getSnapPart(child)!=null)
+            return JNodeView.getSnapPart(child);
         if(child instanceof ParentView) { ParentView par = (ParentView)child;
-            SnapPart no = getSnapPart(par, p.getX(), p.getY());
+            JNodeView no = getSnapPart(par, p.getX(), p.getY());
             if(no!=null)
                 return no; }
     }

@@ -7,7 +7,7 @@ import snap.view.*;
 /**
  * A SnapPart for JFile.
  */
-public class SnapPartFile extends SnapPart <JFile> {
+public class JFileView extends JNodeView <JFile> {
 
     // The SnapCodeArea
     SnapEditor       _codeArea;
@@ -27,20 +27,20 @@ public void setJNode(JFile aJNode)
     // Reset children and their UI
     _children = null;
     _pane.getVBox().removeChildren();
-    for(SnapPart child : getChildren())
+    for(JNodeView child : getChildren())
         _pane.getVBox().addChild(child.getUI());
 }
 
 /**
  * Override to return JFile child node owners.
  */
-protected List <SnapPart> createChildren()
+protected List <JNodeView> createChildren()
 {
-    List <SnapPart> children = new ArrayList();
+    List <JNodeView> children = new ArrayList();
     JFile jfile = getJNode();
     JClassDecl cdecl = jfile.getClassDecl(); if(cdecl==null) return children;
     for(JMemberDecl md : cdecl.getMemberDecls()) {
-        SnapPart mdp = SnapPartMemberDecl.createSnapPart(md); if(mdp==null) continue;
+        JNodeView mdp = JMemberDeclView.createSnapPart(md); if(mdp==null) continue;
         children.add(mdp);
     }
     return children;
@@ -52,7 +52,7 @@ protected List <SnapPart> createChildren()
 public View createUI()
 {
     // Get pane and set Type=None
-    SnapPartPane pane = (SnapPartPane)super.createUI(); pane.setType(SnapPartPane.Type.None);
+    JNodeViewBase pane = (JNodeViewBase)super.createUI(); pane.setType(JNodeViewBase.Type.None);
     pane.setFill(Color.GRAY); pane.setBorder(Color.LIGHTGRAY, 1); //Bevel
     
     // Configure VBox special for file

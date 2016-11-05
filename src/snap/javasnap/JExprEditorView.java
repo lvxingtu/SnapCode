@@ -1,12 +1,12 @@
 package snap.javasnap;
 import snap.javaparse.*;
-import snap.javasnap.SnapPartPane.Seg;
+import snap.javasnap.JNodeViewBase.Seg;
 import snap.view.*;
 
 /**
  * A SnapPartExpr subclass to do text editing on expression.
  */
-public class SnapPartExprEditor <JNODE extends JExpr>  extends SnapPartExpr<JNODE> {
+public class JExprEditorView <JNODE extends JExpr> extends JExprView <JNODE> {
 
     // The text field
     TextField    _tfield;
@@ -19,7 +19,7 @@ public class SnapPartExprEditor <JNODE extends JExpr>  extends SnapPartExpr<JNOD
  */
 public View createUI()
 {
-    SnapPartPane superUI = (SnapPartPane)super.createUI();
+    JNodeViewBase superUI = (JNodeViewBase)super.createUI();
     superUI.setSeg(Seg.Middle); superUI.setColor(null);
     return superUI;
 }

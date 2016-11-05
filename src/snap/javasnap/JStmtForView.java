@@ -5,7 +5,7 @@ import snap.view.*;
 /**
  * SnapPartStmt subclass for JStmtFor.
  */
-public class SnapPartStmtFor <JNODE extends JStmtFor> extends SnapPartStmt <JNODE> {
+public class JStmtForView <JNODE extends JStmtFor> extends JStmtView <JNODE> {
 
 /**
  * Creates the UI for the top line.

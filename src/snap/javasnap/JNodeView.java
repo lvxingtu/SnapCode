@@ -7,25 +7,25 @@ import snap.view.*;
 /**
  * A custom class.
  */
-public class SnapPart <JNODE extends JNode> extends ViewOwner {
+public class JNodeView <JNODE extends JNode> extends ViewOwner {
 
     // The JNode
     JNODE                _jnode;
     
     // The parent node owner
-    SnapPart             _parent;
+    JNodeView             _parent;
     
     // The children node owners
-    List <SnapPart>      _children;
+    List <JNodeView>      _children;
     
     // Whether part is selected
     boolean              _selected;
     
     // The SnapPartPane
-    SnapPartPane         _pane;
+    JNodeViewBase         _pane;
     
     // The current drag over node
-    static SnapPartPane  _dragOver;
+    static JNodeViewBase  _dragOver;
     
     // Shared list of no children
     static List          _noChildren = Collections.EMPTY_LIST;
@@ -38,13 +38,13 @@ public class SnapPart <JNODE extends JNode> extends ViewOwner {
 /**
  * Creates a SnapPart for a JNode.
  */
-public static SnapPart createSnapPart(JNode aNode)
+public static JNodeView createSnapPart(JNode aNode)
 {
-    SnapPart np = null;
-    if(aNode instanceof JFile) np = new SnapPartFile();
-    else if(aNode instanceof JMemberDecl) np = SnapPartMemberDecl.createSnapPart(aNode);
-    else if(aNode instanceof JStmt) np = SnapPartStmt.createSnapPart(aNode);
-    else if(aNode instanceof JExpr) np = SnapPartExpr.createSnapPart(aNode);
+    JNodeView np = null;
+    if(aNode instanceof JFile) np = new JFileView();
+    else if(aNode instanceof JMemberDecl) np = JMemberDeclView.createSnapPart(aNode);
+    else if(aNode instanceof JStmt) np = JStmtView.createSnapPart(aNode);
+    else if(aNode instanceof JExpr) np = JExprView.createSnapPart(aNode);
     if(np==null) return null;
     np.setJNode(aNode);
     return np;
@@ -73,14 +73,14 @@ public boolean isBlock()  { return getJNode().isBlock(); }
 /**
  * Returns the parent.
  */
-public SnapPart getParent()  { return _parent; }
+public JNodeView getParent()  { return _parent; }
 
 /**
  * Returns the ancestor of given class.
  */
 public <T> T getAncestor(Class <T> aClass)
 {
-    for(SnapPart p=_parent;p!=null;p=p.getParent()) if(aClass.isInstance(p)) return (T)p;
+    for(JNodeView p=_parent;p!=null;p=p.getParent()) if(aClass.isInstance(p)) return (T)p;
     return null;
 }
 
@@ -92,34 +92,34 @@ public int getChildCount()  { return _children!=null? _children.size() : 0; }
 /**
  * Returns the individual child.
  */
-public SnapPart getChild(int anIndex)  { return _children.get(anIndex); }
+public JNodeView getChild(int anIndex)  { return _children.get(anIndex); }
 
 /**
  * Returns the individual child.
  */
-public SnapPart getChildLast()  { int cc = getChildCount(); return cc>0? _children.get(cc-1) : null; }
+public JNodeView getChildLast()  { int cc = getChildCount(); return cc>0? _children.get(cc-1) : null; }
 
 /**
  * Returns the children.
  */
-public List <SnapPart> getChildren()
+public List <JNodeView> getChildren()
 {
     if(_children==null) {
-        _children = createChildren(); for(SnapPart child : _children) child._parent = this; }
+        _children = createChildren(); for(JNodeView child : _children) child._parent = this; }
     return _children;
 }
 
 /**
  * Creates the children.
  */
-protected List <SnapPart> createChildren()
+protected List <JNodeView> createChildren()
 {
     if(!isBlock()) return _noChildren;
     
-    List <SnapPart> children = new ArrayList();
+    List <JNodeView> children = new ArrayList();
     JNode node = getJNode();
     if(node.getBlock()!=null) for(JStmt stmt : node.getBlock().getStatements()) {
-        SnapPart mcnp = createSnapPart(stmt); if(mcnp==null) continue;
+        JNodeView mcnp = createSnapPart(stmt); if(mcnp==null) continue;
         children.add(mcnp);
     }
     return children;
@@ -158,11 +158,11 @@ public double getHeight()  { return getUI().getHeight(); }
 /**
  * Returns the SnapPart of a node.
  */
-public static SnapPart getSnapPart(View aView)
+public static JNodeView getSnapPart(View aView)
 {
     if(aView==null) return null;
     ViewOwner o = aView.getOwner();
-    return o instanceof SnapPart? (SnapPart)o : getSnapPart(aView.getParent());
+    return o instanceof JNodeView? (JNodeView)o : getSnapPart(aView.getParent());
 }
 
 /**
@@ -170,7 +170,7 @@ public static SnapPart getSnapPart(View aView)
  */
 public void initUI()
 {
-    if(getAncestor(SnapPartFile.class)==null) return;
+    if(getAncestor(JFileView.class)==null) return;
     enableEvents(getUI(), DragEvents);
 }
 
@@ -180,7 +180,7 @@ public void initUI()
 protected View createUI()
 {
     // Create SnapPartPane
-    _pane = new SnapPartPane();
+    _pane = new JNodeViewBase();
     
     // Add horizontal UI
     configureHBox(_pane.getHBox());
@@ -190,7 +190,7 @@ protected View createUI()
     // Add child UI
     if(isBlock()) {
         _pane.getVBox();
-        for(SnapPart child : getChildren())
+        for(JNodeView child : getChildren())
             _pane.getVBox().addChild(child.getUI());
     }
     
