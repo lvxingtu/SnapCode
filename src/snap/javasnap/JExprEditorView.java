@@ -15,26 +15,25 @@ public class JExprEditorView <JNODE extends JExpr> extends JExprView <JNODE> {
     static final String TextFieldName = "ExprText";
 
 /**
- * Creates UI.
+ * Updates UI.
  */
-public View createUI()
+public void updateUI()
 {
-    JNodeViewBase superUI = (JNodeViewBase)super.createUI();
-    superUI.setSeg(Seg.Middle); superUI.setColor(null);
-    return superUI;
+    super.updateUI();
+    setSeg(Seg.Middle); setColor(null);
 }
 
 /**
- * Creates UI.
+ * Updates UI for HBox.
  */
-protected void configureHBox(HBox aHBox)
+protected void updateHBox(HBox aHBox)
 {
     // Get expression
     JExpr expr = getJNode(); String str = expr.getString();
     
     // Create text field, configure and return
     _tfield = createTextField(str); _tfield.setName(TextFieldName); _tfield.setPrefHeight(18);
-    enableEvents(_tfield, KeyRelease); //enableEvents(_tfield, DragEvents);
+    _tfield.addEventHandler(e -> handleTextEvent(e), KeyRelease); //enableEvents(_tfield, DragEvents);
     aHBox.addChild(_tfield);
 }
 
@@ -42,39 +41,22 @@ protected void configureHBox(HBox aHBox)
 void fireTextFieldAction()  { _tfield.fireActionEvent(); }
 
 /**
- * Responds to UI.
+ * Handle TextField event.
  */
-protected void respondUI(ViewEvent anEvent)
+protected void handleTextEvent(ViewEvent anEvent)
 {
-    // Handle KeyEvents
+    // Handle KeyEvents: Update PopupList
     if(anEvent.isKeyRelease())
-        runLater(() -> handleKeyFinished(anEvent));
+        getEnv().runLater(() ->
+            SnapEditorPopup.getShared().activatePopupList(this, _tfield.getText(), _tfield.getSelStart()));
     
-    // Handle ExprText
-    else if(anEvent.equals(TextFieldName)) handleCodeCompletion();
-    
-    // Handle normal
-    else super.respondUI(anEvent);
-}
-
-/**
- * Handle KeyEvents.
- */
-protected void handleKeyFinished(ViewEvent anEvent)
-{
-    // Handle KeyFinished: Update PopupList and reset TextField with PrefWidth
-    SnapEditorPopup.getShared().activatePopupList(this, _tfield.getText(), _tfield.getSelStart());
-}
-
-/**
- * Called to insert CodeComp into expression.
- */
-protected void handleCodeCompletion()
-{
-    SnapEditorPopup hpop = SnapEditorPopup.getShared();
-    String str = getViewStringValue(_tfield); if(hpop.isShowing()) str = hpop.getFixedText();
-    getCodeArea().replaceJNode(getJNode(), str);
-    hpop.hide();
+    // Handle ExprText Action
+    else {
+        SnapEditorPopup hpop = SnapEditorPopup.getShared();
+        String str = _tfield.getText(); if(hpop.isShowing()) str = hpop.getFixedText();
+        getCodeArea().replaceJNode(getJNode(), str);
+        hpop.hide();
+    }
 }
 
 /**

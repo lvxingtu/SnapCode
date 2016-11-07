@@ -8,14 +8,14 @@ import snap.view.*;
 public class JStmtWhileView <JNODE extends JStmtWhile> extends JStmtView <JNODE> {
 
 /**
- * Creates the UI for the top line.
+ * Updates UI for top line.
  */
-protected void configureHBox(HBox theHBox)
+protected void updateHBox(HBox theHBox)
 {
     JStmtWhile wstmt = getJNode(); JExpr cond = wstmt.getConditional();
-    JExprView spart = new JExprEditorView(); spart.setJNode(cond); spart._parent = this;
+    JExprView spart = new JExprEditorView(); spart.setJNode(cond);
     Label label = createLabel("while");
-    theHBox.setChildren(label, spart.getUI());
+    theHBox.setChildren(label, spart);
 }    
 
 }

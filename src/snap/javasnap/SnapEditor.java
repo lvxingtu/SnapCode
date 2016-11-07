@@ -11,16 +11,16 @@ import snap.view.*;
 public class SnapEditor extends StackView {
 
     // The JavaTextView
-    JavaTextView        _jtextView;
+    JavaTextView         _jtextView;
     
     // The scripts pane
-    JFileView        _filePart;
+    JFileView            _filePart;
 
     // The selected part
     JNodeView            _selPart;
     
     // The mouse node and X/Y during mouse drag
-    View                _mnode;  JNodeView _mpart; double _mx, _my;
+    View                 _mnode;  JNodeView _mpart; double _mx, _my;
 
 /**
  * Creates a new SnapCodeArea.
@@ -32,8 +32,8 @@ public SnapEditor(JavaTextView aJTV)
     
     // Create FilePart and add
     _filePart = new JFileView(); _filePart._codeArea = this;
-    View fpUI = _filePart.getUI(); fpUI.setGrowWidth(true); fpUI.setGrowHeight(true);
-    addChild(fpUI);
+    _filePart.setGrowWidth(true); _filePart.setGrowHeight(true);
+    addChild(_filePart);
 
     // Configure mouse handling
     enableEvents(MousePress, MouseDrag, MouseRelease);
@@ -266,7 +266,7 @@ protected void processEvent(ViewEvent anEvent)
         _mx = anEvent.getX(); _my = anEvent.getY();
         _mnode = ViewUtils.getDeepestChildAt(this, _mx, _my);
         _mpart = JNodeView.getJNodeView(_mnode);
-        if(_mpart==null) _mnode = null; else _mnode = _mpart.getUI();
+        if(_mpart==null) _mnode = null; else _mnode = _mpart;
         if(_mpart==_filePart) { setSelectedPart(null); _mpart = null; }
         setSelectedPart(_mpart);
     }

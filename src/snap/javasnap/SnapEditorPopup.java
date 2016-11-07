@@ -67,10 +67,10 @@ public void activatePopupList(JNodeView aPart, String aString, int anIndex)
 /**
  * Show Dialog.
  */
-public void showPopup(JNodeView aPart)
+public void showPopup(JNodeView aView)
 {
-    View ui = aPart.getUI();
-    if(!getPopup().isShowing()) getPopup().show(ui, 0, ui.getHeight());
+    if(getPopup().isShowing()) return;
+    getPopup().show(aView, 0, aView.getHeight());
 }
 
 /**

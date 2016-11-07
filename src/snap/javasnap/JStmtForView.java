@@ -8,9 +8,9 @@ import snap.view.*;
 public class JStmtForView <JNODE extends JStmtFor> extends JStmtView <JNODE> {
 
 /**
- * Creates the UI for the top line.
+ * Updates UI for top line.
  */
-protected void configureHBox(HBox theHBox)
+protected void updateHBox(HBox theHBox)
 {
     JStmtFor fs = getJNode();
     Label label = createLabel("for");
@@ -20,6 +20,7 @@ protected void configureHBox(HBox theHBox)
     if(fs.getInitDecl()!=null) { JStmtVarDecl ivd = fs.getInitDecl(); String str = ivd.getString();
         TextField tfield = createTextField(str); tfield.setName("ExprText"); tfield.setProp("Expr", ivd);
         tfield.setMinWidth(36); tfield.setPrefHeight(20); //tfield.setPrefColumnCount(str.length()*3/4);
+        tfield.addEventHandler(e -> handleTextEvent(e));
         theHBox.addChild(tfield);
     }
     
@@ -27,6 +28,7 @@ protected void configureHBox(HBox theHBox)
     if(fs.getConditional()!=null) { JExpr cond = fs.getConditional(); String str = cond.getString();
         TextField tfield = createTextField(str); tfield.setName("ExprText"); tfield.setProp("Expr", cond);
         tfield.setMinWidth(36); tfield.setPrefHeight(20); //tfield.setPrefColumnCount(str.length());
+        tfield.addEventHandler(e -> handleTextEvent(e));
         theHBox.addChild(tfield);
     }
     
@@ -35,6 +37,7 @@ protected void configureHBox(HBox theHBox)
         JStmtExpr se = fs.getUpdateStmts().get(0); String str = se.getString();
         TextField tfield = createTextField(str); tfield.setName("ExprText"); tfield.setProp("Expr", se);
         tfield.setMinWidth(36); tfield.setPrefHeight(20); //tfield.setPrefColumnCount(str.length());
+        tfield.addEventHandler(e -> handleTextEvent(e));
         theHBox.addChild(tfield);
     }
 }
@@ -42,17 +45,11 @@ protected void configureHBox(HBox theHBox)
 /**
  * Responds to UI.
  */
-protected void respondUI(ViewEvent anEvent)
+protected void handleTextEvent(ViewEvent anEvent)
 {
-    // Handle ExprText
-    if(anEvent.equals("ExprText")) {
-        TextField tfield = anEvent.getView(TextField.class);
-        JNode jnode = (JNode)tfield.getProp("Expr");
-        getCodeArea().replaceJNode(jnode, anEvent.getStringValue());
-    }
-    
-    // Do normal version
-    else super.respondUI(anEvent);
+    TextField tfield = anEvent.getView(TextField.class);
+    JNode jnode = (JNode)tfield.getProp("Expr");
+    getCodeArea().replaceJNode(jnode, anEvent.getStringValue());
 }
 
 }

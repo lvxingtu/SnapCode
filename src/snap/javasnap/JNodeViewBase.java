@@ -28,6 +28,9 @@ public class JNodeViewBase extends VBox {
     // The foreground shape
     PathView      _fg;
     
+    // Whether part is selected
+    boolean       _selected;
+    
     // The selection shape
     Path          _selShape;
     
@@ -47,18 +50,13 @@ public class JNodeViewBase extends VBox {
 protected JNodeViewBase()
 {
     // Configure
-    setAlign(Pos.TOP_LEFT); setFillWidth(true); //setSpacing(2);
+    setAlign(Pos.TOP_LEFT); setFillWidth(true);
     
     // Set background
-    _bg = new PathView(); _bg.setManaged(false); //_bg.setStroke(null);
-    //Light.Distant light = new Light.Distant(); light.setAzimuth(55); light.setElevation(115);
-    //Lighting lighting = new Lighting(); lighting.setLight(light); lighting.setSurfaceScale(.4);
-    EmbossEffect emb = new EmbossEffect(68,112,4);
-    _bg.setEffect(emb);
+    _bg = new PathView(); _bg.setManaged(false); //_bg.setEffect(new EmbossEffect(68,112,4));
     
     // Create HBox
     _hbox = new HBox(); _hbox.setMinHeight(PieceHeight); _hbox.setSpacing(2);
-    //_hbox.setBorder(Color.RED, 2);
     
     // Create/set foreground
     _fg = new PathView(); _fg.setManaged(false); //_fg.setStroke(null); _fg.setMouseTransparent(true);
@@ -96,7 +94,7 @@ public Color getColor()  { return _color; }
 public void setColor(Color aColor)
 {
     _color = aColor;
-    _bg.setFill(aColor); //_bg.setBorder(aColor!=null? aColor.darker() : null, 2);
+    _bg.setFill(aColor); _bg.setBorder(aColor!=null? aColor.darker() : null, 1);
 }
 
 /**
@@ -121,10 +119,16 @@ protected VBox createVBox()
 }
 
 /**
+ * Returns whether part is selected.
+ */
+public boolean isSelected()  { return _selected; }
+
+/**
  * Sets whether part is selected.
  */
 public void setSelected(boolean aValue)
 {
+    _selected = aValue;
     _fg.setBorder(aValue? Border.createLineBorder(Color.get("#FFFFFFCC"),2) : null);
 }
 

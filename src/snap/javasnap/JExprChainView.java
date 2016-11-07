@@ -9,6 +9,15 @@ import snap.view.*;
 public class JExprChainView <JNODE extends JExprChain> extends JExprView <JNODE> {
 
 /**
+ * Updates HBox.
+ */
+protected void updateHBox(HBox aHBox)
+{
+    for(JNodeView child : getJNodeViews()) aHBox.addChild(child);
+    for(View child : aHBox.getChildren()) child.setGrowWidth(true);
+}
+
+/**
  * Override to create children.
  */
 protected List <JNodeView> createJNodeViews()
@@ -17,15 +26,6 @@ protected List <JNodeView> createJNodeViews()
     List children = new ArrayList();
     for(JExpr exp : echain.getExpressions()) { JExprView spe = createView(exp); children.add(spe); }
     return children;
-}
-
-/**
- * Configure HBox.
- */
-protected void configureHBox(HBox aHBox)
-{
-    for(JNodeView child : getJNodeViews()) aHBox.addChild(child.getUI());
-    for(View child : aHBox.getChildren()) child.setGrowWidth(true);
 }
 
 }

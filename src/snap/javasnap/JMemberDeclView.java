@@ -25,34 +25,25 @@ public static JNodeView createView(JNode aNode)
  */
 public static class MethodDecl <JNODE extends JMethodDecl> extends JMemberDeclView <JNODE> {
 
-    /**
-     * Override to configure SnapPartPane.
-     */
-    protected View createUI()
+    /** Override. */
+    protected void updateUI()
     {
-        JNodeViewBase pane = (JNodeViewBase)super.createUI(); pane.setType(JNodeViewBase.Type.MemberDecl);
-        pane.setColor(MemberDeclColor); pane.getHBox().setMinWidth(120);
-        return pane;
+        super.updateUI(); setType(JNodeViewBase.Type.MemberDecl);
+        setColor(MemberDeclColor); getHBox().setMinWidth(120);
     }
     
-    /**
-     * Creates UI.
-     */
-    protected void configureHBox(HBox spane)
+    /** Updates UI for HBox. */
+    protected void updateHBox(HBox spane)
     {
         JMethodDecl md = getJNode();
         Label label = createLabel(md.getName());
         spane.addChild(label);
     }
     
-    /**
-     * Returns a string describing the part.
-     */
+    /** Returns a string describing the part. */
     public String getPartString()  { return "Method"; }
     
-    /**
-     * Drops a node.
-     */
+    /** Drops a node. */
     protected void dropNode(JNode aNode, double anX, double aY)
     {
         if(getJNodeViewCount()==0) getCodeArea().insertNode(getJNode(), aNode, 0);
@@ -66,9 +57,7 @@ public static class MethodDecl <JNODE extends JMethodDecl> extends JMemberDeclVi
  */
 public static class ConstructorDecl <JNODE extends JConstrDecl> extends MethodDecl <JNODE> {
 
-    /**
-     * Returns a string describing the part.
-     */
+    /** Returns a string describing the part. */
     public String getPartString()  { return "Constructor"; }
 }
     

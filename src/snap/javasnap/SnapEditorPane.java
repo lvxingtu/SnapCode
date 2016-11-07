@@ -200,7 +200,7 @@ public void copy()
 {
     // Make sure statement is selected
     if(!(getSelectedPart() instanceof JStmtView)) {
-        JStmtView stmt = (JStmtView)getSelectedPart().getAncestor(JStmtView.class); if(stmt==null) return;
+        JStmtView stmt = getSelectedPart().getParent(JStmtView.class); if(stmt==null) return;
         setSelectedPart(stmt);
     }
     

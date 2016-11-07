@@ -7,49 +7,22 @@ import snap.view.*;
 /**
  * A View subclass to display a JNode.
  */
-public class JNodeView <JNODE extends JNode> extends ViewOwner {
+public class JNodeView <JNODE extends JNode> extends JNodeViewBase {
 
     // The JNode
-    JNODE                _jnode;
-    
-    // The parent node owner
-    JNodeView             _parent;
+    JNODE                 _jnode;
     
     // The children node owners
     List <JNodeView>      _jnodeViews;
     
-    // Whether part is selected
-    boolean              _selected;
-    
-    // The SnapPartPane
-    JNodeViewBase         _pane;
-    
     // The current drag over node
     static JNodeViewBase  _dragOver;
     
-    // Shared list of no children
-    static List          _noChildren = Collections.EMPTY_LIST;
-   
     // Constants for colors
     public static Color PieceColor = Color.get("#4C67d6");
     public static Color BlockStmtColor = Color.get("#8f56e3");
     public static Color MemberDeclColor = Color.get("#f0a822");
     
-/**
- * Creates a SnapPart for a JNode.
- */
-public static JNodeView createView(JNode aNode)
-{
-    JNodeView np = null;
-    if(aNode instanceof JFile) np = new JFileView();
-    else if(aNode instanceof JMemberDecl) np = JMemberDeclView.createView(aNode);
-    else if(aNode instanceof JStmt) np = JStmtView.createView(aNode);
-    else if(aNode instanceof JExpr) np = JExprView.createView(aNode);
-    if(np==null) return null;
-    np.setJNode(aNode);
-    return np;
-}
-
 /**
  * Returns the JNode.
  */
@@ -58,7 +31,37 @@ public JNODE getJNode()  { return _jnode; }
 /**
  * Sets the JNode.
  */
-public void setJNode(JNODE aJNode)  { _jnode = aJNode; }
+public void setJNode(JNODE aJNode)
+{
+    _jnode = aJNode;
+    updateUI();
+}
+
+/**
+ * Updates the UI.
+ */
+protected void updateUI()
+{
+    // Add horizontal UI
+    updateHBox(getHBox());
+    if(getHBox().getChildCount()>0 && getHBox().getChild(0) instanceof TextField)
+        getHBox().setPadding(0,2,0,0);
+    
+    // Add child UI
+    if(isBlock()) {
+        getVBox();
+        for(JNodeView child : getJNodeViews())
+            getVBox().addChild(child);
+    }
+
+    if(getParent(JFileView.class)==null) return;
+    enableEvents(DragEvents);
+}
+
+/**
+ * Updates the UI for the top line.
+ */
+protected void updateHBox(HBox spane)  { }
 
 /**
  * Returns the SnapCodeArea.
@@ -73,16 +76,7 @@ public boolean isBlock()  { return getJNode().isBlock(); }
 /**
  * Returns the parent.
  */
-public JNodeView getJNodeViewParent()  { return _parent; }
-
-/**
- * Returns the ancestor of given class.
- */
-public <T> T getAncestor(Class <T> aClass)
-{
-    for(JNodeView p=_parent;p!=null;p=p.getJNodeViewParent()) if(aClass.isInstance(p)) return (T)p;
-    return null;
-}
+public JNodeView getJNodeViewParent()  { return getParent(JNodeView.class); }
 
 /**
  * Returns the number of children.
@@ -102,19 +96,14 @@ public JNodeView getJNodeViewLast()  { int cc = getJNodeViewCount(); return cc>0
 /**
  * Returns the children.
  */
-public List <JNodeView> getJNodeViews()
-{
-    if(_jnodeViews==null) {
-        _jnodeViews = createJNodeViews(); for(JNodeView child : _jnodeViews) child._parent = this; }
-    return _jnodeViews;
-}
+public List <JNodeView> getJNodeViews()  { return _jnodeViews!=null? _jnodeViews : (_jnodeViews=createJNodeViews()); }
 
 /**
  * Creates the children.
  */
 protected List <JNodeView> createJNodeViews()
 {
-    if(!isBlock()) return _noChildren;
+    if(!isBlock()) return Collections.EMPTY_LIST;
     
     List <JNodeView> children = new ArrayList();
     JNode node = getJNode();
@@ -126,77 +115,9 @@ protected List <JNodeView> createJNodeViews()
 }
 
 /**
- * Returns whether part is selected.
- */
-public boolean isSelected()  { return _selected; }
-
-/**
- * Sets whether part is selected.
- */
-public void setSelected(boolean aValue)  { _selected = aValue; _pane.setSelected(aValue); }
-
-/**
  * Returns a string describing the part.
  */
 public String getPartString()  { return getJNode().getNodeString(); }
-
-/**
- * Standard toString implementation.
- */
-public String toString()  { return getJNode().toString(); }
-
-/**
- * Returns part width.
- */
-public double getWidth()  { return getUI().getWidth(); }
-
-/**
- * Returns part height.
- */
-public double getHeight()  { return getUI().getHeight(); }
-
-/**
- * Returns the SnapPart of a node.
- */
-public static JNodeView getJNodeView(View aView)
-{
-    if(aView==null) return null;
-    ViewOwner o = aView.getOwner();
-    return o instanceof JNodeView? (JNodeView)o : getJNodeView(aView.getParent());
-}
-
-/**
- * Init UI.
- */
-public void initUI()
-{
-    if(getAncestor(JFileView.class)==null) return;
-    enableEvents(getUI(), DragEvents);
-}
-
-/**
- * Creates UI.
- */
-protected View createUI()
-{
-    // Create SnapPartPane
-    _pane = new JNodeViewBase();
-    
-    // Add horizontal UI
-    configureHBox(_pane.getHBox());
-    if(_pane.getHBox().getChildCount()>0 && _pane.getHBox().getChild(0) instanceof TextField)
-        _pane.getHBox().setPadding(0,2,0,0);
-    
-    // Add child UI
-    if(isBlock()) {
-        _pane.getVBox();
-        for(JNodeView child : getJNodeViews())
-            _pane.getVBox().addChild(child.getUI());
-    }
-    
-    // Return SnapPartPane
-    return _pane;
-}
 
 /**
  * Creates a statement label.
@@ -219,18 +140,12 @@ protected TextField createTextField(String aString)
 }
 
 /**
- * Creates the UI for the top line.
+ * ProcessEvent.
  */
-protected void configureHBox(HBox spane)  { }
-
-/**
- * Respond to UI.
- */
-protected void respondUI(ViewEvent anEvent)
+protected void processEvent(ViewEvent anEvent)
 {
-    // Handle DragEvent: Accept drag event
-    if(anEvent.isDragEvent())
-        handleDragEvent(anEvent);
+    if(anEvent.isDragEvent()) handleDragEvent(anEvent);
+    else super.processEvent(anEvent);
 }
 
 /**
@@ -243,9 +158,9 @@ protected void handleDragEvent(ViewEvent anEvent)
     anEvent.acceptDrag(); anEvent.consume();
     
     // Handle DragEnter, DragOver, DragExit: Apply/clear effect from DragEffectNode
-    if(anEvent.isDragEnter() || anEvent.isDragOver() && _dragOver!=_pane) {
-        if(_dragOver!=null) _dragOver.setUnderDrag(false); _pane.setUnderDrag(true); _dragOver = _pane; }
-    if(anEvent.isDragExit()) { _pane.setUnderDrag(false); if(_dragOver==_pane) _dragOver = null; }
+    if(anEvent.isDragEnter() || anEvent.isDragOver() && _dragOver!=this) {
+        if(_dragOver!=null) _dragOver.setUnderDrag(false); setUnderDrag(true); _dragOver = this; }
+    if(anEvent.isDragExit()) { setUnderDrag(false); if(_dragOver==this) _dragOver = null; }
     
     // Handle DragDropEvent
     if(anEvent.isDragDropEvent() && SupportPane._dragSP!=null) {
@@ -268,4 +183,33 @@ protected void dropNode(JNode aNode, double anX, double aY)
     System.out.println("Cannot add node to " + getClass().getSimpleName());
 }
     
+/**
+ * Standard toString implementation.
+ */
+public String toString()  { return getJNode().toString(); }
+
+/**
+ * Returns the SnapPart of a node.
+ */
+public static JNodeView getJNodeView(View aView)
+{
+    if(aView instanceof JNodeView) return (JNodeView)aView;
+    return aView.getParent(JNodeView.class);
+}
+
+/**
+ * Creates a SnapPart for a JNode.
+ */
+public static JNodeView createView(JNode aNode)
+{
+    JNodeView np = null;
+    if(aNode instanceof JFile) np = new JFileView();
+    else if(aNode instanceof JMemberDecl) np = JMemberDeclView.createView(aNode);
+    else if(aNode instanceof JStmt) np = JStmtView.createView(aNode);
+    else if(aNode instanceof JExpr) np = JExprView.createView(aNode);
+    if(np==null) return null;
+    np.setJNode(aNode);
+    return np;
+}
+
 }

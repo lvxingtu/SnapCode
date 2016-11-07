@@ -26,9 +26,23 @@ public void setJNode(JFile aJNode)
     
     // Reset children and their UI
     _jnodeViews = null;
-    _pane.getVBox().removeChildren();
+    getVBox().removeChildren();
     for(JNodeView child : getJNodeViews())
-        _pane.getVBox().addChild(child.getUI());
+        getVBox().addChild(child);
+}
+
+/**
+ * Updates UI.
+ */
+public void updateUI()
+{
+    // Get pane and set Type=None
+    super.updateUI(); setType(JNodeViewBase.Type.None);
+    setFill(Color.GRAY); setBorder(Color.LIGHTGRAY, 1); //Bevel
+    
+    // Configure VBox special for file
+    VBox vbox = getVBox(); vbox.setPadding(0,10,10,10); vbox.setSpacing(25);
+    vbox.setFillWidth(false);
 }
 
 /**
@@ -44,23 +58,6 @@ protected List <JNodeView> createJNodeViews()
         children.add(mdp);
     }
     return children;
-}
-
-/**
- * Creates UI.
- */
-public View createUI()
-{
-    // Get pane and set Type=None
-    JNodeViewBase pane = (JNodeViewBase)super.createUI(); pane.setType(JNodeViewBase.Type.None);
-    pane.setFill(Color.GRAY); pane.setBorder(Color.LIGHTGRAY, 1); //Bevel
-    
-    // Configure VBox special for file
-    VBox vbox = pane.getVBox(); vbox.setPadding(0,10,10,10); vbox.setSpacing(25);
-    vbox.setFillWidth(false);
-
-    // Return pane
-    return pane;
 }
 
 /**

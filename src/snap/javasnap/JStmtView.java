@@ -3,38 +3,25 @@ import snap.javaparse.*;
 import snap.view.*;
 
 /**
- * A SnapPart for JStatement.
+ * A JNodeView for JStatement.
  */
 public class JStmtView <JNODE extends JStmt> extends JNodeView <JNODE> {
 
 /**
- * Creates a SnapPart for a JNode.
+ * Override to configure.
  */
-public static JNodeView createView(JNode aNode)
+protected void updateUI()
 {
-    if(aNode instanceof JStmtExpr) return new JStmtExprView();
-    if(aNode instanceof JStmtWhile) return new JStmtWhileView();
-    if(aNode instanceof JStmtIf) return new JStmtIfView();
-    if(aNode instanceof JStmtFor) return new JStmtForView();
-    return new JStmtView();
+    super.updateUI();
+    setType(isBlock()? JNodeViewBase.Type.BlockStmt : JNodeViewBase.Type.Piece);
+    setColor(isBlock()? BlockStmtColor : PieceColor);
+    getHBox().setMinWidth(120);
 }
 
 /**
- * Override to configure SnapPartPane.
+ * Updates UI for top line.
  */
-protected View createUI()
-{
-    JNodeViewBase pane = (JNodeViewBase)super.createUI();
-    pane.setType(isBlock()? JNodeViewBase.Type.BlockStmt : JNodeViewBase.Type.Piece);
-    pane.setColor(isBlock()? BlockStmtColor : PieceColor);
-    pane.getHBox().setMinWidth(120);
-    return pane;
-}
-
-/**
- * Creates UI.
- */
-protected void configureHBox(HBox theHBox)
+protected void updateHBox(HBox theHBox)
 {
     // Create label for statement and add to HBox
     JStmt stmt = getJNode();
@@ -74,4 +61,16 @@ protected void dropNode(JNode aNode, double anX, double aY)
     else getJNodeViewLast().dropNode(aNode, anX, getJNodeViewLast().getHeight());
 }
     
+/**
+ * Creates a JStmtView for a JStmt.
+ */
+public static JNodeView createView(JNode aNode)
+{
+    if(aNode instanceof JStmtExpr) return new JStmtExprView();
+    if(aNode instanceof JStmtWhile) return new JStmtWhileView();
+    if(aNode instanceof JStmtIf) return new JStmtIfView();
+    if(aNode instanceof JStmtFor) return new JStmtForView();
+    return new JStmtView();
+}
+
 }

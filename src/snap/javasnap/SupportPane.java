@@ -84,7 +84,7 @@ protected void respondUI(ViewEvent anEvent)
         // Create Dragboard, set image and start drag
         Dragboard dboard = anEvent.getDragboard();
         dboard.setContent("SupportPane:" + _dragSP.getClass().getSimpleName());
-        Image img = ViewUtils.getImage(_dragSP.getUI()); dboard.setDragImage(img);
+        Image img = ViewUtils.getImage(_dragSP); dboard.setDragImage(img);
         dboard.startDrag();
     }
 }
@@ -116,7 +116,7 @@ public void updateTabView(Class aClass, ChildView aPane)
     
     for(String str : strings) {
         JNodeView move = createSnapPartStmt(str);
-        aPane.addChild(move.getUI());
+        aPane.addChild(move);
     }
 }
 
@@ -144,15 +144,15 @@ private View createBlocksPane()
     
     // Add node for while(true)
     JNodeView ws = createSnapPartStmt("while(true) {\n}");
-    pane.addChild(ws.getUI());
+    pane.addChild(ws);
     
     // Add node for repeat(x)
     JNodeView fs = createSnapPartStmt("for(int i=0; i<10; i++) {\n}");
-    pane.addChild(fs.getUI());
+    pane.addChild(fs);
     
     // Add node for if(expr)
     JNodeView is =  createSnapPartStmt("if(true) {\n}");
-    pane.addChild(is.getUI());
+    pane.addChild(is);
 
     // Wrap in ScrollView and return
     ScrollView spane = new ScrollView(pane); spane.setPrefWidth(200);
