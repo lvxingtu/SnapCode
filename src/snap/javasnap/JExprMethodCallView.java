@@ -11,7 +11,7 @@ public class JExprMethodCallView <JNODE extends JExprMethodCall> extends JExprVi
 /**
  * Override to create children for method args.
  */
-protected List <JNodeView> createChildren()
+protected List <JNodeView> createJNodeViews()
 {
     JExprMethodCall mc = getJNode(); List <JExpr> args = mc.getArgs();
     List children = new ArrayList();
@@ -40,7 +40,7 @@ protected void configureHBox(HBox aHBox)
     aHBox.addChild(label);
     
     // Add child UIs
-    for(JNodeView child : getChildren())
+    for(JNodeView child : getJNodeViews())
         aHBox.addChild(child.getUI());
 }
 

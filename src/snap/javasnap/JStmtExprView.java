@@ -11,10 +11,10 @@ public class JStmtExprView <JNODE extends JStmtExpr> extends JStmtView<JNODE> {
 /**
  * Override to return JFile child node owners.
  */
-protected List <JNodeView> createChildren()
+protected List <JNodeView> createJNodeViews()
 {
     JStmtExpr stmt = getJNode(); JExpr expr = stmt.getExpr();
-    JExprView sexpr = JExprView.createSnapPart(expr);
+    JExprView sexpr = JExprView.createView(expr);
     List <JNodeView> children = new ArrayList(); children.add(sexpr);
     return children;
 }
@@ -33,7 +33,7 @@ protected View createUI()
  */
 protected void configureHBox(HBox aHBox)
 {
-    for(JNodeView spart : getChildren()) aHBox.addChild(spart.getUI());
+    for(JNodeView spart : getJNodeViews()) aHBox.addChild(spart.getUI());
     for(View child : aHBox.getChildren()) child.setGrowWidth(true);
 }
 

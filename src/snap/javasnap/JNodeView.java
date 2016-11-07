@@ -5,7 +5,7 @@ import snap.javaparse.*;
 import snap.view.*;
 
 /**
- * A custom class.
+ * A View subclass to display a JNode.
  */
 public class JNodeView <JNODE extends JNode> extends ViewOwner {
 
@@ -16,7 +16,7 @@ public class JNodeView <JNODE extends JNode> extends ViewOwner {
     JNodeView             _parent;
     
     // The children node owners
-    List <JNodeView>      _children;
+    List <JNodeView>      _jnodeViews;
     
     // Whether part is selected
     boolean              _selected;
@@ -38,13 +38,13 @@ public class JNodeView <JNODE extends JNode> extends ViewOwner {
 /**
  * Creates a SnapPart for a JNode.
  */
-public static JNodeView createSnapPart(JNode aNode)
+public static JNodeView createView(JNode aNode)
 {
     JNodeView np = null;
     if(aNode instanceof JFile) np = new JFileView();
-    else if(aNode instanceof JMemberDecl) np = JMemberDeclView.createSnapPart(aNode);
-    else if(aNode instanceof JStmt) np = JStmtView.createSnapPart(aNode);
-    else if(aNode instanceof JExpr) np = JExprView.createSnapPart(aNode);
+    else if(aNode instanceof JMemberDecl) np = JMemberDeclView.createView(aNode);
+    else if(aNode instanceof JStmt) np = JStmtView.createView(aNode);
+    else if(aNode instanceof JExpr) np = JExprView.createView(aNode);
     if(np==null) return null;
     np.setJNode(aNode);
     return np;
@@ -63,7 +63,7 @@ public void setJNode(JNODE aJNode)  { _jnode = aJNode; }
 /**
  * Returns the SnapCodeArea.
  */
-public SnapEditor getCodeArea()  { return getParent()!=null? getParent().getCodeArea() : null; }
+public SnapEditor getCodeArea()  { return getJNodeViewParent()!=null? getJNodeViewParent().getCodeArea() : null; }
 
 /**
  * Returns whether NodePane is a block.
@@ -73,53 +73,53 @@ public boolean isBlock()  { return getJNode().isBlock(); }
 /**
  * Returns the parent.
  */
-public JNodeView getParent()  { return _parent; }
+public JNodeView getJNodeViewParent()  { return _parent; }
 
 /**
  * Returns the ancestor of given class.
  */
 public <T> T getAncestor(Class <T> aClass)
 {
-    for(JNodeView p=_parent;p!=null;p=p.getParent()) if(aClass.isInstance(p)) return (T)p;
+    for(JNodeView p=_parent;p!=null;p=p.getJNodeViewParent()) if(aClass.isInstance(p)) return (T)p;
     return null;
 }
 
 /**
  * Returns the number of children.
  */
-public int getChildCount()  { return _children!=null? _children.size() : 0; }
+public int getJNodeViewCount()  { return _jnodeViews!=null? _jnodeViews.size() : 0; }
 
 /**
  * Returns the individual child.
  */
-public JNodeView getChild(int anIndex)  { return _children.get(anIndex); }
+public JNodeView getJNodeView(int anIndex)  { return _jnodeViews.get(anIndex); }
 
 /**
  * Returns the individual child.
  */
-public JNodeView getChildLast()  { int cc = getChildCount(); return cc>0? _children.get(cc-1) : null; }
+public JNodeView getJNodeViewLast()  { int cc = getJNodeViewCount(); return cc>0? _jnodeViews.get(cc-1) : null; }
 
 /**
  * Returns the children.
  */
-public List <JNodeView> getChildren()
+public List <JNodeView> getJNodeViews()
 {
-    if(_children==null) {
-        _children = createChildren(); for(JNodeView child : _children) child._parent = this; }
-    return _children;
+    if(_jnodeViews==null) {
+        _jnodeViews = createJNodeViews(); for(JNodeView child : _jnodeViews) child._parent = this; }
+    return _jnodeViews;
 }
 
 /**
  * Creates the children.
  */
-protected List <JNodeView> createChildren()
+protected List <JNodeView> createJNodeViews()
 {
     if(!isBlock()) return _noChildren;
     
     List <JNodeView> children = new ArrayList();
     JNode node = getJNode();
     if(node.getBlock()!=null) for(JStmt stmt : node.getBlock().getStatements()) {
-        JNodeView mcnp = createSnapPart(stmt); if(mcnp==null) continue;
+        JNodeView mcnp = createView(stmt); if(mcnp==null) continue;
         children.add(mcnp);
     }
     return children;
@@ -158,11 +158,11 @@ public double getHeight()  { return getUI().getHeight(); }
 /**
  * Returns the SnapPart of a node.
  */
-public static JNodeView getSnapPart(View aView)
+public static JNodeView getJNodeView(View aView)
 {
     if(aView==null) return null;
     ViewOwner o = aView.getOwner();
-    return o instanceof JNodeView? (JNodeView)o : getSnapPart(aView.getParent());
+    return o instanceof JNodeView? (JNodeView)o : getJNodeView(aView.getParent());
 }
 
 /**
@@ -190,7 +190,7 @@ protected View createUI()
     // Add child UI
     if(isBlock()) {
         _pane.getVBox();
-        for(JNodeView child : getChildren())
+        for(JNodeView child : getJNodeViews())
             _pane.getVBox().addChild(child.getUI());
     }
     

@@ -25,22 +25,22 @@ public void setJNode(JFile aJNode)
     super.setJNode(aJNode);
     
     // Reset children and their UI
-    _children = null;
+    _jnodeViews = null;
     _pane.getVBox().removeChildren();
-    for(JNodeView child : getChildren())
+    for(JNodeView child : getJNodeViews())
         _pane.getVBox().addChild(child.getUI());
 }
 
 /**
  * Override to return JFile child node owners.
  */
-protected List <JNodeView> createChildren()
+protected List <JNodeView> createJNodeViews()
 {
     List <JNodeView> children = new ArrayList();
     JFile jfile = getJNode();
     JClassDecl cdecl = jfile.getClassDecl(); if(cdecl==null) return children;
     for(JMemberDecl md : cdecl.getMemberDecls()) {
-        JNodeView mdp = JMemberDeclView.createSnapPart(md); if(mdp==null) continue;
+        JNodeView mdp = JMemberDeclView.createView(md); if(mdp==null) continue;
         children.add(mdp);
     }
     return children;

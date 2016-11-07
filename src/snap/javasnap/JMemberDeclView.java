@@ -10,7 +10,7 @@ public class JMemberDeclView <JNODE extends JMemberDecl> extends JNodeView <JNOD
 /**
  * Creates a SnapPart for a JNode.
  */
-public static JNodeView createSnapPart(JNode aNode)
+public static JNodeView createView(JNode aNode)
 {
     JNodeView np = null;
     if(aNode instanceof JConstrDecl) np = new ConstructorDecl();
@@ -55,9 +55,9 @@ public static class MethodDecl <JNODE extends JMethodDecl> extends JMemberDeclVi
      */
     protected void dropNode(JNode aNode, double anX, double aY)
     {
-        if(getChildCount()==0) getCodeArea().insertNode(getJNode(), aNode, 0);
-        else if(aY<getHeight()/2) getChild(0).dropNode(aNode, anX, 0);
-        else getChildLast().dropNode(aNode, anX, getChildLast().getHeight());
+        if(getJNodeViewCount()==0) getCodeArea().insertNode(getJNode(), aNode, 0);
+        else if(aY<getHeight()/2) getJNodeView(0).dropNode(aNode, anX, 0);
+        else getJNodeViewLast().dropNode(aNode, anX, getJNodeViewLast().getHeight());
     }
 }
 

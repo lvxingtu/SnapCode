@@ -165,7 +165,7 @@ private View createBlocksPane()
 protected JNodeView createSnapPartStmt(String aString)
 {
     JNode node = _stmtParser.parseCustom(aString, JNode.class);
-    return JNodeView.createSnapPart(node);
+    return JNodeView.createView(node);
 }
 
 /**
@@ -176,8 +176,8 @@ protected JNodeView getSnapPart(ParentView aPar, double anX, double aY)
     for(View child : aPar.getChildren()) {
         if(!child.isVisible()) continue;
         Point p = child.parentToLocal(anX, aY);
-        if(child.contains(p.getX(), p.getY()) && JNodeView.getSnapPart(child)!=null)
-            return JNodeView.getSnapPart(child);
+        if(child.contains(p.getX(), p.getY()) && JNodeView.getJNodeView(child)!=null)
+            return JNodeView.getJNodeView(child);
         if(child instanceof ParentView) { ParentView par = (ParentView)child;
             JNodeView no = getSnapPart(par, p.getX(), p.getY());
             if(no!=null)

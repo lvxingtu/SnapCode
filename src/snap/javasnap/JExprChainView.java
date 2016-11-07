@@ -11,11 +11,11 @@ public class JExprChainView <JNODE extends JExprChain> extends JExprView <JNODE>
 /**
  * Override to create children.
  */
-protected List <JNodeView> createChildren()
+protected List <JNodeView> createJNodeViews()
 {
     JExprChain echain = getJNode();
     List children = new ArrayList();
-    for(JExpr exp : echain.getExpressions()) { JExprView spe = createSnapPart(exp); children.add(spe); }
+    for(JExpr exp : echain.getExpressions()) { JExprView spe = createView(exp); children.add(spe); }
     return children;
 }
 
@@ -24,7 +24,7 @@ protected List <JNodeView> createChildren()
  */
 protected void configureHBox(HBox aHBox)
 {
-    for(JNodeView child : getChildren()) aHBox.addChild(child.getUI());
+    for(JNodeView child : getJNodeViews()) aHBox.addChild(child.getUI());
     for(View child : aHBox.getChildren()) child.setGrowWidth(true);
 }
 

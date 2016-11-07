@@ -167,7 +167,7 @@ void rebuildNodePath()
         label.setName("NodePathLabel"); label.setProp("SnapPart", part);
         if(part==spart) label.setFill(Color.LIGHTGRAY);
         _nodePathBox.addChild(label,0); label.setOwner(this); enableEvents(label, MouseRelease);
-        part = part.getParent(); if(part==null) break;
+        part = part.getJNodeViewParent(); if(part==null) break;
         Label div = new Label(" \u2022 "); div.setFont(Font.Arial12);
         _nodePathBox.addChild(div,0);
     }
@@ -245,6 +245,6 @@ public void redo()  { getJavaTextView().redo(); rebuildLater(); }
 /**
  * Escape.
  */
-public void escape()  { JNodeView par = getSelectedPart().getParent(); if(par!=null) setSelectedPart(par); }
+public void escape()  { JNodeView par = getSelectedPart().getJNodeViewParent(); if(par!=null) setSelectedPart(par); }
 
 }

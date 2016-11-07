@@ -11,7 +11,7 @@ public abstract class JExprView <JNODE extends JExpr> extends JNodeView <JNODE> 
 /**
  * Creates a SnapPart for a JNode.
  */
-public static JExprView createSnapPart(JNode aNode)
+public static JExprView createView(JNode aNode)
 {
     JExprView sp;
     if(aNode instanceof JExprMethodCall) sp = new JExprMethodCallView();
@@ -24,7 +24,7 @@ public static JExprView createSnapPart(JNode aNode)
 /**
  * Returns whether expression is in chain.
  */
-public boolean isChained()  { return getParent() instanceof JExprChainView; }
+public boolean isChained()  { return getJNodeViewParent() instanceof JExprChainView; }
 
 /**
  * Creates UI.
@@ -33,8 +33,8 @@ public View createUI()
 {
     JNodeViewBase pane = (JNodeViewBase)super.createUI(); pane.setPadding(0,2,2,4);
     
-    if(isChained()) { JNodeView par = getParent();
-        pane.setSeg(this==par.getChild(0)? Seg.First : this==par.getChildLast()? Seg.Last : Seg.Middle);
+    if(isChained()) { JNodeView par = getJNodeViewParent();
+        pane.setSeg(this==par.getJNodeView(0)? Seg.First : this==par.getJNodeViewLast()? Seg.Last : Seg.Middle);
         pane.setColor(PieceColor);
     }
 
@@ -46,7 +46,7 @@ public View createUI()
  */
 protected void dropNode(JNode aJNode, double anX, double aY)
 {
-    getParent().dropNode(aJNode, anX, aY);
+    getJNodeViewParent().dropNode(aJNode, anX, aY);
 }
 
 }

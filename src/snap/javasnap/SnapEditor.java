@@ -136,7 +136,7 @@ void setSelectedPartFromTextArea()
 public JNodeView getSnapPartAt(JNodeView aPart, int anIndex)
 {
     // Check children
-    List <JNodeView> children = aPart.getChildren();
+    List <JNodeView> children = aPart.getJNodeViews();
     for(JNodeView child : children) {
         JNodeView part = getSnapPartAt(child, anIndex);
         if(part!=null)
@@ -265,7 +265,7 @@ protected void processEvent(ViewEvent anEvent)
     if(anEvent.isMousePress()) {
         _mx = anEvent.getX(); _my = anEvent.getY();
         _mnode = ViewUtils.getDeepestChildAt(this, _mx, _my);
-        _mpart = JNodeView.getSnapPart(_mnode);
+        _mpart = JNodeView.getJNodeView(_mnode);
         if(_mpart==null) _mnode = null; else _mnode = _mpart.getUI();
         if(_mpart==_filePart) { setSelectedPart(null); _mpart = null; }
         setSelectedPart(_mpart);
@@ -282,7 +282,7 @@ protected void processEvent(ViewEvent anEvent)
     // Handle MouseReleased
     else if(anEvent.isMouseRelease()) {
         if(_mpart==null) return;
-        if(_mnode.getTransX()>150 && _mpart.getParent()!=null) removeNode(_mpart.getJNode());
+        if(_mnode.getTransX()>150 && _mpart.getJNodeViewParent()!=null) removeNode(_mpart.getJNode());
         _mnode.setTransX(0); _mnode.setTransY(0);
         _mnode = null;
     }

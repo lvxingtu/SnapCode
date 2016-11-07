@@ -10,7 +10,7 @@ public class JStmtView <JNODE extends JStmt> extends JNodeView <JNODE> {
 /**
  * Creates a SnapPart for a JNode.
  */
-public static JNodeView createSnapPart(JNode aNode)
+public static JNodeView createView(JNode aNode)
 {
     if(aNode instanceof JStmtExpr) return new JStmtExprView();
     if(aNode instanceof JStmtWhile) return new JStmtWhileView();
@@ -65,13 +65,13 @@ protected void dropNode(JNode aNode, double anX, double aY)
         getCodeArea().insertNode(getJNode(), aNode, 1);
     
     // If block but no children, insert inside statement
-    else if(getChildCount()==0)
+    else if(getJNodeViewCount()==0)
         getCodeArea().insertNode(getJNode(), aNode, 0);
     
     // If before first child statement, have first child dropNode, otherwise have last child dropNode 
     else if(aY<getHeight()/2)
-        getChild(0).dropNode(aNode, anX, 0);
-    else getChildLast().dropNode(aNode, anX, getChildLast().getHeight());
+        getJNodeView(0).dropNode(aNode, anX, 0);
+    else getJNodeViewLast().dropNode(aNode, anX, getJNodeViewLast().getHeight());
 }
     
 }
