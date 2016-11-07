@@ -9,20 +9,7 @@ public abstract class JExprView <JNODE extends JExpr> extends JNodeView <JNODE> 
 /**
  * Updates UI.
  */
-public void updateUI()
-{
-    super.updateUI(); setPadding(0,2,2,4);
-    
-    if(isChained()) { JNodeView par = getJNodeViewParent();
-        setSeg(this==par.getJNodeView(0)? Seg.First : this==par.getJNodeViewLast()? Seg.Last : Seg.Middle);
-        setColor(PieceColor);
-    }
-}
-
-/**
- * Returns whether expression is in chain.
- */
-public boolean isChained()  { return getJNodeViewParent() instanceof JExprChainView; }
+public void updateUI()  { super.updateUI(); getHBox().setPadding(0,2,2,2); }
 
 /**
  * Override to forward to parent.

@@ -125,7 +125,7 @@ public String getPartString()  { return getJNode().getNodeString(); }
 protected Label createLabel(String aString)
 {
     Label label = new Label(aString); label.setPadding(3,4,4,8);
-    label.setFont(new Font("Arial Bold", 11)); label.setTextFill(Color.WHITE);
+    label.setFont(new Font("Arial Bold", 12)); label.setTextFill(Color.WHITE);
     return label;
 }
 
@@ -134,8 +134,9 @@ protected Label createLabel(String aString)
  */
 protected TextField createTextField(String aString)
 {
-    TextField tfield = new TextField(); tfield.setText(aString);// tfield.setPadding(0,0,0,8);
-    tfield.setFont(new Font("Arial", 11)); tfield.setAlign(Pos.CENTER); //tfield.setRadius(8);
+    TextField tfield = new TextField(); tfield.setText(aString);
+    tfield.setFont(new Font("Arial", 11)); tfield.setAlign(Pos.CENTER);
+    tfield.setColumnCount(0); tfield.setMinWidth(36); tfield.setPrefHeight(18); tfield.setPadding(2,6,2,6);
     return tfield;
 }
 

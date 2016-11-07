@@ -15,6 +15,8 @@ protected void updateHBox(HBox aHBox)
 {
     for(JNodeView child : getJNodeViews()) aHBox.addChild(child);
     for(View child : aHBox.getChildren()) child.setGrowWidth(true);
+    getJNodeView(0).setSeg(Seg.First);
+    getJNodeViewLast().setSeg(Seg.Last);
 }
 
 /**

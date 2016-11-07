@@ -21,7 +21,7 @@ public class SupportPane extends ViewOwner {
     // The statement parser and expression parser
     Parser             _stmtParser = JavaParser.getShared().getStmtParser();
     Parser             _exprParser = JavaParser.getShared().getExprParser();
-
+    
 /**
  * Returns the editor pane.
  */
@@ -127,7 +127,7 @@ private View createMethodsPane()
 {
     // Create vertical box
     VBox pane = new VBox(); pane.setPadding(20,20,20,20); pane.setSpacing(16);
-    pane.setGrowWidth(true); pane.setGrowHeight(true); pane.setFill(Color.GRAY); //pane.setBorder(bevel);
+    pane.setGrowWidth(true); pane.setGrowHeight(true); pane.setFill(JFileView.BACK_FILL); //pane.setBorder(bevel);
     
     // Wrap in ScrollView and return
     ScrollView spane = new ScrollView(pane); spane.setPrefWidth(200);
@@ -140,7 +140,7 @@ private View createMethodsPane()
 private View createBlocksPane()
 {
     VBox pane = new VBox(); pane.setPadding(20,20,20,20); pane.setSpacing(16);
-    pane.setGrowWidth(true); pane.setGrowHeight(true); pane.setFill(Color.GRAY); //pane.setBorder(bevel);
+    pane.setGrowWidth(true); pane.setGrowHeight(true); pane.setFill(JFileView.BACK_FILL); //pane.setBorder(bevel);
     
     // Add node for while(true)
     JNodeView ws = createSnapPartStmt("while(true) {\n}");

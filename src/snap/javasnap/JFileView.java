@@ -12,6 +12,9 @@ public class JFileView extends JNodeView <JFile> {
     // The SnapCodeArea
     SnapEditor       _codeArea;
 
+    // Background fill
+    static final Color    BACK_FILL = new Color("#B0B0B0");
+
 /**
  * Returns the SnapCodeArea.
  */
@@ -38,7 +41,7 @@ public void updateUI()
 {
     // Get pane and set Type=None
     super.updateUI(); setType(JNodeViewBase.Type.None);
-    setFill(Color.GRAY); setBorder(Color.LIGHTGRAY, 1); //Bevel
+    setFill(BACK_FILL); setBorder(Color.LIGHTGRAY, 1); //Bevel
     
     // Configure VBox special for file
     VBox vbox = getVBox(); vbox.setPadding(0,10,10,10); vbox.setSpacing(25);

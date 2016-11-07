@@ -19,7 +19,6 @@ protected void updateHBox(HBox theHBox)
     // Add init declaration text
     if(fs.getInitDecl()!=null) { JStmtVarDecl ivd = fs.getInitDecl(); String str = ivd.getString();
         TextField tfield = createTextField(str); tfield.setName("ExprText"); tfield.setProp("Expr", ivd);
-        tfield.setMinWidth(36); tfield.setPrefHeight(20); //tfield.setPrefColumnCount(str.length()*3/4);
         tfield.addEventHandler(e -> handleTextEvent(e));
         theHBox.addChild(tfield);
     }
@@ -27,7 +26,6 @@ protected void updateHBox(HBox theHBox)
     // Add conditional text
     if(fs.getConditional()!=null) { JExpr cond = fs.getConditional(); String str = cond.getString();
         TextField tfield = createTextField(str); tfield.setName("ExprText"); tfield.setProp("Expr", cond);
-        tfield.setMinWidth(36); tfield.setPrefHeight(20); //tfield.setPrefColumnCount(str.length());
         tfield.addEventHandler(e -> handleTextEvent(e));
         theHBox.addChild(tfield);
     }
@@ -36,7 +34,6 @@ protected void updateHBox(HBox theHBox)
     if(fs.getUpdateStmts()!=null && fs.getUpdateStmts().size()>0) {
         JStmtExpr se = fs.getUpdateStmts().get(0); String str = se.getString();
         TextField tfield = createTextField(str); tfield.setName("ExprText"); tfield.setProp("Expr", se);
-        tfield.setMinWidth(36); tfield.setPrefHeight(20); //tfield.setPrefColumnCount(str.length());
         tfield.addEventHandler(e -> handleTextEvent(e));
         theHBox.addChild(tfield);
     }

@@ -6,7 +6,7 @@ import snap.view.*;
  * A SnapPart subclass for JMethodDecl.
  */
 public class JMemberDeclView <JNODE extends JMemberDecl> extends JNodeView <JNODE> {
-
+    
 /**
  * Creates a SnapPart for a JNode.
  */
@@ -36,7 +36,7 @@ public static class MethodDecl <JNODE extends JMethodDecl> extends JMemberDeclVi
     protected void updateHBox(HBox spane)
     {
         JMethodDecl md = getJNode();
-        Label label = createLabel(md.getName());
+        Label label = createLabel(md.getName()); label.setFont(label.getFont().deriveFont(14));
         spane.addChild(label);
     }
     

@@ -32,7 +32,7 @@ protected void updateHBox(HBox aHBox)
     JExpr expr = getJNode(); String str = expr.getString();
     
     // Create text field, configure and return
-    _tfield = createTextField(str); _tfield.setName(TextFieldName); _tfield.setPrefHeight(18);
+    _tfield = createTextField(str); _tfield.setName(TextFieldName);
     _tfield.addEventHandler(e -> handleTextEvent(e), KeyRelease); //enableEvents(_tfield, DragEvents);
     aHBox.addChild(_tfield);
 }
