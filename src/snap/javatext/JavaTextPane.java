@@ -151,10 +151,9 @@ public void respondUI(ViewEvent anEvent)
         }
         
         // Handle KeyTyped: If PopupList not visible, ActivatePopupList
-        else if(anEvent.isKeyType()) { char ch = anEvent.getKeyChar();
+        else if(anEvent.isKeyType()) {
             if(getPopup().isShowing() || anEvent.isShortcutDown()) return;
-            if(ch==KeyCode.CHAR_UNDEFINED) return;
-            if(Character.isISOControl(ch)) return;
+            if(anEvent.isControlChar() || anEvent.isSpaceKey()) return;
             runLater(() -> getTextView().activatePopupList());
         }
         
