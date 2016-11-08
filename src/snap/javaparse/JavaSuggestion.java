@@ -240,10 +240,18 @@ private static JVarDecl getVarDeclForInitializer(JNode aNode)
  */
 private static final boolean isRecivingClassAssignable(JavaDecl aJD, Class aRC, ClassLoader aCldr)
 {
-    if(aRC==null || aJD.isPackage()) return false;
-    String tname = aJD.getTypeName(); if(tname==null) return false;
-    Class tcls = ClassUtils.getClass(tname, aCldr); if(tcls==null) return false;
-    return ClassUtils.isAssignable(aRC, tcls); //aRC.isAssignableFrom(tcls);
+    return getRecivingClassAssignableScore(aJD, aRC, aCldr)>0;
+}
+    
+/**
+ * Returns whether suggestion is receiving class.
+ */
+private static final int getRecivingClassAssignableScore(JavaDecl aJD, Class aRC, ClassLoader aCldr)
+{
+    if(aRC==null || aJD.isPackage()) return 0;
+    String tname = aJD.getTypeName(); if(tname==null) return 0;
+    Class tcls = ClassUtils.getClass(tname, aCldr); if(tcls==null) return 0;
+    return aRC==tcls? 2 : ClassUtils.isAssignable(aRC, tcls)? 1 : 0;
 }
     
 /**
@@ -261,9 +269,9 @@ private static class DeclCompare implements Comparator<JavaDecl> {
     public int compare(JavaDecl o1, JavaDecl o2)
     {
         // Get whether either suggestion is of Assignable to ReceivingClass
-        boolean rca1 = isRecivingClassAssignable(o1, _rclass, _cldr);
-        boolean rca2 = isRecivingClassAssignable(o2, _rclass, _cldr);
-        if(rca1!=rca2) return rca1? -1 : 1;
+        int rca1 = getRecivingClassAssignableScore(o1, _rclass, _cldr);
+        int rca2 = getRecivingClassAssignableScore(o2, _rclass, _cldr);
+        if(rca1!=rca2) return rca1>rca2? -1 : 1;
                 
         // If Suggestion Types differ, return by type
         if(o1.getType()!=o2.getType()) return getOrder(o1.getType())< getOrder(o2.getType())? -1 : 1;

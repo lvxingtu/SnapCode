@@ -272,7 +272,10 @@ private static String COMMON_CLASS_NAMES_SIMPLE[], COMMON_CLASS_NAMES[] = {
     "java.util.Collections", "java.util.Date", "java.util.HashMap", "java.util.HashSet", "java.util.Hashtable",
     "java.util.Map", "java.util.Random", "java.util.Scanner", "java.util.Stack", "java.util.Timer",
     "java.util.Vector",
-    "java.io.File"
+    "java.io.File",
+    "snap.gfx.Border", "snap.gfx.Color", "snap.gfx.Font", 
+    "snap.view.Button", "snap.view.Label", "snap.view.View", "snap.view.ViewOwner",
+    "snap.viewx.ScanPane"
 };
 
 }
