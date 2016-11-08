@@ -1,6 +1,5 @@
 package snap.javasnap;
 import snap.javaparse.*;
-import snap.javasnap.JNodeViewBase.Seg;
 import snap.view.*;
 
 /**
