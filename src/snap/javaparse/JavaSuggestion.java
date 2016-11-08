@@ -4,6 +4,7 @@
 package snap.javaparse;
 import java.lang.reflect.*;
 import java.util.*;
+import java.util.stream.Collectors;
 import snap.util.*;
 
 /**
@@ -25,37 +26,42 @@ public static JavaDecl[] getSuggestions(JNode aNode)
     else if(aNode instanceof JExprId)
         getSuggestions((JExprId)aNode, list);
     
-    // Sort list and return
-    Class reccls = getReceivingClass(aNode);
+    // Get receiving class and, if 2 letters or less, filter out suggestions that don't apply (unless none do)
+    Class reccls = getReceivingClass(aNode); ClassLoader cldr = aNode.getClassLoader();
+    if(reccls!=null && list.size()>10 && aNode.getName().length()<=2) {
+        List l2 = list.stream().filter(p -> isRecivingClassAssignable(p, reccls, cldr)).collect(Collectors.toList());
+        if(l2.size()>0) list = l2;
+    }
+        
+    // Get array and sort
     JavaDecl decls[] = list.toArray(new JavaDecl[0]);
-    Arrays.sort(decls, new DeclCompare(aNode.getClassLoader(), reccls));
+    Arrays.sort(decls, new DeclCompare(reccls, cldr));
     return decls;
 }
 
 /**
- * Override to add suggestions for JavaType.
+ * Find suggestions for JType.
  */
 private static void getSuggestions(JType aJType, List <JavaDecl> theSuggestions)
 {
     ClassPathInfo cpinfo = ClassPathInfo.get(aJType);
-    String name = aJType.getName();
-    if(name!=null) {
-        List <String> cnames = cpinfo.getAllClassNames(name);
-        for(String cname : cnames) {
-            if(aJType.getParent() instanceof JExprAlloc) {
-                Class cls = cpinfo.getClass(cname);
-                if(cls==null || !Modifier.isPublic(cls.getModifiers())) continue;
-                Constructor cstrs[] = null; try { cstrs = cls.getConstructors(); } catch(Throwable t) { }
-                if(cstrs!=null) for(Constructor cstr : cstrs)
-                    theSuggestions.add(new JavaDecl(cstr));
-            }
-            else theSuggestions.add(new JavaDecl(cname, null, null, null));
+    String prefix = aJType.getName();
+
+    List <String> cnames = prefix.length()>3? cpinfo.getAllClassNames(prefix) : cpinfo.getCommonClassNames(prefix);
+    for(String cname : cnames) {
+        if(aJType.getParent() instanceof JExprAlloc) {
+            Class cls = cpinfo.getClass(cname);
+            if(cls==null || !Modifier.isPublic(cls.getModifiers())) continue;
+            Constructor cstrs[] = null; try { cstrs = cls.getConstructors(); } catch(Throwable t) { }
+            if(cstrs!=null) for(Constructor cstr : cstrs)
+                theSuggestions.add(new JavaDecl(cstr));
         }
+        else theSuggestions.add(new JavaDecl(cname, null, null, null));
     }
 }
 
 /**
- * Override to add suggestions for JIdentifier.
+ * Find suggestions for JExprId.
  */
 private static void getSuggestions(JExprId anId, List <JavaDecl> theSuggestions)
 {
@@ -106,8 +112,8 @@ private static void getSuggestions(JExprId anId, List <JavaDecl> theSuggestions)
             ecd = ecd.getEnclosingClassDecl(); ec = ecd!=null? ecd.getJClass() : null;
         }
 
-        // Add classes with prefix that are public
-        List <String> cnames = cpinfo.getAllClassNames(prefix);
+        // If starts with upper case or is greater than 3 chars, add classes with prefix that are public
+        List <String> cnames = prefix.length()>3? cpinfo.getAllClassNames(prefix) : cpinfo.getCommonClassNames(prefix);
         for(String cname : cnames) {
             Class cls = cpinfo.getClass(cname);
             if(cls==null || !Modifier.isPublic(cls.getModifiers())) continue;
@@ -214,26 +220,37 @@ private static JVarDecl getVarDeclForInitializer(JNode aNode)
 }
 
 /**
+ * Returns whether suggestion is receiving class.
+ */
+private static final boolean isRecivingClassAssignable(JavaDecl aJD, Class aRC, ClassLoader aCldr)
+{
+    if(aRC==null || aJD.isPackage()) return false;
+    String tname = aJD.getTypeName(); if(tname==null) return false;
+    Class tcls = ClassUtils.getClass(tname, aCldr); if(tcls==null) return false;
+    return aRC.isAssignableFrom(tcls);
+}
+    
+/**
  * A Comparator to sort JavaDecls.
  */
 private static class DeclCompare implements Comparator<JavaDecl> {
 
-    // The ClassLoader and the class type of node
-    ClassLoader _cldr; Class _rclass = null;
+    // The receiving class for suggestions and ClassLoader
+    Class _rclass = null; ClassLoader _cldr;
     
     /** Creates a DeclCompare. */
-    DeclCompare(ClassLoader aClassLoader, Class aRC)  { _cldr = aClassLoader; _rclass = aRC; }
+    DeclCompare(Class aRC, ClassLoader aClassLoader)  { _rclass = aRC; _cldr = aClassLoader; }
 
     /** Standard compare to method.  */
     public int compare(JavaDecl o1, JavaDecl o2)
     {
         // Get whether either suggestion is of Assignable to ReceivingClass
-        boolean rca1 = isRecivingClassAssignable(o1);
-        boolean rca2 = isRecivingClassAssignable(o2);
+        boolean rca1 = isRecivingClassAssignable(o1, _rclass, _cldr);
+        boolean rca2 = isRecivingClassAssignable(o2, _rclass, _cldr);
         if(rca1!=rca2) return rca1? -1 : 1;
                 
         // If Suggestion Types differ, return by type
-        if(o1.getType()!=o2.getType()) return o1.getType().ordinal()<o2.getType().ordinal()? -1 : 1;
+        if(o1.getType()!=o2.getType()) return getOrder(o1.getType())< getOrder(o2.getType())? -1 : 1;
         
         // If either is member class, sort other first
         if(o1.isMemberClass()!=o2.isMemberClass()) return o2.isMemberClass()? -1 : 1; 
@@ -254,13 +271,11 @@ private static class DeclCompare implements Comparator<JavaDecl> {
         return o1.getFullName().compareToIgnoreCase(o2.getFullName());
     }
 
-    /** Returns whether suggestion is receiving class. */
-    private boolean isRecivingClassAssignable(JavaDecl aJD)
+    /** Returns the type order. */
+    public static final int getOrder(JavaDecl.Type aType)
     {
-        if(_rclass==null || aJD.isPackage()) return false;
-        String tname = aJD.getTypeName(); if(tname==null) return false;
-        Class tcls = ClassUtils.getClass(tname, _cldr); if(tcls==null) return false;
-        return _rclass.isAssignableFrom(tcls);
+        switch(aType) { case VarDecl: return 0; case Field: return 1; case Method: return 2; case Class: return 3;
+            case Package: return 4; default: return 5; }
     }
 }
 

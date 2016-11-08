@@ -65,7 +65,8 @@ public JavaDecl(Field aField)
  */
 public JavaDecl(Constructor aConstr)
 {
-    _type = Type.Constructor; _name = _cname = aConstr.getName(); _sname = aConstr.getDeclaringClass().getSimpleName();
+    _type = Type.Constructor; _name = _cname = _tname = aConstr.getName();
+    _sname = aConstr.getDeclaringClass().getSimpleName();
     _argTypeNames = new String[aConstr.getParameterCount()];
     
     // Get GenericParameterTypes and names (this can fail https://bugs.openjdk.java.net/browse/JDK-8075483))
@@ -102,7 +103,7 @@ public JavaDecl(String aClsName, String aMmbrName, String aTypeName, String theM
     
     // Handle Constructor
     else if(aClsName!=null && (aMmbrName==null || aMmbrName.equals("<init>")) && theMmbrTypes!=null) {
-        _type = Type.Constructor; _cname = _name = aClsName; _argTypeNames = theMmbrTypes;
+        _type = Type.Constructor; _cname = _name = _tname = aClsName; _argTypeNames = theMmbrTypes;
         _sname = getSimpleName(aClsName);
     }
     

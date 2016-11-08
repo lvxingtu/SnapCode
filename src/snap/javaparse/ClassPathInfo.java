@@ -104,6 +104,25 @@ private List <String> getClassNames(List <WebFile> theFiles)
 }
 
 /**
+ * Returns all classes with prefix.
+ */
+public List <String> getCommonClassNames(String aPrefix)
+{
+    String prefix = aPrefix.toLowerCase();
+    String ccn[] = COMMON_CLASS_NAMES, ccns[] = COMMON_CLASS_NAMES_SIMPLE;
+    
+    // Initialize COMMON_CLASS_NAMES_SIMPLE
+    if(ccns==null) {
+        ccns = COMMON_CLASS_NAMES_SIMPLE = new String[ccn.length];
+        for(int i=0;i<ccn.length;i++) { String str = ccn[i];
+            int ind = str.lastIndexOf('.'); ccns[i] = str.substring(ind+1).toLowerCase(); } }
+            
+    List list = new ArrayList();
+    for(int i=0,iMax=ccn.length;i<iMax;i++) if(ccns[i].startsWith(prefix)) list.add(ccn[i]);
+    return list;
+}
+
+/**
  * Returns packages for entries list.
  */
 private List <String> getPackageNames(List <WebFile> theFiles)
@@ -240,5 +259,20 @@ public static ClassPathInfo get(WebSite aSite)
     }
     return cpinfo;
 }
+
+/**
+ * Returns a list of common class names.
+ */
+private static String COMMON_CLASS_NAMES_SIMPLE[], COMMON_CLASS_NAMES[] = {
+    "java.lang.Boolean", "java.lang.Byte", "java.lang.Character", "java.lang.Class", "java.lang.Double",
+    "java.lang.Enum", "java.lang.Float", "java.lang.Integer", "java.lang.Long", "java.lang.Math", "java.lang.Number",
+    "java.lang.Object", "java.lang.String", "java.lang.StringBuffer", "java.lang.StringBuilder", "java.lang.System",
+    "java.lang.Thread",
+    "java.util.List", "java.util.Map", "java.util.Set", "java.util.ArrayList", "java.util.Arrays",
+    "java.util.Collections", "java.util.Date", "java.util.HashMap", "java.util.HashSet", "java.util.Hashtable",
+    "java.util.Map", "java.util.Random", "java.util.Scanner", "java.util.Stack", "java.util.Timer",
+    "java.util.Vector",
+    "java.io.File"
+};
 
 }
