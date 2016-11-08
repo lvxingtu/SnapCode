@@ -151,6 +151,22 @@ private static Class getReceivingClass(JNode aNode)
     JVarDecl vd = getVarDeclForInitializer(aNode);
     if(vd!=null)
         return vd.getJClass();
+        
+    // If node is JExprMath, return op class
+    JExprMath me = aNode.getParent(JExprMath.class);
+    if(me!=null) {
+        switch(me.getOp()) { case Or: case And: case Not: return Boolean.class; }
+        return Double.class;
+    }
+    
+    // If node is expression and top parent is conditional statement, return boolean
+    JExpr exp = aNode instanceof JExpr? (JExpr)aNode : aNode.getParent(JExpr.class);
+    if(exp!=null) {
+        while(exp.getParent() instanceof JExpr) exp = (JExpr)exp.getParent();
+        JNode par = exp.getParent();
+        if(par instanceof JStmtIf || par instanceof JStmtWhile || par instanceof JStmtDo)
+            return Boolean.class;
+    }
 
     // Return null since no assignment type found for class
     return null;
@@ -227,7 +243,7 @@ private static final boolean isRecivingClassAssignable(JavaDecl aJD, Class aRC, 
     if(aRC==null || aJD.isPackage()) return false;
     String tname = aJD.getTypeName(); if(tname==null) return false;
     Class tcls = ClassUtils.getClass(tname, aCldr); if(tcls==null) return false;
-    return aRC.isAssignableFrom(tcls);
+    return ClassUtils.isAssignable(aRC, tcls); //aRC.isAssignableFrom(tcls);
 }
     
 /**
