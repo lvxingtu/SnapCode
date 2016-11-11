@@ -28,7 +28,7 @@ public class DiffPage extends WebPage {
 protected View createUI()
 {
     _splitView = new SplitView();
-    ScrollView spane = new ScrollView(_splitView); spane.setFitWidth(true);
+    ScrollView spane = new ScrollView(_splitView); spane.setFillWidth(true);
     return spane;
 }
 

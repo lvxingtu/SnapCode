@@ -68,7 +68,7 @@ protected View createUI()
     
     // Add Horizontal browser UI
     _hbox = new HBox(); _hbox.setPrefHeight(300); _hbox.setFillHeight(true);
-    ScrollView spane = new ScrollView(_hbox); spane.setPrefHeight(300); spane.setFitHeight(true);
+    ScrollView spane = new ScrollView(_hbox); spane.setPrefHeight(300); spane.setFillHeight(true);
     
     // Add content view and return UI
     _topSplit.addItem(spane);
