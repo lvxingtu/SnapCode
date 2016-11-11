@@ -25,7 +25,7 @@ public class JavaPopupList extends PopupList <JavaDecl> implements PropChangeLis
 public JavaPopupList(JavaTextView aJavaTextView)
 {
     _textView = aJavaTextView;
-    setPrefWidth(500);
+    setPrefWidth(500); setVisRowCount(15);
 }
 
 /**
@@ -127,11 +127,6 @@ public void setItems(List <JavaDecl> theItems)
     if(theItems!=null && theItems.size()>0)
         setSelectedIndex(0);
 }
-
-/**
- * Override to limit pref height.
- */
-public double getScrollPrefHeight()  { return getRowHeight()*15; }
 
 /**
  * Override to configure cells.
