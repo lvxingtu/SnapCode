@@ -4,10 +4,10 @@
     <LineBorder Color="#666666" />
     <fill type="gradient" roll="90" color="#85b5e6" color2="#426fa3" color3="#85b5e6" stop2="0.5" nstops="3" />
   </RectView>
-  <PathView Name="HomeButton" x="4" y="2" width="36" height="36">
+  <PathView Name="HomeButton" x="6" y="5" width="36" height="36">
     <LineBorder />
     <color value="#ff67b0" />
-    <effect type="emboss" radius="5" />
+    <effect type="emboss" radius="4" />
     <path>
       <mv x="258" y="463" />
       <ln x="258" y="476" />
@@ -30,7 +30,7 @@
       <cl />
     </path>
   </PathView>
-  <PathView Name="BackButton" x="46" y="2" width="36" height="36">
+  <PathView Name="BackButton" x="48" y="5" width="36" height="36">
     <LineBorder />
     <fill type="image" resource="484300717" />
     <effect type="emboss" radius="5" />
@@ -45,7 +45,23 @@
       <cl />
     </path>
   </PathView>
-  <PathView Name="RefreshButton" x="130" y="2" width="36" height="36">
+  <PathView Name="NextButton" x="90" y="5" width="36" height="36">
+    <LineBorder />
+    <fill type="image" resource="484300717" />
+    <effect type="emboss" radius="5" />
+    <path>
+      <mv x="4.747" y="-16" />
+      <ln x="3.987" y="-3.784" />
+      <ln x="-15" y="-3.066" />
+      <ln x="-15" y="12.982" />
+      <ln x="6.013" y="12.743" />
+      <ln x="6.013" y="24" />
+      <ln x="25" y="4.359" />
+      <ln x="4.747" y="-16" />
+      <cl />
+    </path>
+  </PathView>
+  <PathView Name="RefreshButton" x="132" y="5" width="36" height="36">
     <LineBorder />
     <color value="#9eceff" />
     <effect type="emboss" radius="6" />
@@ -69,7 +85,7 @@
       <cl />
     </path>
   </PathView>
-  <PathView Name="RunButton" x="172" y="2" width="36" height="36">
+  <PathView Name="RunButton" x="174" y="5" width="36" height="36">
     <LineBorder />
     <color value="#2aff4b" />
     <effect type="emboss" radius="6" />
@@ -80,23 +96,7 @@
       <cl />
     </path>
   </PathView>
-  <PathView Name="NextButton" x="88" y="2" width="36" height="36">
-    <LineBorder />
-    <fill type="image" resource="484300717" />
-    <effect type="emboss" radius="5" />
-    <path>
-      <mv x="4.747" y="-16" />
-      <ln x="3.987" y="-3.784" />
-      <ln x="-15" y="-3.066" />
-      <ln x="-15" y="12.982" />
-      <ln x="6.013" y="12.743" />
-      <ln x="6.013" y="24" />
-      <ln x="25" y="4.359" />
-      <ln x="4.747" y="-16" />
-      <cl />
-    </path>
-  </PathView>
-  <TextField Name="SearchText" x="293" y="18" width="200" height="22" LeanX="RIGHT">
+  <TextField Name="SearchText" x="293" y="16" width="200" height="22" LeanX="RIGHT" Radius="8">
     <font name="Arial" size="12" />
   </TextField>
   <resource name="484300717" rm-byte-encoding="Ascii85">

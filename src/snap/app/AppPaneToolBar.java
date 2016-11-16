@@ -146,10 +146,9 @@ protected View createUI()
     SpringView uin = (SpringView)super.createUI();
     
     // Add MenuButton
-    MenuButton menuButton = new MenuButton(); menuButton.setName("RunMenuButton");
-    menuButton.setBounds(210,24,18,16); menuButton.setMinSize(18,16); menuButton.setPrefSize(18,16);
-    menuButton.setItems(getRunMenuButtonItems());
-    uin.addChild(menuButton);
+    MenuButton mbtn = new MenuButton(); mbtn.setName("RunMenuButton"); mbtn.setBounds(207,29,15,14);
+    mbtn.setItems(getRunMenuButtonItems()); mbtn.getGraphicAfter().setPadding(0,0,0,0);
+    uin.addChild(mbtn);
     
     // Add FileTabsPane pane
     _fileTabsPane = new HBox(); _fileTabsPane.setSpacing(4); _fileTabsPane.setPadding(4,0,0,4);
