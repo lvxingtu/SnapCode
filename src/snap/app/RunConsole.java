@@ -90,9 +90,15 @@ void appendString(String aStr, Color aColor)
  */
 String getLink(String aPrefix, String linkedText)
 {
+    // Get start/end of full class path for .java
     int start = aPrefix.indexOf("at "); if(start<0) return "/Unknown"; start += 3;
-    int end = aPrefix.indexOf('$'); if(end<0) end = aPrefix.lastIndexOf('.'); if(end<0) end = aPrefix.length() - 1;
-    String path = aPrefix.substring(start, end); path = '/' + path.replace('.', '/') + ".java";
+    int end = aPrefix.indexOf('$');
+    if(end<start) end = aPrefix.lastIndexOf('.');
+    if(end<start) end = aPrefix.length() - 1;
+
+    // Create link from path and return
+    String path = aPrefix.substring(start, end);
+    path = '/' + path.replace('.', '/') + ".java";
     path = getSourceURL(path);
     String lineStr = linkedText.substring(linkedText.indexOf(":") + 1);
     int line = SnapUtils.intValue(lineStr); if(line>0) path += "#LineNumber=" + line;
