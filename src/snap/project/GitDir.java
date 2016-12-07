@@ -576,13 +576,17 @@ public class GitFileSite extends WebSite {
         return file;
     }
     
-    /** Get file from directory. */
-    protected List <FileHeader> getFileHeaders(String aPath) throws Exception
+    /** Returns file content (bytes for file, FileHeaders for dir). */
+    protected Object getFileContent(String aPath) throws Exception
     {
         // Get root tree and look for file
-        GitFile gfile = getTree().getFile(aPath); if(gfile==null || !gfile.isDir()) return null;
-    
-        // Walk RevTree and get files for children
+        GitFile gfile = getTree().getFile(aPath); if(gfile==null) return null;
+        
+        // Handle plain file
+        if(!gfile.isDir())
+            return gfile.getBytes();
+            
+        // Handle directory: Walk RevTree and get files for children
         List <FileHeader> files = new ArrayList();
         for(GitFile gf : gfile.getFiles()) {
             FileHeader child = getFileHeader(gf.getPath());
@@ -591,13 +595,6 @@ public class GitFileSite extends WebSite {
         
         // Return files
         return files;
-    }
-    
-    /** Return file bytes. */
-    protected byte[] getFileBytes(String aPath) throws Exception
-    {
-        GitFile gfile = getTree().getFile(aPath); if(gfile==null) return null;
-        return gfile.getBytes();
     }
 }
 
@@ -618,11 +615,17 @@ protected class GitIndexSite extends WebSite {
         return file;
     }
     
-    /** Get file headers for directory path files. */
-    protected List <FileHeader> getFileHeaders(String aPath) throws Exception
+    /** Returns file content (bytes for file, FileHeaders for dir). */
+    protected Object getFileContent(String aPath) throws Exception
     {
-        // Get GitIndex.Entry for path and iterate over Entry.Entries (children)
-        GitIndex.Entry entry = getIndex().getEntry(aPath); if(entry==null || !entry.isDir()) return null;
+        // Get entry
+        GitIndex.Entry entry = getIndex().getEntry(aPath); if(entry==null) return null;
+        
+        // Handle plain file
+        if(!entry.isDir())
+            return entry.getBytes();
+        
+        // Handle directory
         List <FileHeader> files = new ArrayList(); String lastPath = "";
         for(GitIndex.Entry child : entry.getEntries()) {
             FileHeader file = getFileHeader(child.getPath());
@@ -631,13 +634,6 @@ protected class GitIndexSite extends WebSite {
         
         // Return files
         return files;
-    }
-    
-    /** Return file bytes. */
-    protected byte[] getFileBytes(String aPath) throws Exception
-    {
-        GitIndex.Entry entry = getIndex().getEntry(aPath); if(entry==null || entry.isDir()) return null;
-        return entry.getBytes();
     }
 }
 
