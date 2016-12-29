@@ -12,8 +12,8 @@ jar cmf MANIFEST.MF AppLoader.jar snap/app/AppLoader*.class
 cd ..
 
 echo "Creating SnapCode package"
-export JAVA_HOME="/Library/Java/JavaVirtualMachines/jdk1.8.0_60.jdk/Contents/Home"
-$JAVA_HOME/bin/javapackager -deploy -native image -Bruntime=$JAVA_HOME -Bmac.signing-key-developer-id-app="Developer ID Application: ReportMill Software" \
+export JAVA_HOME="/Library/Java/JavaVirtualMachines/jdk1.8.0_111.jdk/Contents/Home"
+$JAVA_HOME/bin/javapackager -deploy -native image -Bruntime=$JAVA_HOME \
 -outdir bin/SnapApp -outfile SnapCode -name SnapCode \
 -appclass snap.app.AppLoader -v -srcdir bin \
 -srcfiles AppLoader.jar:SnapCode1.jar:jgit.jar:jsch.jar:tools.jar:spell.jar:BuildInfo.txt \
@@ -24,9 +24,7 @@ cp $JAVA_HOME/jre/bin/java bin/SnapApp/bundles/SnapCode.app/Contents/PlugIns/Jav
 
 echo "Running codesign"
 cd bin/SnapApp/bundles
-codesign -f -s "Developer ID Application: ReportMill Software" SnapCode.app/Contents/PlugIns/Java.runtime/Contents/Home/jre/bin/java
-codesign -f -s "Developer ID Application: ReportMill Software" SnapCode.app/Contents/PlugIns/Java.runtime
-codesign -f -s "Developer ID Application: ReportMill Software" SnapCode.app
+codesign -f --deep -s "Developer ID Application: ReportMill Software" SnapCode.app
 
 echo "Codesign Verify"
 codesign --verify --verbose=4 SnapCode.app
