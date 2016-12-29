@@ -6,6 +6,7 @@ import snap.javaparse.JavaData;
 import snap.javaparse.JavaDecl;
 import snap.project.*;
 import snap.util.*;
+import snap.view.DialogBox;
 import snap.web.*;
 
 /**
@@ -67,6 +68,10 @@ public void runFile(AppPane anAppPane, RunConfig aConfig, WebFile aFile, boolean
     // If TeaVM (links against jar and activates TVViewEnv), generate tea files and open in browser
     if(isTeaVM(_proj, aFile)) {
         runTea(anAppPane); return; }
+        
+    // If HTML
+    if(isTeaHTML(_proj, aFile)) {
+        runTeaHTML(aFile); return; }
     
     // Run/debug file
     if(isDebug) debugApp(anAppPane);
@@ -227,18 +232,7 @@ public void teaExited()
 {
     WebURL html = WebURL.getURL(_proj.getClassPath().getBuildPathAbsolute() + "/tea/index.html");
     WebFile htmlFile = html.getFile();
-    if(htmlFile==null) {
-        htmlFile = html.createFile(false);
-        String s1 = "<!DOCTYPE html>\n<html>\n<head>\n<title>SnapTea</title>\n";
-        String s2 = "<meta http-equiv=\"Content-Type\" content=\"text/html;charset=utf-8\">\n";
-        String s3 = "<script type=\"text/javascript\" charset=\"utf-8\" src=\"runtime.js\"></script>\n";
-        String s4 = "<script type=\"text/javascript\" charset=\"utf-8\" src=\"classes.js\"></script>\n";
-        String s5 = "</head>\n<body onload=\"main()\">\n";
-        String s6 = "";//"<canvas id=\"myCanvas\" width=\"800\" height=\"600\" style=\"border:1px solid #999999;\"></canvas>\n";
-        String s7 = "</body>\n</html>";
-        htmlFile.setText(s1+s2+s3+s4+s5+s6+s7);
-        htmlFile.save();
-    }
+    if(htmlFile==null) htmlFile = getHTMLIndexFile();
     snap.gfx.GFXEnv.getEnv().openFile(htmlFile.getStandardFile());
 }
 
@@ -287,6 +281,87 @@ private void updateTeaFiles(WebFile aFile)
  * Returns whether given file is a resource file.
  */
 public boolean isResourceFile(WebFile aFile)  { return !aFile.getType().equals("java"); }
+
+/**
+ * Returns whether this is TeaVM launch.
+ */
+public boolean isTeaHTML(Project aProj, WebFile aFile)
+{
+    // If class path doesn't include TeaVM jar, return false
+    String cpath = FilePathUtils.getJoinedPath(aProj.getProjectSet().getLibPaths());
+    if(!cpath.contains("teavm-")) return false;
+    
+    // If main class contains TVViewEnv, return true
+    return aFile.getType().equals("html") || aFile.getType().equals("snp");
+}
+
+/**
+ * Runs the provided file as straight app.
+ */
+void runTeaHTML(WebFile aFile)
+{
+    // If snp file, offer to create HTML
+    if(aFile.getType().equals("snp")) {
+        String htmlFilename = aFile.getSimpleName() + ".html";
+        WebFile htmlFile = aFile.getParent().getFile(htmlFilename);
+        if(htmlFile==null)
+            if(!DialogBox.showConfirmDialog(null, "Create HTML file", "Create HTML file?")) return;
+        aFile = createHTMLFile(aFile);
+    }
+    
+    WebURL turl = WebURL.getURL(_proj.getClassPath().getBuildPathAbsolute() + "/tea");
+    WebFile tdir = turl.getFile();
+    if(tdir==null) { }
+    
+    // Update Tea files
+    updateTeaFiles();
+    
+    WebURL html = WebURL.getURL(_proj.getClassPath().getBuildPathAbsolute() + "/tea/" + aFile.getName());
+    WebFile htmlFile = html.getFile();
+    snap.gfx.GFXEnv.getEnv().openFile(htmlFile);
+}
+
+/**
+ * Creates and returns an HTML file for given name.
+ */
+public WebFile getHTMLIndexFile()
+{
+    WebURL html = WebURL.getURL(_proj.getClassPath().getBuildPathAbsolute() + "/tea/index.html");
+    WebFile hfile = html.getFile(); if(hfile!=null) return hfile;
+    hfile = html.createFile(false);
+
+    StringBuffer sb = new StringBuffer();
+    sb.append("<!DOCTYPE html>\n<html>\n<head>\n<title>SnapTea</title>\n");
+    sb.append("<meta http-equiv=\"Content-Type\" content=\"text/html;charset=utf-8\">\n");
+    sb.append("<script type=\"text/javascript\" charset=\"utf-8\" src=\"runtime.js\"></script>\n");
+    sb.append("<script type=\"text/javascript\" charset=\"utf-8\" src=\"classes.js\"></script>\n");
+    sb.append("</head>\n<body onload=\"main()\">\n"); sb.append("</body>\n</html>");
+    hfile.setText(sb.toString());
+    hfile.save();
+    return hfile;
+}
+
+/**
+ * Creates and returns an HTML file for given name.
+ */
+public WebFile createHTMLFile(WebFile aFile)
+{
+    String hpath = aFile.getParent().getDirPath() + aFile.getSimpleName() + ".html";
+    WebFile hfile = aFile.getSite().createFile(hpath, false);
+
+    StringBuffer sb = new StringBuffer();
+    sb.append("<!DOCTYPE html>\n<html>\n<head>\n<title>SnapTea</title>\n");
+    sb.append("<meta http-equiv=\"Content-Type\" content=\"text/html;charset=utf-8\">\n");
+    sb.append("<script type=\"text/javascript\" charset=\"utf-8\" src=\"runtime.js\"></script>\n");
+    sb.append("<script type=\"text/javascript\" charset=\"utf-8\" src=\"classes.js\"></script>\n");
+    sb.append("</head>\n<body onload=\"load()\">\n");
+    sb.append("<script type=\"text/javascript\">\n");
+    sb.append("    function load() { main(\"" + aFile.getName() + "\"); }\n");
+    sb.append("</script>\n"); sb.append("</body>\n</html>");
+    hfile.setText(sb.toString());
+    hfile.save();
+    return hfile;
+}
 
 /**
  * Returns the last run file.
