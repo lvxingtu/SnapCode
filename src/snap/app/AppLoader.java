@@ -23,7 +23,7 @@ public class AppLoader {
 /**
  * Main method - reinvokes main1() on app event thread in exception handler.
  */
-public static void main(final String args[])
+public static void main(String args[])
 {
     // Invoke real main with exception handler
     try { main1(args); }
@@ -37,7 +37,7 @@ public static void main(final String args[])
  *     - Load main Jar into URLClassLoader, load main class and invoke main method
  *     - Check for update from remove site in background
  */
-public static void main1(final String args[]) throws Exception
+public static void main1(String args[]) throws Exception
 {
     // Make sure default jar is in place
     try { copyDefaultMainJar(); }
@@ -111,18 +111,28 @@ private static void checkForUpdates() throws IOException, MalformedURLException
     // Get URL connection and lastModified time
     File jarFile = getAppFile(JarName);
     URL url = new URL(JarURL);
-    URLConnection connection = url.openConnection();
+    URLConnection connection = url.openConnection(); connection.setUseCaches(false);
     long mod0 = jarFile.lastModified(), mod1 = connection.getLastModified();
     if(mod0>=mod1) { System.out.println("No update available at " + JarURL + '(' + mod0 + '>' + mod1 + ')'); return; }
     
-    // Get update file and write to JarName.update
+    // Load Update bytes from URL connection
     System.out.println("Loading update from " + JarURL);
     byte bytes[] = getBytes(connection); System.out.println("Update loaded");
-    File updatePacked = getAppFile(JarName + ".pack.gz"), updateFile = getAppFile(JarName + ".update");
-    writeBytes(updatePacked, bytes); System.out.println("Update saved: " + updatePacked);
-    unpack(updatePacked, updateFile); System.out.println("Update unpacked: " + updateFile);
+    File updateFile = getAppFile(JarName + ".update");
+    
+    // If packed write to pack file and unpack
+    if(JarURL.endsWith(".pack.gz")) {
+        File updatePacked = getAppFile(JarName + ".pack.gz");
+        writeBytes(updatePacked, bytes); System.out.println("Update saved: " + updatePacked);
+        unpack(updatePacked, updateFile); System.out.println("Update unpacked: " + updateFile);
+        updatePacked.delete();
+    }
+    
+    // If not packed just write to file
+    else { writeBytes(updateFile, bytes); System.out.println("Update saved: " + updateFile); }
+    
+    // Set modified time so it matches server
     updateFile.setLastModified(mod1);
-    updatePacked.delete();
     
     // Let the user know
     String msg = "A new update is available. Restart application to apply";
