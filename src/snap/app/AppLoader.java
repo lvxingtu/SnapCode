@@ -9,14 +9,15 @@ import java.util.zip.GZIPInputStream;
 import javax.swing.*;
 
 /**
- * This app 
+ * This class checks for an updated main jar and, if found, downloads it.
+ * After update check, forwards on to main jar main method. 
  */
 public class AppLoader {
 
     // Constants
     static final String AppDirName = "SnapCode";
     static final String JarName = "SnapCode1.jar";
-    static final String JarURL = "http://reportmill.com/snap1/SnapCode1.jar.pack.gz";
+    static final String JarURL = "http://reportmill.com/snap1/SnapCode1.jar"; // Was .pack.gz;
     static final String LoaderJarName = "AppLoader.jar"; // 
     static final String MainClass = "snap.app.App";
 

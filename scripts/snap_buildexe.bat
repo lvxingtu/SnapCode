@@ -9,7 +9,7 @@ pushd Z:\Temp\SnapCode
 -srcfiles AppLoader.jar;SnapCode1.jar;jgit.jar;jsch.jar;tools.jar;spell.jar;BuildInfo.txt
 
 echo "Signing SnapCode.exe"
-Z:\Temp\Signtool\signtool sign /f Z:\Temp\Signtool\RMVeriCert.pfx /p rmverisign ^
+Z:\Temp\Signtool\signtool sign /f Z:\Temp\Signtool\RMComoCert.pfx /p rmcomodo ^
 /t http://timestamp.verisign.com/scripts/timstamp.dll C:\Users\Jeff\SnapApp\bundles\SnapCode.exe
 
 echo "Verify Signing SnapCode.exe"
