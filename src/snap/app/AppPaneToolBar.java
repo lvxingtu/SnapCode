@@ -505,7 +505,7 @@ protected class FileTab extends Label {
         // Add a close box graphic
         Polygon poly = new Polygon(0,2,2,0,5,3,8,0,10,2,7,5,10,8,8,10,5,7,2,10,0,8,3,5);
         ShapeView sview = new ShapeView(poly); sview.setBorder(TAB_CLOSE_BORDER1); sview.setPrefSize(11,11);
-        sview.addEventHandler(e->handleTabCloseBoxEvent(e), MouseEnter, MouseExit, MouseRelease);
+        sview.addEventFilter(e->handleTabCloseBoxEvent(e), MouseEnter, MouseExit, MouseRelease);
         setGraphicAfter(sview);
     }
     

@@ -701,7 +701,7 @@ private void configureFilesListCell(ListCell <AppFile> aCell)
     
     ShapeView snode = new ShapeView(poly); snode.setProp("File", item.getFile());
     snode.setBorder(CLOSE_BOX_BORDER1); snode.setFill(Color.WHITE); snode.setPrefSize(11,11);
-    snode.addEventHandler(e->handleBookmarkEvent(e), MouseEnter, MouseExit, MouseRelease);
+    snode.addEventFilter(e->handleBookmarkEvent(e), MouseEnter, MouseExit, MouseRelease);
     aCell.setGraphicAfter(snode);
 }
 
