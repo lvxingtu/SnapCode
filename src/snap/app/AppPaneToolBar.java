@@ -162,6 +162,7 @@ protected void initUI()
 {
     // Get/configure SearchComboBox
     ComboBox <WebFile> searchComboBox = getView("SearchComboBox", ComboBox.class);
+    searchComboBox.setItemTextFunction(itm -> { return itm!=null? itm.getName() : null; });
     searchComboBox.setCellConfigure(this :: configureSearchListCell);
     searchComboBox.setPrefixFunction(s -> getFilesForPrefix(s));
     
@@ -371,7 +372,6 @@ private void scaleFileTabs()
 public void configureSearchListCell(ListCell<WebFile> aCell)
 {
     WebFile file = aCell.getItem(); if(file==null) return;
-    aCell.setText(file.getName());
     Label after = new Label("- " + file.getParent().getPath()); if(aCell.isSelected()) after.setTextFill(Color.WHITE);
     aCell.setGraphicAfter(after);
 }

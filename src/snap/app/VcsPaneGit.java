@@ -163,7 +163,7 @@ protected void addListView(View aPrevNode, Object theItems[])
 
     // Create list view and add
     ListView lview = new ListView(); lview.setName("ListView"); lview.setPrefWidth(200);
-    lview.setCellConfigure(c -> configureListCell((ListCell)c));
+    lview.setItemTextFunction(itm -> getItemText(itm));
     lview.setItems(theItems);
     
     ScrollView spane = new ScrollView(lview); spane.setShowVBar(true);
@@ -187,9 +187,16 @@ protected Object[] getRootItems()
  */
 private void configureListCell(ListCell aCell)
 {
-    // Evaluate key
-    Object anItem = aCell.getItem(); if(anItem==null) return;
-    String value = null;
+    String value = getItemText(aCell.getItem());
+    aCell.setText(value);
+}
+
+/**
+ * Return text for a ListView item.
+ */
+private String getItemText(Object anItem)
+{
+    String value = null; if(anItem==null) return null;
     if(anItem instanceof GitBranch) value = ((GitBranch)anItem).getPlainName();
     else if(anItem instanceof GitCommit) { Date date = new Date(((GitCommit)anItem).getCommitTime());
         value = "Commit " + _fmt.format(date); }
@@ -197,7 +204,7 @@ private void configureListCell(ListCell aCell)
     else if(anItem instanceof GitIndex) value = "Index";
     else if(anItem instanceof GitIndex.Entry) value = ((GitIndex.Entry)anItem).getName();
     else if(anItem instanceof GitRef) value = ((GitRef)anItem).getName();
-    aCell.setText(value);
+    return value;
 }
 
 // DateFormat for commit labels.
