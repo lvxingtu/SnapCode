@@ -26,12 +26,6 @@ public class AppPaneToolBar extends ViewOwner {
     // The view for the currently selected view
     View                     _selectedView;
     
-    // The SearchText
-    TextField                _searchText;
-    
-    // The SearchMenu that shows suggestions for the SearchText
-    PopupList <WebFile>      _searchMenu;
-    
     // A placeholder for fill from toolbar button under mouse
     Paint                    _tempFill;
     
@@ -135,7 +129,7 @@ private WebURL getFallbackURL()
 /**
  * Selects the search text.
  */
-public void selectSearchText()  { runLater(() -> _searchText.requestFocus()); }
+public void selectSearchText()  { runLater(() -> requestFocus("SearchComboBox")); }
 
 /**
  * Override to add menu button.
@@ -166,14 +160,19 @@ protected View createUI()
  */
 protected void initUI()
 {
-    // Fix buttons to PickOnBounds (instead of paths) for HomeButton, BackButton, NextButton, RefreshButton, RunButton
-    //getNative("HomeButton", javafx.scene.Node.class).setPickOnBounds(true);
+    // Get/configure SearchComboBox
+    ComboBox <WebFile> searchComboBox = getView("SearchComboBox", ComboBox.class);
+    searchComboBox.setCellConfigure(this :: configureSearchListCell);
+    searchComboBox.setPrefixFunction(s -> getFilesForPrefix(s));
     
-    // Get SearchText and Enable KeyReleased
-    _searchText = getView("SearchText", TextField.class);
-    _searchText.setPromptText("Search"); _searchText.getLabel().setImage(Image.get(TextPane.class, "Find.png"));
-    enableEvents(_searchText, KeyRelease);
-    TextField.setBackLabelAlignAnimatedOnFocused(_searchText, true);
+    // Get/configure SearchComboBox.PopupList
+    searchComboBox.getPopupList().setRowHeight(22); searchComboBox.getPopupList().setPrefWidth(300);
+    searchComboBox.getPopupList().setAltPaint(Color.get("#F8F8F8"));
+    
+    // Get/configure SearchText: radius, prompt, image, animation
+    TextField searchText = searchComboBox.getTextField(); searchText.setRadius(8);
+    searchText.setPromptText("Search"); searchText.getLabel().setImage(Image.get(TextPane.class, "Find.png"));
+    TextField.setBackLabelAlignAnimatedOnFocused(searchText, true);
     
     // Enable events on buttons
     String bnames[] = { "HomeButton", "BackButton", "NextButton", "RefreshButton", "RunButton" };
@@ -238,9 +237,9 @@ public void respondUI(ViewEvent anEvent)
     if(anEvent.equals("FileTab") && anEvent.isMouseRelease())
         handleFileTabClicked(anEvent);
 
-    // Handle SearchText
-    if(anEvent.equals("SearchText"))
-        handleSearchText(anEvent);
+    // Handle SearchComboBox
+    if(anEvent.equals("SearchComboBox"))
+        handleSearchComboBox(anEvent);
 }
 
 /**
@@ -263,6 +262,36 @@ protected void handleFileTabClicked(ViewEvent anEvent)
         bpane.getBrowser().setURL(file.getURL());
         bpane.getWindow().setVisible(true);
     }
+}
+
+/**
+ * Handle SearchComboBox changes.
+ */
+public void handleSearchComboBox(ViewEvent anEvent)
+{
+    // Get selected file and/or text
+    WebFile file = (WebFile)anEvent.getSelectedItem();
+    String text = anEvent.getStringValue();
+    
+    // If file available, open file
+    if(file!=null)
+        getAppPane().getBrowser().setFile(file);
+
+    // If text available, either open URL or search for string
+    else if(text!=null && text.length()>0) {
+        int colon = text.indexOf(':');
+        if(colon>0 && colon<6) {
+            WebURL url = WebURL.getURL(text);
+            getAppPane().getBrowser().setURL(url);
+        }
+        else {
+            getAppPane().getSearchPane().search(text);
+            getAppPane().setSupportTrayIndex(SupportTray.SEARCH_PANE);
+        }
+    }
+    
+    // Clear SearchComboBox
+    setViewText("SearchComboBox", null);
 }
 
 /**
@@ -337,97 +366,14 @@ private void scaleFileTabs()
 }
 
 /**
- * Handle SearchText changes.
+ * Configures a search list cell.
  */
-public void handleSearchText(ViewEvent anEvent)
+public void configureSearchListCell(ListCell<WebFile> aCell)
 {
-    // Get search menu
-    PopupList <WebFile> searchMenu = getSearchMenu();
-    
-    // Handle KeyReleased: Let key do normal processing and call handleSearchTextKeyFinished()
-    if(anEvent.isKeyRelease() && !anEvent.isEnterKey())
-        runLater(() -> handleSearchTextKeyFinished(anEvent));
-    
-    // Handle ActionEvent
-    else {
-        searchMenu.hide();
-        WebFile file = searchMenu.getSelectedItem();
-        if(file!=null) {
-            getAppPane().getBrowser().setFile(file);
-            setViewValue(_searchText, "");
-        }
-        else if(getViewStringValue(_searchText)!=null && getViewStringValue(_searchText).length()>0) {
-            String text = getViewStringValue(_searchText);
-            int colon = text.indexOf(':');
-            if(colon>0 && colon<6) {
-                WebURL url = WebURL.getURL(text);
-                getAppPane().getBrowser().setURL(url);
-            }
-            else {
-                getAppPane().getSearchPane().search(getViewStringValue(_searchText));
-                getAppPane().setSupportTrayIndex(SupportTray.SEARCH_PANE);
-            }
-            setViewValue(_searchText, "");
-        }
-    }
-}
-
-/**
- * Called after SearchText KeyReleased is processed.
- */
-private void handleSearchTextKeyFinished(ViewEvent anEvent)
-{
-    if(anEvent.isDownArrow() || anEvent.isUpArrow()) return;
-    if(anEvent.isEscapeKey()) { handleSearchTextEscapeKey(); return; }
-    
-    
-    String prefix = anEvent.getStringValue();
-    List <WebFile> files = getFilesForPrefix(anEvent.getStringValue());
-    PopupList <WebFile> searchMenu = getSearchMenu();
-    searchMenu.setItems(files);
-    if(files.size()>0)
-        searchMenu.setSelectedIndex(0);
-    if(files.size()==0) searchMenu.hide();
-    else if(!searchMenu.isShowing()) searchMenu.show(_searchText, 0, _searchText.getHeight());
-}
-
-/**
- * Called when SearchText gets Escape key.
- */
-private void handleSearchTextEscapeKey()
-{
-    // If text present, clear it
-    if(_searchText.length()>0)
-        _searchText.setText("");
-        
-    // Otherwise try to pass off to page.FirstFocus
-    else {
-        AppPane appPane = getAppPane();
-        WebPage page = appPane.getBrowser().getPage(); if(page==null) return;
-        Object firstFoc = page.getFirstFocus();
-        if(firstFoc!=null)
-            page.requestFocus(firstFoc);
-        else page.getUI().requestFocus();
-    }
-}
-
-/**
- * Returns the SearchMenu.
- */
-public PopupList <WebFile> getSearchMenu()
-{
-    if(_searchMenu==null) {
-        _searchMenu = new PopupList <WebFile>() {
-            public void configureCell(snap.view.ListCell<WebFile> aCell) {
-                super.configureCell(aCell);
-                WebFile file = aCell.getItem(); if(file==null) return;
-                aCell.setText(file.getName() + " - " + file.getParent().getPath());
-            }
-            public void fireActionEvent()  { super.fireActionEvent(); sendEvent(_searchText); }
-        };
-        _searchMenu.setRowHeight(22); _searchMenu.setPrefWidth(300);
-    }
-    return _searchMenu;
+    WebFile file = aCell.getItem(); if(file==null) return;
+    aCell.setText(file.getName());
+    Label after = new Label("- " + file.getParent().getPath()); if(aCell.isSelected()) after.setTextFill(Color.WHITE);
+    aCell.setGraphicAfter(after);
 }
 
 /**
@@ -435,6 +381,7 @@ public PopupList <WebFile> getSearchMenu()
  */
 private List <WebFile> getFilesForPrefix(String aPrefix)
 {
+    if(aPrefix.length()==0) return Collections.EMPTY_LIST;
     List <WebFile> files = new ArrayList(); if(aPrefix==null || aPrefix.length()==0) return files;
     for(WebSite site : getAppPane().getSites())
         getFilesForPrefix(aPrefix, site.getRootDir(), files);
