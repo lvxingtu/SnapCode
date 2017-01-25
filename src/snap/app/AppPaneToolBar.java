@@ -162,7 +162,7 @@ protected void initUI()
 {
     // Get/configure SearchComboBox
     ComboBox <WebFile> searchComboBox = getView("SearchComboBox", ComboBox.class);
-    searchComboBox.setItemTextFunction(itm -> { return itm!=null? itm.getName() : null; });
+    searchComboBox.setItemTextFunction(itm -> itm.getName());
     searchComboBox.setCellConfigure(this :: configureSearchListCell);
     searchComboBox.setPrefixFunction(s -> getFilesForPrefix(s));
     

@@ -183,15 +183,6 @@ protected Object[] getRootItems()
 }
 
 /**
- * Called to configure ListCell.
- */
-private void configureListCell(ListCell aCell)
-{
-    String value = getItemText(aCell.getItem());
-    aCell.setText(value);
-}
-
-/**
  * Return text for a ListView item.
  */
 private String getItemText(Object anItem)
