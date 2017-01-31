@@ -82,8 +82,11 @@ protected List <Marker> createMarkers()
         markers.add(new BuildIssueMarker(issue));
         
     // Add markers for breakpoints
-    for(Breakpoint bp : _textView.getBreakpoints())
-        markers.add(new BreakpointMarker(bp));
+    for(Breakpoint bp : _textView.getBreakpoints()) {
+        if(bp.getLine()<_textView.getLineCount())
+            markers.add(new BreakpointMarker(bp));
+        else _textView.removeBreakpoint(bp);
+    }
     
     // Return markers
     return markers;
