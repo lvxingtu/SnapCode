@@ -103,14 +103,14 @@ protected View createUI()
  */
 protected void initU()
 {
-    addKeyActionEvent("CutButton", "Shortcut+X");
-    addKeyActionEvent("CopyButton", "Shortcut+C");
-    addKeyActionEvent("PasteButton", "Shortcut+V");
-    addKeyActionEvent("DeleteButton", "DELETE");
-    addKeyActionEvent("DeleteButton", "BACKSPACE");
-    addKeyActionEvent("UndoButton", "Shortcut+Z");
-    addKeyActionEvent("RedoButton", "Shortcut+Shift+Z");
-    addKeyActionEvent("Escape", "ESC");
+    addKeyActionHandler("CutButton", "Shortcut+X");
+    addKeyActionHandler("CopyButton", "Shortcut+C");
+    addKeyActionHandler("PasteButton", "Shortcut+V");
+    addKeyActionHandler("DeleteButton", "DELETE");
+    addKeyActionHandler("DeleteButton", "BACKSPACE");
+    addKeyActionHandler("UndoButton", "Shortcut+Z");
+    addKeyActionHandler("RedoButton", "Shortcut+Shift+Z");
+    addKeyActionHandler("Escape", "ESC");
 }
 
 /**

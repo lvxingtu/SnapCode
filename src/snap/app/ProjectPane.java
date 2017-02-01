@@ -463,8 +463,8 @@ protected void handleBuildCompleted()
 protected void initUI()
 {
     // Have Backspace and Delete remove selected Jar path
-    addKeyActionEvent("DeleteAction", "DELETE");
-    addKeyActionEvent("BackSpaceAction", "BACK_SPACE");
+    addKeyActionHandler("DeleteAction", "DELETE");
+    addKeyActionHandler("BackSpaceAction", "BACK_SPACE");
     enableEvents("JarPathsList", DragEvents);
     enableEvents("ProjectPathsList", MouseRelease);
 }

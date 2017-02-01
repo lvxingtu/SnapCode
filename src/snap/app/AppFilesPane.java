@@ -164,8 +164,8 @@ protected void initUI()
     enableEvents(_filesTree, MousePress, MouseRelease); enableEvents(_filesTree, DragEvents);
     
     // Register for copy/paste
-    addKeyActionEvent("CopyAction", "Shortcut+C");
-    addKeyActionEvent("PasteAction", "Shortcut+V");
+    addKeyActionHandler("CopyAction", "Shortcut+C");
+    addKeyActionHandler("PasteAction", "Shortcut+V");
 }
 
 /**

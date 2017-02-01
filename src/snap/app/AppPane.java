@@ -331,8 +331,8 @@ protected void initUI()
     _browserBox.getChild(0).setGrowHeight(true); // So support tray has constant size
     
     // Add key binding to OpenMenuItem and CloseWindow
-    addKeyActionEvent("OpenMenuItem", "meta O");
-    addKeyActionEvent("CloseFileAction", "meta W");
+    addKeyActionHandler("OpenMenuItem", "meta O");
+    addKeyActionHandler("CloseFileAction", "meta W");
 
     // Configure Window
     getWindow().setTitle("SnapCode Project");
