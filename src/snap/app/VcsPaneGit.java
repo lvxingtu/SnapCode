@@ -171,7 +171,7 @@ protected void addListView(View aPrevNode, Object theItems[])
     lview.setOwner(this);
     
     // Make sure new ListView is visible
-    runLaterDelayed(50, () -> spane.scrollToVisible(lview.getBoundsInside()));
+    runLaterDelayed(50, () -> spane.scrollToVisible(lview.getBoundsLocal()));
 }
     
 protected Object[] getRootItems()
