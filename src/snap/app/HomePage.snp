@@ -34,7 +34,7 @@
           <string>New Java File</string>
         </RichText>
       </TextView>
-      <ImageView x="197" y="37.5" width="48" height="87">
+      <ImageView x="197" y="37.5" width="48" height="87" ImageName="Duke.png">
         <effect type="shadow" radius="6" dx="2" dy="2" color="#00000086" />
       </ImageView>
     </SpringView>
