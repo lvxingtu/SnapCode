@@ -210,12 +210,13 @@ protected List <String> getTeaCommand()
     commands.add(_proj.getClassName(getURL().getFile()));
     
     // Add output dir
-    String bpath = _proj.getClassPath().getBuildPathAbsolute() + "/tea";
+    String bpath = _proj.getClassPath().getBuildPathAbsolute() + "tea";
     String bpathNtv = FilePathUtils.getNativePath(bpath);
     commands.add("-d"); commands.add(bpathNtv);
     
     // Add other options
-    commands.add("-S"); commands.add("-D");
+    //commands.add("-S"); commands.add("-D");
+    commands.add("-G"); commands.add("-g");
     
     // Add App Args
     if(getAppArgs()!=null && getAppArgs().length()>0)
