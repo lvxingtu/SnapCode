@@ -336,7 +336,7 @@ protected void initUI()
 
     // Configure Window
     getWindow().setTitle("SnapCode Project");
-    getWindow().setMenuBar(getMenuBar());
+    getRootView().setMenuBar(getMenuBar());
     
     // Register for WelcomePanel on close
     enableEvents(getWindow(), WinClose);
