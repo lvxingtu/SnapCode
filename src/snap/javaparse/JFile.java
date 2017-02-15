@@ -152,9 +152,14 @@ public JImportDecl getImport(String aName)
     
         // Get import name (just continue if null)
         String iname = imp.getName(); if(iname==null) continue;
+        
+        // If import is static, see if it matches given name
+        if(imp.isStatic() && iname.endsWith(aName)) {
+            if(iname.length()==aName.length() || iname.charAt(iname.length()-aName.length()-1)=='.') {
+                match = imp; break; }}
     
         // If import is inclusive ("import xxx.*") and ImportName.aName is known class, return class name
-        if(imp.isInclusive && match==null) { String cname = iname + '.' + aName;
+        else if(imp.isInclusive && match==null) { String cname = iname + '.' + aName;
             if(isKnownClassName(cname) || imp.isClassName() && isKnownClassName(iname + '$' + aName))
                 match = imp; }
         
