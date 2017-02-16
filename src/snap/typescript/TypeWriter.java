@@ -5,10 +5,7 @@ import snap.javaparse.*;
 /**
  * A class to convert Java to TypeScript.
  */
-public class TypeWriter {
-
-    // The TypeBuffer
-    TypeBuffer  _tb = new TypeBuffer();
+public class TypeWriter extends TypeBuffer {
 
 /**
  * Returns the string for JNode.
@@ -16,7 +13,7 @@ public class TypeWriter {
 public String getString(JNode aNode)
 {
     writeJNode(aNode);
-    return _tb._sb.toString();
+    return _sb.toString();
 }
 
 /**
@@ -33,19 +30,26 @@ public void writeJNode(JNode aNode)
  */
 public void writeJFile(JFile aJFile)
 {
-    _tb.append("/* Generated from Java with SnapCode - http://www.reportmill.com */\n");
+    append("/* Generated from Java with SnapCode - http://www.reportmill.com */\n");
     
     String pname = aJFile.getPackageName();
-    if(pname!=null) _tb.append("namespace ").append(pname).append(' ').append("{\n");
+    if(pname!=null) append("namespace ").append(pname).append(' ').append("{").endln();
+    indent();
     
     // Append imports
     for(JImportDecl imp : aJFile.getImportDecls())
         writeJImportDecl(imp);
-    _tb.endln();
-    
+    endln();
     
     // Append class decls
     writeJClassDecl(aJFile.getClassDecl());
+    
+    // Outdent and terminate namespace
+    outdent();
+    append("}");
+    
+    // Write main method
+    endln().endln().append(aJFile.getClassDecl().getClassName()).append(".main(null);\n");
 }
 
 /**
@@ -56,7 +60,7 @@ public void writeJImportDecl(JImportDecl anImp)
     String iname = anImp.getName();
     int ind = iname.lastIndexOf('.');
     String iname2 = anImp.isInclusive() || ind<0? iname.replace('.', '_') : iname.substring(ind+1);
-    _tb.indent().append("import ").append(iname2).append(" = ").append(iname).append(";\n");
+    append("import ").append(iname2).append(" = ").append(iname).append(';').endln();
 }
 
 /**
@@ -65,25 +69,26 @@ public void writeJImportDecl(JImportDecl anImp)
 public void writeJClassDecl(JClassDecl aCDecl)
 {
     // Append class
-    _tb.indent().append("export class ").append(aCDecl.getSimpleName()).append(" {\n\n");
+    append("export class ").append(aCDecl.getSimpleName()).append(" {").endln().endln();
+    indent();
     
-    // Append ivars
-    for(JFieldDecl fd : aCDecl.getFieldDecls())
-        writeJFieldDecl(fd);
+    // Append fields
+    JFieldDecl fdecls[] = aCDecl.getFieldDecls();
+    for(JFieldDecl fd : aCDecl.getFieldDecls()) {
+        writeJFieldDecl(fd); endln(); }
         
     // Append methods
-    for(JMethodDecl md : aCDecl.getMethodDecls())
-        writeJMethodDecl(md);
-        
-    // Write class
-    _tb.endln().indent();
-    _tb.append(aCDecl.getSimpleName()).append("[\"__class] = \"").append(aCDecl.getClassName()).append("\";\n\n");
+    JMethodDecl mdecls[] = aCDecl.getMethodDecls(), mlast = mdecls.length>0? mdecls[mdecls.length-1] : null;
+    for(JMethodDecl md : aCDecl.getMethodDecls()) {
+        writeJMethodDecl(md); if(md!=mlast) endln(); }
         
     // Terminate
-    _tb.append("}");
+    outdent();
+    append('}').endln();
     
-    // Write main method
-    _tb.endln().endln().append(aCDecl.getClassName()).append(".main(null);\n");
+    // Write class
+    endln();
+    append(aCDecl.getSimpleName()).append("[\"__class\"] = \"").append(aCDecl.getClassName()).append("\";").endln();
 }
 
 /**
@@ -91,11 +96,16 @@ public void writeJClassDecl(JClassDecl aCDecl)
  */
 public void writeJFieldDecl(JFieldDecl aFDecl)
 {
-    String mods = "public ";
+    // Get modifier string
+    JModifiers mods = aFDecl.getModifiers();
+    String mstr = mods!=null && mods.isPublic()? "public " : "";
 
-    _tb.indent();
-    writeJVarDecl(aFDecl.getVarDecls().get(0));
-    _tb.append(";\n\n");
+    // Get first var decl
+    JVarDecl vd = aFDecl.getVarDecls().get(0);
+    
+    // Write var decl and terminator
+    writeJVarDecl(vd);
+    append(';').endln();
 }
 
 /**
@@ -103,14 +113,23 @@ public void writeJFieldDecl(JFieldDecl aFDecl)
  */
 public void writeJMethodDecl(JMethodDecl aMDecl)
 {
-    String mods = "public ";
+    // Get modifier string
+    JModifiers mods = aMDecl.getModifiers();
+    String mstr = mods.isPublic() && mods.isStatic()? "public static " : mods.isPublic()? "public " : "";
 
-    _tb.indent().append(mods).append(aMDecl.getName()).append("(");
+    // Write modifiers, method name and args start char
+    append(mstr).append(aMDecl.getName()).append("(");
+    
+    // Write parameters
     List <JVarDecl> params = aMDecl.getParameters();
     JVarDecl last = params.size()>0? params.get(params.size()-1) : null;
     for(JVarDecl param : aMDecl.getParameters()) {
-        writeJVarDecl(param); if(param!=last) _tb.append(", "); }
-    _tb.append(") : ").append(aMDecl.getType().getName()).append(' ');
+        writeJVarDecl(param); if(param!=last) append(", "); }
+        
+    // Write return type
+    append(") : ").append(aMDecl.getType().getName()).append(' ');
+    
+    // Write method block
     writeJStmtBlock(aMDecl.getBlock());
 }
 
@@ -119,7 +138,7 @@ public void writeJMethodDecl(JMethodDecl aMDecl)
  */
 public void writeJVarDecl(JVarDecl aVD)
 {
-    _tb.append(aVD.getName()).append(" : ").append(aVD.getType().getName());
+    append(aVD.getName()).append(" : ").append(aVD.getType().getName());
 }
 
 /**
@@ -127,10 +146,16 @@ public void writeJVarDecl(JVarDecl aVD)
  */
 public void writeJStmtBlock(JStmtBlock aBlock)
 {
-    _tb.append("{\n");
+    // Write start and indent
+    append('{').endln();
+    indent();
+    
+    // Write statements
     for(JStmt stmt : aBlock.getStatements())
         writeJStmt(stmt);
-    _tb.indent().append("}\n");
+        
+    // Outdent and terminate
+    outdent(); append('}').endln();
 }
 
 /**
@@ -138,7 +163,7 @@ public void writeJStmtBlock(JStmtBlock aBlock)
  */
 public void writeJStmt(JStmt aStmt)
 {
-    _tb.indent().indent().append(aStmt.getString()).append("\n");
+    append(aStmt.getString()).endln();
 }
 
 }
