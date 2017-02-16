@@ -2,7 +2,9 @@ package snap.app;
 import java.io.File;
 import java.util.*;
 import snap.gfx.*;
+import snap.javaparse.JavaData;
 import snap.project.Project;
+import snap.typescript.TypeWriter;
 import snap.util.*;
 import snap.view.*;
 import snap.viewx.*;
@@ -330,6 +332,16 @@ public void respondUI(ViewEvent anEvent)
         String cpath = jfile.getPath().replace("/src/", "/bin/").replace(".java", ".class");
         WebFile cfile = jfile.getSite().getFile(cpath);
         if(cfile!=null) getBrowser().setFile(cfile);
+    }
+    
+    // Handle GenerateTypeScriptMenuItem
+    if(anEvent.equals("GenerateTypeScriptMenuItem")) {
+        WebFile jfile = getSelectedFile(); if(!jfile.getType().equals("java")) return;
+        JavaData jdata = JavaData.get(jfile);
+        String str = new TypeWriter().getString(jdata.getJFile());
+        String fname = "/tmp/" + jfile.getSimpleName() + ".ts";
+        SnapUtils.writeBytes(str.getBytes(), fname);
+        GFXEnv.getEnv().openFile(fname);
     }
     
     // Handle CopyAction, PasteAction
