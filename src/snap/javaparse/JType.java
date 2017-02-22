@@ -127,7 +127,8 @@ public boolean isNumberType()
     JavaDecl decl = getDecl(); if(decl==null) return false;
     String tp = decl.getClassName().intern();
     return tp=="byte" || tp=="short" || tp=="int" || tp=="long" || tp=="float" || tp=="double" ||
-        tp=="java.lang.Number";
+        tp=="java.lang.Byte" || tp=="java.lang.Short" || tp=="java.lang.Integer" || tp=="java.lang.Long" ||
+        tp=="java.lang.Float" || tp=="java.lang.Double" || tp=="java.lang.Number";
 }
 
 /**

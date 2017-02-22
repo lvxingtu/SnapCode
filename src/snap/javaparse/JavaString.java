@@ -38,12 +38,16 @@ public JavaString append(long aLong)  { _sb.append(aLong); return this; }
 /**
  * Append float.
  */
-public JavaString append(float aFloat)  { _sb.append(aFloat); return this; }
+public JavaString append(float aFloat)  { return append((double)aFloat); }
 
 /**
  * Append double.
  */
-public JavaString append(double aDouble)  { _sb.append(aDouble); return this; }
+public JavaString append(double aDouble)
+{
+    if(aDouble==(int)aDouble) return append((long)aDouble);
+    _sb.append(aDouble); return this;
+}
 
 /**
  * Append Object.
@@ -174,15 +178,7 @@ public JavaString append(JExprLambda anExpr)
 /**
  * Append JExprLiteral.
  */
-public JavaString append(JExprLiteral anExpr)
-{
-    String str = anExpr.getValue()!=null? anExpr.getValue().toString() : "null";
-    if(anExpr.getLiteralType()==JExprLiteral.LiteralType.Float) str = trimZero(str) + 'f';
-    else if(anExpr.getLiteralType()==JExprLiteral.LiteralType.Double) str = trimZero(str);
-    else if(anExpr.getLiteralType()==JExprLiteral.LiteralType.Long) str += 'L';
-    else if(anExpr.getLiteralType()==JExprLiteral.LiteralType.String) str = '"' + str + '"';
-    return append(str);
-}
+public JavaString append(JExprLiteral anExpr)  { return append(anExpr.getValueString()); }
 
 /**
  * Append JExprMath.

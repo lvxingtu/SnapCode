@@ -177,8 +177,9 @@ public String getTypeString(JType aType)
     String name = aType.getName();
     if(name.equals("void")) name = "";
     else if(name.equals("Object")) name = "any";
-    else if(name.equals("String")) name = "string";
+    else if(name.equals("String") || name.equals("char") || name.equals("Character")) name = "string";
     else if(aType.isNumberType()) name = "number";
+    else if(name.equals("Boolean")) name = "boolean";
     if(aType.isArrayType())
         name = name + "[]";
     return name;
@@ -199,6 +200,7 @@ public void writeJStmt(JStmt aStmt)
     else if(aStmt instanceof JStmtSynchronized) writeJStmtSynchronized((JStmtSynchronized)aStmt);
     else if(aStmt instanceof JStmtTry) writeJStmtTry((JStmtTry)aStmt);
     else if(aStmt instanceof JStmtVarDecl) writeJStmtVarDecl((JStmtVarDecl)aStmt);
+    else if(aStmt instanceof JStmtWhile) writeJStmtWhile((JStmtWhile)aStmt);
     else append(aStmt.getString()).endln();
 }
 
@@ -377,11 +379,24 @@ public void writeJStmtVarDecl(JStmtVarDecl aStmt)
 }
 
 /**
+ * Writes a JStmtWhile.
+ */
+public void writeJStmtWhile(JStmtWhile aStmt)
+{
+    // Write "while", conditional and statement
+    append("while(");
+    writeJExpr(aStmt.getConditional());
+    append(") ");
+    writeJStmt(aStmt.getStmt());
+}
+
+/**
  * Writes a JExpr.
  */
 public void writeJExpr(JExpr aExpr)
 {
-    if(aExpr instanceof JExprChain) writeJExprChain((JExprChain)aExpr);
+    if(aExpr instanceof JExprAlloc) writeJExprAlloc((JExprAlloc)aExpr);
+    else if(aExpr instanceof JExprChain) writeJExprChain((JExprChain)aExpr);
     else if(aExpr instanceof JExpr.CastExpr) writeJExprCast((JExpr.CastExpr)aExpr);
     else if(aExpr instanceof JExprId) writeJExprId((JExprId)aExpr);
     else if(aExpr instanceof JExpr.InstanceOfExpr) writeJExprInstanceOf((JExpr.InstanceOfExpr)aExpr);
@@ -389,6 +404,30 @@ public void writeJExpr(JExpr aExpr)
     else if(aExpr instanceof JExprMath) writeJExprMath((JExprMath)aExpr);
     else if(aExpr instanceof JExprMethodCall) writeJExprMethodCall((JExprMethodCall)aExpr);
     else append(aExpr.getString());
+}
+
+/**
+ * Writes a JExpr.CastExpr.
+ */
+public void writeJExprAlloc(JExprAlloc aExpr)
+{
+    // Append 'new' keyword, type and parameter list start char
+    JType typ = aExpr.getType();
+    append("new "); writeJType(typ);
+    append('(');
+    
+    // Append args
+    List <JExpr> args = aExpr.getArgs(); JExpr last = args.size()>0? args.get(args.size()-1) : null;
+    for(JExpr arg : aExpr.getArgs()) {
+        writeJExpr(arg); if(arg!=last) append(", "); }
+        
+    // Append close char
+    append(')');
+    
+    // Append ClassDecl
+    if(aExpr.getClassDecl()!=null) {
+        System.err.println("Need to write ClassDecl for " + aExpr.getClassDecl().getClassName());
+    }
 }
 
 /**
@@ -404,10 +443,30 @@ public void writeJExprCast(JExpr.CastExpr aExpr)
 }
 
 /**
+ * Writes a JExprChain.
+ */
+public void writeJExprChain(JExprChain aExpr)
+{
+    // Write component expressions
+    List <JExpr> exprs = aExpr.getExpressions(); JExpr last = exprs.get(exprs.size()-1);
+    for(JExpr exp : exprs) {
+        writeJExpr(exp); if(exp!=last) append('.'); }
+}
+
+/**
  * Writes a JExprId.
  */
 public void writeJExprId(JExprId aExpr)
 {
+    // If id is field or method, append "this."
+    if(aExpr.getParentExpr()==null) {
+        JavaDecl jdecl = aExpr.getDecl();
+        JavaDecl.Type typ = jdecl!=null? jdecl.getType() : null;
+        if(typ==JavaDecl.Type.Field || typ==JavaDecl.Type.Method)
+            append("this.");
+    }
+    
+    // Append id
     append(aExpr.getString());
 }
 
@@ -422,7 +481,7 @@ public void writeJExprInstanceOf(JExpr.InstanceOfExpr aExpr)
     String tstr = getTypeString(typ);
     
     // Handle primitive types
-    if(tstr.equals("number") || tstr.equals("string")) {
+    if(tstr.equals("number") || tstr.equals("string") || tstr.equals("boolean")) {
         append("typeof "); writeJExpr(expr); append(" === \'").append(tstr).append('\'');
         return;
     }
@@ -436,36 +495,17 @@ public void writeJExprInstanceOf(JExpr.InstanceOfExpr aExpr)
 }
 
 /**
- * Writes a JExprChain.
- */
-public void writeJExprChain(JExprChain aExpr)
-{
-    // If first expression is field or method call, write "this." prefix
-    JExpr exp0 = aExpr.getExpr(0);
-    JavaDecl jdecl = exp0.getDecl();
-    JavaDecl.Type typ = jdecl!=null? jdecl.getType() : null;
-    if(typ==JavaDecl.Type.Field || typ==JavaDecl.Type.Method)
-        append("this.");
-        
-    // Write component expressions
-    List <JExpr> exprs = aExpr.getExpressions(); JExpr last = exprs.get(exprs.size()-1);
-    for(JExpr exp : exprs) {
-        writeJExpr(exp); if(exp!=last) append('.'); }
-}
-
-/**
  * Writes a JExprLiteral.
  */
 public void writeJExprLiteral(JExprLiteral aExpr)
 {
-    String str = aExpr.getString();
+    String str = aExpr.getValueString();
     JExprLiteral.LiteralType typ = aExpr.getLiteralType();
-    if(typ==JExprLiteral.LiteralType.Long || typ==JExprLiteral.LiteralType.Double) {
+    if(typ==JExprLiteral.LiteralType.Long || typ==JExprLiteral.LiteralType.Float ||
+        typ==JExprLiteral.LiteralType.Double) {
         char c = str.charAt(str.length()-1);
         if(Character.isLetter(c)) str = str.substring(0, str.length()-1);
     }
-    else if(typ==JExprLiteral.LiteralType.Character)
-        str = '\'' + str + '\'';
     append(str);
 }
 
@@ -494,7 +534,22 @@ public void writeJExprMath(JExprMath aExpr)
         writeJExpr(exp2);
     }
     
-    else append(aExpr.getString());
+    // Handle unary pre
+    else if(op==JExprMath.Op.Negate || op==JExprMath.Op.Not ||
+        op==JExprMath.Op.PreDecrement || op==JExprMath.Op.PreIncrement) {
+        JExpr exp0 = aExpr.getOperand(0);
+        append(JExprMath.getOpString(op));
+        writeJExpr(exp0);
+    }
+    
+    // Handle unary post
+    else if(op==JExprMath.Op.PostDecrement || op==JExprMath.Op.PostIncrement) {
+        JExpr exp0 = aExpr.getOperand(0);
+        append(JExprMath.getOpString(op));
+        writeJExpr(exp0);
+    }
+    
+    else throw new RuntimeException("TSWriter.writeJExprMath: Unsupported op: " + op);
 }
 
 /**

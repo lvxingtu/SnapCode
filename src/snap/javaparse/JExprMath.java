@@ -117,7 +117,7 @@ public static String getOpString(Op anOp)
         case Conditional: return "?"; case Assignment: return "=";
         case ShiftLeft: return "<<"; case ShiftRight: return ">>"; case ShiftRightUnsigned: return ">>>";
         case PreIncrement: return "++"; case PreDecrement: return "--";
-        case Negate: return "!"; case BitComp: return "<DUNNO>";
+        case Negate: return "-"; case BitComp: return "<DUNNO>";
         case PostIncrement: return "++"; case PostDecrement: return "--";
         default: throw new RuntimeException("JExprMath: Unknown Op: " + anOp);
     }

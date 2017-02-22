@@ -6,7 +6,7 @@ package snap.javaparse;
 public class JExprLiteral extends JExpr {
 
     // The string used to represent literal
-    String        _valueString;
+    String        _valueStr;
 
     // The literal value
     Object        _value;
@@ -36,7 +36,6 @@ public JExprLiteral(Object aValue)
     else if(aValue instanceof Character) _literalType = LiteralType.Character;
     else if(aValue instanceof String) _literalType = LiteralType.String;
     else if(aValue==null) _literalType = LiteralType.Null;
-    _valueString = aValue.toString();
 }
 
 /**
@@ -57,38 +56,60 @@ public boolean isNull()  { return getLiteralType()==LiteralType.Null; }
 /**
  * Returns the value.
  */
-public Object getValue()  { return _value!=null || isNull()? _value : (_value=createValue()); }
-
-/**
- * Creates the value.
- */
-protected Object createValue()
+public Object getValue()
 {
+    // If value already set or null, return
+    if(_value!=null || isNull()) return _value;
+    
     // Get literal type and string info
     String s = getValueString(); int len = s.length(); char c = s.charAt(len-1);
     
     // Decode type from string
     switch(getLiteralType()) {
-        case Boolean: return Boolean.valueOf(s);
-        case Integer: try { return Integer.decode(s); } catch(Exception e) { return 0; }
-        case Long: try { return Long.decode(s.substring(0,len-1)); } catch(Exception e) { return 0; }
-        case Float: return Float.valueOf(s.substring(0,len-1));
-        case Double: return c=='d' || c=='D'? Double.valueOf(s.substring(0,len-1)) : Double.valueOf(s);
-        case Character: return s.charAt(1);
-        case String: return s.substring(1, s.length()-1);
+        case Boolean: _value = Boolean.valueOf(s); break;
+        case Integer: try { _value = Integer.decode(s); } catch(Exception e) { } break;
+        case Long: try { _value = Long.decode(s.substring(0,len-1)); } catch(Exception e) { } break;
+        case Float: _value = Float.valueOf(s.substring(0,len-1)); break;
+        case Double: _value = c=='d' || c=='D'? Double.valueOf(s.substring(0,len-1)) : Double.valueOf(s); break;
+        case Character: _value = s.charAt(1); break;
+        case String: _value = s.substring(1, s.length()-1); break;
         default: return null;
     }
+    return _value;
 }
 
 /**
  * Returns the value string.
  */
-public String getValueString()  { return _valueString; }
+public String getValueString()
+{
+    // If value string already set, just return
+    if(_valueStr!=null) return _valueStr;
+    
+    // Create value string from value
+    if(_value==null) _valueStr = "null";
+    else if(_value instanceof Boolean) _valueStr = _value.toString();
+    else if(_value instanceof Character || _value instanceof String) _valueStr = _value.toString();
+    else if(_value instanceof Byte || _value instanceof Short) _valueStr = _value.toString();
+    else if(_value instanceof Integer) _valueStr = _value.toString();
+    else if(_value instanceof Long) _valueStr = _value.toString() + 'L';
+    else if(_value instanceof Float) { float val = (Float)_value;
+        if(val==(int)val) _valueStr = Integer.toString((int)val) + 'f';
+        else _valueStr = _value.toString() + 'f';
+    }
+    else if(_value instanceof Double) { double val = (Double)_value;
+        if(val==(long)val) _valueStr = Long.toString((int)val) + 'd';
+        else _valueStr = _value.toString() + 'd';
+    }
+    
+    // Return value string
+    return _valueStr;
+}
 
 /**
  * Sets the value string.
  */
-public void setValueString(String aString)  { _valueString = aString; }
+public void setValueString(String aString)  { _valueStr = aString; }
 
 /**
  * Tries to resolve the class declaration for this node.
