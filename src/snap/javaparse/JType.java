@@ -120,6 +120,17 @@ protected void append(StringBuffer aSB)
 }
 
 /**
+ * Returns whether type is number type.
+ */
+public boolean isNumberType()
+{
+    JavaDecl decl = getDecl(); if(decl==null) return false;
+    String tp = decl.getClassName().intern();
+    return tp=="byte" || tp=="short" || tp=="int" || tp=="long" || tp=="float" || tp=="double" ||
+        tp=="java.lang.Number";
+}
+
+/**
  * Standard equals implementation.
  */
 public boolean equals(Object anObj)

@@ -101,4 +101,26 @@ private String getClassNameMath()
  */
 public String getNodeString()  { return op + "Expr"; }
 
+/**
+ * Returns the Op string for op.
+ */
+public static String getOpString(Op anOp)
+{
+    switch(anOp) {
+        case Add: return "+"; case Subtract: return "-";
+        case Multiply: return "*"; case Divide: return "/"; case Mod: return "%";
+        case Equal: return "=="; case NotEqual: return "!=";
+        case LessThan: return "<"; case GreaterThan: return ">";
+        case LessThanOrEqual: return "<="; case GreaterThanOrEqual: return ">=";
+        case Or: return "||"; case And: return "&&"; case Not: return "!";
+        case BitOr: return "|"; case BitXOr: return "^"; case BitAnd: return "&";
+        case Conditional: return "?"; case Assignment: return "=";
+        case ShiftLeft: return "<<"; case ShiftRight: return ">>"; case ShiftRightUnsigned: return ">>>";
+        case PreIncrement: return "++"; case PreDecrement: return "--";
+        case Negate: return "!"; case BitComp: return "<DUNNO>";
+        case PostIncrement: return "++"; case PostDecrement: return "--";
+        default: throw new RuntimeException("JExprMath: Unknown Op: " + anOp);
+    }
+}
+
 }

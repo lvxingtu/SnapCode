@@ -9,7 +9,10 @@ import snap.util.SnapUtils;
  * A JStatement for for() statements.
  */
 public class JStmtFor extends JStmt
-{    
+{
+    // Whether this for statement is really ForEach
+    boolean                 _forEach = true;
+    
     // The for-init declaration (if declaration)
     JStmtVarDecl            _initDecl;
     
@@ -24,6 +27,11 @@ public class JStmtFor extends JStmt
     
     // The statement to perform while conditional is true
     JStmt                   _stmt;
+
+/**
+ * Returns whether for statement is ForEach.
+ */
+public boolean isForEach()  { return _forEach; }
 
 /**
  * Returns the init declaration.

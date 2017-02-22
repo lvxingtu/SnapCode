@@ -21,6 +21,11 @@ public class JExprLambda extends JExpr {
 public List <JVarDecl> getParams()  { return _params; }
 
 /**
+ * Returns the number of paramters.
+ */
+public int getParamCount()  { return _params.size(); }
+
+/**
  * Returns the parameter at given index.
  */
 public JVarDecl getParam(int anIndex)  { return _params.get(anIndex); }

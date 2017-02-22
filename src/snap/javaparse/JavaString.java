@@ -161,10 +161,11 @@ public JavaString append(JExprId anExpr)  { return append(anExpr.getName()); }
  */
 public JavaString append(JExprLambda anExpr)
 {
-    if(anExpr.getParams().size()>1 || anExpr.getParam(0).isTypeSet()) append("(");
-    if(anExpr.getParams().size()>0) append(anExpr.getParam(0));
-    for(int i=1;i<anExpr.getParams().size();i++) append(", ").append(anExpr.getParam(i));
-    if(anExpr.getParams().size()>1 || anExpr.getParam(0).isTypeSet()) append(")");
+    int pcount = anExpr.getParamCount();
+    if(pcount>1 || pcount>0 && anExpr.getParam(0).isTypeSet()) append("(");
+    if(pcount>0) append(anExpr.getParam(0));
+    for(int i=1;i<pcount;i++) append(", ").append(anExpr.getParam(i));
+    if(pcount>1 || pcount>0 && anExpr.getParam(0).isTypeSet()) append(")");
     append(" -> ");
     if(anExpr.getExpr()!=null) return append(anExpr.getExpr());
     return append(anExpr.getBlock());
@@ -295,7 +296,9 @@ public JavaString append(JStmtAssert aStmt)
 public JavaString append(JStmtBlock aStmt)
 {
     append("{\n"); indent();
-    for(JStmt s : aStmt.getStatements()) appendIndent().append(s).append('\n');
+    if(aStmt!=null)
+        for(JStmt s : aStmt.getStatements())
+            appendIndent().append(s).append('\n');
     outdent(); return append("}");
 }
 

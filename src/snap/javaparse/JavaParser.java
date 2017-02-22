@@ -917,8 +917,8 @@ public static class ForStatementHandler extends JNodeParseHandler<JStmtFor>
             getPart().setConditional(aNode.getCustomNode(JExpr.class));
         
         // Handle separator
-        else if(anId==";")
-            partIndex++;
+        else if(anId==";") {
+            partIndex++; getPart()._forEach = false; }
         
         // Handle Statement
         else if(anId=="Statement")
