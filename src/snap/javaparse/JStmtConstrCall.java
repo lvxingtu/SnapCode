@@ -6,7 +6,7 @@ import java.util.*;
  * A JStmt subclass to represent an explicit constructor invocation, like: this(x) or super(y).
  * Found in first line of JContrDecl only.
  */
-public class JConstrCall extends JStmt {
+public class JStmtConstrCall extends JStmt {
 
     // The identifier
     List <JExprId>        _idList = new ArrayList();

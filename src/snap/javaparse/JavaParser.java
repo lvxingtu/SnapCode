@@ -491,7 +491,7 @@ public static class ConstrDeclHandler extends JNodeParseHandler <JConstrDecl>
         
         // Handle ConstrCall
         else if(anId=="ConstrCall")
-            getPart().getBlock().addStatement(aNode.getCustomNode(JConstrCall.class));
+            getPart().getBlock().addStatement(aNode.getCustomNode(JStmtConstrCall.class));
         
         // Handle BlockStatement
         else if(anId=="BlockStatement")
@@ -519,7 +519,7 @@ public static class ThrowsListHandler extends ParseHandler <ArrayList<JExpr>>
 /**
  * ConstrCall Handler.
  */
-public static class ConstrCallHandler extends JNodeParseHandler <JConstrCall>
+public static class ConstrCallHandler extends JNodeParseHandler <JStmtConstrCall>
 {
     /** ParseHandler method. */
     protected void parsedOne(ParseNode aNode, String anId)

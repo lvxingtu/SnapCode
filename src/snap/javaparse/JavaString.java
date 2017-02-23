@@ -271,7 +271,7 @@ public JavaString append(JStmt aStmt)
     if(aStmt instanceof JStmtTry) return append((JStmtTry)aStmt);
     if(aStmt instanceof JStmtVarDecl) return append((JStmtVarDecl)aStmt);
     if(aStmt instanceof JStmtWhile) return append((JStmtWhile)aStmt);
-    if(aStmt instanceof JConstrCall) return append((JConstrCall)aStmt);
+    if(aStmt instanceof JStmtConstrCall) return append((JStmtConstrCall)aStmt);
     if(aStmt==null) return append("null");
     return append("JavaString.append(JStmt): Not implemented for " + aStmt.getClass().getSimpleName());
 }
@@ -453,7 +453,7 @@ public JavaString append(JStmtWhile aStmt)
 /**
  * Append JConstrCall.
  */
-public JavaString append(JConstrCall aStmt)
+public JavaString append(JStmtConstrCall aStmt)
 {
     List <JExprId> idList = aStmt.getIds(); if(idList.size()>0) append(idList.get(0));
     for(int i=1;i<idList.size();i++) append('.').append(idList.get(i));

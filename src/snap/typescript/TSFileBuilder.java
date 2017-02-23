@@ -95,8 +95,8 @@ public boolean buildFiles(TaskMonitor aTaskMonitor)
         JavaData jdata = JavaData.get(file);
         String tscript = _twriter.getString(jdata.getJFile());
         WebFile tsfile = getTSFile(file);
-        if(SnapUtils.equals(tscript, tsfile.getText()))
-            continue;
+        //if(SnapUtils.equals(tscript, tsfile.getText()))
+        //    continue;
         tsfile.setText(tscript);
         tsfile.save();
     }

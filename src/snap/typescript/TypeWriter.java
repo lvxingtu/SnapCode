@@ -59,6 +59,7 @@ public void writeJFile(JFile aJFile)
 public void writeJImportDecl(JImportDecl anImp)
 {
     String iname = anImp.getName(); if(iname.startsWith("jsweet.")) return;
+    iname = iname.replace(".function", ".__function");
     int ind = iname.lastIndexOf('.');
     String iname2 = anImp.isInclusive() || ind<0? iname.replace('.', '_') : iname.substring(ind+1);
     append("import ").append(iname2).append(" = ").append(iname).append(';').endln();
@@ -97,9 +98,9 @@ public void writeJClassDecl(JClassDecl aCDecl)
  */
 public void writeJFieldDecl(JFieldDecl aFDecl)
 {
-    // Get modifier string
+    // Write modifiers
     JModifiers mods = aFDecl.getModifiers();
-    String mstr = mods!=null && mods.isPublic()? "public " : "";
+    writeJModifiers(mods);
 
     // Get first var decl
     JVarDecl vd = aFDecl.getVarDecls().get(0);
@@ -114,13 +115,12 @@ public void writeJFieldDecl(JFieldDecl aFDecl)
  */
 public void writeJMethodDecl(JMethodDecl aMDecl)
 {
-    // Get modifier string
+    // Write modifiers
     JModifiers mods = aMDecl.getModifiers();
-    String mstr = mods!=null && mods.isPublic() && mods.isStatic()? "public static " :
-        mods!=null && mods.isPublic()? "public " : "";
+    writeJModifiers(mods);
 
-    // Write modifiers, method name and args start char
-    append(mstr).append(aMDecl.getName()).append("(");
+    // Write method name and args start char
+    append(aMDecl.getName()).append("(");
     
     // Write parameters
     List <JVarDecl> params = aMDecl.getParameters();
@@ -145,7 +145,8 @@ public void writeJMethodDecl(JMethodDecl aMDecl)
 public void writeJVarDecl(JVarDecl aVD)
 {
     // Write name
-    append(aVD.getName()).append(" : ");
+    JExprId name = aVD.getId();
+    writeJExprId(name); append(" : ");
     
     // Write type
     String tstr = getTypeString(aVD.getType());
@@ -158,6 +159,26 @@ public void writeJVarDecl(JVarDecl aVD)
         append("= ");
         writeJExpr(init);
     }
+}
+
+/**
+ * Writes a JModifiers.
+ */
+public void writeJModifiers(JModifiers aMod)
+{
+    String str = getJModifierString(aMod);
+    append(str);
+}
+
+/**
+ * Returns a string for JModifier.
+ */
+public String getJModifierString(JModifiers aMod)
+{
+    String str = ""; if(aMod==null) return str;
+    if(aMod.isPublic()) str += "public ";
+    if(aMod.isStatic()) str += "static ";
+    return str;
 }
 
 /**
@@ -192,16 +213,25 @@ public void writeJStmt(JStmt aStmt)
 {
     if(aStmt instanceof JStmtAssert) writeJStmtAssert((JStmtAssert)aStmt);
     else if(aStmt instanceof JStmtBlock) writeJStmtBlock((JStmtBlock)aStmt, false);
+    else if(aStmt instanceof JStmtBreak) writeJStmtBreak((JStmtBreak)aStmt);
+    else if(aStmt instanceof JStmtClassDecl) writeJStmtClassDecl((JStmtClassDecl)aStmt);
+    else if(aStmt instanceof JStmtConstrCall) writeJStmtConstrCall((JStmtConstrCall)aStmt);
+    else if(aStmt instanceof JStmtContinue) writeJStmtContinue((JStmtContinue)aStmt);
+    else if(aStmt instanceof JStmtDo) writeJStmtDo((JStmtDo)aStmt);
+    else if(aStmt instanceof JStmtEmpty) writeJStmtEmpty((JStmtEmpty)aStmt);
     else if(aStmt instanceof JStmtExpr) writeJStmtExpr((JStmtExpr)aStmt);
     else if(aStmt instanceof JStmtFor) writeJStmtFor((JStmtFor)aStmt);
     else if(aStmt instanceof JStmtIf) writeJStmtIf((JStmtIf)aStmt);
+    else if(aStmt instanceof JStmtLabeled) writeJStmtLabeled((JStmtLabeled)aStmt);
     else if(aStmt instanceof JStmtReturn) writeJStmtReturn((JStmtReturn)aStmt);
     else if(aStmt instanceof JStmtSwitch) writeJStmtSwitch((JStmtSwitch)aStmt);
     else if(aStmt instanceof JStmtSynchronized) writeJStmtSynchronized((JStmtSynchronized)aStmt);
+    else if(aStmt instanceof JStmtThrow) writeJStmtThrow((JStmtThrow)aStmt);
     else if(aStmt instanceof JStmtTry) writeJStmtTry((JStmtTry)aStmt);
     else if(aStmt instanceof JStmtVarDecl) writeJStmtVarDecl((JStmtVarDecl)aStmt);
     else if(aStmt instanceof JStmtWhile) writeJStmtWhile((JStmtWhile)aStmt);
-    else append(aStmt.getString()).endln();
+    else throw new RuntimeException("TSWriter.writeJStmt: Unsupported statement " + aStmt.getClass());
+    //else append(aStmt.getString()).endln();
 }
 
 /**
@@ -231,6 +261,69 @@ public void writeJStmtBlock(JStmtBlock aBlock, boolean doSemicolon)
         
     // Outdent and terminate
     outdent(); append(doSemicolon? "};" : "}").endln();
+}
+
+/**
+ * Writes a JStmtBreak.
+ */
+public void writeJStmtBreak(JStmtBreak aStmt)
+{
+    append("break");
+    JExpr label = aStmt.getLabel();
+    if(label!=null) {
+        append(' '); writeJExpr(label); }
+    append(';').endln();
+}
+
+/**
+ * Writes a JStmtClassDecl.
+ */
+public void writeJStmtClassDecl(JStmtClassDecl aStmt)
+{
+    JClassDecl cdecl = aStmt.getClassDecl();
+    writeJClassDecl(cdecl);
+}
+
+/**
+ * Writes a JStmtConstrCall.
+ */
+public void writeJStmtConstrCall(JStmtConstrCall aStmt)
+{
+    append(aStmt.getString()).endln();
+}
+
+/**
+ * Writes a JStmtContinue.
+ */
+public void writeJStmtContinue(JStmtContinue aStmt)
+{
+    append("continue");
+    JExpr label = aStmt.getLabel();
+    if(label!=null) {
+        append(' '); writeJExpr(label); }
+    append(';').endln();
+}
+
+/**
+ * Writes a JStmtDo.
+ */
+public void writeJStmtDo(JStmtDo aStmt)
+{
+    append("do ");
+    JStmt stmt = aStmt.getStatement();
+    writeJStmt(stmt);
+    JExpr cond = aStmt.getConditional();
+    append("while(");
+    writeJExpr(cond);
+    append(");").endln();
+}
+
+/**
+ * Writes a JStmtEmpty.
+ */
+public void writeJStmtEmpty(JStmtEmpty aStmt)
+{
+    append(';').endln();
 }
 
 /**
@@ -295,7 +388,28 @@ public void writeJStmtFor(JStmtFor aStmt)
 
     // Write for closing paren and statement    
     append(") ");
-    writeJStmt(aStmt.getStatement());
+    JStmt stmt = aStmt.getStatement();
+    if(stmt instanceof JStmtBlock)
+        writeJStmt(stmt);
+    else {
+        endln().indent();
+        writeJStmt(stmt);
+        outdent();
+    }
+}
+
+/**
+ * Writes a JStmtLabeled.
+ */
+public void writeJStmtLabeled(JStmtLabeled aStmt)
+{
+    JExprId label = aStmt.getLabel();
+    writeJExprId(label);
+    append(':');
+    JStmt stmt = aStmt.getStmt();
+    if(stmt!=null) {
+        append(' '); writeJStmt(stmt); }
+    else endln();
 }
 
 /**
@@ -340,6 +454,16 @@ public void writeJStmtSwitchLabel(JStmtSwitch.SwitchLabel aSL)
 public void writeJStmtSynchronized(JStmtSynchronized aStmt)
 {
     writeJStmtBlock(aStmt.getBlock(), true);
+}
+
+/**
+ * Writes a JStmtThrow.
+ */
+public void writeJStmtThrow(JStmtThrow aStmt)
+{
+    append("throw ");
+    writeJExpr(aStmt.getExpr());
+    append(';').endln();
 }
 
 /**
@@ -396,18 +520,23 @@ public void writeJStmtWhile(JStmtWhile aStmt)
 public void writeJExpr(JExpr aExpr)
 {
     if(aExpr instanceof JExprAlloc) writeJExprAlloc((JExprAlloc)aExpr);
+    else if(aExpr instanceof JExprArrayIndex) writeJExprArrayIndex((JExprArrayIndex)aExpr);
     else if(aExpr instanceof JExprChain) writeJExprChain((JExprChain)aExpr);
     else if(aExpr instanceof JExpr.CastExpr) writeJExprCast((JExpr.CastExpr)aExpr);
     else if(aExpr instanceof JExprId) writeJExprId((JExprId)aExpr);
     else if(aExpr instanceof JExpr.InstanceOfExpr) writeJExprInstanceOf((JExpr.InstanceOfExpr)aExpr);
+    else if(aExpr instanceof JExprLambda) writeJExprLambda((JExprLambda)aExpr);
     else if(aExpr instanceof JExprLiteral) writeJExprLiteral((JExprLiteral)aExpr);
     else if(aExpr instanceof JExprMath) writeJExprMath((JExprMath)aExpr);
     else if(aExpr instanceof JExprMethodCall) writeJExprMethodCall((JExprMethodCall)aExpr);
-    else append(aExpr.getString());
+    else if(aExpr instanceof JExprMethodRef) writeJExprMethodRef((JExprMethodRef)aExpr);
+    else if(aExpr instanceof JExprType) writeJExprType((JExprType)aExpr);
+    else throw new RuntimeException("TSWriter.writeJExpr: Unsupported expression " + aExpr.getClass());
+    //else append(aExpr.getString());
 }
 
 /**
- * Writes a JExpr.CastExpr.
+ * Writes a JExprAlloc.
  */
 public void writeJExprAlloc(JExprAlloc aExpr)
 {
@@ -428,6 +557,17 @@ public void writeJExprAlloc(JExprAlloc aExpr)
     if(aExpr.getClassDecl()!=null) {
         System.err.println("Need to write ClassDecl for " + aExpr.getClassDecl().getClassName());
     }
+}
+
+/**
+ * Writes a JExprArrayIndex.
+ */
+public void writeJExprArrayIndex(JExprArrayIndex aExpr)
+{
+    JExpr expr = aExpr.getArrayExpr();
+    writeJExpr(expr);
+    JExpr iexpr = aExpr.getIndexExpr();
+    append('['); writeJExpr(iexpr); append(']');
 }
 
 /**
@@ -459,7 +599,7 @@ public void writeJExprChain(JExprChain aExpr)
 public void writeJExprId(JExprId aExpr)
 {
     // If id is field or method, append "this."
-    if(aExpr.getParentExpr()==null) {
+    if(aExpr.getParentExpr()==null && !(aExpr.getParent() instanceof JVarDecl)) {
         JavaDecl jdecl = aExpr.getDecl();
         JavaDecl.Type typ = jdecl!=null? jdecl.getType() : null;
         if(typ==JavaDecl.Type.Field || typ==JavaDecl.Type.Method)
@@ -467,7 +607,10 @@ public void writeJExprId(JExprId aExpr)
     }
     
     // Append id
-    append(aExpr.getString());
+    String str = aExpr.getName();
+    if(str.equals("in")) str = "__in";
+    else if(str.equals("function")) str = "__function";
+    append(str);
 }
 
 /**
@@ -492,6 +635,27 @@ public void writeJExprInstanceOf(JExpr.InstanceOfExpr aExpr)
     
     // Get write type
     writeJType(typ);
+}
+
+/**
+ * Writes a JExprLambda.
+ */
+public void writeJExprLambda(JExprLambda aExpr)
+{
+    // Write parameters
+    append('(');
+    List <JVarDecl> params = aExpr.getParams(); JVarDecl last = params.size()>0? params.get(params.size()-1) : null;
+    for(JVarDecl param : aExpr.getParams()) {
+        append(param.getName()); if(param!=last) append(','); }
+    append(')');
+    
+    // Write fat arrow
+    append(" => ");
+    
+    // Write expression or statement block
+    if(aExpr.getExpr()!=null)
+        writeJExpr(aExpr.getExpr());
+    else writeJStmtBlock(aExpr.getBlock(), false);
 }
 
 /**
@@ -558,8 +722,8 @@ public void writeJExprMath(JExprMath aExpr)
 public void writeJExprMethodCall(JExprMethodCall aExpr)
 {
     // Append name and open char
-    JExpr id = aExpr.getId(); String name = id.getName();
-    append(name).append('(');
+    JExprId id = aExpr.getId(); String name = id.getName();
+    writeJExprId(id); append('(');
     
     // Append args
     List <JExpr> args = aExpr.getArgs(); JExpr last = args.size()>0? args.get(args.size()-1) : null;
@@ -568,6 +732,23 @@ public void writeJExprMethodCall(JExprMethodCall aExpr)
         
     // Append close char
     append(')');
+}
+
+/**
+ * Writes a JExprMethodRef.
+ */
+public void writeJExprMethodRef(JExprMethodRef aExpr)
+{
+    System.out.println("TSWriter: Need to write method ref: " + aExpr.getFile().getClassName());
+}
+
+/**
+ * Writes a JExprType.
+ */
+public void writeJExprType(JExprType aExpr)
+{
+    JType typ = aExpr.getType();
+    writeJType(typ);
 }
 
 }
