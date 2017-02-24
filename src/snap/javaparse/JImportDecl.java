@@ -68,7 +68,10 @@ protected JavaDecl getDeclImpl()
 public String getImportClassName(String aName)
 {
     String cname = isClassName()? getClassName() : getName();
-    if(isInclusive) cname += (isClassName()? '$' : '.') + aName;
+    if(isInclusive) {
+        if(!isStatic() || !cname.endsWith(aName))
+            cname += (isClassName()? '$' : '.') + aName;
+    }
     return cname;
 }
 

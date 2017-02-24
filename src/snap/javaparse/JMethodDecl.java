@@ -127,9 +127,15 @@ protected JavaDecl resolveName(JNode aNode)
         return getDecl();
     
     // Iterate over formalParams
+    String name = aNode.getName();
     if(aNode instanceof JExprId) for(JVarDecl vd : _params)
-        if(SnapUtils.equals(vd.getName(), aNode.getName()))
+        if(SnapUtils.equals(vd.getName(), name))
             return vd.getDecl();
+    
+    // Look for JTypeParam for given name
+    JTypeParam tp = getTypeParam(name);
+    if(tp!=null)
+        return tp.getDecl();
     
     // Do normal version
     return super.resolveName(aNode);

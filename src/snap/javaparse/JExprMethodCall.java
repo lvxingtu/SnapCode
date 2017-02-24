@@ -99,14 +99,12 @@ protected JavaDecl getDeclImpl()
     JavaDecl decl = new JavaDecl(meth);
     
     // If method return type is TypeVariable name, try to resolve it to real class
-    if(meth.getGenericReturnType() instanceof TypeVariable) {
-        
-        // Get TypeVariable and name
-        TypeVariable tv = (TypeVariable)meth.getGenericReturnType();
+    Type rtype = meth.getGenericReturnType();
+    if(rtype instanceof TypeVariable) { TypeVariable tv = (TypeVariable)rtype;
+
+        // See if method can resolve TypeVariable from method args
         String name = tv.getName();
-        
-        // See if method can resolve TypeVariable name
-        Class rclass = resolveTypeName(meth, name);
+        Class rclass = resolveTypeVarFromArgs(meth, name);
         if(rclass!=null) {
             decl._tname = rclass.getName(); return decl; }
             
@@ -115,42 +113,58 @@ protected JavaDecl getDeclImpl()
         rclass = resolveTypeName(pclass, name);
         if(rclass!=null) {
             decl._tname = rclass.getName(); return decl; }
-        System.err.println("JExprMethodCall.getDeclImpl: Can't type name for method: " + meth); 
+            
+        // This should never happen - TypeVar should be defined either in method or class
+        System.err.println("JExprMethodCall.getDeclImpl: Can't type name for method: " + meth);
     }
     
     // Return decl
     return decl;
 }
 
-/** Tries to resolve a Type name to a class from a method's TypeVariables. */
-private Class resolveTypeName(Method aMeth, String aName)
+/** Tries to resolve a Type name to a class from a method's TypeVariables and args. */
+private Class resolveTypeVarFromArgs(Method aMeth, String aName)
 {
     // See if TypeVariable exists for name (just return if null)
-    TypeVariable tv = null; for(TypeVariable t : aMeth.getTypeParameters()) if(t.getName().equals(aName)) tv = t;
+    TypeVariable tv = null;
+    for(TypeVariable t : aMeth.getTypeParameters()) if(t.getName().equals(aName)) { tv = t; break; }
     if(tv==null) return null;
     
-    // Resolve type for args with matching type name
-    for(int i=0, iMax=aMeth.getParameterCount(); i<iMax; i++) {
-        Type t = aMeth.getGenericParameterTypes()[i];
-        if(t instanceof ParameterizedType) { ParameterizedType pt = (ParameterizedType)t;
-            for(Type t2 : pt.getActualTypeArguments())
+    // Iterate over parameters and see if matching TypeVariable arg can resolve
+    Type ptypes[] = aMeth.getGenericParameterTypes();
+    for(int i=0, iMax=ptypes.length; i<iMax; i++) { Type t = ptypes[i];
+    
+        // If TypeVariable with same name, return class for arg expression
+        if(t instanceof TypeVariable && ((TypeVariable)t).getName().equals(aName)) {
+            JExpr expr = getArgs().get(i);
+            Class cls = expr.getJClass();
+            if(cls!=Object.class)
+                return cls;
+        }
+        
+        // If ParameterizedType with matching type args...
+        else if(t instanceof ParameterizedType) { ParameterizedType pt = (ParameterizedType)t;
+            Type targs[] = pt.getActualTypeArguments();
+            for(Type t2 : targs)
                 if(t2 instanceof TypeVariable && ((TypeVariable)t2).getName().equals(aName)) {
                     JExpr expr = getArgs().get(i);
                     Class cls = expr.getJClass();
                     if(cls==Class.class && expr instanceof JExprChain) { JExprChain ec = (JExprChain)expr;
                         cls = ec.getExpr(ec.getExprCount()-2).getJClass(); }
-                    return cls;
+                    //if(cls!=Object.class)
+                        return cls;
                 }
         }
     }
     
-    // Return null since type name not found or not resolved
-    return null;
+    // Return type from since type name not found or not resolved
+    return getTypeClass(tv);
 }
 
 /** Returns the class name, converting primitive arrays to 'int[]' instead of '[I'. */
 private Class resolveTypeName(Type aType, String aName)
 {
+    // Handle Class
     if(aType instanceof Class) { Class cls = (Class)aType;
         for(Type t : cls.getTypeParameters()) {
             Class c = resolveTypeName(t, aName); if(c!=null)
@@ -159,32 +173,43 @@ private Class resolveTypeName(Type aType, String aName)
         if(scls!=Object.class && scls!=null)
             return resolveTypeName(stype, aName);
     }
+    
+    // Handle GenericArrayType
     if(aType instanceof GenericArrayType) { GenericArrayType gat = (GenericArrayType)aType;
         return resolveTypeName(gat.getGenericComponentType(), aName); }
+        
+    // Handle ParamterizedType
     if(aType instanceof ParameterizedType) { ParameterizedType pt = (ParameterizedType)aType;
         if(pt.getActualTypeArguments().length>0)
             return getTypeClass(pt.getActualTypeArguments()[0]); }
+            
+    // Handle TypeVariable
     if(aType instanceof TypeVariable) { TypeVariable tv = (TypeVariable)aType;
         if(tv.getName().equals(aName))
             return getTypeClass(tv); }
+
+    // Return null since not found
     return null;
 }
 
 /** Returns the class name, converting primitive arrays to 'int[]' instead of '[I'. */
 private Class getTypeClass(Type aType)
 {
+    Class tc = null;
     if(aType instanceof Class)
-        return (Class)aType;
-    if(aType instanceof GenericArrayType) { GenericArrayType gat = (GenericArrayType)aType;
-        return getTypeClass(gat.getGenericComponentType()); }
-    if(aType instanceof ParameterizedType)
-        return getTypeClass(((ParameterizedType)aType).getRawType());
-    if(aType instanceof TypeVariable)
-        return getTypeClass(((TypeVariable)aType).getBounds()[0]);
-    if(aType instanceof WildcardType) { WildcardType wc = (WildcardType)aType;
+        tc = (Class)aType;
+    else if(aType instanceof GenericArrayType) { GenericArrayType gat = (GenericArrayType)aType;
+        tc = getTypeClass(gat.getGenericComponentType()); }
+    else if(aType instanceof ParameterizedType)
+        tc = getTypeClass(((ParameterizedType)aType).getRawType());
+    else if(aType instanceof TypeVariable)
+        tc = getTypeClass(((TypeVariable)aType).getBounds()[0]);
+    else if(aType instanceof WildcardType) { WildcardType wc = (WildcardType)aType;
         if(wc.getLowerBounds().length>0) return getTypeClass(wc.getLowerBounds()[0]);
-        return getTypeClass(wc.getUpperBounds()[0]); }
-    System.err.println("JExprMethodCall.getTypeClass: Can't get class from type: " + aType); return null;
+        tc = getTypeClass(wc.getUpperBounds()[0]); }
+    if(tc==null)
+        System.err.println("JExprMethodCall.getTypeClass: Can't get class from type: " + aType);
+    return tc;
 }
 
 /**

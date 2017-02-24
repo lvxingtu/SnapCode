@@ -119,6 +119,8 @@ public String getClassName()
     // Get name from type
     JType typ = getType(); if(typ==null) return null;
     String cname = typ.getClassName();
+    if(cname==null)
+        System.err.println("JVarDecl.getClassName: Can't find class for " + getName() + " in " + getFile().getName());
     
     // Handle array
     if(_arrayCount>0) {
