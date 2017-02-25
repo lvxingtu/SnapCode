@@ -89,6 +89,15 @@ public static class SwitchLabel extends JNode
     
     /** Adds a statement. */
     public void addStatement(JStmt aStmt)  { _stmts.add(aStmt); addChild(aStmt, -1); }
+    
+    /** Override to check inner variable declaration statements. */
+    protected JavaDecl resolveName(JNode aNode)
+    {
+        JavaDecl decl = JStmtBlock.resolveName(aNode, getStatements());
+        if(decl!=null)
+            return decl;
+        return super.resolveName(aNode);
+    }
 }
 
 }

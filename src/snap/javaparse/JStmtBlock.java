@@ -38,14 +38,24 @@ public JStmtBlock getBlock()  { return this; }
 /**
  * Override to check inner variable declaration statements.
  */
-@Override
 protected JavaDecl resolveName(JNode aNode)
+{
+    JavaDecl decl = resolveName(aNode, getStatements());
+    if(decl!=null)
+        return decl;
+    return super.resolveName(aNode);
+}
+
+/**
+ * Override to check inner variable declaration statements.
+ */
+public static JavaDecl resolveName(JNode aNode, List <JStmt> theStmts)
 {
     // Get node info
     String name = aNode.getName(); boolean isType = aNode instanceof JExprType;
     
     // Iterate over statements and see if any contains variable
-    if(!isType) for(JStmt s : getStatements()) {
+    if(!isType) for(JStmt s : theStmts) {
         if(s instanceof JStmtLabeled) { JStmtLabeled ls = (JStmtLabeled)s;
             if(SnapUtils.equals(ls.getLabelName(), name))
                 return ls.getLabelVarDecl().getDecl(); }
@@ -58,7 +68,7 @@ protected JavaDecl resolveName(JNode aNode)
     }
     
     // Do normal version
-    return super.resolveName(aNode);
+    return null;
 }
 
 /**

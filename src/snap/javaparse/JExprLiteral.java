@@ -116,7 +116,8 @@ public void setValueString(String aString)  { _valueStr = aString; }
  */
 protected JavaDecl getDeclImpl()
 {
-    Class cls = getValue()!=null? getValue().getClass() : Object.class;
+    Object val = getValue(); if(val==null) return null;
+    Class cls = val.getClass();
     return new JavaDecl(cls);
 }
         
