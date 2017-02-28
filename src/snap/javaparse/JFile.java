@@ -144,7 +144,6 @@ public JImportDecl getImport(String aName)
 {
     // Handle fully specified name
     if(isKnownClassName(aName)) return null;
-    if(_unusedImports==null) _unusedImports = new HashSet(getImportDecls());
     
     // Iterate over imports to see if any can resolve name
     JImportDecl match = null;
@@ -170,7 +169,10 @@ public JImportDecl getImport(String aName)
     }
     
     // Remove match from UnusedImports and return
-    if(match!=null) _unusedImports.remove(match);
+    if(match!=null) {
+        if(match.isInclusive()) match.addFoundClassName(aName);
+        match._used = true;
+    }
     return match;
 }
 
@@ -179,9 +181,6 @@ public JImportDecl getImport(String aName)
  */
 public JImportDecl getStaticImport(String aName, Class theParams[])
 {
-    // Handle fully specified name
-    if(_unusedImports==null) _unusedImports = new HashSet(getImportDecls());
-    
     // Iterate over imports to see if any can resolve name
     for(int i=_importDecls.size()-1; i>=0; i--) { JImportDecl imp = _importDecls.get(i);
     
@@ -250,8 +249,20 @@ public Member getImportClassMember(String aName, Class theParams[])
  */
 public Set <JImportDecl> getUnusedImports()
 {
-    resolveClassNames(this); if(_unusedImports==null) _unusedImports = new HashSet();
-    return _unusedImports;
+    if(_unusedImports!=null) return _unusedImports;
+    resolveClassNames(this);
+    Set <JImportDecl> uimps = new HashSet();
+    for(JImportDecl imp : getImportDecls()) if(!imp._used) uimps.add(imp);
+    System.out.println("Expanded imports in file " + getClassName() + ":");
+    for(JImportDecl imp : getImportDecls()) {
+        if(imp.isInclusive() && !imp.isStatic() && imp.getFoundClassNames().size()>0) {
+            System.out.print("    " + imp.getString() + ": ");
+            List <String> names = imp.getFoundClassNames(); String last = names.size()>0? names.get(names.size()-1):null;
+            for(String n : names) {
+                System.out.print(n); if(n!=last) System.out.print(", "); else System.out.println(); }
+        }
+    }
+    return _unusedImports = uimps;
 }
 
 /**
@@ -259,7 +270,11 @@ public Set <JImportDecl> getUnusedImports()
  */
 private void resolveClassNames(JNode aNode)
 {
-    aNode.getClassName();
+    // Handle JType
+    if(aNode instanceof JType || aNode instanceof JExprId)
+        aNode.getClassName();
+        
+    // Recurse for children
     for(JNode child : aNode.getChildren())
         resolveClassNames(child);
 }

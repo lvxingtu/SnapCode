@@ -3,6 +3,7 @@
  */
 package snap.javaparse;
 import java.lang.reflect.Member;
+import java.util.*;
 import snap.util.ClassUtils;
 
 /**
@@ -18,6 +19,12 @@ public class JImportDecl extends JNode {
     
     // Whether import is inclusive (ends with '.*')
     boolean        isInclusive;
+    
+    // Whether import is used
+    boolean        _used;
+    
+    // The list of child class names found by this import, if inclusive
+    List <String>  _found = Collections.EMPTY_LIST;
     
 /**
  * Returns whether import is static.
@@ -109,5 +116,19 @@ public void setNameExpr(JExpr anExpr)  { replaceChild(_nameExpr, _nameExpr = anE
  * Resolves the name from identifier, if available.
  */
 protected String getNameImpl()  { return _nameExpr!=null? _nameExpr.getName() : null; }
+
+/**
+ * Returns the list of child class names found by this import (if inclusive).
+ */
+public List <String> getFoundClassNames()  { return _found; }
+
+/**
+ * Adds a child class name to list of those
+ */
+protected void addFoundClassName(String aName)
+{
+    if(_found==Collections.EMPTY_LIST) _found = new ArrayList();
+    _found.add(aName);
+}
 
 }

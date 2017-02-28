@@ -346,7 +346,7 @@ public String getNodeString()  { return getClass().getSimpleName(); }
 /**
  * Returns the string for this node (from Token.Tokenizer.getInput(Start,End)).
  */
-public String getString()  { return new JavaString().append(this).toString(); }
+public String getString()  { return new JavaWriter().getString(this); }
 
 /**
  * Standard toString implementation.

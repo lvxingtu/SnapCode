@@ -1,11 +1,10 @@
-package snap.typescript;
+package snap.javaparse;
 import java.util.List;
-import snap.javaparse.*;
 
 /**
- * A class to convert Java to TypeScript.
+ * A class to convert a JNode (tree) to a String.
  */
-public class TypeWriter {
+public class JavaWriter {
 
     // The StringBuffer
     StringBuffer      _sb = new StringBuffer();
@@ -35,7 +34,7 @@ public String getString(JNode aNode)
 public void writeJNode(JNode aNode)
 {
     if(aNode instanceof JFile) writeJFile((JFile)aNode);
-    //else if(aNode instanceof JPackageDecl) writeJPackageDecl((JPackageDecl)aNode);
+    else if(aNode instanceof JPackageDecl) writeJPackageDecl((JPackageDecl)aNode);
     else if(aNode instanceof JImportDecl) writeJImportDecl((JImportDecl)aNode);
     else if(aNode instanceof JClassDecl) writeJClassDecl((JClassDecl)aNode);
     else if(aNode instanceof JFieldDecl) writeJFieldDecl((JFieldDecl)aNode);
@@ -44,7 +43,17 @@ public void writeJNode(JNode aNode)
     else if(aNode instanceof JExpr) writeJExpr((JExpr)aNode);
     else if(aNode instanceof JType) writeJType((JType)aNode);
     else if(aNode instanceof JVarDecl) writeJVarDecl((JVarDecl)aNode);
-    else append("TSWriter: write" + aNode.getClass().getSimpleName() + " not implemented");
+    else append("JavaWriter: write" + aNode.getClass().getSimpleName() + " not implemented");
+}
+
+/**
+ * Write a JPackageDecl.
+ */
+public void writeJPackageDecl(JPackageDecl aPDecl)
+{
+    append("package ");
+    append(aPDecl.getName());
+    append(';').endln();
 }
 
 /**
@@ -52,11 +61,10 @@ public void writeJNode(JNode aNode)
  */
 public void writeJFile(JFile aJFile)
 {
-    append("/* Generated from Java with SnapCode - http://www.reportmill.com */\n");
-    
-    String pname = aJFile.getPackageName();
-    if(pname!=null) append("namespace ").append(pname).append(' ').append("{").endln();
-    indent();
+    // Append Package declaration
+    JPackageDecl pdecl = aJFile.getPackageDecl();
+    if(pdecl!=null)
+        writeJPackageDecl(pdecl);
     
     // Append imports
     for(JImportDecl imp : aJFile.getImportDecls())
@@ -65,13 +73,6 @@ public void writeJFile(JFile aJFile)
     
     // Append class decls
     writeJClassDecl(aJFile.getClassDecl());
-    
-    // Outdent and terminate namespace
-    outdent();
-    append("}");
-    
-    // Write main method
-    endln().endln().append(aJFile.getClassDecl().getClassName()).append(".main(null);\n");
 }
 
 /**
@@ -79,11 +80,12 @@ public void writeJFile(JFile aJFile)
  */
 public void writeJImportDecl(JImportDecl anImp)
 {
-    String iname = anImp.getName(); if(iname.startsWith("jsweet.")) return;
-    iname = iname.replace(".function", ".__function");
-    int ind = iname.lastIndexOf('.');
-    String iname2 = anImp.isInclusive() || ind<0? iname.replace('.', '_') : iname.substring(ind+1);
-    append("import ").append(iname2).append(" = ").append(iname).append(';').endln();
+    String iname = anImp.getName();
+    append("import ");
+    if(anImp.isStatic()) append("static ");
+    append(iname);
+    if(anImp.isInclusive()) append(".*");
+    append(';').endln();
 }
 
 /**
@@ -94,8 +96,8 @@ public void writeJClassDecl(JClassDecl aCDecl)
     // Append class label with modifiers: public class XXX ...
     String cname = aCDecl.getSimpleName();
     JModifiers mods = aCDecl.getModifiers();
-    String mstr = mods!=null && mods.isAbstract()? "abstract " : "";
-    append("export ").append(mstr).append("class ").append(cname).append(' ');
+    writeJModifiers(mods);
+    append("class ").append(cname).append(' ');
     
     // Append extends types
     List <JType> etypes = aCDecl.getExtendsTypes(); JType elast = etypes.size()>0? etypes.get(etypes.size()-1) : null;
@@ -127,19 +129,10 @@ public void writeJClassDecl(JClassDecl aCDecl)
     outdent();
     append('}').endln();
     
-    // Write class
-    endln();
-    append(cname).append("[\"__class\"] = \"").append(aCDecl.getClassName()).append("\";").endln();
-    
     // Append inner classes
     JClassDecl cdecls[] = aCDecl.getClassDecls();
-    if(cdecls.length>0) {
-        System.out.println("Write Inner classes for " + cname);
-        endln().append("export namespace ").append(cname).append(" {").endln().endln().indent();
-        for(JClassDecl cd : cdecls)
-            writeJClassDecl(cd);
-        outdent().append('}').endln();
-    }
+    for(JClassDecl cd : cdecls) {
+        endln(); writeJClassDecl(cd); }
 }
 
 /**
@@ -168,6 +161,10 @@ public void writeJMethodDecl(JMethodDecl aMDecl)
     JModifiers mods = aMDecl.getModifiers();
     writeJModifiers(mods);
 
+    // Write return type (if not empty/void)
+    JType rtype = aMDecl.getType();
+    writeJType(rtype); append(' ');
+    
     // Write method name and args start char
     append(aMDecl.getName()).append("(");
     
@@ -180,10 +177,6 @@ public void writeJMethodDecl(JMethodDecl aMDecl)
     // Write parameters close char
     append(") ");
     
-    // Write return type (if not empty/void)
-    String tstr = getTypeString(aMDecl.getType());
-    if(tstr.length()>0) append(": ").append(tstr).append(' ');
-    
     // Write method block
     writeJStmtBlock(aMDecl.getBlock(), false);
 }
@@ -193,19 +186,19 @@ public void writeJMethodDecl(JMethodDecl aMDecl)
  */
 public void writeJVarDecl(JVarDecl aVD)
 {
-    // Write name
-    JExprId name = aVD.getId();
-    writeJExprId(name); append(" : ");
-    
     // Write type
     String tstr = getTypeString(aVD.getType());
     for(int i=0,iMax=aVD.getArrayCount();i<iMax;i++) tstr += "[]";
     append(tstr).append(' ');
     
+    // Write name
+    JExprId name = aVD.getId();
+    writeJExprId(name);
+    
     // Write initializer
     JExpr init = aVD.getInitializer();
     if(init!=null) {
-        append("= ");
+        append(" = ");
         writeJExpr(init);
     }
 }
@@ -246,11 +239,6 @@ public void writeJType(JType aType)
 public String getTypeString(JType aType)
 {
     String name = aType.getName();
-    if(name.equals("void")) name = "";
-    else if(name.equals("Object")) name = "any";
-    else if(name.equals("String") || name.equals("char") || name.equals("Character")) name = "string";
-    else if(aType.isNumberType()) name = "number";
-    else if(name.equals("Boolean")) name = "boolean";
     if(aType.isArrayType())
         name = name + "[]";
     return name;
@@ -290,9 +278,9 @@ public void writeJStmt(JStmt aStmt)
 public void writeJStmtAssert(JStmtAssert aStmt)
 {
     JExpr cond = aStmt.getConditional(), expr = aStmt.getExpr();
-    append("if(!("); writeJExpr(cond); append(")) ");
-    append("throw new Error(\"Assertion error\")");
-    append(';').endln();
+    append("assert(");
+    writeJExpr(cond);
+    append(");").endln();
 }
 
 /**
@@ -339,7 +327,15 @@ public void writeJStmtClassDecl(JStmtClassDecl aStmt)
  */
 public void writeJStmtConstrCall(JStmtConstrCall aStmt)
 {
-    append(aStmt.getString()).endln();
+    List <JExprId> ids = aStmt.getIds(); JExprId ilast = ids.size()>0? ids.get(ids.size()-1) : null;
+    for(JExprId id : ids) {
+        writeJExprId(id); if(id!=ilast) append('.'); }
+
+    append('(');
+    List <JExpr> args = aStmt.getArgs(); JExpr alast = args.size()>0? args.get(args.size()-1) : null;
+    for(JExpr arg : args) {
+        writeJExpr(arg); if(arg!=alast) append(", "); }
+    append(");").endln();
 }
 
 /**
@@ -416,16 +412,15 @@ public void writeJStmtFor(JStmtFor aStmt)
 
     // Handle for(each)
     if(aStmt.isForEach()) {
-        append("let ").append(initVD.getName()).append(" of ");
+        writeJVarDecl(initVD);
+        append(" : ");
         writeJExpr(cond);
     }
     
     // Handle conventional for()
     else {
-        if(initVD!=null) {
-            if(initVD.getType()!=null) append("let ");
+        if(initVD!=null)
             writeJVarDecl(initVD);
-        }
         append(';');
         if(cond!=null)
             writeJExpr(cond);
@@ -529,9 +524,10 @@ public void writeJStmtTry(JStmtTry aStmt)
     append("try "); writeJStmtBlock(tryBlock, false);
         
     // Write catch blocks
-    //for(JStmtTry.CatchBlock cb : catchBlocks) {
-    if(catchBlocks.size()>0) { JStmtTry.CatchBlock cb = catchBlocks.get(0);
-        append("catch(").append(cb.getParameter().getName()).append(") ");
+    for(JStmtTry.CatchBlock cb : catchBlocks) {
+        append("catch(");
+        writeJVarDecl(cb.getParameter());
+        append(") ");
         writeJStmtBlock(cb.getBlock(), false);
     }
     
@@ -546,7 +542,6 @@ public void writeJStmtTry(JStmtTry aStmt)
 public void writeJStmtVarDecl(JStmtVarDecl aStmt)
 {
     for(JVarDecl vd : aStmt.getVarDecls()) {
-        append("let ");
         writeJVarDecl(vd);
         append(';').endln();
     }
@@ -581,7 +576,7 @@ public void writeJExpr(JExpr aExpr)
     else if(aExpr instanceof JExprMethodCall) writeJExprMethodCall((JExprMethodCall)aExpr);
     else if(aExpr instanceof JExprMethodRef) writeJExprMethodRef((JExprMethodRef)aExpr);
     else if(aExpr instanceof JExprType) writeJExprType((JExprType)aExpr);
-    else throw new RuntimeException("TSWriter.writeJExpr: Unsupported expression " + aExpr.getClass());
+    else throw new RuntimeException("JavaWriter.writeJExpr: Unsupported expression " + aExpr.getClass());
     //else append(aExpr.getString());
 }
 
@@ -604,9 +599,9 @@ public void writeJExprAlloc(JExprAlloc aExpr)
     append(')');
     
     // Append ClassDecl
-    if(aExpr.getClassDecl()!=null) {
-        System.err.println("Need to write ClassDecl for " + aExpr.getClassDecl().getClassName());
-    }
+    JClassDecl cdecl = aExpr.getClassDecl();
+    if(cdecl!=null)
+        writeJClassDecl(cdecl);
 }
 
 /**
@@ -625,11 +620,10 @@ public void writeJExprArrayIndex(JExprArrayIndex aExpr)
  */
 public void writeJExprCast(JExpr.CastExpr aExpr)
 {
-    append('(').append('<');
+    append('(');
     writeJType(aExpr.getType());
-    append('>');
-    writeJExpr(aExpr.getExpr());
     append(')');
+    writeJExpr(aExpr.getExpr());
 }
 
 /**
@@ -646,22 +640,7 @@ public void writeJExprChain(JExprChain aExpr)
 /**
  * Writes a JExprId.
  */
-public void writeJExprId(JExprId aExpr)
-{
-    // If id is field or method, append "this."
-    if(aExpr.getParentExpr()==null && !(aExpr.getParent() instanceof JVarDecl)) {
-        JavaDecl jdecl = aExpr.getDecl();
-        JavaDecl.Type typ = jdecl!=null? jdecl.getType() : null;
-        if(typ==JavaDecl.Type.Field || typ==JavaDecl.Type.Method)
-            append("this.");
-    }
-    
-    // Append id
-    String str = aExpr.getName();
-    if(str.equals("in")) str = "__in";
-    else if(str.equals("function")) str = "__function";
-    append(str);
-}
+public void writeJExprId(JExprId aExpr)  { append(aExpr.getName()); }
 
 /**
  * Writes a JExpr.InstanceOfExpr.
@@ -671,19 +650,7 @@ public void writeJExprInstanceOf(JExpr.InstanceOfExpr aExpr)
     // Get the type and type string
     JExpr expr = aExpr.getExpr();
     JType typ = aExpr.getType();
-    String tstr = getTypeString(typ);
-    
-    // Handle primitive types
-    if(tstr.equals("number") || tstr.equals("string") || tstr.equals("boolean")) {
-        append("typeof "); writeJExpr(expr); append(" === \'").append(tstr).append('\'');
-        return;
-    }
-    
-    // Get expr and write: expr!=null && expr instanceof
-    writeJExpr(expr); append("!=null && ");
     writeJExpr(expr); append(" instanceof ");
-    
-    // Get write type
     writeJType(typ);
 }
 
@@ -699,8 +666,8 @@ public void writeJExprLambda(JExprLambda aExpr)
         append(param.getName()); if(param!=last) append(','); }
     append(')');
     
-    // Write fat arrow
-    append(" => ");
+    // Write arrow
+    append(" -> ");
     
     // Write expression or statement block
     if(aExpr.getExpr()!=null)
@@ -714,12 +681,6 @@ public void writeJExprLambda(JExprLambda aExpr)
 public void writeJExprLiteral(JExprLiteral aExpr)
 {
     String str = aExpr.getValueString();
-    JExprLiteral.LiteralType typ = aExpr.getLiteralType();
-    if(typ==JExprLiteral.LiteralType.Long || typ==JExprLiteral.LiteralType.Float ||
-        typ==JExprLiteral.LiteralType.Double) {
-        char c = str.charAt(str.length()-1);
-        if(Character.isLetter(c)) str = str.substring(0, str.length()-1);
-    }
     append(str);
 }
 
@@ -763,7 +724,7 @@ public void writeJExprMath(JExprMath aExpr)
         writeJExpr(exp0);
     }
     
-    else throw new RuntimeException("TSWriter.writeJExprMath: Unsupported op: " + op);
+    else throw new RuntimeException("JavaWriter.writeJExprMath: Unsupported op: " + op);
 }
 
 /**
@@ -804,42 +765,42 @@ public void writeJExprType(JExprType aExpr)
 /**
  * Append String.
  */
-public TypeWriter append(String aStr)  { cd(); _sb.append(aStr); return this; }
+public JavaWriter append(String aStr)  { cd(); _sb.append(aStr); return this; }
 
 /**
  * Append char.
  */
-public TypeWriter append(char aValue)  { cd(); _sb.append(aValue); return this; }
+public JavaWriter append(char aValue)  { cd(); _sb.append(aValue); return this; }
 
 /**
  * Append Int.
  */
-public TypeWriter append(int aValue)  { cd(); _sb.append(aValue); return this; }
+public JavaWriter append(int aValue)  { cd(); _sb.append(aValue); return this; }
 
 /**
  * Append Double.
  */
-public TypeWriter append(double aValue)  { cd(); _sb.append(aValue); return this; }
+public JavaWriter append(double aValue)  { cd(); _sb.append(aValue); return this; }
 
 /**
  * Append newline.
  */
-public TypeWriter endln()  { _sb.append('\n'); _lineStart = true; return this; }
+public JavaWriter endln()  { _sb.append('\n'); _lineStart = true; return this; }
 
 /**
  * Append indent.
  */
-public TypeWriter indent()  { _indent++; return this; }
+public JavaWriter indent()  { _indent++; return this; }
 
 /**
  * Append indent.
  */
-public TypeWriter outdent()  { _indent--; return this; }
+public JavaWriter outdent()  { _indent--; return this; }
 
 /**
  * Append indent.
  */
-public TypeWriter appendIndent()  { for(int i=0;i<_indent;i++) _sb.append(_indentStr); return this; }
+public JavaWriter appendIndent()  { for(int i=0;i<_indent;i++) _sb.append(_indentStr); return this; }
 
 /**
  * Checks for indent.
