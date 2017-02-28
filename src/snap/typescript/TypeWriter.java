@@ -72,7 +72,7 @@ public void writeJFile(JFile aJFile)
     append("}");
     
     // Write main method
-    endln().endln().append(aJFile.getClassDecl().getClassName()).append(".main(null);\n");
+    //endln().endln().append(aJFile.getClassDecl().getClassName()).append(".main(null);\n");
 }
 
 /**
@@ -126,25 +126,39 @@ public void writeJClassDecl(JClassDecl aCDecl)
     
     // Append fields
     JFieldDecl fdecls[] = aCDecl.getFieldDecls();
-    for(JFieldDecl fd : aCDecl.getFieldDecls()) {
+    for(JFieldDecl fd : fdecls) {
         writeJFieldDecl(fd); endln(); }
+        
+    // Append constructors
+    JConstrDecl cndecls[] = aCDecl.getConstructorDecls();
+    for(JConstrDecl cd : cndecls) {
+        writeJConstrDecl(cd); endln(); }
         
     // Append methods
     JMethodDecl mdecls[] = aCDecl.getMethodDecls(), mlast = mdecls.length>0? mdecls[mdecls.length-1] : null;
-    for(JMethodDecl md : aCDecl.getMethodDecls()) {
+    for(JMethodDecl md : mdecls) {
         writeJMethodDecl(md); if(md!=mlast) endln(); }
         
     // Terminate
     outdent();
-    append('}').endln();
+    append('}').endln().endln();
     
     // Write class
-    endln();
-    append(cname).append("[\"__class\"] = \"").append(aCDecl.getClassName()).append("\";").endln();
+    String cpath = aCDecl.getClassName().replace('$','.');
+    append(cname).append("[\"__class\"] = \"").append(cpath).append("\";").endln();
+    
+    // Write interfaces
+    if(itypes.size()>0) {
+        append(cname).append("[\"__interfaces\"] = [");
+        for(JType ityp : itypes) { String cp = ityp.getClassName().replace('$','.');
+            append('"').append(cp).append('"'); if(ityp!=ilast) append(","); }
+        append("];").endln();
+    }
     
     // Append inner classes
     JClassDecl cdecls[] = aCDecl.getClassDecls();
     if(cdecls.length>0) {
+        System.out.println("Writing inner classes for " + aCDecl.getFile().getName() + " (" + cdecls.length + ')');
         endln().append("export namespace ").append(cname).append(" {").endln().endln().indent();
         for(JClassDecl cd : cdecls)
             writeJClassDecl(cd);
@@ -170,6 +184,31 @@ public void writeJFieldDecl(JFieldDecl aFDecl)
 }
 
 /**
+ * Writes a JConstrDecl.
+ */
+public void writeJConstrDecl(JConstrDecl aCDecl)
+{
+    // Write modifiers
+    JModifiers mods = aCDecl.getModifiers();
+    writeJModifiers(mods);
+
+    // Write 'constructor' label and start char
+    append("constructor(");
+    
+    // Write parameters
+    List <JVarDecl> params = aCDecl.getParameters();
+    JVarDecl last = params.size()>0? params.get(params.size()-1) : null;
+    for(JVarDecl param : params) {
+        writeJVarDecl(param); if(param!=last) append(", "); }
+        
+    // Write parameters close char
+    append(") ");
+    
+    // Write statement block
+    writeJStmtBlock(aCDecl.getBlock(), false);
+}
+
+/**
  * Writes a JMethodDecl.
  */
 public void writeJMethodDecl(JMethodDecl aMDecl)
@@ -184,7 +223,7 @@ public void writeJMethodDecl(JMethodDecl aMDecl)
     // Write parameters
     List <JVarDecl> params = aMDecl.getParameters();
     JVarDecl last = params.size()>0? params.get(params.size()-1) : null;
-    for(JVarDecl param : aMDecl.getParameters()) {
+    for(JVarDecl param : params) {
         writeJVarDecl(param); if(param!=last) append(", "); }
         
     // Write parameters close char
@@ -255,14 +294,22 @@ public void writeJType(JType aType)
  */
 public String getTypeString(JType aType)
 {
+    // Get name
     String name = aType.getName();
+    
+    // Map core TypeScript types
     if(name.equals("void")) name = "";
     else if(name.equals("Object")) name = "any";
     else if(name.equals("String") || name.equals("char") || name.equals("Character")) name = "string";
     else if(aType.isNumberType()) name = "number";
     else if(name.equals("Boolean")) name = "boolean";
+    else if(aType.getClassName().startsWith("java.lang.")) name = "java.lang." + name;
+    
+    // Add array chars
     if(aType.isArrayType())
         name = name + "[]";
+        
+    // Return name
     return name;
 }
 
