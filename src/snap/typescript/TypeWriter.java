@@ -70,8 +70,26 @@ public void writeJImportDecl(JImportDecl anImp)
  */
 public void writeJClassDecl(JClassDecl aCDecl)
 {
-    // Append class
-    append("export class ").append(aCDecl.getSimpleName()).append(" {").endln().endln();
+    // Append class label with modifiers: public class XXX ...
+    String cname = aCDecl.getSimpleName();
+    JModifiers mods = aCDecl.getModifiers();
+    String mstr = mods!=null && mods.isAbstract()? "abstract " : "";
+    append("export ").append(mstr).append("class ").append(cname).append(' ');
+    
+    // Append extends types
+    List <JType> etypes = aCDecl.getExtendsTypes(); JType elast = etypes.size()>0? etypes.get(etypes.size()-1) : null;
+    if(etypes.size()>0) append("extends ");
+    for(JType etyp : etypes) {
+        writeJType(etyp); if(etyp!=elast) append(", "); else append(' '); }
+        
+    // Append implements types
+    List <JType> itypes = aCDecl.getImplementsTypes(); JType ilast = itypes.size()>0? itypes.get(itypes.size()-1): null;
+    if(itypes.size()>0) append("implements ");
+    for(JType ityp : itypes) {
+        writeJType(ityp); if(ityp!=ilast) append(", "); else append(' '); }
+    
+    // Write class label close char
+    append('{').endln().endln();
     indent();
     
     // Append fields
@@ -90,7 +108,17 @@ public void writeJClassDecl(JClassDecl aCDecl)
     
     // Write class
     endln();
-    append(aCDecl.getSimpleName()).append("[\"__class\"] = \"").append(aCDecl.getClassName()).append("\";").endln();
+    append(cname).append("[\"__class\"] = \"").append(aCDecl.getClassName()).append("\";").endln();
+    
+    // Append inner classes
+    JClassDecl cdecls[] = aCDecl.getClassDecls();
+    if(cdecls.length>0) {
+        System.out.println("Write Inner classes for " + cname);
+        endln().append("export namespace ").append(cname).append(" {").endln().endln().indent();
+        for(JClassDecl cd : cdecls)
+            writeJClassDecl(cd);
+        outdent().append('}').endln();
+    }
 }
 
 /**
@@ -178,6 +206,7 @@ public String getJModifierString(JModifiers aMod)
     String str = ""; if(aMod==null) return str;
     if(aMod.isPublic()) str += "public ";
     if(aMod.isStatic()) str += "static ";
+    if(aMod.isAbstract()) str += "abstract ";
     return str;
 }
 
