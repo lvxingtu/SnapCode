@@ -47,6 +47,16 @@ public void writeJNode(JNode aNode)
 }
 
 /**
+ * Writes a list of JNodes joined by string.
+ */
+public void writeJNodesJoined(List <? extends JNode> theNodes, String aStr)
+{
+    JNode last = theNodes.size()>0? theNodes.get(theNodes.size()-1) : null;
+    for(JNode node : theNodes) {
+        writeJNode(node); if(node!=last) append(aStr); }
+}
+
+/**
  * Write a JPackageDecl.
  */
 public void writeJPackageDecl(JPackageDecl aPDecl)
@@ -327,14 +337,14 @@ public void writeJStmtClassDecl(JStmtClassDecl aStmt)
  */
 public void writeJStmtConstrCall(JStmtConstrCall aStmt)
 {
-    List <JExprId> ids = aStmt.getIds(); JExprId ilast = ids.size()>0? ids.get(ids.size()-1) : null;
-    for(JExprId id : ids) {
-        writeJExprId(id); if(id!=ilast) append('.'); }
-
+    // Write label (this, super, Class.this, etc.) and open char
+    List <JExprId> ids = aStmt.getIds();
+    writeJNodesJoined(ids, ".");
     append('(');
-    List <JExpr> args = aStmt.getArgs(); JExpr alast = args.size()>0? args.get(args.size()-1) : null;
-    for(JExpr arg : args) {
-        writeJExpr(arg); if(arg!=alast) append(", "); }
+    
+    // Write args and close char
+    List <JExpr> args = aStmt.getArgs();
+    writeJNodesJoined(args, ", ");
     append(");").endln();
 }
 

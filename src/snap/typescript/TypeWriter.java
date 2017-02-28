@@ -48,6 +48,16 @@ public void writeJNode(JNode aNode)
 }
 
 /**
+ * Writes a list of JNodes joined by string.
+ */
+public void writeJNodesJoined(List <? extends JNode> theNodes, String aStr)
+{
+    JNode last = theNodes.size()>0? theNodes.get(theNodes.size()-1) : null;
+    for(JNode node : theNodes) {
+        writeJNode(node); if(node!=last) append(aStr); }
+}
+
+/**
  * Write a JFile.
  */
 public void writeJFile(JFile aJFile)
@@ -102,11 +112,19 @@ public void writeJImportDecl(JImportDecl anImp)
  */
 public void writeJClassDecl(JClassDecl aCDecl)
 {
-    // Append class label with modifiers: public class XXX ...
+    // Get class name
     String cname = aCDecl.getSimpleName();
+    if(aCDecl.isAnonymousClass()) { 
+        JClassDecl ec = aCDecl.getEnclosingClassDecl();
+        cname = ec.getSimpleName() + '$' + cname;
+    }
+
+    // Append class label with modifiers: public class/interface XXX ...
     JModifiers mods = aCDecl.getModifiers();
     String mstr = mods!=null && mods.isAbstract()? "abstract " : "";
-    append("export ").append(mstr).append("class ").append(cname).append(' ');
+    append("export ").append(mstr);
+    append(aCDecl.isInterface()? "interface " : "class ");
+    append(cname).append(' ');
     
     // Append extends types
     List <JType> etypes = aCDecl.getExtendsTypes(); JType elast = etypes.size()>0? etypes.get(etypes.size()-1) : null;
@@ -158,7 +176,7 @@ public void writeJClassDecl(JClassDecl aCDecl)
     // Append inner classes
     JClassDecl cdecls[] = aCDecl.getClassDecls();
     if(cdecls.length>0) {
-        System.out.println("Writing inner classes for " + aCDecl.getFile().getName() + " (" + cdecls.length + ')');
+        //System.out.println("Writing inner classes for " + aCDecl.getFile().getName() + " (" + cdecls.length + ')');
         endln().append("export namespace ").append(cname).append(" {").endln().endln().indent();
         for(JClassDecl cd : cdecls)
             writeJClassDecl(cd);
@@ -296,6 +314,7 @@ public String getTypeString(JType aType)
 {
     // Get name
     String name = aType.getName();
+    String cname = aType.getClassName();
     
     // Map core TypeScript types
     if(name.equals("void")) name = "";
@@ -303,7 +322,7 @@ public String getTypeString(JType aType)
     else if(name.equals("String") || name.equals("char") || name.equals("Character")) name = "string";
     else if(aType.isNumberType()) name = "number";
     else if(name.equals("Boolean")) name = "boolean";
-    else if(aType.getClassName().startsWith("java.lang.")) name = "java.lang." + name;
+    else if(cname!=null && cname.startsWith("java.lang.")) name = "java.lang." + name;
     
     // Add array chars
     if(aType.isArrayType())
@@ -396,7 +415,15 @@ public void writeJStmtClassDecl(JStmtClassDecl aStmt)
  */
 public void writeJStmtConstrCall(JStmtConstrCall aStmt)
 {
-    append(aStmt.getString()).endln();
+    // Write label (this, super, Class.this, etc.) and open char
+    List <JExprId> ids = aStmt.getIds();
+    writeJNodesJoined(ids, ".");
+    append('(');
+    
+    // Write args and close char
+    List <JExpr> args = aStmt.getArgs();
+    writeJNodesJoined(args, ", ");
+    append(");").endln();
 }
 
 /**
