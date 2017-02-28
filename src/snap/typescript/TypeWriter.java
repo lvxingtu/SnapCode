@@ -114,6 +114,7 @@ public void writeJClassDecl(JClassDecl aCDecl)
 {
     // Get class name
     String cname = aCDecl.getSimpleName();
+    boolean isInterface = aCDecl.isInterface();
     if(aCDecl.isAnonymousClass()) { 
         JClassDecl ec = aCDecl.getEnclosingClassDecl();
         cname = ec.getSimpleName() + '$' + cname;
@@ -123,7 +124,7 @@ public void writeJClassDecl(JClassDecl aCDecl)
     JModifiers mods = aCDecl.getModifiers();
     String mstr = mods!=null && mods.isAbstract()? "abstract " : "";
     append("export ").append(mstr);
-    append(aCDecl.isInterface()? "interface " : "class ");
+    append(isInterface? "interface " : "class ");
     append(cname).append(' ');
     
     // Append extends types
@@ -161,16 +162,20 @@ public void writeJClassDecl(JClassDecl aCDecl)
     outdent();
     append('}').endln().endln();
     
-    // Write class
-    String cpath = aCDecl.getClassName().replace('$','.');
-    append(cname).append("[\"__class\"] = \"").append(cpath).append("\";").endln();
+    // If not interface, write Class/Interfaces stuff
+    if(!isInterface) {
     
-    // Write interfaces
-    if(itypes.size()>0) {
-        append(cname).append("[\"__interfaces\"] = [");
-        for(JType ityp : itypes) { String cp = ityp.getClassName().replace('$','.');
-            append('"').append(cp).append('"'); if(ityp!=ilast) append(","); }
-        append("];").endln();
+        // Write class
+        String cpath = aCDecl.getClassName().replace('$','.');
+        append(cname).append("[\"__class\"] = \"").append(cpath).append("\";").endln();
+        
+        // Write interfaces
+        if(itypes.size()>0) {
+            append(cname).append("[\"__interfaces\"] = [");
+            for(JType ityp : itypes) { String cp = ityp.getClassName().replace('$','.');
+                append('"').append(cp).append('"'); if(ityp!=ilast) append(","); }
+            append("];").endln();
+        }
     }
     
     // Append inner classes
@@ -251,8 +256,12 @@ public void writeJMethodDecl(JMethodDecl aMDecl)
     String tstr = getTypeString(aMDecl.getType());
     if(tstr.length()>0) append(": ").append(tstr).append(' ');
     
-    // Write method block
-    writeJStmtBlock(aMDecl.getBlock(), false);
+    // If interface or abstract, just write semi-colon
+    if(aMDecl.getEnclosingClassDecl().isInterface() || mods!=null && mods.isAbstract())
+        append(';').endln();
+    
+    // Otherwise, write method block
+    else writeJStmtBlock(aMDecl.getBlock(), false);
 }
 
 /**
