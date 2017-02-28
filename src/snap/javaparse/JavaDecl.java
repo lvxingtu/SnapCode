@@ -263,6 +263,16 @@ public String getFullName()
 } String _fname;
 
 /**
+ * Returns the modifiers.
+ */
+public int getModifiers()  { return _modifier; }
+
+/**
+ * Returns whether decl is static.
+ */
+public boolean isStatic()  { return Modifier.isStatic(_modifier); }
+
+/**
  * Returns a string representation of suggestion.
  */
 public String getSuggestionString()

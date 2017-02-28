@@ -145,7 +145,6 @@ public void writeJClassDecl(JClassDecl aCDecl)
     // Append inner classes
     JClassDecl cdecls[] = aCDecl.getClassDecls();
     if(cdecls.length>0) {
-        System.out.println("Write Inner classes for " + cname);
         endln().append("export namespace ").append(cname).append(" {").endln().endln().indent();
         for(JClassDecl cd : cdecls)
             writeJClassDecl(cd);
@@ -659,17 +658,18 @@ public void writeJExprChain(JExprChain aExpr)
  */
 public void writeJExprId(JExprId aExpr)
 {
-    // If id is field or method (and not 'this' or 'super'), append "this."
-    String str = aExpr.getName();
-    JNode par = aExpr.getParent(); JExpr pexpr = aExpr.getParentExpr();
-    if(pexpr==null && !(par instanceof JVarDecl)) {
-        JavaDecl jdecl = aExpr.getDecl();
-        JavaDecl.Type typ = jdecl!=null? jdecl.getType() : null;
-        if(typ==JavaDecl.Type.Field || typ==JavaDecl.Type.Method)
-            append("this.");
+    // If id is field or method reference and orphan, append "this." (or simple class name if static)
+    if(aExpr.isFieldRef() && aExpr.getParentExpr()==null) { JavaDecl decl = aExpr.getDecl();
+        if(decl.isStatic()) append(decl.getClassSimpleName()).append('.');
+        else append("this.");
+    }
+    if(aExpr.isMethodCall() && aExpr.getMethodCall().getParentExpr()==null) { JavaDecl decl = aExpr.getDecl();
+        if(decl.isStatic()) append(decl.getClassSimpleName()).append('.');
+        else append("this.");
     }
     
     // Append id
+    String str = aExpr.getName();
     if(str.equals("in")) str = "__in";
     else if(str.equals("function")) str = "__function";
     append(str);

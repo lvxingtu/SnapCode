@@ -46,7 +46,7 @@ private String getMethodString(Method aMethod)
     if(classes.length>0) sb.delete(sb.length()-1, sb.length());
     String string = sb.append(");").toString();
     if(_node instanceof JExprId) { JExprId id = (JExprId)_node;
-        if(id.isVariableId()) string = id.getName() + "." + string; }
+        if(id.isVarId()) string = id.getName() + "." + string; }
     return string;
 }
 
@@ -74,7 +74,7 @@ private String getReplaceMethodString(Method aMethod)
     }
     String string = sb.append(");").toString();
     if(_node instanceof JExprId) { JExprId id = (JExprId)_node;
-        if(id.isVariableId()) string = id.getName() + "." + string; }
+        if(id.isVarId()) string = id.getName() + "." + string; }
     return string;
 }
 
