@@ -59,6 +59,7 @@ public void writeJFile(JFile aJFile)
     indent();
     
     // Append imports
+    aJFile.getUnusedImports();
     for(JImportDecl imp : aJFile.getImportDecls())
         writeJImportDecl(imp);
     endln();
@@ -81,9 +82,19 @@ public void writeJImportDecl(JImportDecl anImp)
 {
     String iname = anImp.getName(); if(iname.startsWith("jsweet.")) return;
     iname = iname.replace(".function", ".__function");
-    int ind = iname.lastIndexOf('.');
-    String iname2 = anImp.isInclusive() || ind<0? iname.replace('.', '_') : iname.substring(ind+1);
-    append("import ").append(iname2).append(" = ").append(iname).append(';').endln();
+    
+    // Handle inclusive
+    if(anImp.isInclusive()) {
+        for(String cname : anImp.getFoundClassNames()) {
+            append("import ").append(cname).append(" = ").append(iname).append('.').append(cname).append(';').endln(); }
+    }
+
+    // Fully specified    
+    else {
+        int ind = iname.lastIndexOf('.');
+        String cname = iname.substring(ind+1);
+        append("import ").append(cname).append(" = ").append(iname).append(';').endln();
+    }
 }
 
 /**
@@ -648,8 +659,10 @@ public void writeJExprChain(JExprChain aExpr)
  */
 public void writeJExprId(JExprId aExpr)
 {
-    // If id is field or method, append "this."
-    if(aExpr.getParentExpr()==null && !(aExpr.getParent() instanceof JVarDecl)) {
+    // If id is field or method (and not 'this' or 'super'), append "this."
+    String str = aExpr.getName();
+    JNode par = aExpr.getParent(); JExpr pexpr = aExpr.getParentExpr();
+    if(pexpr==null && !(par instanceof JVarDecl)) {
         JavaDecl jdecl = aExpr.getDecl();
         JavaDecl.Type typ = jdecl!=null? jdecl.getType() : null;
         if(typ==JavaDecl.Type.Field || typ==JavaDecl.Type.Method)
@@ -657,7 +670,6 @@ public void writeJExprId(JExprId aExpr)
     }
     
     // Append id
-    String str = aExpr.getName();
     if(str.equals("in")) str = "__in";
     else if(str.equals("function")) str = "__function";
     append(str);

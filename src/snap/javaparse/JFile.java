@@ -170,9 +170,7 @@ public JImportDecl getImport(String aName)
     
     // Remove match from UnusedImports and return
     if(match!=null) {
-        if(match.isInclusive()) match.addFoundClassName(aName);
-        match._used = true;
-    }
+        if(match.isInclusive()) match.addFoundClassName(aName); match._used = true; }
     return match;
 }
 
@@ -188,7 +186,9 @@ public JImportDecl getStaticImport(String aName, Class theParams[])
         if(imp.isStatic()) {
             Member mbr = imp.getImportMember(aName, theParams);
             if(mbr!=null) {
-                _unusedImports.remove(imp); return imp; }
+                if(imp.isInclusive()) imp.addFoundClassName(aName); imp._used = true;
+                return imp;
+            }
         }
     }
     
@@ -253,17 +253,28 @@ public Set <JImportDecl> getUnusedImports()
     resolveClassNames(this);
     Set <JImportDecl> uimps = new HashSet();
     for(JImportDecl imp : getImportDecls()) if(!imp._used) uimps.add(imp);
+    return _unusedImports = uimps;
+}
+
+/** Print expanded imports. */
+/*private void printExpandedExports()
+{
+    // If no expansions, just return
+    boolean hasExp = false; for(JImportDecl i : getImportDecls()) if(i.isInclusive()) hasExp = true;
+    if(!hasExp) return;
+    
+    // Print expansions
     System.out.println("Expanded imports in file " + getClassName() + ":");
     for(JImportDecl imp : getImportDecls()) {
         if(imp.isInclusive() && !imp.isStatic() && imp.getFoundClassNames().size()>0) {
-            System.out.print("    " + imp.getString() + ": ");
-            List <String> names = imp.getFoundClassNames(); String last = names.size()>0? names.get(names.size()-1):null;
+            System.out.print("    " + imp.getString().trim().replace(';',':') + ' ');
+            List <String> names = new ArrayList(imp.getFoundClassNames());
+            String last = names.size()>0? names.get(names.size()-1):null;
             for(String n : names) {
                 System.out.print(n); if(n!=last) System.out.print(", "); else System.out.println(); }
         }
     }
-    return _unusedImports = uimps;
-}
+}*/
 
 /**
  * Forces all nodes to resolve class names.

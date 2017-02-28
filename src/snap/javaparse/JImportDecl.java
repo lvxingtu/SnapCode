@@ -24,7 +24,7 @@ public class JImportDecl extends JNode {
     boolean        _used;
     
     // The list of child class names found by this import, if inclusive
-    List <String>  _found = Collections.EMPTY_LIST;
+    Set <String>  _found = Collections.EMPTY_SET;
     
 /**
  * Returns whether import is static.
@@ -120,14 +120,14 @@ protected String getNameImpl()  { return _nameExpr!=null? _nameExpr.getName() : 
 /**
  * Returns the list of child class names found by this import (if inclusive).
  */
-public List <String> getFoundClassNames()  { return _found; }
+public Set <String> getFoundClassNames()  { return _found; }
 
 /**
  * Adds a child class name to list of those
  */
 protected void addFoundClassName(String aName)
 {
-    if(_found==Collections.EMPTY_LIST) _found = new ArrayList();
+    if(_found==Collections.EMPTY_SET) _found = new HashSet();
     _found.add(aName);
 }
 

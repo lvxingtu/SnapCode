@@ -15,10 +15,11 @@ public abstract class JExpr extends JNode {
 public JExpr getParentExpr()
 {
     // If parent is JExprChain, iterate over expressions and return one before this expression
-    if(getParent() instanceof JExprChain) { JExprChain parent = getParent(JExprChain.class);
-        for(int i=0, iMax=parent.getExprCount(); i<iMax; i++) { JExpr expr = parent.getExpr(i);
+    JNode par = getParent();
+    if(par instanceof JExprChain) { JExprChain echain = (JExprChain)par;
+        for(int i=0, iMax=echain.getExprCount(); i<iMax; i++) { JExpr expr = echain.getExpr(i);
             if(expr==this)
-                return i>0? parent.getExpr(i-1) : null; } }
+                return i>0? echain.getExpr(i-1) : null; } }
     return null; // Return null, since no parent expression
 }
 
