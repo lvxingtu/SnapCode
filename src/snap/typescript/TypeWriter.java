@@ -342,8 +342,7 @@ public String getTypeString(JType aType)
     // Add array chars
     if(aType.isArrayType())
         name = name + "[]";
-    if(name.equals("float[]"))
-        name = (String)name;
+
     // Return name
     return name;
 }
@@ -797,12 +796,13 @@ public void writeJExprInstanceOf(JExpr.InstanceOfExpr aExpr)
         return;
     }
     
+    // If array type, replace with Array
+    if(typ.isArrayType())
+        tstr = "Array";
+    
     // Get expr and write: expr!=null && expr instanceof
     writeJExpr(expr); append("!=null && ");
-    writeJExpr(expr); append(" instanceof ");
-    
-    // Get write type
-    writeJType(typ);
+    writeJExpr(expr); append(" instanceof "); append(tstr);
 }
 
 /**
@@ -896,12 +896,9 @@ public void writeJExprMethodCall(JExprMethodCall aExpr)
     JExprId id = aExpr.getId(); String name = id.getName();
     writeJExprId(id); append('(');
     
-    // Append args
-    List <JExpr> args = aExpr.getArgs(); JExpr last = args.size()>0? args.get(args.size()-1) : null;
-    for(JExpr arg : aExpr.getArgs()) {
-        writeJExpr(arg); if(arg!=last) append(", "); }
-        
-    // Append close char
+    // Append args and close char
+    List <JExpr> args = aExpr.getArgs();
+    writeJNodesJoined(args, ", ");
     append(')');
 }
 
@@ -925,6 +922,20 @@ public boolean writeJExprMethodCallSpecial(JExprMethodCall aExpr)
         JavaDecl decl = id.getDecl(); if(decl==null || !decl.getClassName().startsWith("jsweet.")) return false;
         JExpr arg = aExpr.getArgs().get(0);
         writeJExpr(arg);
+        return true;
+    }
+    
+    // Handle Arrays.copyOf(array,int,Class): Drop last param
+    if(name.equals("copyOf")) {
+        
+        // If not 3 args or last arg not class or method not from java.util.Arrays, just return
+        if(aExpr.getArgCount()!=3 || !(aExpr.getArg(2).getJClass() instanceof Class)) return false;
+        JavaDecl decl = id.getDecl();if(decl==null || !decl.getClassName().startsWith("java.util.Arrays")) return false;
+    
+        // Write method with only two args
+        writeJExprId(id); append('(');
+        JExpr arg0 = aExpr.getArg(0), arg1 = aExpr.getArg(1);
+        writeJExpr(arg0); append(", "); writeJExpr(arg1); append(')');
         return true;
     }
     

@@ -39,6 +39,16 @@ public void setId(JExprId anId)
 }
 
 /**
+ * Returns the number of arguments.
+ */
+public int getArgCount()  { return _args.size(); }
+
+/**
+ * Returns the individual argument at index.
+ */
+public JExpr getArg(int anIndex)  { return _args.get(anIndex); }
+
+/**
  * Returns the method arguments.
  */
 public List <JExpr> getArgs()  { return _args; }
