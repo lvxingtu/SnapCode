@@ -62,7 +62,7 @@ public void setPackageDecl(JPackageDecl aPD)  { replaceChild(_packageDecl, _pack
 /**
  * Returns the package name.
  */
-public String getPackageName()  { return _packageDecl!=null? _packageDecl.getName() : ""; }
+public String getPackageName()  { return _packageDecl!=null? _packageDecl.getName() : null; }
 
 /**
  * Returns the import statements.
@@ -221,7 +221,8 @@ public String getImportClassName(String aName)
         return imp.getImportClassName(aName);
     
     // If file declares package, see if it's in package
-    if(getPackageName().length()>0) { String cname = getPackageName() + '.' + aName;
+    String pname = getPackageName();
+    if(pname!=null && pname.length()>0) { String cname = pname + '.' + aName;
         if(isKnownClassName(cname))
             return cname; }
     

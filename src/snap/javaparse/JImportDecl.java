@@ -58,10 +58,15 @@ protected JavaDecl getDeclImpl()
 {
     String name = getName(); if(name==null) return null;
     if(isInclusive && isKnownPackageName(name)) return new JavaDecl(JavaDecl.Type.Package, name);
+    
+    // Iterate up parts of import till we find Class in case import is like: import path.Class.InnerClass;
     while(name!=null) {
         if(isKnownClassName(name)) {
-            if(name.length()<getName().length())
-                name = name + getName().substring(name.length()).replace('.', '$');
+            if(name.length()<getName().length()) {
+                String icname = getName().substring(name.length()).replace('.','$'), name2 = name + icname;
+                if(isKnownClassName(name2))
+                    name = name2;
+            }
             return new JavaDecl(name,null,null,null);
         }
         int i = name.lastIndexOf('.'); if(i>0) name = name.substring(0,i); else name = null;

@@ -65,8 +65,8 @@ public void writeJFile(JFile aJFile)
     append("/* Generated from Java with SnapCode - http://www.reportmill.com */\n");
     
     String pname = aJFile.getPackageName();
-    if(pname!=null) append("namespace ").append(pname).append(' ').append("{").endln();
-    indent();
+    if(pname!=null)
+        append("namespace ").append(pname).append(' ').append("{").endln().indent();
     
     // Append imports
     aJFile.getUnusedImports();
@@ -78,11 +78,12 @@ public void writeJFile(JFile aJFile)
     writeJClassDecl(aJFile.getClassDecl());
     
     // Outdent and terminate namespace
-    outdent();
-    append("}");
+    if(pname!=null)
+        outdent().append('}').endln();
     
     // Write main method
-    //endln().endln().append(aJFile.getClassDecl().getClassName()).append(".main(null);\n");
+    if(aJFile.getClassDecl().getSimpleName().equals("HelloWorld"))
+        endln().append(aJFile.getClassDecl().getClassName()).append(".main(null);\n");
 }
 
 /**
@@ -119,11 +120,15 @@ public void writeJClassDecl(JClassDecl aCDecl)
         JClassDecl ec = aCDecl.getEnclosingClassDecl();
         cname = ec.getSimpleName() + '$' + cname;
     }
+    
+    // Add export call
+    if(aCDecl.getFile().getPackageName()!=null)
+        append("export ");
 
     // Append class label with modifiers: public class/interface XXX ...
     JModifiers mods = aCDecl.getModifiers();
     String mstr = mods!=null && mods.isAbstract()? "abstract " : "";
-    append("export ").append(mstr);
+    append(mstr);
     append(isInterface? "interface " : "class ");
     append(cname).append(' ');
     
@@ -743,7 +748,8 @@ public void writeJExprId(JExprId aExpr)
 {
     // If id is field or method reference and orphan, append "this." (or simple class name if static)
     if(aExpr.isFieldRef() && aExpr.getParentExpr()==null) { JavaDecl decl = aExpr.getDecl();
-        if(decl.isStatic()) append(decl.getClassSimpleName()).append('.');
+        if(decl.isStatic()) {
+            if(!decl.getClassName().startsWith("jsweet.")) append(decl.getClassSimpleName()).append('.'); }
         else append("this.");
     }
     if(aExpr.isMethodCall() && aExpr.getMethodCall().getParentExpr()==null) { JavaDecl decl = aExpr.getDecl();
@@ -866,6 +872,9 @@ public void writeJExprMath(JExprMath aExpr)
  */
 public void writeJExprMethodCall(JExprMethodCall aExpr)
 {
+    // If special, just return
+    if(writeJExprMethodCallSpecial(aExpr)) return;
+    
     // Append name and open char
     JExprId id = aExpr.getId(); String name = id.getName();
     writeJExprId(id); append('(');
@@ -877,6 +886,32 @@ public void writeJExprMethodCall(JExprMethodCall aExpr)
         
     // Append close char
     append(')');
+}
+
+/**
+ * Writes a JExprMethodCall.
+ */
+public boolean writeJExprMethodCallSpecial(JExprMethodCall aExpr)
+{
+    JExprId id = aExpr.getId(); String name = id.getName();
+    
+    // Handle jsweet.util.Globals.union()
+    if(name.equals("union")) {
+        JavaDecl decl = id.getDecl(); if(decl==null || !decl.getClassName().startsWith("jsweet.")) return false;
+        JExpr arg = aExpr.getArgs().get(0);
+        append("(<any>"); writeJExpr(arg); append(')');
+        return true;
+    }
+    
+    // Handle jsweet.util.Globals.function()
+    if(name.equals("function")) {
+        JavaDecl decl = id.getDecl(); if(decl==null || !decl.getClassName().startsWith("jsweet.")) return false;
+        JExpr arg = aExpr.getArgs().get(0);
+        writeJExpr(arg);
+        return true;
+    }
+    
+    return false;
 }
 
 /**

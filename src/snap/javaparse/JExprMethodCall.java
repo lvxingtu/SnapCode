@@ -77,6 +77,13 @@ public Method getMethod()
         if(meth!=null)
             return meth;
     }
+    
+    // See if method is from static import
+    Member mem = getFile().getImportClassMember(getName(), getArgClasses());
+    if(mem instanceof Method)
+        return (Method)mem;
+        
+    // Return null since not found
     return null;
 }
 
