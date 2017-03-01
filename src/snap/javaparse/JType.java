@@ -20,6 +20,9 @@ public class JType extends JNode {
     // The generic Types
     List <JType>          _typeArgs;
     
+    // The base type
+    JavaDecl              _baseDecl;
+    
 /**
  * Sets the type name.
  */
@@ -67,18 +70,10 @@ public boolean isReferenceType()  { return _primitive && _arrayCount==0; }
 /**
  * Override to resolve type class name and create declaration from that.
  */
-@Override
 protected JavaDecl getDeclImpl()
 {
-    // Handle primitive type
-    JavaDecl decl = null;
-    Class pclass = ClassUtils.getPrimitiveClass(_name);
-    if(pclass!=null)
-        decl = new JavaDecl(pclass);
-    
-    // If not primitive, try to resolve
-    if(decl==null)
-        decl = resolveName(this);
+    // Get base decl
+    JavaDecl decl = getBaseDecl();
 
     // Handle array
     if(_arrayCount>0 && decl!=null) {
@@ -90,9 +85,30 @@ protected JavaDecl getDeclImpl()
     }
     
     // Return declaration
-    //if(decl==null)
-    //    System.err.println("Unresolved Type: " + getFile().getSourceFile() + " :" + getLineIndex() + " " + getName());
     return decl;
+}
+
+/**
+ * Override to resolve type class name and create declaration from that.
+ */
+protected JavaDecl getBaseDecl()
+{
+    // If already set, just return
+    if(_baseDecl!=null) return _baseDecl;
+    
+    // Handle primitive type
+    JavaDecl decl = null;
+    Class pclass = ClassUtils.getPrimitiveClass(_name);
+    if(pclass!=null)
+        decl = new JavaDecl(pclass);
+    
+    // If not primitive, try to resolve
+    if(decl==null)
+        decl = resolveName(this);
+
+    // Return declaration
+    //if(decl==null) System.err.println("Unresolved Type: " + this);
+    return _baseDecl = decl;
 }
 
 /**
@@ -124,8 +140,9 @@ protected void append(StringBuffer aSB)
  */
 public boolean isNumberType()
 {
-    JavaDecl decl = getDecl(); if(decl==null) return false;
-    String tp = decl.getClassName().intern();
+    JavaDecl decl = getBaseDecl();
+    String tp = decl!=null? decl.getClassName() : null; if(tp==null) return false;
+    tp = tp.intern();
     return tp=="byte" || tp=="short" || tp=="int" || tp=="long" || tp=="float" || tp=="double" ||
         tp=="java.lang.Byte" || tp=="java.lang.Short" || tp=="java.lang.Integer" || tp=="java.lang.Long" ||
         tp=="java.lang.Float" || tp=="java.lang.Double" || tp=="java.lang.Number";

@@ -17,6 +17,12 @@ public class JExprAlloc extends JExpr {
     // The allocation args
     List <JExpr>  _args = Collections.EMPTY_LIST;
     
+    // The dimensions expression, if array
+    JExpr         _arrayDims;
+    
+    // The array init expressionss, if array
+    List <JExpr>  _arrayInits = Collections.EMPTY_LIST;
+    
     // The allocation JClassDecl
     JClassDecl    _classDecl;
 
@@ -55,6 +61,34 @@ public Class[] getArgClasses()
     for(int i=0, iMax=args.size(); i<iMax; i++) { JExpr arg = args.get(i);
         classes[i] = arg!=null? arg.getJClass() : null; }
     return classes;
+}
+
+/**
+ * Returns the array dimensions.
+ */
+public JExpr getArrayDims()  { return _arrayDims; }
+
+/**
+ * Sets the array dimension.
+ */
+public void setArrayDims(JExpr theDims)
+{
+    replaceChild(_arrayDims, _arrayDims = theDims);
+}
+
+/**
+ * Returns the array init expressions, if array.
+ */
+public List <JExpr> getArrayInits()  { return _arrayInits; }
+
+/**
+ * Sets the array init expressions, if array.
+ */
+public void setArrayInits(List <JExpr> theArrayInits)
+{
+    if(_arrayInits!=null) for(JExpr expr : _arrayInits) removeChild(expr);
+    _arrayInits = theArrayInits;
+    if(_arrayInits!=null) for(JExpr expr : _arrayInits) addChild(expr, -1);
 }
 
 /**

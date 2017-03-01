@@ -595,8 +595,24 @@ public void writeJExpr(JExpr aExpr)
  */
 public void writeJExprAlloc(JExprAlloc aExpr)
 {
-    // Append 'new' keyword, type and parameter list start char
+    // Get type - if array, handle separate
     JType typ = aExpr.getType();
+    if(typ.isArrayType()) {
+        
+        // Append 'new Array[', the dimension expression (if set) and dimension close char
+        append("new "); writeJType(typ); append('[');
+        JExpr dim = aExpr.getArrayDims();
+        if(dim!=null) writeJExpr(dim);
+        append(']');
+        
+        // If array init expresions are set, append them
+        List <JExpr> inits = aExpr.getArrayInits();
+        if(inits.size()>0) {
+            append(" = { "); writeJNodesJoined(inits, ", "); append('}'); }
+        return;
+    }
+        
+    // Append 'new' keyword, type and parameter list start char
     append("new "); writeJType(typ);
     append('(');
     

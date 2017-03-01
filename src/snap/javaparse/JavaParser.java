@@ -693,7 +693,7 @@ public static class VarDeclHandler extends JNodeParseHandler <JVarDecl>
         
         // Handle VarInit ArrayInit
         else if(anId=="ArrayInit")
-            getPart().setArrayInit(aNode.getString());
+            getPart().setArrayInits(aNode.getCustomNode(List.class));
         
         // Handle VarInit Expression
         else if(anId=="Expression")
@@ -1528,8 +1528,14 @@ public static class AllocExprHandler extends JNodeParseHandler <JExprAlloc>
         if(anId=="PrimitiveType")
             getPart().setType(aNode.getCustomNode(JType.class));
         
-        // Handle ArrayDimsAndInits (TODO)
-        
+        // Handle ArrayDimsAndInits
+        else if(anId=="Expression" && getPart().getType()!=null && getPart().getType().isArrayType())
+            getPart().setArrayDims(aNode.getCustomNode(JExpr.class));
+            
+        // Handle ArrayDimsAndInits ArrayInit
+        else if(anId=="ArrayInit")
+            getPart().setArrayInits(aNode.getCustomNode(List.class));
+
         // Handle ClassType
         else if(anId=="ClassType")
             getPart().setType(aNode.getCustomNode(JType.class));
@@ -1548,6 +1554,21 @@ public static class AllocExprHandler extends JNodeParseHandler <JExprAlloc>
             cd.addExtendsType(getPart().getType());
             getPart().setClassDecl(cd);
         }
+    }
+}
+
+/**
+ * ArrayInit Handler
+ */
+public static class ArrayInitHandler extends ParseHandler <ArrayList<JExpr>>
+{
+    /** ParseHandler method. */
+    protected void parsedOne(ParseNode aNode, String anId)
+    {
+        // Handle Expression
+        if(anId=="Expression")
+            getPart().add(aNode.getCustomNode(JExpr.class));
+        else getPart();
     }
 }
 

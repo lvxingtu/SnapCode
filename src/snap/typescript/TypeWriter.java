@@ -279,7 +279,8 @@ public void writeJVarDecl(JVarDecl aVD)
     writeJExprId(name); append(" : ");
     
     // Write type
-    String tstr = getTypeString(aVD.getType());
+    JType type = aVD.getType();
+    String tstr = getTypeString(type);
     for(int i=0,iMax=aVD.getArrayCount();i<iMax;i++) tstr += "[]";
     append(tstr).append(' ');
     
@@ -341,7 +342,8 @@ public String getTypeString(JType aType)
     // Add array chars
     if(aType.isArrayType())
         name = name + "[]";
-        
+    if(name.equals("float[]"))
+        name = (String)name;
     // Return name
     return name;
 }
@@ -688,11 +690,27 @@ public void writeJExpr(JExpr aExpr)
  */
 public void writeJExprAlloc(JExprAlloc aExpr)
 {
-    // Append 'new' keyword, type and parameter list start char
+    // Get type - if array, handle separate
     JType typ = aExpr.getType();
-    append("new "); writeJType(typ);
+    if(typ.isArrayType()) {
+        
+        // Append 'new Array(', the dimension expression (if set) and dimension close char
+        JExpr dim = aExpr.getArrayDims();
+        if(dim!=null) {
+            append("new Array("); writeJExpr(dim); append(')'); }
+        
+        // If array init expresions are set, append them
+        List <JExpr> inits = aExpr.getArrayInits();
+        if(inits.size()>0) {
+            append("[ "); writeJNodesJoined(inits, ", "); append(" ]"); }
+        return;
+    }
+        
+    // Append 'new ', type and parameter list start char
+    append("new ");
+    writeJType(typ);
     append('(');
-    
+
     // Append args
     List <JExpr> args = aExpr.getArgs(); JExpr last = args.size()>0? args.get(args.size()-1) : null;
     for(JExpr arg : aExpr.getArgs()) {
@@ -702,9 +720,8 @@ public void writeJExprAlloc(JExprAlloc aExpr)
     append(')');
     
     // Append ClassDecl
-    if(aExpr.getClassDecl()!=null) {
+    if(aExpr.getClassDecl()!=null)
         System.err.println("Need to write ClassDecl for " + aExpr.getClassDecl().getClassName());
-    }
 }
 
 /**

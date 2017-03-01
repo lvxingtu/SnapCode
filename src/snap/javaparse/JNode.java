@@ -354,9 +354,12 @@ public String getString()  { return new JavaWriter().getString(this); }
 public String toString()
 {
     StringBuffer sb = new StringBuffer(getClass().getSimpleName()).append(" { ");
+    if(getFile()!=null) sb.append("File:").append(getFile().getName()).append(", ");
     sb.append("Line:").append(getLineIndex()).append(", Start:").append(getStart()).append(", End:").append(getEnd());
     if(getName()!=null && getName().length()>0) sb.append(", Name:").append(getName());
-    sb.append(" }\n");
+    sb.append(" } ");
+    String str = getString(); int ind = str.indexOf('\n'); if(ind>0) str = str.substring(0,ind) + " ...";
+    sb.append(str);
     return sb.toString();
 }
 

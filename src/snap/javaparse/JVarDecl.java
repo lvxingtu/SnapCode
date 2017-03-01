@@ -3,6 +3,7 @@
  */
 package snap.javaparse;
 import java.lang.reflect.Field;
+import java.util.*;
 
 /**
  * A JNode to represent a defined variable.
@@ -23,7 +24,7 @@ public class JVarDecl extends JNode {
     JExpr          _initializer;
     
     // The array initializer (if array)
-    String         _arrayInit;
+    List <JExpr>   _arrayInits = Collections.EMPTY_LIST;
 
 /**
  * Resolves the name from identifier.
@@ -83,14 +84,19 @@ public JExpr getInitializer()  { return _initializer; }
 public void setInitializer(JExpr anExpr)  { replaceChild(_initializer, _initializer=anExpr); }
 
 /**
- * Returns the array initializer.
+ * Returns the array init expressions, if array.
  */
-public String getArrayInit()  { return _arrayInit; }
+public List <JExpr> getArrayInits()  { return _arrayInits; }
 
 /**
- * Sets the array initializer.
+ * Sets the array init expressions, if array.
  */
-public void setArrayInit(String aValue)  { _arrayInit = aValue; }
+public void setArrayInits(List <JExpr> theArrayInits)
+{
+    if(_arrayInits!=null) for(JExpr expr : _arrayInits) removeChild(expr);
+    _arrayInits = theArrayInits;
+    if(_arrayInits!=null) for(JExpr expr : _arrayInits) addChild(expr, -1);
+}
 
 /**
  * Returns the declaring class, if field variable.
