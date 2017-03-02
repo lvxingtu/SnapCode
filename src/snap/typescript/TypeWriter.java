@@ -160,8 +160,8 @@ public void writeJClassDecl(JClassDecl aCDecl)
         
     // Append constructors
     JConstrDecl cndecls[] = aCDecl.getConstructorDecls();
-    for(JConstrDecl cd : cndecls) {
-        writeJConstrDecl(cd); endln(); }
+    if(cndecls.length>1) writeJConstrDecls(cndecls);
+    else if(cndecls.length==1) writeJConstrDecl(cndecls[0]);
         
     // Append methods
     JMethodDecl mdecls[] = aCDecl.getMethodDecls(), mlast = mdecls.length>0? mdecls[mdecls.length-1] : null;
@@ -285,6 +285,47 @@ public void writeJConstrDecl(JConstrDecl aCDecl)
 }
 
 /**
+ * Writes a JConstrDecl.
+ */
+public void writeJConstrDecls(JConstrDecl theCDecls[])
+{
+    // Get common return type and parameter types
+    JModifiers mods = theCDecls[0].getModifiers();
+    JVarDecl params[] = TSWriterUtils.getCommonParams(theCDecls);
+    writeJMethodDeclHead(mods, "constructor", null, Arrays.asList(params), true);
+    
+    // Write block char, endline and indent
+    append('{').endln().indent();
+    
+    // Write JStmtConstrCall if needed
+    JConstrDecl cd0 = theCDecls[0];
+    JClassDecl clsdecl = cd0.getEnclosingClassDecl();
+    if(clsdecl.getSuperClass()!=Object.class)
+        append("super();").endln();
+
+    // Determine constructor version
+    append("let overload_version : number = 4;").endln().endln();
+    
+    // Iterate over constructor decls and write if blocks
+    for(JConstrDecl cd : theCDecls) {
+        List <JVarDecl> cdparams = cd.getParameters();
+        append("// Overload version: "); writeJMethodDeclHead(null, "", null, cdparams, false); endln();
+        append("if(overload_version==").append(cdparams.size()).append(") ");
+        List <String> lvarMaps = null;
+        for(int i=0,iMax=cdparams.size();i<iMax;i++) { JVarDecl vd = cdparams.get(i);
+            if(!vd.getName().equals(params[i].getName())) {
+                String lvar = "let " + vd.getName() + " = " + params[i].getName() + ";";
+                if(lvarMaps==null) lvarMaps = new ArrayList(); lvarMaps.add(lvar);
+            }
+        }
+        writeJStmtBlock(cd.getBlock(), false, lvarMaps); endln();
+    }
+    
+    // outdent, write block end char and endline
+    outdent().append('}').endln().endln();
+}
+
+/**
  * Writes a JMethodDecl.
  */
 public void writeJMethodDecl(JMethodDecl aMDecl)
@@ -325,7 +366,7 @@ public void writeJMethodDeclHead(JModifiers theMods, String aName, JType aReturn
     
     // Write params close char and return type (if not empty/void)
     append(") ");
-    String tstr = TSWriterUtils.getTypeString(aReturnType);
+    String tstr = aReturnType!=null? TSWriterUtils.getTypeString(aReturnType) : "";
     if(tstr.length()>0) append(": ").append(tstr).append(' ');
 }
     
@@ -458,28 +499,47 @@ public void writeJStmtAssert(JStmtAssert aStmt)
 /**
  * Writes a JStmtBlock.
  */
-public void writeJStmtBlock(JStmtBlock aBlock, boolean doSemicolon)
+public void writeJStmtBlock(JStmtBlock aBlock, boolean doSemicolon)  { writeJStmtBlock(aBlock, doSemicolon, null); }
+
+/**
+ * Writes a JStmtBlock.
+ */
+public void writeJStmtBlock(JStmtBlock aBlock, boolean doSemicolon, List <String> extraLines)
 {
     // Write start and indent
-    append('{').endln();
-    indent();
+    append('{').endln().indent();
     
-    // Get statements and first
-    List <JStmt> stmts = aBlock!=null? aBlock.getStatements() : null;
-    JStmt first = stmts!=null && stmts.size()>0? stmts.get(0) : null;
-    
-    // If owned by JConstrDecl and first line not JStmtContrCall, add one
-    if(aBlock!=null && aBlock.getParent() instanceof JConstrDecl && !(first instanceof JStmtConstrCall) &&
-        aBlock.getParent(JClassDecl.class).getSuperClass()!=Object.class)
-        append("super();").endln();
+    // Write extra lines
+    if(extraLines!=null)
+        for(String line : extraLines)
+            append(line).endln();
+
+    // If owned by JConstrDecl and first line not JStmtConstrCall, add one
+    writeJStmtBlockConstrCall(aBlock);
     
     // Write statements
+    List <JStmt> stmts = aBlock!=null? aBlock.getStatements() : null;
     if(stmts!=null)
         for(JStmt stmt : stmts)
             writeJStmt(stmt);
         
     // Outdent and terminate
     outdent(); append(doSemicolon? "};" : "}").endln();
+}
+
+/**
+ * Writes the implied JStmtConstrCall for given block, if needed.
+ */
+public void writeJStmtBlockConstrCall(JStmtBlock aBlock)
+{
+    if(aBlock==null) return;
+    JNode bpar = aBlock.getParent();
+    JConstrDecl cd = bpar instanceof JConstrDecl? (JConstrDecl)bpar : null; if(cd==null) return;
+    List <JStmt> stmts = aBlock.getStatements();
+    JStmt first = stmts!=null && stmts.size()>0? stmts.get(0) : null; if(first instanceof JStmtConstrCall) return;
+    JClassDecl clsdecl = cd.getEnclosingClassDecl(); if(clsdecl.getSuperClass()==Object.class) return;
+    if(clsdecl.getConstructorDecls().length!=1) return;
+    append("super();").endln();
 }
 
 /**
