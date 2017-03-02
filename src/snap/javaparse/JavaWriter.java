@@ -43,6 +43,7 @@ public void writeJNode(JNode aNode)
     else if(aNode instanceof JExpr) writeJExpr((JExpr)aNode);
     else if(aNode instanceof JType) writeJType((JType)aNode);
     else if(aNode instanceof JVarDecl) writeJVarDecl((JVarDecl)aNode);
+    else if(aNode instanceof JEnumConst) writeJEnumConst((JEnumConst)aNode);
     else append("JavaWriter: write" + aNode.getClass().getSimpleName() + " not implemented");
 }
 
@@ -107,7 +108,8 @@ public void writeJClassDecl(JClassDecl aCDecl)
     String cname = aCDecl.getSimpleName();
     JModifiers mods = aCDecl.getModifiers();
     writeJModifiers(mods);
-    append("class ").append(cname).append(' ');
+    append(aCDecl.isClass()? "class " : aCDecl.isInterface()? "interface " : "enum ");
+    append(cname).append(' ');
     
     // Append extends types
     List <JType> etypes = aCDecl.getExtendsTypes(); JType elast = etypes.size()>0? etypes.get(etypes.size()-1) : null;
@@ -124,6 +126,11 @@ public void writeJClassDecl(JClassDecl aCDecl)
     // Write class label close char
     append('{').endln().endln();
     indent();
+    
+    // Append enum constants
+    List <JEnumConst> econsts = aCDecl.getEnumConstants();
+    if(econsts.size()>0) {
+        writeJNodesJoined(econsts, ", "); endln(); }
     
     // Append fields
     JFieldDecl fdecls[] = aCDecl.getFieldDecls();
@@ -144,6 +151,11 @@ public void writeJClassDecl(JClassDecl aCDecl)
     for(JClassDecl cd : cdecls) {
         endln(); writeJClassDecl(cd); }
 }
+
+/**
+ * Write JEnumConst.
+ */
+public void writeJEnumConst(JEnumConst aConst)  { append(aConst.getName()); }
 
 /**
  * Writes a JFieldDecl.

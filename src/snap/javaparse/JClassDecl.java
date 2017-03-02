@@ -128,9 +128,19 @@ public ClassType getClassType()  { return _classType; }
 public void setClassType(ClassType aType)  { _classType = aType; }
 
 /**
+ * Returns whether class type is Class.
+ */
+public boolean isClass()  { return getClassType()==ClassType.Class; }
+
+/**
  * Returns whether class type is Interface.
  */
 public boolean isInterface()  { return getClassType()==ClassType.Interface; }
+
+/**
+ * Returns whether class type is Enum.
+ */
+public boolean isEnum()  { return getClassType()==ClassType.Enum; }
 
 /**
  * Returns whether class is anonymous class.

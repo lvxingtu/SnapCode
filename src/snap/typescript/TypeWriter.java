@@ -44,6 +44,7 @@ public void writeJNode(JNode aNode)
     else if(aNode instanceof JExpr) writeJExpr((JExpr)aNode);
     else if(aNode instanceof JType) writeJType((JType)aNode);
     else if(aNode instanceof JVarDecl) writeJVarDecl((JVarDecl)aNode);
+    else if(aNode instanceof JEnumConst) writeJEnumConst((JEnumConst)aNode);
     else append("TSWriter: write" + aNode.getClass().getSimpleName() + " not implemented");
 }
 
@@ -113,6 +114,10 @@ public void writeJImportDecl(JImportDecl anImp)
  */
 public void writeJClassDecl(JClassDecl aCDecl)
 {
+    // If enum, go to specific method
+    if(aCDecl.isEnum()) {
+        writeJClassDeclEnum(aCDecl); return; }
+
     // Get class name
     String cname = aCDecl.getSimpleName();
     boolean isInterface = aCDecl.isInterface();
@@ -195,20 +200,57 @@ public void writeJClassDecl(JClassDecl aCDecl)
 }
 
 /**
+ * Writes a JClassDecl of ClassType.Enum.
+ */
+public void writeJClassDeclEnum(JClassDecl aCDecl)
+{
+    // Get class name
+    String cname = aCDecl.getSimpleName();
+    
+    // Add export call
+    if(aCDecl.getParent() instanceof JClassDecl || aCDecl.getFile().getPackageName()!=null)
+        append("export ");
+
+    // Append class label with modifiers: public class/interface XXX ...
+    JModifiers mods = aCDecl.getModifiers();
+    String mstr = mods!=null && mods.isAbstract()? "abstract " : "";
+    append(mstr);
+    append("enum ");
+    append(cname).append(' ');
+    
+    // Write class label close char
+    append('{').endln();
+    indent();
+    
+    // Append enum constants
+    List <JEnumConst> econsts = aCDecl.getEnumConstants();
+    writeJNodesJoined(econsts, ", "); endln();
+        
+    // Terminate
+    outdent();
+    append('}').endln();
+}
+
+/**
+ * Write JEnumConst.
+ */
+public void writeJEnumConst(JEnumConst aConst)  { append(aConst.getName()); }
+
+/**
  * Writes a JFieldDecl.
  */
 public void writeJFieldDecl(JFieldDecl aFDecl)
 {
-    // Write modifiers
+    // Get modifiers and JVarDecls
     JModifiers mods = aFDecl.getModifiers();
-    writeJModifiers(mods);
-
-    // Get first var decl
-    JVarDecl vd = aFDecl.getVarDecls().get(0);
+    List <JVarDecl> vds = aFDecl.getVarDecls();
     
-    // Write var decl and terminator
-    writeJVarDecl(vd);
-    append(';').endln();
+    // Iterate over VarDecls and write mods, var decl and statement/line terminator
+    for(JVarDecl vd : vds) {
+        writeJModifiers(mods);
+        writeJVarDecl(vd);
+        append(';').endln();
+    }
 }
 
 /**
@@ -342,6 +384,13 @@ public String getTypeString(JType aType)
     // Add array chars
     if(aType.isArrayType())
         name = name + "[]";
+        
+    // If enum, add class name
+    Class cls = aType.getJClass();
+    if(cls!=null && cls.isEnum()) {
+        Class ecls = cls.getEnclosingClass();
+        if(ecls!=null) name = ecls.getSimpleName() + '.' + name;
+    }
 
     // Return name
     return name;
@@ -395,9 +444,18 @@ public void writeJStmtBlock(JStmtBlock aBlock, boolean doSemicolon)
     append('{').endln();
     indent();
     
+    // Get statements and first
+    List <JStmt> stmts = aBlock!=null? aBlock.getStatements() : null;
+    JStmt first = stmts!=null && stmts.size()>0? stmts.get(0) : null;
+    
+    // If owned by JConstrDecl and first line not JStmtContrCall, add one
+    if(aBlock!=null && aBlock.getParent() instanceof JConstrDecl && !(first instanceof JStmtConstrCall) &&
+        aBlock.getParent(JClassDecl.class).getSuperClass()!=Object.class)
+        append("super();").endln();
+    
     // Write statements
-    if(aBlock!=null)
-        for(JStmt stmt : aBlock.getStatements())
+    if(stmts!=null)
+        for(JStmt stmt : stmts)
             writeJStmt(stmt);
         
     // Outdent and terminate
@@ -762,13 +820,26 @@ public void writeJExprChain(JExprChain aExpr)
  */
 public void writeJExprId(JExprId aExpr)
 {
+    // If Enum class id append enclosing class
+    if(aExpr.isEnumId() && aExpr.getParentExpr()==null) { JavaDecl decl = aExpr.getDecl();
+        Class cls = aExpr.getJClass(), ecls = cls!=null? cls.getEnclosingClass() : null;
+        if(ecls!=null) append(ecls.getSimpleName()).append('.');
+    }
+    
+    // If Enum constant id append class and enclosing class and parent
+    else if(aExpr.isEnumConstId() && aExpr.getParentExpr()==null) { JavaDecl decl = aExpr.getDecl();
+        Class cls = aExpr.getJClass(), ecls = cls!=null? cls.getEnclosingClass() : null;
+        if(ecls!=null) append(ecls.getSimpleName()).append('.');
+        if(cls!=null) append(cls.getSimpleName()).append('.');
+    }
+    
     // If id is field or method reference and orphan, append "this." (or simple class name if static)
-    if(aExpr.isFieldRef() && aExpr.getParentExpr()==null) { JavaDecl decl = aExpr.getDecl();
+    else if(aExpr.isFieldRef() && aExpr.getParentExpr()==null) { JavaDecl decl = aExpr.getDecl();
         if(decl.isStatic()) {
             if(!decl.getClassName().startsWith("jsweet.")) append(decl.getClassSimpleName()).append('.'); }
         else append("this.");
     }
-    if(aExpr.isMethodCall() && aExpr.getMethodCall().getParentExpr()==null) { JavaDecl decl = aExpr.getDecl();
+    else if(aExpr.isMethodCall() && aExpr.getMethodCall().getParentExpr()==null) { JavaDecl decl = aExpr.getDecl();
         if(decl.isStatic()) append(decl.getClassSimpleName()).append('.');
         else append("this.");
     }
