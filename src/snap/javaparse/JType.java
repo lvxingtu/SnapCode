@@ -124,7 +124,6 @@ public void addTypeArg(JType aType)
     if(_typeArgs==null) _typeArgs = new ArrayList();
     _typeArgs.add(aType); addChild(aType, -1);
 }
-
     
 /**
  * Returns the Java code string for node.

@@ -220,6 +220,18 @@ public JMethodDecl[] getMethodDecls()
 /**
  * Returns the JMethodDecl for given name.
  */
+public JMethodDecl[] getMethodDecls(String aName)
+{
+    List <JMethodDecl> mdecls = new ArrayList();
+    for(JMethodDecl md : getMethodDecls())
+        if(md.getName().equals(aName))
+            mdecls.add(md);
+    return mdecls.toArray(new JMethodDecl[mdecls.size()]);
+}
+
+/**
+ * Returns the JMethodDecl for given name.
+ */
 public JMethodDecl getMethodDecl(String aName, Class theClasses[])
 {
     for(JMethodDecl md : getMethodDecls())

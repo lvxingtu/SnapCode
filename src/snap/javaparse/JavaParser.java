@@ -671,7 +671,7 @@ public static class FormalParamHandler extends JNodeParseHandler <JVarDecl>
             
         // Handle ("[" "]")*
         else if(anId=="[")
-            getPart().setArrayCount(getPart().getArrayCount()+1);
+            getPart().getType().setArrayCount(getPart().getArrayCount()+1);
     }
 }
 

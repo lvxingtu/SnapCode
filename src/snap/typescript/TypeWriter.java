@@ -1,5 +1,5 @@
 package snap.typescript;
-import java.util.List;
+import java.util.*;
 import snap.javaparse.*;
 
 /**
@@ -165,8 +165,14 @@ public void writeJClassDecl(JClassDecl aCDecl)
         
     // Append methods
     JMethodDecl mdecls[] = aCDecl.getMethodDecls(), mlast = mdecls.length>0? mdecls[mdecls.length-1] : null;
-    for(JMethodDecl md : mdecls) {
-        writeJMethodDecl(md); if(md!=mlast) endln(); }
+    Set <String> mdone = new HashSet();
+    for(JMethodDecl md : mdecls) { String name = md.getName();
+        if(mdone.contains(name)) continue;
+        JMethodDecl all[] = aCDecl.getMethodDecls(name);
+        if(all.length>1) writeJMethodDecls(all);
+        else writeJMethodDecl(md); if(md!=mlast) endln();
+        mdone.add(name);
+    }
         
     // Terminate
     outdent();
@@ -283,25 +289,12 @@ public void writeJConstrDecl(JConstrDecl aCDecl)
  */
 public void writeJMethodDecl(JMethodDecl aMDecl)
 {
-    // Write modifiers
+    // Get parts and write actual declaration line
     JModifiers mods = aMDecl.getModifiers();
-    writeJModifiers(mods);
-
-    // Write method name and args start char
-    append(aMDecl.getName()).append("(");
-    
-    // Write parameters
+    String name = aMDecl.getName();
+    JType rtype = aMDecl.getType();
     List <JVarDecl> params = aMDecl.getParameters();
-    JVarDecl last = params.size()>0? params.get(params.size()-1) : null;
-    for(JVarDecl param : params) {
-        writeJVarDecl(param); if(param!=last) append(", "); }
-        
-    // Write parameters close char
-    append(") ");
-    
-    // Write return type (if not empty/void)
-    String tstr = getTypeString(aMDecl.getType());
-    if(tstr.length()>0) append(": ").append(tstr).append(' ');
+    writeJMethodDeclHead(mods, name, rtype, params, false);
     
     // If interface or abstract, just write semi-colon
     if(aMDecl.getEnclosingClassDecl().isInterface() || mods!=null && mods.isAbstract())
@@ -309,6 +302,65 @@ public void writeJMethodDecl(JMethodDecl aMDecl)
     
     // Otherwise, write method block
     else writeJStmtBlock(aMDecl.getBlock(), false);
+}
+
+/**
+ * Writes a JMethodDecl.
+ */
+public void writeJMethodDeclHead(JModifiers theMods, String aName, JType aReturnType, List <JVarDecl> theParams,
+    boolean isCombined)
+{
+    // Write modifiers, method name and params start char
+    writeJModifiers(theMods);
+    append(aName).append("(");
+    
+    // Write params
+    JVarDecl plast = theParams.size()>0? theParams.get(theParams.size()-1) : null;
+    for(JVarDecl p : theParams) {
+        writeJExprId(p.getId()); if(isCombined) append('?');
+        append(" : ");
+        String tstr = TSWriterUtils.getTypeString(p.getType());
+        append(tstr); if(p!=plast) append(", ");
+    }
+    
+    // Write params close char and return type (if not empty/void)
+    append(") ");
+    String tstr = TSWriterUtils.getTypeString(aReturnType);
+    if(tstr.length()>0) append(": ").append(tstr).append(' ');
+}
+    
+/**
+ * Writes an array of JMethodDecl objects for the same name.
+ */
+public void writeJMethodDecls(JMethodDecl theMDecls[])
+{
+    // Get common return type and parameter types
+    JModifiers mods = theMDecls[0].getModifiers();
+    String name = theMDecls[0].getName();
+    JType rtype = TSWriterUtils.getCommonReturnType(theMDecls);
+    JVarDecl params[] = TSWriterUtils.getCommonParams(theMDecls);
+    writeJMethodDeclHead(mods, name, rtype, Arrays.asList(params), true);
+    
+    append('{').endln().indent();
+    append("let overload_version : number = 4;").endln().endln();
+    
+    for(JMethodDecl md : theMDecls) {
+        List <JVarDecl> mdparams = md.getParameters();
+        append("// Overload version: "); writeJMethodDeclHead(null, name, md.getType(), mdparams, false); endln();
+        append("if(overload_version==").append(md.getParameters().size()).append(") ");
+        append("return this.").append(TSWriterUtils.getMethodNameUnique(md)).append('(');
+        for(int i=0,iMax=mdparams.size();i<iMax;i++) { JVarDecl p = params[i];
+            append(p.getName()); if(i+1<iMax) append(", "); }
+        append(");").endln().endln();
+    }
+    outdent().append('}').endln().endln();
+    
+    // Write actual methods with new names
+    for(JMethodDecl md : theMDecls) {
+        String mname = TSWriterUtils.getMethodNameUnique(md);
+        writeJMethodDeclHead(md.getModifiers(), mname, md.getType(), md.getParameters(), false);
+        writeJStmtBlock(md.getBlock(), false); endln();
+    }
 }
 
 /**
@@ -322,14 +374,14 @@ public void writeJVarDecl(JVarDecl aVD)
     
     // Write type
     JType type = aVD.getType();
-    String tstr = getTypeString(type);
+    String tstr = TSWriterUtils.getTypeString(type);
     for(int i=0,iMax=aVD.getArrayCount();i<iMax;i++) tstr += "[]";
-    append(tstr).append(' ');
+    append(tstr);
     
     // Write initializer
     JExpr init = aVD.getInitializer();
     if(init!=null) {
-        append("= ");
+        append(" = ");
         writeJExpr(init);
     }
 }
@@ -360,40 +412,8 @@ public String getJModifierString(JModifiers aMod)
  */
 public void writeJType(JType aType)
 {
-    String str = getTypeString(aType); if(str.length()==0) return;
+    String str = TSWriterUtils.getTypeString(aType); if(str.length()==0) return;
     append(str);
-}
-
-/**
- * Returns a type string.
- */
-public String getTypeString(JType aType)
-{
-    // Get name
-    String name = aType.getName();
-    String cname = aType.getClassName();
-    
-    // Map core TypeScript types
-    if(name.equals("void")) name = "";
-    else if(name.equals("Object")) name = "any";
-    else if(name.equals("String") || name.equals("char") || name.equals("Character")) name = "string";
-    else if(aType.isNumberType()) name = "number";
-    else if(name.equals("Boolean")) name = "boolean";
-    else if(cname!=null && cname.startsWith("java.lang.")) name = "java.lang." + name;
-    
-    // Add array chars
-    if(aType.isArrayType())
-        name = name + "[]";
-        
-    // If enum, add class name
-    Class cls = aType.getJClass();
-    if(cls!=null && cls.isEnum()) {
-        Class ecls = cls.getEnclosingClass();
-        if(ecls!=null) name = ecls.getSimpleName() + '.' + name;
-    }
-
-    // Return name
-    return name;
 }
 
 /**
@@ -859,7 +879,7 @@ public void writeJExprInstanceOf(JExpr.InstanceOfExpr aExpr)
     // Get the type and type string
     JExpr expr = aExpr.getExpr();
     JType typ = aExpr.getType();
-    String tstr = getTypeString(typ);
+    String tstr = TSWriterUtils.getTypeString(typ);
     
     // Handle primitive types
     if(tstr.equals("number") || tstr.equals("string") || tstr.equals("boolean")) {
