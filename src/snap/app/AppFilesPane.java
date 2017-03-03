@@ -4,7 +4,7 @@ import java.util.*;
 import snap.gfx.*;
 import snap.javaparse.JavaData;
 import snap.project.Project;
-import snap.typescript.TypeWriter;
+import snap.typescript.TSWriter;
 import snap.util.*;
 import snap.view.*;
 import snap.viewx.*;
@@ -338,7 +338,7 @@ public void respondUI(ViewEvent anEvent)
     if(anEvent.equals("GenerateTypeScriptMenuItem")) {
         WebFile jfile = getSelectedFile(); if(!jfile.getType().equals("java")) return;
         JavaData jdata = JavaData.get(jfile);
-        String str = new TypeWriter().getString(jdata.getJFile());
+        String str = new TSWriter().getString(jdata.getJFile());
         String fname = "/tmp/" + jfile.getSimpleName() + ".ts";
         SnapUtils.writeBytes(str.getBytes(), fname);
         GFXEnv.getEnv().openFile(fname);

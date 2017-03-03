@@ -5,7 +5,7 @@ import snap.javaparse.*;
 /**
  * A class to convert Java to TypeScript.
  */
-public class TypeWriter {
+public class TSWriter {
 
     // The StringBuffer
     StringBuffer      _sb = new StringBuffer();
@@ -1120,42 +1120,42 @@ public void writeJExprType(JExprType aExpr)
 /**
  * Append String.
  */
-public TypeWriter append(String aStr)  { cd(); _sb.append(aStr); return this; }
+public TSWriter append(String aStr)  { cd(); _sb.append(aStr); return this; }
 
 /**
  * Append char.
  */
-public TypeWriter append(char aValue)  { cd(); _sb.append(aValue); return this; }
+public TSWriter append(char aValue)  { cd(); _sb.append(aValue); return this; }
 
 /**
  * Append Int.
  */
-public TypeWriter append(int aValue)  { cd(); _sb.append(aValue); return this; }
+public TSWriter append(int aValue)  { cd(); _sb.append(aValue); return this; }
 
 /**
  * Append Double.
  */
-public TypeWriter append(double aValue)  { cd(); _sb.append(aValue); return this; }
+public TSWriter append(double aValue)  { cd(); _sb.append(aValue); return this; }
 
 /**
  * Append newline.
  */
-public TypeWriter endln()  { _sb.append('\n'); _lineStart = true; return this; }
+public TSWriter endln()  { _sb.append('\n'); _lineStart = true; return this; }
 
 /**
  * Append indent.
  */
-public TypeWriter indent()  { _indent++; return this; }
+public TSWriter indent()  { _indent++; return this; }
 
 /**
  * Append indent.
  */
-public TypeWriter outdent()  { _indent--; return this; }
+public TSWriter outdent()  { _indent--; return this; }
 
 /**
  * Append indent.
  */
-public TypeWriter appendIndent()  { for(int i=0;i<_indent;i++) _sb.append(_indentStr); return this; }
+public TSWriter appendIndent()  { for(int i=0;i<_indent;i++) _sb.append(_indentStr); return this; }
 
 /**
  * Checks for indent.

@@ -23,7 +23,7 @@ public class TSFileBuilder implements ProjectFileBuilder {
     boolean                  _interrupt;
     
     // The TypeWriter to convert files to type script
-    TypeWriter               _twriter = new TypeWriter();
+    TSWriter                 _twriter = new TSWriter();
     
 /**
  * Creates a new TSFileBuilder for given Project.
