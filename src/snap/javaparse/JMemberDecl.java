@@ -30,7 +30,11 @@ protected String getNameImpl()  { return _id!=null? _id.getName() : null; }
 /**
  * Returns the modifiers.
  */
-public JModifiers getModifiers()  { return _mods; }
+public JModifiers getModifiers()
+{
+    if(_mods==null) setModifiers(new JModifiers());
+    return _mods;
+}
 
 /**
  * Sets the modifiers.

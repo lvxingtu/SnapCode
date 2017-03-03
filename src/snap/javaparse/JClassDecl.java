@@ -220,11 +220,11 @@ public JMethodDecl[] getMethodDecls()
 /**
  * Returns the JMethodDecl for given name.
  */
-public JMethodDecl[] getMethodDecls(String aName)
+public JMethodDecl[] getMethodDecls(String aName, boolean isStatic)
 {
     List <JMethodDecl> mdecls = new ArrayList();
     for(JMethodDecl md : getMethodDecls())
-        if(md.getName().equals(aName))
+        if(md.getName().equals(aName) && md.getModifiers().isStatic()==isStatic)
             mdecls.add(md);
     return mdecls.toArray(new JMethodDecl[mdecls.size()]);
 }

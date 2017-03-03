@@ -168,9 +168,12 @@ public void writeJClassDecl(JClassDecl aCDecl)
     Set <String> mdone = new HashSet();
     for(JMethodDecl md : mdecls) { String name = md.getName();
         if(mdone.contains(name)) continue;
-        JMethodDecl all[] = aCDecl.getMethodDecls(name);
-        if(all.length>1) writeJMethodDecls(all);
-        else writeJMethodDecl(md); if(md!=mlast) endln();
+        JMethodDecl allInst[] = aCDecl.getMethodDecls(name, false);
+        if(allInst.length>1) writeJMethodDecls(allInst);
+        else if(allInst.length==1) writeJMethodDecl(allInst[0]);
+        JMethodDecl allStatic[] = aCDecl.getMethodDecls(name, true);
+        if(allStatic.length>1) writeJMethodDecls(allStatic);
+        else if(allStatic.length==1) writeJMethodDecl(allStatic[0]); if(md!=mlast) endln();
         mdone.add(name);
     }
         
@@ -281,7 +284,7 @@ public void writeJConstrDecl(JConstrDecl aCDecl)
     append(") ");
     
     // Write statement block
-    writeJStmtBlock(aCDecl.getBlock(), false);
+    writeJStmtBlock(aCDecl.getBlock(), false); endln();
 }
 
 /**
