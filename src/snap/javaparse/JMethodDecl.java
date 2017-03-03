@@ -52,6 +52,16 @@ public void setTypeParams(List <JTypeParam> theTPs)
 }
 
 /**
+ * Returns the number of formal parameters.
+ */
+public int getParamCount()  { return _params.size(); }
+
+/**
+ * Returns the individual formal parameter at given index.
+ */
+public JVarDecl getParam(int anIndex)  { return _params.get(anIndex); }
+
+/**
  * Returns the list of formal parameters.
  */
 public List <JVarDecl> getParameters()  { return _params; }

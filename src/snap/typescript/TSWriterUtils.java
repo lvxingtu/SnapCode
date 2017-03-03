@@ -146,4 +146,64 @@ public static JType getCommonType(JType aTyp0, JType aTyp1)
     return type;
 }
 
+/**
+ * Sorts an array of JMethodDecl by arg count.
+ */
+public static void sort(JMethodDecl theMDecls[])
+{
+    Arrays.sort(theMDecls, (o1,o2) ->
+        o1.getParamCount()<o2.getParamCount()? -1 : o1.getParamCount()>o2.getParamCount()? 1 :0);
+}
+
+/**
+ * Returns the conditionals to specify a specific method decl: if(args-are-correct) return call-method-decl-X;
+ */
+public static List <String> getMethodDispatchConditionals(JMethodDecl theMDecls[], JVarDecl theParams[], boolean doRtrn)
+{
+    // Iterate over method declarations and create conditional line for each
+    List <String> lines = new ArrayList();
+    for(int i=theMDecls.length-1;i>=0;i--) { JMethodDecl md = theMDecls[i]; int pcount = md.getParamCount();
+    
+        // Create string buffer with start of conditional
+        StringBuffer sb = new StringBuffer("if(");
+        
+        // Iterate over args and build arg check: if((argX != null && argX instanceof type) || argX === null) && ...
+        //                 or for primitive type: if((typeof argX ==='ptype') || argX ===nul) && ...
+        for(int j=0;j<pcount;j++) { JVarDecl vd = md.getParam(j); String arg = theParams[j].getName();
+            String tstr = getTypeString(vd.getType()); if(tstr.contains("[]")) tstr = "Array";
+            boolean prim = tstr.equals("boolean") || tstr.equals("number") || tstr.equals("string");
+            if(prim) {
+                sb.append("((typeof ").append(arg).append(" === ").append('\'').append(tstr).append("\')");
+                sb.append(" || ");
+            }
+            else {
+                sb.append("((").append(arg).append(" != null && ");
+                sb.append(arg).append(" instanceof ").append(tstr).append(") || ");
+            }
+            sb.append(arg).append(" === null)");
+            if(j+1<pcount) sb.append(" && ");
+        }
+        
+        // If remaining args, add check for undefined
+        if(pcount<theParams.length)
+            sb.append(pcount>0? " && " : "").append(theParams[pcount].getName()).append(" === undefined");
+        
+        // Close conditional
+        sb.append(')');
+        lines.add(sb.toString());
+        
+        // If doReturns
+        if(doRtrn) {
+            sb.setLength(0); sb.append("    ");
+            if(!md.getType().getName().equals("void")) sb.append(" return");
+            sb.append(" this.").append(TSWriterUtils.getMethodNameUnique(md)).append('(');
+            for(int j=0;j<pcount;j++) { JVarDecl p = theParams[j];
+                sb.append(p.getName()); if(j+1<pcount) sb.append(", "); }
+            sb.append(");");
+            lines.add(sb.toString());
+        }
+    }
+    return lines;
+}
+
 }

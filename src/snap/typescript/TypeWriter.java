@@ -290,6 +290,7 @@ public void writeJConstrDecl(JConstrDecl aCDecl)
 public void writeJConstrDecls(JConstrDecl theCDecls[])
 {
     // Get common return type and parameter types
+    TSWriterUtils.sort(theCDecls);
     JModifiers mods = theCDecls[0].getModifiers();
     JVarDecl params[] = TSWriterUtils.getCommonParams(theCDecls);
     writeJMethodDeclHead(mods, "constructor", null, Arrays.asList(params), true);
@@ -303,22 +304,27 @@ public void writeJConstrDecls(JConstrDecl theCDecls[])
     if(clsdecl.getSuperClass()!=Object.class)
         append("super();").endln();
 
-    // Determine constructor version
-    append("let overload_version : number = 4;").endln().endln();
+    // Get dispatch conditional lines: if(arg-types-for-meth-1) return meth-1(args);
+    List <String> dispatchConds = TSWriterUtils.getMethodDispatchConditionals(theCDecls, params, false);
     
     // Iterate over constructor decls and write if blocks
-    for(JConstrDecl cd : theCDecls) {
+    for(int i=0,iMax=theCDecls.length;i<iMax;i++) { JConstrDecl cd = theCDecls[iMax-i-1];
+    
+        // Get dispatch conditional and append
+        String dline = dispatchConds.get(i);
+        append(dline).append(' ');
+        
+        // Write mappings for var name differences
         List <JVarDecl> cdparams = cd.getParameters();
-        append("// Overload version: "); writeJMethodDeclHead(null, "", null, cdparams, false); endln();
-        append("if(overload_version==").append(cdparams.size()).append(") ");
         List <String> lvarMaps = null;
-        for(int i=0,iMax=cdparams.size();i<iMax;i++) { JVarDecl vd = cdparams.get(i);
-            if(!vd.getName().equals(params[i].getName())) {
-                String lvar = "let " + vd.getName() + " = " + params[i].getName() + ";";
+        for(int j=0,jMax=cdparams.size();j<jMax;j++) { JVarDecl vd = cdparams.get(j);
+            if(!vd.getName().equals(params[j].getName())) {
+                String lvar = "let " + vd.getName() + " = " + params[j].getName() + ";";
                 if(lvarMaps==null) lvarMaps = new ArrayList(); lvarMaps.add(lvar);
             }
         }
-        writeJStmtBlock(cd.getBlock(), false, lvarMaps); endln();
+        writeJStmtBlock(cd.getBlock(), false, lvarMaps);
+        if(i+1<iMax) endln();
     }
     
     // outdent, write block end char and endline
@@ -375,28 +381,26 @@ public void writeJMethodDeclHead(JModifiers theMods, String aName, JType aReturn
  */
 public void writeJMethodDecls(JMethodDecl theMDecls[])
 {
-    // Get common return type and parameter types
+    // Get method declaration parts and write header: "public method(arg? : type, ...) : type""
+    TSWriterUtils.sort(theMDecls);
     JModifiers mods = theMDecls[0].getModifiers();
     String name = theMDecls[0].getName();
     JType rtype = TSWriterUtils.getCommonReturnType(theMDecls);
     JVarDecl params[] = TSWriterUtils.getCommonParams(theMDecls);
     writeJMethodDeclHead(mods, name, rtype, Arrays.asList(params), true);
     
+    // Start method block and indent
     append('{').endln().indent();
-    append("let overload_version : number = 4;").endln().endln();
     
-    for(JMethodDecl md : theMDecls) {
-        List <JVarDecl> mdparams = md.getParameters();
-        append("// Overload version: "); writeJMethodDeclHead(null, name, md.getType(), mdparams, false); endln();
-        append("if(overload_version==").append(md.getParameters().size()).append(") ");
-        append("return this.").append(TSWriterUtils.getMethodNameUnique(md)).append('(');
-        for(int i=0,iMax=mdparams.size();i<iMax;i++) { JVarDecl p = params[i];
-            append(p.getName()); if(i+1<iMax) append(", "); }
-        append(");").endln().endln();
-    }
+    // Get dispatch conditional lines and append: if(arg-types-for-meth-1) return meth-1(args);
+    List <String> dispatchLines = TSWriterUtils.getMethodDispatchConditionals(theMDecls, params, true);
+    for(String dline : dispatchLines)
+        append(dline).endln();
+    
+    // Outdent and end method block    
     outdent().append('}').endln().endln();
     
-    // Write actual methods with new names
+    // Write actual methods with new names: method_type_type(args)
     for(JMethodDecl md : theMDecls) {
         String mname = TSWriterUtils.getMethodNameUnique(md);
         writeJMethodDeclHead(md.getModifiers(), mname, md.getType(), md.getParameters(), false);
