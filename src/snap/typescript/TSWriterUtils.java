@@ -1,4 +1,5 @@
 package snap.typescript;
+import java.lang.reflect.TypeVariable;
 import java.util.*;
 import snap.javaparse.*;
 
@@ -10,7 +11,12 @@ public class TSWriterUtils {
 /**
  * Returns a type string.
  */
-public static String getTypeString(JType aType)
+public static String getTypeString(JType aType)  { return getTypeString(aType, true); }
+
+/**
+ * Returns a type string.
+ */
+public static String getTypeString(JType aType, boolean includeTypeParams)
 {
     // Get name
     String name = aType.getName();
@@ -33,6 +39,14 @@ public static String getTypeString(JType aType)
     if(cls!=null && cls.isEnum()) {
         Class ecls = cls.getEnclosingClass();
         if(ecls!=null) name = ecls.getSimpleName() + '.' + name;
+    }
+    
+    // Add type parameters
+    TypeVariable tparams[] = includeTypeParams && cls!=null? cls.getTypeParameters() : null;
+    if(tparams!=null && tparams.length>0) {
+        name += '<';
+        for(int i=0,iMax=tparams.length;i<iMax;i++) { name += "any"; if(i+1<iMax) name += ','; }
+        name += '>';
     }
 
     // Return name
@@ -132,7 +146,7 @@ public static JType getCommonType(JType aTyp0, JType aTyp1)
     if(aTyp0==null || aTyp1==null) return aTyp0!=null? aTyp0 : aTyp1;
     
     // If either is void, return other
-    String tstr0 = getTypeString(aTyp0), tstr1 = getTypeString(aTyp1);
+    String tstr0 = getTypeString(aTyp0, false), tstr1 = getTypeString(aTyp1, false);
     if(tstr0.length()==0 || tstr1.length()==0) return tstr0.length()==0? aTyp1 : aTyp0;
     
     // If types are equal return type 0
@@ -170,7 +184,7 @@ public static List <String> getMethodDispatchConditionals(JMethodDecl theMDecls[
         // Iterate over args and build arg check: if((argX != null && argX instanceof type) || argX === null) && ...
         //                 or for primitive type: if((typeof argX ==='ptype') || argX ===nul) && ...
         for(int j=0;j<pcount;j++) { JVarDecl vd = md.getParam(j); String arg = theParams[j].getName();
-            String tstr = getTypeString(vd.getType()); if(tstr.contains("[]")) tstr = "Array";
+            String tstr = getTypeString(vd.getType(),false); if(tstr.contains("[]")) tstr = "Array";
             boolean prim = tstr.equals("boolean") || tstr.equals("number") || tstr.equals("string");
             if(prim) {
                 sb.append("((typeof ").append(arg).append(" === ").append('\'').append(tstr).append("\')");

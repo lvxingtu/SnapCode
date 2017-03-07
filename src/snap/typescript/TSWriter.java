@@ -155,7 +155,7 @@ public void writeJClassDecl(JClassDecl aCDecl)
     
     // Append fields
     JFieldDecl fdecls[] = aCDecl.getFieldDecls();
-    for(JFieldDecl fd : fdecls) {
+    if(!isInterface) for(JFieldDecl fd : fdecls) {
         writeJFieldDecl(fd); endln(); }
         
     // Append constructors
@@ -386,11 +386,16 @@ public void writeJMethodDecls(JMethodDecl theMDecls[])
 {
     // Get method declaration parts and write header: "public method(arg? : type, ...) : type""
     TSWriterUtils.sort(theMDecls);
-    JModifiers mods = theMDecls[0].getModifiers();
-    String name = theMDecls[0].getName();
+    JMethodDecl md0 = theMDecls[0];
+    JModifiers mods = md0.getModifiers();
+    String name = md0.getName();
     JType rtype = TSWriterUtils.getCommonReturnType(theMDecls);
     JVarDecl params[] = TSWriterUtils.getCommonParams(theMDecls);
     writeJMethodDeclHead(mods, name, rtype, Arrays.asList(params), true);
+    
+    // If interface, just return
+    if(md0.getEnclosingClassDecl().isInterface()) {
+        append(';').endln(); return; }
     
     // Start method block and indent
     append('{').endln().indent();
@@ -946,7 +951,7 @@ public void writeJExprInstanceOf(JExpr.InstanceOfExpr aExpr)
     // Get the type and type string
     JExpr expr = aExpr.getExpr();
     JType typ = aExpr.getType();
-    String tstr = TSWriterUtils.getTypeString(typ);
+    String tstr = TSWriterUtils.getTypeString(typ, false);
     
     // Handle primitive types
     if(tstr.equals("number") || tstr.equals("string") || tstr.equals("boolean")) {
