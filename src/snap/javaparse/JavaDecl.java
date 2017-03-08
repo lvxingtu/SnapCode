@@ -15,8 +15,8 @@ public class JavaDecl implements Comparable<JavaDecl> {
     // The type
     Type           _type;
     
-    // The class name of this declaration
-    String         _cname;
+    // The modifiers
+    int            _mods;
     
     // The name of the declaration member
     String         _name;
@@ -24,14 +24,14 @@ public class JavaDecl implements Comparable<JavaDecl> {
     // The simple name of the declaration member
     String         _sname;
     
+    // The class name of this declaration
+    String         _cname;
+    
     // The type of the declaration member
     String         _tname;
     
     // A string description of arg types
     String         _argTypeNames[];
-    
-    // The modifier
-    int            _modifier;
     
     // The package name
     String         _pname;
@@ -39,53 +39,74 @@ public class JavaDecl implements Comparable<JavaDecl> {
     // The VariableDecl
     JVarDecl       _vdecl;
     
+    // Map of package name to JavaDecls
+    static Map <String,JavaDecl>  _pkgDecls = new HashMap();
+    
     // Constants for type
     public enum Type { Class, Field, Constructor, Method, Package, VarDecl }
     
-/**
- * Creates a new JavaDecl for class.
- */
-public JavaDecl(Class aClass)
-{
-    _type = Type.Class; _cname = _name = getTypeName(aClass); _sname = aClass.getSimpleName();
-    _modifier = aClass.getModifiers();
-}
-
-/**
- * Creates a new JavaDecl for field.
- */
-public JavaDecl(Field aField)
-{
-    _type = Type.Field; _name = _sname = aField.getName(); _cname = aField.getDeclaringClass().getName();
-    _tname = getTypeName(aField.getGenericType()); _modifier = aField.getModifiers();
-}
-
-/**
- * Creates a new JavaDecl for constructor.
- */
-public JavaDecl(Constructor aConstr)
-{
-    _type = Type.Constructor; _name = _cname = _tname = aConstr.getName();
-    _sname = aConstr.getDeclaringClass().getSimpleName();
-    _argTypeNames = new String[aConstr.getParameterCount()];
+    // Common shared decls
+    public static final JavaDecl INT_DECL = new JavaDecl(int.class);
+    public static final JavaDecl BOOL_DECL = new JavaDecl(boolean.class);
+    public static final JavaDecl OBJECT_DECL = new JavaDecl(Object.class);
+    public static final JavaDecl CLASS_DECL = new JavaDecl(Class.class);
+    public static final JavaDecl STRING_DECL = new JavaDecl(String.class);
     
-    // Get GenericParameterTypes and names (this can fail https://bugs.openjdk.java.net/browse/JDK-8075483))
-    java.lang.reflect.Type ptypes[] = aConstr.getGenericParameterTypes();
-    for(int i=0,iMax=aConstr.getParameterCount(); i<iMax; i++)
-        _argTypeNames[i] = ptypes.length==iMax? getTypeName(ptypes[i]) : getTypeName(aConstr.getParameterTypes()[i]);
-    _modifier = aConstr.getModifiers();
-}
-
 /**
- * Creates a new JavaDecl for method.
+ * Creates a new JavaDecl for Class, Field, Constructor, Method, VarDecl or class name string.
  */
-public JavaDecl(Method aMethod)
+public JavaDecl(Object anObj)
 {
-    _type = Type.Method; _name = _sname = aMethod.getName(); _cname = aMethod.getDeclaringClass().getName();
-    _argTypeNames = new String[aMethod.getParameterCount()];
-    for(int i=0,iMax=aMethod.getParameterCount(); i<iMax; i++)
-        _argTypeNames[i] = getTypeName(aMethod.getGenericParameterTypes()[i]);
-    _tname = getTypeName(aMethod.getGenericReturnType()); _modifier = aMethod.getModifiers();
+    // Handle Class
+    if(anObj instanceof Class) { Class cls = (Class)anObj; _type = Type.Class;
+        _name = getTypeName(cls); _sname = cls.getSimpleName(); _cname = _name;
+        _mods = cls.getModifiers();
+    }
+
+    // Handle Field
+    else if(anObj instanceof Field) { Field field = (Field)anObj; _type = Type.Field;
+        _name = _sname = field.getName(); _cname = field.getDeclaringClass().getName();
+        _tname = getTypeName(field.getGenericType()); _mods = field.getModifiers();
+    }
+    
+    // Handle Method
+    else if(anObj instanceof Method) { Method meth = (Method)anObj; _type = Type.Method;
+        _name = _sname = meth.getName(); _cname = meth.getDeclaringClass().getName();
+        _tname = getTypeName(meth.getGenericReturnType()); _mods = meth.getModifiers();
+        
+        // Get GenericParameterTypes and names
+        java.lang.reflect.Type ptypes[] = meth.getGenericParameterTypes();
+        _argTypeNames = new String[meth.getParameterCount()];
+        for(int i=0,iMax=ptypes.length; i<iMax; i++)
+            _argTypeNames[i] = getTypeName(ptypes[i]);
+    }
+    
+    // Handle Constructor
+    else if(anObj instanceof Constructor) { Constructor constr = (Constructor)anObj; _type = Type.Constructor;
+        _name = _cname = _tname = constr.getName();
+        _sname = constr.getDeclaringClass().getSimpleName();
+        _mods = constr.getModifiers();
+    
+        // Get GenericParameterTypes (this can fail https://bugs.openjdk.java.net/browse/JDK-8075483))
+        java.lang.reflect.Type ptypes[] = constr.getGenericParameterTypes();
+        if(ptypes.length<constr.getParameterCount()) ptypes = constr.getParameterTypes();
+        _argTypeNames = new String[ptypes.length];
+        for(int i=0,iMax=ptypes.length; i<iMax; i++)
+            _argTypeNames[i] = getTypeName(ptypes[i]);
+    }
+    
+    // Handle VarDecl
+    else if(anObj instanceof JVarDecl) { _vdecl = (JVarDecl)anObj; _type = Type.VarDecl;
+        _name = _sname = _vdecl.getName(); _tname = _vdecl.getClassName();
+    }
+    
+    // Handle String (assumed to be class name)
+    else if(anObj instanceof String) { String cname = (String)anObj; _type = Type.Class;
+        _name = cname; _sname = getSimpleName(cname); _cname = cname;
+    }
+    
+    // Throw exception for unknown type
+    else throw new RuntimeException("JavaDecl.init: Unsupported type " + anObj);
 }
 
 /**
@@ -93,12 +114,8 @@ public JavaDecl(Method aMethod)
  */
 public JavaDecl(String aClsName, String aMmbrName, String aTypeName, String theMmbrTypes[])
 {
-    // Handle Class
-    if(aClsName!=null && aMmbrName==null && theMmbrTypes==null) {
-        _type = Type.Class; _cname = _name = aClsName; _sname = getSimpleName(aClsName); }
-    
     // Handle Field
-    else if(aClsName!=null && aMmbrName!=null && theMmbrTypes==null) {
+    if(aClsName!=null && aMmbrName!=null && theMmbrTypes==null) {
         _type = Type.Field; _cname = aClsName; _name = _sname = aMmbrName; _tname = aTypeName; }
     
     // Handle Constructor
@@ -118,18 +135,16 @@ public JavaDecl(String aClsName, String aMmbrName, String aTypeName, String theM
 }
 
 /**
- * Creates a new JavaDecl.
+ * Returns the JavaDecl for given package name from shared cache.
  */
-public JavaDecl(Type aType, Object anObj)
+public static JavaDecl getPackageDecl(String aName)
 {
-    _type = aType;
-    if(_type==Type.Package) {
-        _pname = _name = (String)anObj; _sname = getSimpleName(_pname); }
-    else if(_type==Type.VarDecl) {
-        _vdecl = (JVarDecl)anObj; _sname = _name = _vdecl.getName(); _tname = _vdecl.getClassName(); }
-    else throw new RuntimeException("Unknown type for " + aType + ", " + anObj);
+    JavaDecl pd = _pkgDecls.get(aName); if(pd!=null) return pd;
+    pd = new JavaDecl(aName); pd._type = Type.Package; pd._name = pd._pname = aName; pd._sname = getSimpleName(aName);
+    _pkgDecls.put(aName, pd);
+    return pd;
 }
-        
+
 /**
  * Returns the type.
  */
@@ -164,6 +179,16 @@ public boolean isPackage()  { return _type==Type.Package; }
  * Returns whether is a variable declaration reference.
  */
 public boolean isVarDecl()  { return _type==Type.VarDecl; }
+
+/**
+ * Returns the modifiers.
+ */
+public int getModifiers()  { return _mods; }
+
+/**
+ * Returns whether decl is static.
+ */
+public boolean isStatic()  { return Modifier.isStatic(_mods); }
 
 /**
  * Returns the name.
@@ -258,19 +283,9 @@ public String getFullName()
     if(_fname!=null) return _fname;
     String name = getMatchName();
     if(_type==Type.Method || _type==Type.Field) name = _tname + " " + name;
-    String mstr = Modifier.toString(_modifier); if(mstr.length()>0) name = mstr + " " + name;
+    String mstr = Modifier.toString(_mods); if(mstr.length()>0) name = mstr + " " + name;
     return _fname=name;
 } String _fname;
-
-/**
- * Returns the modifiers.
- */
-public int getModifiers()  { return _modifier; }
-
-/**
- * Returns whether decl is static.
- */
-public boolean isStatic()  { return Modifier.isStatic(_modifier); }
 
 /**
  * Returns a string representation of suggestion.
@@ -351,7 +366,7 @@ public boolean equals(Object anObj)
     if(anObj==this) return true;
     JavaDecl decl = anObj instanceof JavaDecl? (JavaDecl)anObj : null; if(decl==null) return false;
     if(decl._type!=_type) return false;
-    if(decl._modifier!=_modifier) return false;
+    if(decl._mods!=_mods) return false;
     if(!decl._name.equals(_name)) return false;
     if(!SnapUtils.equals(decl._cname,_cname)) return false;
     if(_tname!=null && !_tname.equals(decl._tname)) return false;
@@ -453,58 +468,66 @@ private static boolean isPossibleMatch(JNode aNode, JavaDecl aDecl)
     return false;
 }
 
-/** Returns the class name, converting primitive arrays to 'int[]' instead of '[I'. */
-private String getTypeName(java.lang.reflect.Type aType)
+/**
+ * Returns the class name, converting primitive arrays to 'int[]' instead of '[I'.
+ */
+public static String getTypeName(java.lang.reflect.Type aType)
 {
-    if(aType instanceof Class)
-        return getTypeName((Class)aType);
+    // Handle Class
+    if(aType instanceof Class) { Class cls = (Class)aType;
+        if(cls.isArray()) return getTypeName(cls.getComponentType()) + "[]";
+        return cls.getName();
+    }
+        
+    // Handle GenericArrayType
     if(aType instanceof GenericArrayType) { GenericArrayType gat = (GenericArrayType)aType;
         return getTypeName(gat.getGenericComponentType()) + "[]"; }
+        
+    // Handle ParameterizedType (e.g., Class <T>, List <T>, Map <K,V>)
     if(aType instanceof ParameterizedType)
         return getTypeName(((ParameterizedType)aType).getRawType());
+        
+    // Handle TypeVariable
     if(aType instanceof TypeVariable)
         return getTypeName(((TypeVariable)aType).getBounds()[0]);
+        
+    // Handle WildcardType
     if(aType instanceof WildcardType) { WildcardType wc = (WildcardType)aType;
         if(wc.getLowerBounds().length>0)
             return getTypeName(wc.getLowerBounds()[0]);
         return getTypeName(wc.getUpperBounds()[0]);
     }
+    
+    // Complain about anything else
     throw new RuntimeException("JavaDecl: Can't get Type name from type: " + aType);
 }
 
-/** Returns the class name, converting primitive arrays to 'int[]' instead of '[I'. */
-private String getTypeName(Class aClass)
-{
-    if(!aClass.isArray()) return aClass.getName();
-    return getTypeName(aClass.getComponentType()) + "[]";
-}
-
 /** Returns a simple class name. */
-private String getSimpleName(String cname)
+private static String getSimpleName(String cname)
 {
     int i = cname.lastIndexOf('$'); if(i<0) i = cname.lastIndexOf('.'); if(i>0) cname = cname.substring(i+1);
     return cname;
 }
 
 /** Returns the parent class name. */
-private String getParentClassName(String cname)
+private static String getParentClassName(String cname)
 {
    int i = cname.lastIndexOf('$'); if(i<0) i = cname.lastIndexOf('.'); if(i>0) cname = cname.substring(0,i);
    return cname;
 }
 
 /** Returns the top level class name. */
-private String getRootClassName(String cname)
+private static String getRootClassName(String cname)
 {
    int i = cname.indexOf('$'); if(i>0) cname = cname.substring(0,i);
    return cname;
 }
 
 /** Returns a package name for a class name. */
-private String getPackageName(String cname)
+private static String getPackageName(String cname)
 {
-    String name = getClassName(); int i = name.lastIndexOf('.'); name = i>0? name.substring(0,i) : "";
-    return name;
+    int i = cname.lastIndexOf('.'); cname = i>0? cname.substring(0,i) : "";
+    return cname;
 }
 
 }

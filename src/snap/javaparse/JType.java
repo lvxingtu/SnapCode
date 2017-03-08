@@ -81,7 +81,7 @@ protected JavaDecl getDeclImpl()
         String pfix = "["; for(int i=1; i<_arrayCount; i++) pfix += "[";
         if(_primitive) cname = pfix + ClassUtils.getClassCoded(cname);
         else cname = pfix + "L" + cname + ";";
-        decl = new JavaDecl(cname, null, null, null);
+        decl = new JavaDecl(cname);
     }
     
     // Return declaration

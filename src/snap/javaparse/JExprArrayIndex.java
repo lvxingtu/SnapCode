@@ -51,8 +51,8 @@ public String getNodeString()  { return "ArrayIndex"; }
 protected JavaDecl getDeclImpl()
 {
     Class pclass = _arrayExpr!=null? _arrayExpr.getJClass() : null;
-    Class iclass = pclass!=null && pclass.isArray()? pclass.getComponentType() : Object.class;
-    return new JavaDecl(iclass);
+    Class iclass = pclass!=null && pclass.isArray()? pclass.getComponentType() : null;
+    return iclass!=null? new JavaDecl(iclass) : JavaDecl.OBJECT_DECL;
 }
 
 }

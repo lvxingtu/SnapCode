@@ -92,7 +92,7 @@ private JavaDecl getRef(ClassFileData.Constant aConst)
 {
     if(aConst.isClass()) {
         String cname = aConst.getClassName(); if(cname.startsWith("[")) return null;
-        return new JavaDecl(cname, null, null, null);
+        return new JavaDecl(cname);
     }
     if(aConst.isField()) {
         String cname = aConst.getDeclClassName(); if(cname.startsWith("[")) return null;
@@ -111,8 +111,13 @@ private JavaDecl getRef(ClassFileData.Constant aConst)
 private final void addClassRef(Type aType, Set <JavaDecl> theRefs)
 {
     // Handle simple Class
-    if(aType instanceof Class)
-        addClassRef((Class)aType, theRefs);
+    if(aType instanceof Class) { Class cls = (Class)aType;
+        while(cls.isArray()) cls = cls.getComponentType();
+        if(cls.isAnonymousClass() || cls.isPrimitive() || cls.isSynthetic()) return;
+        JavaDecl ref; try { ref = new JavaDecl(cls); ref._mods = 0; }
+        catch(Throwable e) { System.err.println(e + " in " + _file); return; }
+        theRefs.add(ref);
+    }
         
     // Handle ParameterizedType
     else if(aType instanceof ParameterizedType) { ParameterizedType ptype = (ParameterizedType)aType;
@@ -134,18 +139,6 @@ private final void addClassRef(Type aType, Set <JavaDecl> theRefs)
         for(Type type : wct.getUpperBounds())
             addClassRef(type, theRefs);
     }
-}
-
-/**
- * Adds a ref for a declaration type class.
- */
-private final void addClassRef(Class aClass, Set <JavaDecl> theRefs)
-{
-    while(aClass.isArray()) aClass = aClass.getComponentType();
-    if(aClass.isAnonymousClass() || aClass.isPrimitive() || aClass.isSynthetic()) return;
-    JavaDecl ref; try { ref = new JavaDecl(aClass); ref._modifier = 0; }
-    catch(Throwable e) { System.err.println(e + " in " + _file); return; }
-    theRefs.add(ref);
 }
 
 /** Returns the top level class name. */

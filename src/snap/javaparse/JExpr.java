@@ -134,7 +134,7 @@ public static class InstanceOfExpr extends JExpr {
     public String getNodeString()  { return "InstanceOf"; }
     
     /** Override to return declaration of type. */
-    protected JavaDecl getDeclImpl()  { return _bd; } static JavaDecl _bd = new JavaDecl(boolean.class);
+    protected JavaDecl getDeclImpl()  { return _bd; } static JavaDecl _bd = JavaDecl.BOOL_DECL;
 }
 
 }

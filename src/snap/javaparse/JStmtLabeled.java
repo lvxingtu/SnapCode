@@ -39,7 +39,7 @@ public String getLabelName()  { return _label!=null? _label.getName() : null; }
 public JVarDecl getLabelVarDecl()
 {
     if(_lvd!=null) return _lvd;
-    JType typ = new JType(); typ._name = "String"; typ._decl = new JavaDecl(String.class);
+    JType typ = new JType(); typ._name = "String"; typ._decl = JavaDecl.STRING_DECL;
     _lvd = new JVarDecl(); _lvd._id = _label; _lvd._type = typ;
     return _lvd;
 }

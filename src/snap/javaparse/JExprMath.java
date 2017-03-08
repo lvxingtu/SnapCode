@@ -69,20 +69,20 @@ protected JavaDecl getDeclImpl()
     switch(op) {
         case Add: case Subtract: case Multiply: case Divide: case Mod: return getDeclMath();
         case Equal: case NotEqual: case LessThan: case GreaterThan: case LessThanOrEqual: case GreaterThanOrEqual:
-        case Or: case And: case Not: return new JavaDecl(boolean.class);
+        case Or: case And: case Not: return JavaDecl.BOOL_DECL;
         case Conditional:     // Should probably take common ancestor of both
-            return getChildCount()>2? getOperand(1).getDecl() : new JavaDecl(Object.class);
+            return getChildCount()>2? getOperand(1).getDecl() : JavaDecl.OBJECT_DECL;
         case Assignment: return getOperand(0).getDecl();
         case BitOr: case BitXOr: case BitAnd: return getOperand(0).getDecl();
         case ShiftLeft: case ShiftRight: case ShiftRightUnsigned: return getOperand(0).getDecl();
         case PreIncrement: case PreDecrement: case Negate: case BitComp: return getOperand(0).getDecl();
         case PostIncrement: case PostDecrement: return getOperand(0).getDecl();
-        default: return new JavaDecl(boolean.class);
+        default: return JavaDecl.BOOL_DECL;
     }
 }
 
 /** Returns the class name for math expression. */
-private JavaDecl getDeclMath() { String c = getClassNameMath(); return c!=null? new JavaDecl(c,null,null,null) : null; }
+private JavaDecl getDeclMath() { String cname = getClassNameMath(); return cname!=null? new JavaDecl(cname) : null; }
 private String getClassNameMath()
 {
     String c1 = getChildCount()>0? getOperand(0).getClassName() : null;

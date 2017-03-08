@@ -120,7 +120,7 @@ protected JavaDecl resolveName(JNode aNode)
     
     // If it's in JPackageDecl, it's a Package
     if(isKnownPackageName(name))
-        return new JavaDecl(JavaDecl.Type.Package, name);
+        return JavaDecl.getPackageDecl(name);
     
     // See if it's a known class name using imports
     String cname = getImportClassName(name);

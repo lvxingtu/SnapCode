@@ -56,7 +56,7 @@ private static void getSuggestions(JType aJType, List <JavaDecl> theSuggestions)
             if(cstrs!=null) for(Constructor cstr : cstrs)
                 theSuggestions.add(new JavaDecl(cstr));
         }
-        else theSuggestions.add(new JavaDecl(cname, null, null, null));
+        else theSuggestions.add(new JavaDecl(cname));
     }
 }
 
@@ -77,9 +77,9 @@ private static void getSuggestions(JExprId anId, List <JavaDecl> theSuggestions)
         if(parExpr instanceof JExprId && ((JExprId)parExpr).isPackageName()) { JExprId parId = (JExprId)parExpr;
             String parPkg = parId.getPackageName();
             for(String cname : cpinfo.getPackageClassNames(parPkg, prefix))
-                theSuggestions.add(new JavaDecl(cname, null, null, null));
+                theSuggestions.add(new JavaDecl(cname));
             for(String pname : cpinfo.getPackageChildrenNames(parPkg, prefix))
-                theSuggestions.add(new JavaDecl(JavaDecl.Type.Package, pname));
+                theSuggestions.add(JavaDecl.getPackageDecl(pname));
         }
         
         // Handle anything else with a parent class
@@ -117,13 +117,13 @@ private static void getSuggestions(JExprId anId, List <JavaDecl> theSuggestions)
         for(String cname : cnames) {
             Class cls = cpinfo.getClass(cname);
             if(cls==null || !Modifier.isPublic(cls.getModifiers())) continue;
-            theSuggestions.add(new JavaDecl(cname, null, null, null));
+            theSuggestions.add(new JavaDecl(cname));
         }
 
         // Add packages with prefix
         List <String> pnames = cpinfo.getAllPackageNames(prefix);
         for(String name : pnames)
-            theSuggestions.add(new JavaDecl(JavaDecl.Type.Package, name));
+            theSuggestions.add(JavaDecl.getPackageDecl(name));
     }
 }
 

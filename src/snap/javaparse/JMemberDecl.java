@@ -20,7 +20,7 @@ public class JMemberDecl extends JNode {
     JavaDecl        _super;
     
     // A bobus JavaDecl to stand in for null super decl
-    static JavaDecl _nullMmbr = new JavaDecl("NullSuperMemberStandIn",null,null,null);
+    static JavaDecl _nullMmbr = new JavaDecl("NullSuperMemberStandIn");
     
 /**
  * Returns the member name.
