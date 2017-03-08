@@ -16,6 +16,9 @@ public class ClassData {
 
     // The class file
     WebFile        _file;
+    
+    // The class name
+    String         _cname;
 
 /**
  * Creates a new ClassData for given file.
@@ -41,7 +44,7 @@ public void getDeclsAndRefs(Set <JavaDecl> theDecls, Set <JavaDecl> theRefs)
     catch(Exception e) { System.err.println(e); return; }
     
     // Iterate over constants and add to set top level class names
-    String cname = getRootClassName(getProj().getClassName(_file));
+    String cname = _cname = getRootClassName(getProj().getClassName(_file));
     for(int i=1, iMax=cfd.getConstantCount(); i<=iMax; i++) { ClassFileData.Constant constant = cfd.getConstant(i);
         if(constant.isClass() && (isInRootClassName(cname, constant.getClassName()) ||
             ClassUtils.isPrimitiveClassName(constant.getClassName())))
@@ -57,7 +60,7 @@ public void getDeclsAndRefs(Set <JavaDecl> theDecls, Set <JavaDecl> theRefs)
     addClassRef(cls.getGenericSuperclass(), theRefs);
     for(Type tp : cls.getGenericInterfaces()) addClassRef(tp, theRefs);
     
-    // Fields: add JavaDecl for each declared field - also make sure field type is in references
+    // Fields: add JavaDecl for each declared field - also make sure field type is in refs
     Field fields[]; try { fields = cls.getDeclaredFields(); }
     catch(Throwable e) { System.err.println(e + " in " + _file); return; }
     for(Field field : fields) {
@@ -65,7 +68,7 @@ public void getDeclsAndRefs(Set <JavaDecl> theDecls, Set <JavaDecl> theRefs)
         addClassRef(field.getGenericType(), theRefs);
     }
     
-    // Constructors: Add JavaDecl for each constructor - also make sure parameter types are in references
+    // Constructors: Add JavaDecl for each constructor - also make sure parameter types are in refs
     Constructor constrs[]; try { constrs = cls.getDeclaredConstructors(); }
     catch(Throwable e) { System.err.println(e + " in " + _file); return; }
     for(Constructor constr : constrs) {
@@ -74,7 +77,7 @@ public void getDeclsAndRefs(Set <JavaDecl> theDecls, Set <JavaDecl> theRefs)
         for(Type t : constr.getGenericParameterTypes()) addClassRef(t, theRefs);
     }
     
-    // Methods: Add JavaDecl for each declared method - also make sure return type and parameter types are in references
+    // Methods: Add JavaDecl for each declared method - also make sure return/parameter types are in refs
     Method methods[]; try { methods = cls.getDeclaredMethods(); }
     catch(Throwable e) { System.err.println(e + " in " + _file); return; }
     for(Method meth : methods) {
@@ -86,24 +89,51 @@ public void getDeclsAndRefs(Set <JavaDecl> theDecls, Set <JavaDecl> theRefs)
 }
 
 /**
- * Returns the JavaDecl for given Class ConstantPool Constant.
+ * Returns the JavaDecl for given Class ConstantPool Constant if external reference.
  */
 private JavaDecl getRef(ClassFileData.Constant aConst)
 {
+    // Handle Class reference
     if(aConst.isClass()) {
         String cname = aConst.getClassName(); if(cname.startsWith("[")) return null;
         return new JavaDecl(cname);
     }
+    
+    // Handle Field reference
     if(aConst.isField()) {
         String cname = aConst.getDeclClassName(); if(cname.startsWith("[")) return null;
         return new JavaDecl(cname, aConst.getMemberName(), aConst.getType(), null);
     }
+    
+    // Handle method reference
     if(aConst.isMethod()) {
         String cname = aConst.getDeclClassName(); if(cname.startsWith("[")) return null;
         return new JavaDecl(cname, aConst.getMemberName(), aConst.getType(), aConst.getParameterTypes());
     }
+    
+    // Return null since unknown Constant reference
     return null;
 }
+
+/** Returns method for given ClassFileData.Constant. */
+/*public Method getMethod(ClassFileData.Constant aConst)
+{
+    Project proj = getProj();
+    String cstr = aConst.getDeclClassName(), pstrs[] = aConst.getParameterTypes(), name = aConst.getMemberName();
+    Class cls = proj.getClassForName(cstr), params[] = new Class[pstrs.length];
+    for(int i=0;i<pstrs.length;i++)
+        params[i] = proj.getClassForName(pstrs[i]);
+    return ClassUtils.getMethod(cls, name, params); }*/
+
+/** Returns constructor for given ClassFileData.Constant. */
+/*public Constructor getConstructor(ClassFileData.Constant aConst)
+{
+    Project proj = getProj();
+    String cstr = aConst.getDeclClassName(), pstrs[] = aConst.getParameterTypes();
+    Class cls = proj.getClassForName(cstr), params[] = new Class[pstrs.length];
+    for(int i=0;i<pstrs.length;i++)
+        params[i] = proj.getClassForName(pstrs[i]);
+    return ClassUtils.getConstructor(cls, params); }*/
 
 /**
  * Adds a ref for a declaration type class.
