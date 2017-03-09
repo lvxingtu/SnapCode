@@ -62,18 +62,19 @@ public boolean isDependenciesSet()  { return _dset; } boolean _dset;
  */
 public Set <WebFile> updateDependencies()
 {
-    // Get new declarations and refs
-    Set <JavaDecl> ndecls = new HashSet(), nrefs = new HashSet(); _dset = true; _jfile = null;
+    // Get Java file, project, RootProject, ProjectSet and class files
     WebFile jfile = _file;
     Project proj = Project.get(jfile), rootProj = proj.getRootProject();
     ProjectSet projSet = rootProj.getProjectSet();
     WebFile cfiles[] = proj.getClassFiles(jfile);
-    if(cfiles!=null) {
-        for(WebFile cfile : cfiles) {
-            ClassData cdata = ClassData.get(cfile);
-            try { cdata.getDeclsAndRefs(ndecls, nrefs); }
-            catch(Throwable t) { }
-        }
+    
+    // Get new declarations
+    Set <JavaDecl> ndecls = new HashSet();
+    if(cfiles!=null) for(WebFile cfile : cfiles) {
+        String cname = proj.getClassName(cfile);
+        ClassDecl cdecl = proj.getClassDecl(cname);
+        try { ndecls.addAll(cdecl.updateDecls()); }
+        catch(Throwable t) { System.err.printf("JavaData.updateDepends failed to get decls in %s: %s\n", cfile, t); }
     }
     
     // If declarations have changed, get set of update files
@@ -81,6 +82,14 @@ public Set <WebFile> updateDependencies()
     if(!ndecls.equals(_decls)) {
         updateFiles.addAll(getDependents());
         _decls = ndecls;
+    }
+    
+    // Get new refs
+    Set <JavaDecl> nrefs = new HashSet(); _dset = true; _jfile = null;
+    if(cfiles!=null) for(WebFile cfile : cfiles) {
+        ClassData cdata = ClassData.get(cfile);
+        try { cdata.getRefs(nrefs); }
+        catch(Throwable t) { System.err.printf("JavaData.updateDepends failed to get refs in %s: %s\n", cfile, t); }
     }
     
     //System.out.println(jfile.getName() + ": " + StringUtils.join(updateFiles.toArray(), ", "));

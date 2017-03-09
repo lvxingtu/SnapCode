@@ -110,31 +110,6 @@ public JavaDecl(Object anObj)
 }
 
 /**
- * Creates a new JavaDecl.
- */
-public JavaDecl(String aClsName, String aMmbrName, String aTypeName, String theMmbrTypes[])
-{
-    // Handle Field
-    if(aClsName!=null && aMmbrName!=null && theMmbrTypes==null) {
-        _type = Type.Field; _cname = aClsName; _name = _sname = aMmbrName; _tname = aTypeName; }
-    
-    // Handle Constructor
-    else if(aClsName!=null && (aMmbrName==null || aMmbrName.equals("<init>")) && theMmbrTypes!=null) {
-        _type = Type.Constructor; _cname = _name = _tname = aClsName; _argTypeNames = theMmbrTypes;
-        _sname = getSimpleName(aClsName);
-    }
-    
-    // Handle Method
-    else if(aClsName!=null && aMmbrName!=null && theMmbrTypes!=null) {
-        _type = Type.Method; _cname = aClsName; _name = _sname = aMmbrName;
-        _tname = aTypeName; _argTypeNames = theMmbrTypes;
-    }
-    
-    // If anything else, throw exception
-    else throw new RuntimeException("Unknown type for " + aClsName + ", " + aMmbrName + ", " + theMmbrTypes);
-}
-
-/**
  * Returns the JavaDecl for given package name from shared cache.
  */
 public static JavaDecl getPackageDecl(String aName)

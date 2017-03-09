@@ -5,6 +5,7 @@ package snap.project;
 import java.io.Closeable;
 import java.net.*;
 import java.util.*;
+import snap.javaparse.ClassDecl;
 import snap.typescript.TSFileBuilder;
 import snap.util.*;
 import snap.web.*;
@@ -43,6 +44,9 @@ public class Project extends SnapObject {
     
     // The set of projects this project depends on
     ProjectSet                         _projSet = new ProjectSet(this);
+    
+    // A map of ClassDecl objects to provide JavaDecls for project
+    Map <String,ClassDecl>             _cdecls = new HashMap();
     
     // Constants for Project Settings
     public static final String         RemoteURL = "RemoteSourceURL";
@@ -126,6 +130,17 @@ public Project[] getProjects()  { return _projSet.getProjects(); }
  * Returns the set of projects this project depends on.
  */
 public ProjectSet getProjectSet()  { return _projSet; }
+
+/**
+ * Returns the class decl for given class name.
+ */
+public ClassDecl getClassDecl(String aCName)
+{
+    Project rproj = getRootProject(); if(rproj!=this) return rproj.getClassDecl(aCName);
+    ClassDecl cdecl = _cdecls.get(aCName);
+    if(cdecl==null) _cdecls.put(aCName, cdecl=new ClassDecl(this, aCName));
+    return cdecl;
+}
 
 /**
  * Returns the source file for given path.
