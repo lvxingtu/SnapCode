@@ -6,7 +6,7 @@ import snap.project.Project;
 /**
  * This class manages JavaDecls for a class.
  */
-public class ClassDecl {
+public class JavaDecls {
 
     // The project this class works for
     Project          _proj;
@@ -18,7 +18,7 @@ public class ClassDecl {
     JavaDecl         _cdecl;
     
     // The super class decl
-    ClassDecl         _sdecl;
+    JavaDecls        _sdecl;
     
     // The field decls
     List <JavaDecl>  _fdecls = new ArrayList();
@@ -30,16 +30,16 @@ public class ClassDecl {
     List <JavaDecl>  _cdecls = new ArrayList();
 
 /**
- * Creates a new ClassDecl.
+ * Creates a new JavaDecls.
  */
-public ClassDecl(Project aProj, String aClassName)
+public JavaDecls(Project aProj, String aClassName)
 {
     // Set project, class name and super decl
     _proj = aProj; _cname = aClassName;
     Class cls = aProj.getClassForName(_cname);
     Class scls = cls.getSuperclass();
     if(scls!=null)
-        _sdecl = aProj.getClassDecl(scls.getName());
+        _sdecl = aProj.getJavaDecls(scls.getName());
         
     // Set base classes from JavaDecl constants
     if(cls==int.class) _cdecl = JavaDecl.INT_DECL;
@@ -55,7 +55,7 @@ public ClassDecl(Project aProj, String aClassName)
 /**
  * Returns the super class decl.
  */
-public ClassDecl getSuperClassDecl()  { return _sdecl; }
+public JavaDecls getSuperClassDecl()  { return _sdecl; }
 
 /**
  * Updates JavaDecls.
@@ -243,32 +243,32 @@ public static JavaDecl getJavaDecl(Project aProj, Object anObj)
 {
     // Handle Class
     if(anObj instanceof Class) { Class cls = (Class)anObj;
-        ClassDecl cdecl = aProj.getClassDecl(cls.getName());
-        return cdecl.getClassDecl();
+        JavaDecls decls = aProj.getJavaDecls(cls.getName());
+        return decls.getClassDecl();
     }
     
     // Handle Field
     if(anObj instanceof Field) { Field field = (Field)anObj; Class cls = field.getDeclaringClass();
-        ClassDecl cdecl = aProj.getClassDecl(cls.getName());
-        return cdecl.getFieldDecl(field);
+        JavaDecls decls = aProj.getJavaDecls(cls.getName());
+        return decls.getFieldDecl(field);
     }
     
     // Handle Method
     if(anObj instanceof Method) { Method meth = (Method)anObj; Class cls = meth.getDeclaringClass();
-        ClassDecl cdecl = aProj.getClassDecl(cls.getName());
-        return cdecl.getMethodDecl(meth);
+        JavaDecls decls = aProj.getJavaDecls(cls.getName());
+        return decls.getMethodDecl(meth);
     }
 
     // Handle Constructor
     if(anObj instanceof Constructor) { Constructor constr = (Constructor)anObj; Class cls = constr.getDeclaringClass();
-        ClassDecl cdecl = aProj.getClassDecl(cls.getName());
-        return cdecl.getConstructorDecl(constr);
+        JavaDecls decls = aProj.getJavaDecls(cls.getName());
+        return decls.getConstructorDecl(constr);
     }
     
     // Handle string
     if(anObj instanceof String) { String cname = (String)anObj; Class cls = aProj.getClassForName(cname);
-        ClassDecl cdecl = cls!=null? aProj.getClassDecl(cname) : null;
-        return cdecl!=null? cdecl.getClassDecl() : null;
+        JavaDecls decls = cls!=null? aProj.getJavaDecls(cname) : null;
+        return decls!=null? decls.getClassDecl() : null;
     }
 
     // Complain

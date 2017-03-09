@@ -45,8 +45,8 @@ public class Project extends SnapObject {
     // The set of projects this project depends on
     ProjectSet                         _projSet = new ProjectSet(this);
     
-    // A map of ClassDecl objects to provide JavaDecls for project
-    Map <String,ClassDecl>             _cdecls = new HashMap();
+    // A map of JavaDecls objects to provide JavaDecls for project
+    Map <String,JavaDecls>             _decls = new HashMap();
     
     // Constants for Project Settings
     public static final String         RemoteURL = "RemoteSourceURL";
@@ -132,20 +132,20 @@ public Project[] getProjects()  { return _projSet.getProjects(); }
 public ProjectSet getProjectSet()  { return _projSet; }
 
 /**
- * Returns the class decl for given class name.
+ * Returns the JavaDecls for given class name.
  */
-public ClassDecl getClassDecl(String aCName)
+public JavaDecls getJavaDecls(String aCName)
 {
-    Project rproj = getRootProject(); if(rproj!=this) return rproj.getClassDecl(aCName);
-    ClassDecl cdecl = _cdecls.get(aCName);
-    if(cdecl==null) _cdecls.put(aCName, cdecl=new ClassDecl(this, aCName));
-    return cdecl;
+    Project rproj = getRootProject(); if(rproj!=this) return rproj.getJavaDecls(aCName);
+    JavaDecls decls = _decls.get(aCName);
+    if(decls==null) _decls.put(aCName, decls=new JavaDecls(this, aCName));
+    return decls;
 }
 
 /**
  * Returns a JavaDecl for object.
  */
-public JavaDecl getJavaDecl(Object anObj)  { return ClassDecl.getJavaDecl(this, anObj); }
+public JavaDecl getJavaDecl(Object anObj)  { return JavaDecls.getJavaDecl(this, anObj); }
 
 /**
  * Returns the source file for given path.
