@@ -58,7 +58,7 @@ public Class[] getArgClasses()
 protected JavaDecl getDeclImpl()
 {
     Constructor c = getConstructor();
-    return c!=null? new JavaDecl(c) : null;
+    return c!=null? getJavaDecl(c) : null;
 }
 
 /**

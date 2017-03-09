@@ -123,7 +123,7 @@ public void setBlock(JStmtBlock aBlock)  { replaceChild(_block, _block = aBlock)
 protected JavaDecl getDeclImpl()
 {
     Method meth = getMethod();
-    return meth!=null? new JavaDecl(meth) : null;
+    return meth!=null? getJavaDecl(meth) : null;
 }
 
 /**
@@ -188,13 +188,13 @@ protected JavaDecl getSuperDeclImpl()
     
     // Iterate over superclasses and return if any have method
     for(Class cls=sclass; cls!=null; cls=cls.getSuperclass()) {
-        try { return new JavaDecl(cls.getDeclaredMethod(getName(), ptypes)); }
+        try { return getJavaDecl(cls.getDeclaredMethod(getName(), ptypes)); }
         catch(Exception e) { }
     }
     
     // Iterate over enclosing class interfaces and return if any have method
     for(Class intf : ecd.getInterfaces())
-        try { return new JavaDecl(intf.getDeclaredMethod(getName(), ptypes)); }
+        try { return getJavaDecl(intf.getDeclaredMethod(getName(), ptypes)); }
         catch(Exception e) { }
     
     // Return null since not found

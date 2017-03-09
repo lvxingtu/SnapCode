@@ -314,8 +314,7 @@ protected JavaDecl getDeclImpl()
     
     // Return class name
     Class cls = cname!=null? getClassForName(cname) : null;
-    try { return cls!=null? new JavaDecl(cls) : null; }
-    catch(Throwable e) { System.err.println("JClassDecl.getDeclImpl: " + e); return null; }
+    return cls!=null? getJavaDecl(cls) : null;
 }
 
 /**
@@ -340,7 +339,7 @@ protected JavaDecl resolveName(JNode aNode)
     // If it's "super", set class and return ClassField
     if(name.equals("super")) {
         Class sclass = getSuperClass();
-        return sclass!=null? new JavaDecl(sclass) : null;
+        return sclass!=null? getJavaDecl(sclass) : null;
     }
     
     // Iterate over fields and return declaration if found
@@ -353,14 +352,14 @@ protected JavaDecl resolveName(JNode aNode)
     Class sclass = getSuperClass();
     Field field = sclass!=null? ClassUtils.getField(sclass, name) : null;
     if(field!=null)
-        return new JavaDecl(field);
+        return getJavaDecl(field);
     
     // Check interfaces
     if(isId) for(JType tp : getImplementsTypes()) {
         Class cls = tp.getJClass();
         Field fd = cls!=null? ClassUtils.getField(cls, name) : null;
         if(fd!=null)
-            return new JavaDecl(fd);
+            return getJavaDecl(fd);
     }
 
     // Look for JTypeParam for given name
@@ -372,7 +371,7 @@ protected JavaDecl resolveName(JNode aNode)
     Class cdClass = getJClass();
     Class cls = null; try { cls = cdClass!=null? ClassUtils.getClass(cdClass, name) : null; } catch(Throwable t) { }
     if(cls!=null)
-        return new JavaDecl(cls);
+        return getJavaDecl(cls);
     
     // Do normal version
     return super.resolveName(aNode);

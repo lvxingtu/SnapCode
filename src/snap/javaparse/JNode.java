@@ -146,6 +146,11 @@ protected JavaDecl getDeclImpl()  { return null; }
 public JavaDecl getEnclosingDecl()  { JNode n = getEnclosingDeclNode(); return n!=null? n.getDecl() : null; }
 
 /**
+ * Returns a JavaDecl for a Class, Field, Method, Constructor or class name string.
+ */
+public JavaDecl getJavaDecl(Object anObj)  { return getFile().getJavaDecl(anObj); }
+
+/**
  * Returns the enclosing JavaDecl (JVarDecl, JConstrDecl, JMethodDecl or JClassDecl).
  */
 public JNode getEnclosingDeclNode()

@@ -46,7 +46,7 @@ protected JavaDecl getDeclImpl()
 {
     Class cls = getParent().getJClass();
     Field field = cls!=null? ClassUtils.getField(cls, getName()) : null;
-    return field!=null? new JavaDecl(field) : null;
+    return field!=null? getJavaDecl(field) : null;
 }
 
 /**

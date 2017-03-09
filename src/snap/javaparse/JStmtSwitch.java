@@ -51,7 +51,7 @@ protected JavaDecl resolveName(JNode aNode)
         Class cls = getExpr().getJClass();
         Field field = cls!=null? ClassUtils.getField(cls, name) : null;
         if(field!=null)
-            return new JavaDecl(field);
+            return getJavaDecl(field);
     }
 
     // Do normal version

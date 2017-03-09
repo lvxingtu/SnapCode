@@ -67,7 +67,7 @@ protected JavaDecl getDeclImpl()
                 if(isKnownClassName(name2))
                     name = name2;
             }
-            return new JavaDecl(name);
+            return getJavaDecl(name);
         }
         int i = name.lastIndexOf('.'); if(i>0) name = name.substring(0,i); else name = null;
     }

@@ -118,7 +118,7 @@ protected JavaDecl getDeclImpl()
 {
     Object val = getValue(); if(val==null) return null;
     Class cls = val.getClass();
-    return new JavaDecl(cls);
+    return getJavaDecl(cls);
 }
         
 /**

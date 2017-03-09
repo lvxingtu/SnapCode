@@ -112,7 +112,7 @@ public String getNodeString()  { return "Allocation"; }
 protected JavaDecl getDeclImpl()
 {
     Constructor cstr = getConstructor();
-    return cstr!=null? new JavaDecl(cstr) : null;
+    return cstr!=null? getJavaDecl(cstr) : null;
 }
 
 /**

@@ -113,7 +113,7 @@ protected JavaDecl getDeclImpl()
 {
     Field field = getField();
     if(field!=null)
-        return new JavaDecl(field);
+        return getJavaDecl(field);
     return new JavaDecl(this);
 }
 

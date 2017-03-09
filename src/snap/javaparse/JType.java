@@ -81,7 +81,7 @@ protected JavaDecl getDeclImpl()
         String pfix = "["; for(int i=1; i<_arrayCount; i++) pfix += "[";
         if(_primitive) cname = pfix + ClassUtils.getClassCoded(cname);
         else cname = pfix + "L" + cname + ";";
-        decl = new JavaDecl(cname);
+        decl = getJavaDecl(cname);
     }
     
     // Return declaration
@@ -100,7 +100,7 @@ protected JavaDecl getBaseDecl()
     JavaDecl decl = null;
     Class pclass = ClassUtils.getPrimitiveClass(_name);
     if(pclass!=null)
-        decl = new JavaDecl(pclass);
+        decl = getJavaDecl(pclass);
     
     // If not primitive, try to resolve
     if(decl==null)

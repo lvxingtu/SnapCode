@@ -34,11 +34,21 @@ public class ClassDecl {
  */
 public ClassDecl(Project aProj, String aClassName)
 {
+    // Set project, class name and super decl
     _proj = aProj; _cname = aClassName;
     Class cls = aProj.getClassForName(_cname);
     Class scls = cls.getSuperclass();
     if(scls!=null)
         _sdecl = aProj.getClassDecl(scls.getName());
+        
+    // Set base classes from JavaDecl constants
+    if(cls==int.class) _cdecl = JavaDecl.INT_DECL;
+    else if(cls==boolean.class) _cdecl = JavaDecl.BOOL_DECL;
+    else if(cls==Object.class) _cdecl = JavaDecl.OBJECT_DECL;
+    else if(cls==Class.class) _cdecl = JavaDecl.CLASS_DECL;
+    else if(cls==String.class) _cdecl = JavaDecl.STRING_DECL;
+    
+    // Do initial load
     updateDecls();
 }
 
@@ -225,5 +235,44 @@ public void removeDecl(JavaDecl aDecl)
  * Standard toString implementation.
  */
 public String toString()  { return "ClassDecl { ClassName=" + _cname + " }"; }
+
+/**
+ * Returns a JavaDecl for object.
+ */
+public static JavaDecl getJavaDecl(Project aProj, Object anObj)
+{
+    // Handle Class
+    if(anObj instanceof Class) { Class cls = (Class)anObj;
+        ClassDecl cdecl = aProj.getClassDecl(cls.getName());
+        return cdecl.getClassDecl();
+    }
+    
+    // Handle Field
+    if(anObj instanceof Field) { Field field = (Field)anObj; Class cls = field.getDeclaringClass();
+        ClassDecl cdecl = aProj.getClassDecl(cls.getName());
+        return cdecl.getFieldDecl(field);
+    }
+    
+    // Handle Method
+    if(anObj instanceof Method) { Method meth = (Method)anObj; Class cls = meth.getDeclaringClass();
+        ClassDecl cdecl = aProj.getClassDecl(cls.getName());
+        return cdecl.getMethodDecl(meth);
+    }
+
+    // Handle Constructor
+    if(anObj instanceof Constructor) { Constructor constr = (Constructor)anObj; Class cls = constr.getDeclaringClass();
+        ClassDecl cdecl = aProj.getClassDecl(cls.getName());
+        return cdecl.getConstructorDecl(constr);
+    }
+    
+    // Handle string
+    if(anObj instanceof String) { String cname = (String)anObj; Class cls = aProj.getClassForName(cname);
+        ClassDecl cdecl = cls!=null? aProj.getClassDecl(cname) : null;
+        return cdecl!=null? cdecl.getClassDecl() : null;
+    }
+
+    // Complain
+    throw new RuntimeException("Project.getJavaDecl: Unsupported type " + anObj);
+}
 
 }

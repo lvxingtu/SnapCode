@@ -91,7 +91,7 @@ protected JavaDecl resolveName(JNode aNode)
             return JavaDecl.getPackageDecl(pname2);
         String cname = pname + '.' + name;
         if(isKnownClassName(cname))
-            return new JavaDecl(cname);
+            return getJavaDecl(cname);
     }
         
     // Handle Parent is Class: Look for ".this", ".class", static field or inner class
@@ -103,10 +103,10 @@ protected JavaDecl resolveName(JNode aNode)
             return JavaDecl.CLASS_DECL; // was FieldName
         Class cls = pclass!=null? ClassUtils.getClass(pclass, name) : null;
         if(cls!=null)
-            return new JavaDecl(cls); // was ClassName
+            return getJavaDecl(cls); // was ClassName
         Field field = pclass!=null? ClassUtils.getField(pclass, name) : null;
         if(field!=null) // && Modifier.isStatic(field.getModifiers()))
-            return new JavaDecl(field); // was FieldName
+            return getJavaDecl(field); // was FieldName
     }
     
     // Handle any parent with class: Look for field
@@ -115,7 +115,7 @@ protected JavaDecl resolveName(JNode aNode)
             return JavaDecl.INT_DECL; // was FieldName;
         Field field = pclass!=null? ClassUtils.getField(pclass, name) : null;
         if(field!=null)
-            return new JavaDecl(field); // was FieldName;
+            return getJavaDecl(field); // was FieldName;
     }
 
     // Do normal version

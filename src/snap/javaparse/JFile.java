@@ -126,16 +126,21 @@ protected JavaDecl resolveName(JNode aNode)
     String cname = getImportClassName(name);
     Class cls = cname!=null? getClassForName(cname) : null;
     if(cls!=null)
-        return new JavaDecl(cls);
+        return getJavaDecl(cls);
         
     // See if it's a known static import class member
     Field field = (Field)getImportClassMember(name, null);
     if(field!=null)
-        return new JavaDecl(field);
+        return getJavaDecl(field);
 
     // Do normal version
     return super.resolveName(aNode);
 }
+
+/**
+ * Returns a JavaDecl for a Class, Field, Method, Constructor or class name string.
+ */
+public JavaDecl getJavaDecl(Object anObj)  { return _proj.getJavaDecl(anObj); }
 
 /**
  * Returns an import that can be used to resolve the given name.

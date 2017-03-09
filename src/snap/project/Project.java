@@ -5,7 +5,7 @@ package snap.project;
 import java.io.Closeable;
 import java.net.*;
 import java.util.*;
-import snap.javaparse.ClassDecl;
+import snap.javaparse.*;
 import snap.typescript.TSFileBuilder;
 import snap.util.*;
 import snap.web.*;
@@ -141,6 +141,11 @@ public ClassDecl getClassDecl(String aCName)
     if(cdecl==null) _cdecls.put(aCName, cdecl=new ClassDecl(this, aCName));
     return cdecl;
 }
+
+/**
+ * Returns a JavaDecl for object.
+ */
+public JavaDecl getJavaDecl(Object anObj)  { return ClassDecl.getJavaDecl(this, anObj); }
 
 /**
  * Returns the source file for given path.

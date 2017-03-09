@@ -113,7 +113,7 @@ protected JavaDecl getDeclImpl()
         return null;
     
     // Get decl for method
-    JavaDecl decl = new JavaDecl(meth);
+    JavaDecl decl = getJavaDecl(meth);
     return decl;
 }
 

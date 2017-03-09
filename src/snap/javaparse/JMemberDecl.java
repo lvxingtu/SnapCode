@@ -20,7 +20,7 @@ public class JMemberDecl extends JNode {
     JavaDecl        _super;
     
     // A bobus JavaDecl to stand in for null super decl
-    static JavaDecl _nullMmbr = new JavaDecl("NullSuperMemberStandIn");
+    static JavaDecl NULL_DECL = JavaDecl.INT_DECL;
     
 /**
  * Returns the member name.
@@ -81,9 +81,9 @@ public JTypeParam getTypeParam(String aName)
  */
 public JavaDecl getSuperDecl()
 {
-    if(_super!=null) return _super!=_nullMmbr? _super : null;
-    if(_super==null) { _super = getSuperDeclImpl(); if(_super==null) _super = _nullMmbr; }
-    return _super!=_nullMmbr? _super : null;
+    if(_super!=null) return _super!=NULL_DECL? _super : null;
+    if(_super==null) { _super = getSuperDeclImpl(); if(_super==null) _super = NULL_DECL; }
+    return _super!=NULL_DECL? _super : null;
 }
 
 /**

@@ -16,7 +16,7 @@ public class JConstrDecl extends JMethodDecl {
 protected JavaDecl getDeclImpl()
 {
     Constructor c = getConstructor();
-    return c!=null? new JavaDecl(c) : null;
+    return c!=null? getJavaDecl(c) : null;
 }
 
 /**
@@ -42,7 +42,7 @@ protected JavaDecl getSuperDeclImpl()
     
     // Iterate over superclasses and return if any have method
     for(Class cls=sclass; cls!=null; cls=cls.getSuperclass()) {
-        try { return new JavaDecl(cls.getDeclaredConstructor(ptypes)); }
+        try { return getJavaDecl(cls.getDeclaredConstructor(ptypes)); }
         catch(Exception e) { }
     }
     

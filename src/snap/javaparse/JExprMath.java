@@ -82,7 +82,7 @@ protected JavaDecl getDeclImpl()
 }
 
 /** Returns the class name for math expression. */
-private JavaDecl getDeclMath() { String cname = getClassNameMath(); return cname!=null? new JavaDecl(cname) : null; }
+private JavaDecl getDeclMath() { String cname = getClassNameMath(); return cname!=null? getJavaDecl(cname) : null; }
 private String getClassNameMath()
 {
     String c1 = getChildCount()>0? getOperand(0).getClassName() : null;

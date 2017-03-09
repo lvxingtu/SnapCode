@@ -17,18 +17,21 @@ public class ClassData {
     // The class file
     WebFile        _file;
     
+    // The project
+    Project        _proj;
+    
     // The class name
     String         _cname;
 
 /**
  * Creates a new ClassData for given file.
  */
-public ClassData(WebFile aFile)  { _file = aFile; }
+public ClassData(WebFile aFile)  { _file = aFile; _proj = Project.get(_file); }
 
 /**
  * Returns the project.
  */
-private Project getProj()  { return Project.get(_file); }
+private Project getProj()  { return _proj; }
 
 /**
  * Returns the set of JavaDecls that this class references.
@@ -44,7 +47,7 @@ public void getRefs(Set <JavaDecl> theRefs)
     catch(Exception e) { System.err.println(e); return; }
     
     // Iterate over constants and add to set top level class names
-    String cname = _cname = getRootClassName(getProj().getClassName(_file));
+    String cname = _cname = getRootClassName(_proj.getClassName(_file));
     for(int i=1, iMax=cfd.getConstantCount(); i<=iMax; i++) { ClassFileData.Constant constant = cfd.getConstant(i);
         if(constant.isClass() && (isInRootClassName(cname, constant.getClassName()) ||
             ClassUtils.isPrimitiveClassName(constant.getClassName())))
@@ -54,7 +57,7 @@ public void getRefs(Set <JavaDecl> theRefs)
     }
     
     // Get class and make sure TypeParameters, superclass and interfaces are in refs
-    Class cls = getProj().getClassForFile(_file);
+    Class cls = _proj.getClassForFile(_file);
     for(TypeVariable tp : cls.getTypeParameters()) addClassRef(tp, theRefs);
     addClassRef(cls.getGenericSuperclass(), theRefs);
     for(Type tp : cls.getGenericInterfaces()) addClassRef(tp, theRefs);
@@ -91,14 +94,14 @@ private JavaDecl getRef(ClassFileData.Constant aConst)
     // Handle Class reference
     if(aConst.isClass()) {
         String cname = aConst.getClassName(); if(cname.startsWith("[")) return null;
-        ClassDecl cdecl = getProj().getClassDecl(cname);
+        ClassDecl cdecl = _proj.getClassDecl(cname);
         return cdecl.getClassDecl();
     }
     
     // Handle Field reference
     if(aConst.isField()) {
         String cname = aConst.getDeclClassName(); if(cname.startsWith("[")) return null;
-        ClassDecl cdecl = getProj().getClassDecl(cname);
+        ClassDecl cdecl = _proj.getClassDecl(cname);
         String name = aConst.getMemberName();
         return cdecl.getFieldDeclDeep(-1, name, null); //aConst.getType();
     }
@@ -106,7 +109,7 @@ private JavaDecl getRef(ClassFileData.Constant aConst)
     // Handle method reference
     if(aConst.isConstructor()) {
         String cname = aConst.getDeclClassName(); if(cname.startsWith("[")) return null;
-        ClassDecl cdecl = getProj().getClassDecl(cname);
+        ClassDecl cdecl = _proj.getClassDecl(cname);
         String ptypes[] = aConst.getParameterTypes();
         return cdecl.getConstructorDeclDeep(-1, ptypes);
     }
@@ -114,7 +117,7 @@ private JavaDecl getRef(ClassFileData.Constant aConst)
     // Handle method reference
     if(aConst.isMethod()) {
         String cname = aConst.getDeclClassName(); if(cname.startsWith("[")) return null;
-        ClassDecl cdecl = getProj().getClassDecl(cname);
+        ClassDecl cdecl = _proj.getClassDecl(cname);
         String name = aConst.getMemberName();
         String ptypes[] = aConst.getParameterTypes();
         return cdecl.getMethodDeclDeep(-1, name, null, ptypes);
@@ -133,9 +136,8 @@ private final void addClassRef(Type aType, Set <JavaDecl> theRefs)
     if(aType instanceof Class) { Class cls = (Class)aType;
         while(cls.isArray()) cls = cls.getComponentType();
         if(cls.isAnonymousClass() || cls.isPrimitive() || cls.isSynthetic()) return;
-        JavaDecl ref; try { ref = new JavaDecl(cls); ref._mods = 0; }
-        catch(Throwable e) { System.err.println(e + " in " + _file); return; }
-        theRefs.add(ref);
+        JavaDecl decl = _proj.getJavaDecl(cls);
+        theRefs.add(decl);
     }
         
     // Handle ParameterizedType

@@ -54,9 +54,9 @@ private static void getSuggestions(JType aJType, List <JavaDecl> theSuggestions)
             if(cls==null || !Modifier.isPublic(cls.getModifiers())) continue;
             Constructor cstrs[] = null; try { cstrs = cls.getConstructors(); } catch(Throwable t) { }
             if(cstrs!=null) for(Constructor cstr : cstrs)
-                theSuggestions.add(new JavaDecl(cstr));
+                theSuggestions.add(aJType.getJavaDecl(cstr));
         }
-        else theSuggestions.add(new JavaDecl(cname));
+        else theSuggestions.add(aJType.getJavaDecl(cname));
     }
 }
 
@@ -77,7 +77,7 @@ private static void getSuggestions(JExprId anId, List <JavaDecl> theSuggestions)
         if(parExpr instanceof JExprId && ((JExprId)parExpr).isPackageName()) { JExprId parId = (JExprId)parExpr;
             String parPkg = parId.getPackageName();
             for(String cname : cpinfo.getPackageClassNames(parPkg, prefix))
-                theSuggestions.add(new JavaDecl(cname));
+                theSuggestions.add(anId.getJavaDecl(cname));
             for(String pname : cpinfo.getPackageChildrenNames(parPkg, prefix))
                 theSuggestions.add(JavaDecl.getPackageDecl(pname));
         }
@@ -85,13 +85,13 @@ private static void getSuggestions(JExprId anId, List <JavaDecl> theSuggestions)
         // Handle anything else with a parent class
         else if(parExpr.getJClass()!=null) { Class pclass = parExpr.getJClass();
             if(pclass.isArray()) // If array, add array field
-                theSuggestions.add(new JavaDecl(getLengthField()));
+                theSuggestions.add(anId.getJavaDecl(getLengthField()));
             for(Field field : pclass.getFields()) // Add class fields
                 if(StringUtils.startsWithIC(field.getName(), prefix))
-                    theSuggestions.add(new JavaDecl(field));
+                    theSuggestions.add(anId.getJavaDecl(field));
             for(Method method : pclass.getMethods()) // Add class methods
                 if(StringUtils.startsWithIC(method.getName(), prefix))
-                    theSuggestions.add(new JavaDecl(method));
+                    theSuggestions.add(anId.getJavaDecl(method));
         }
     }
     
@@ -108,7 +108,7 @@ private static void getSuggestions(JExprId anId, List <JavaDecl> theSuggestions)
         Class ec = ecd!=null? ecd.getJClass() : null;
         while(ecd!=null && ec!=null) {
             for(Method meth : ClassUtils.getMethods(ec, prefix))
-                theSuggestions.add(new JavaDecl(meth));
+                theSuggestions.add(anId.getJavaDecl(meth));
             ecd = ecd.getEnclosingClassDecl(); ec = ecd!=null? ecd.getJClass() : null;
         }
 
@@ -117,7 +117,7 @@ private static void getSuggestions(JExprId anId, List <JavaDecl> theSuggestions)
         for(String cname : cnames) {
             Class cls = cpinfo.getClass(cname);
             if(cls==null || !Modifier.isPublic(cls.getModifiers())) continue;
-            theSuggestions.add(new JavaDecl(cname));
+            theSuggestions.add(anId.getJavaDecl(cname));
         }
 
         // Add packages with prefix

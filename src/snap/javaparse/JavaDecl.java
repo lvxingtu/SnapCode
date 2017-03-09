@@ -46,7 +46,7 @@ public class JavaDecl implements Comparable<JavaDecl> {
     public enum Type { Class, Field, Constructor, Method, Package, VarDecl }
     
     // Common shared decls
-    public static final JavaDecl INT_DECL = new JavaDecl(int.class);
+    public static final JavaDecl INT_DECL = new JavaDecl(boolean.class);
     public static final JavaDecl BOOL_DECL = new JavaDecl(boolean.class);
     public static final JavaDecl OBJECT_DECL = new JavaDecl(Object.class);
     public static final JavaDecl CLASS_DECL = new JavaDecl(Class.class);
@@ -226,14 +226,14 @@ public JVarDecl getVarDecl() { assert(isVarDecl()); return _vdecl; }
 public String getPrettyName()
 {
     String name = _cname;
-    if(_type==Type.Method || _type==Type.Field) name += '.' + _name;
-    if(_type==Type.Method || _type==Type.Constructor) {
+    if(isMethod() || isField()) name += '.' + _name;
+    if(isMethod() || isConstructor()) {
         String names[] = Arrays.copyOf(_argTypeNames, _argTypeNames.length);
         for(int i=0;i<names.length;i++) names[i] = getSimpleName(names[i]);
         name +=  '(' + StringUtils.join(names, ",") + ')';
     }
-    if(_type==Type.Package) return _pname;
-    if(_type==Type.VarDecl) return _name;
+    if(isPackage()) return _pname;
+    if(isVarDecl()) return _name;
     return name;
 }
 
@@ -243,10 +243,10 @@ public String getPrettyName()
 public String getMatchName()
 {
     String name = _cname;
-    if(_type==Type.Method || _type==Type.Field) name += '.' + _name;
-    if(_type==Type.Method || _type==Type.Constructor) name +=  '(' + StringUtils.join(_argTypeNames, ",") + ')';
-    if(_type==Type.Package) return _pname;
-    if(_type==Type.VarDecl) return _name;
+    if(isMethod() || isField()) name += '.' + _name;
+    if(isMethod() || isConstructor()) name +=  '(' + StringUtils.join(_argTypeNames, ",") + ')';
+    if(isPackage()) return _pname;
+    if(isVarDecl()) return _name;
     return name;
 }
 
@@ -257,7 +257,7 @@ public String getFullName()
 {
     if(_fname!=null) return _fname;
     String name = getMatchName();
-    if(_type==Type.Method || _type==Type.Field) name = _tname + " " + name;
+    if(isMethod() || isField()) name = _tname + " " + name;
     String mstr = Modifier.toString(_mods); if(mstr.length()>0) name = mstr + " " + name;
     return _fname=name;
 } String _fname;
@@ -320,6 +320,7 @@ public Class getDeclClass(Project aProj)
  */
 public boolean matches(Project aProj, JavaDecl aDecl)
 {
+    if(aDecl==this) return true;
     if(aDecl._type!=_type) return false;
     if(!aDecl._name.equals(_name)) return false;
     if(!Arrays.equals(aDecl._argTypeNames, _argTypeNames)) return false;
