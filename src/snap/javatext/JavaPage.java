@@ -174,7 +174,7 @@ private void openDecl(JavaDecl aDecl)
     Project proj = Project.get(getSite()); if(proj==null) return;
     WebFile file = proj.getProjectSet().getJavaFile(cname); if(file==null) return;
     JavaData jdata = JavaData.get(file);
-    JNode node = JavaDecl.getDeclMatch(jdata.getJFile(), aDecl);
+    JNode node = JavaDecls.getDeclMatch(jdata.getJFile(), aDecl);
     String urls = file.getURL().getString();
     if(node!=null) urls += String.format("#Sel=%d-%d", node.getStart(), node.getEnd());
     getBrowser().setURLString(urls);
