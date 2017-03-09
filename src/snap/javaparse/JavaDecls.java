@@ -29,6 +29,9 @@ public class JavaDecls {
     // The constructor decls
     List <JavaDecl>  _cdecls = new ArrayList();
 
+    // Map of package name to JavaDecls
+    static Map <String,JavaDecl>  _pkgDecls = new HashMap();
+    
 /**
  * Creates a new JavaDecls.
  */
@@ -285,6 +288,18 @@ public static JavaDecl getJavaDecl(Project aProj, Object anObj)
 
     // Complain
     throw new RuntimeException("Project.getJavaDecl: Unsupported type " + anObj);
+}
+
+/**
+ * Returns the JavaDecl for given package name from shared cache.
+ */
+public static JavaDecl getPackageDecl(String aName)
+{
+    JavaDecl pd = _pkgDecls.get(aName); if(pd!=null) return pd;
+    pd = new JavaDecl(null,aName); pd._type = JavaDecl.Type.Package;
+    pd._name = pd._pname = aName; pd._sname = JavaDecl.getSimpleName(aName);
+    _pkgDecls.put(aName, pd);
+    return pd;
 }
 
 }

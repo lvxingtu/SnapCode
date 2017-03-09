@@ -79,7 +79,7 @@ private static void getSuggestions(JExprId anId, List <JavaDecl> theSuggestions)
             for(String cname : cpinfo.getPackageClassNames(parPkg, prefix))
                 theSuggestions.add(anId.getJavaDecl(cname));
             for(String pname : cpinfo.getPackageChildrenNames(parPkg, prefix))
-                theSuggestions.add(JavaDecl.getPackageDecl(pname));
+                theSuggestions.add(JavaDecls.getPackageDecl(pname));
         }
         
         // Handle anything else with a parent class
@@ -123,7 +123,7 @@ private static void getSuggestions(JExprId anId, List <JavaDecl> theSuggestions)
         // Add packages with prefix
         List <String> pnames = cpinfo.getAllPackageNames(prefix);
         for(String name : pnames)
-            theSuggestions.add(JavaDecl.getPackageDecl(name));
+            theSuggestions.add(JavaDecls.getPackageDecl(name));
     }
 }
 

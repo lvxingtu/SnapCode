@@ -57,7 +57,7 @@ public boolean isClassName()  { return getDecl().isClass(); }
 protected JavaDecl getDeclImpl()
 {
     String name = getName(); if(name==null) return null;
-    if(isInclusive && isKnownPackageName(name)) return JavaDecl.getPackageDecl(name);
+    if(isInclusive && isKnownPackageName(name)) return JavaDecls.getPackageDecl(name);
     
     // Iterate up parts of import till we find Class in case import is like: import path.Class.InnerClass;
     while(name!=null) {
@@ -73,7 +73,7 @@ protected JavaDecl getDeclImpl()
     }
     
     // If class not found, return as package decl anyway
-    return JavaDecl.getPackageDecl(getName());
+    return JavaDecls.getPackageDecl(getName());
 }
 
 /**

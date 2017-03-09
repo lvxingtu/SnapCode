@@ -45,9 +45,6 @@ public class JavaDecl implements Comparable<JavaDecl> {
     // The VariableDecl
     JVarDecl       _vdecl;
     
-    // Map of package name to JavaDecls
-    static Map <String,JavaDecl>  _pkgDecls = new HashMap();
-    
     // Constants for type
     public enum Type { Class, Field, Constructor, Method, Package, VarDecl }
     
@@ -116,18 +113,6 @@ public JavaDecl(JavaDecls theJDs, Object anObj)
     
     // Throw exception for unknown type
     else throw new RuntimeException("JavaDecl.init: Unsupported type " + anObj);
-}
-
-/**
- * Returns the JavaDecl for given package name from shared cache.
- */
-public static JavaDecl getPackageDecl(String aName)
-{
-    JavaDecl pd = _pkgDecls.get(aName); if(pd!=null) return pd;
-    pd = new JavaDecl(null,aName); pd._type = Type.Package;
-    pd._name = pd._pname = aName; pd._sname = getSimpleName(aName);
-    _pkgDecls.put(aName, pd);
-    return pd;
 }
 
 /**
@@ -489,7 +474,7 @@ public static String getTypeName(java.lang.reflect.Type aType)
 }
 
 /** Returns a simple class name. */
-private static String getSimpleName(String cname)
+public static String getSimpleName(String cname)
 {
     int i = cname.lastIndexOf('$'); if(i<0) i = cname.lastIndexOf('.'); if(i>0) cname = cname.substring(i+1);
     return cname;

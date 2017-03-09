@@ -88,7 +88,7 @@ protected JavaDecl resolveName(JNode aNode)
     if(parDecl.isPackage()) {
         String pname = parDecl.getPackageName(), pname2 = pname + '.' + name;
         if(isKnownPackageName(pname2))
-            return JavaDecl.getPackageDecl(pname2);
+            return JavaDecls.getPackageDecl(pname2);
         String cname = pname + '.' + name;
         if(isKnownClassName(cname))
             return getJavaDecl(cname);
