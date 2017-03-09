@@ -173,12 +173,11 @@ public void searchReference(WebFile aFile, List <Result> theResults, JavaDecl aD
     
     // Handle JavaFile
     else if(aFile.getType().equals("java")) {
-        Project proj = getRootProject();
         JavaData jdata = JavaData.get(aFile);
         Set <JavaDecl> refs = jdata.getRefs();
         for(JavaDecl decl : refs) {
-            if(decl.matches(proj, aDecl)) {
-                List <JNode> nodes = new ArrayList(); JavaDecl.getRefMatches(proj, jdata.getJFile(), aDecl, nodes);
+            if(decl.matches(aDecl)) {
+                List <JNode> nodes = new ArrayList(); JavaDecl.getRefMatches(jdata.getJFile(), aDecl, nodes);
                 for(JNode node : nodes)
                     theResults.add(new Result(node));
                 return;
@@ -216,11 +215,10 @@ public void searchDeclaration(WebFile aFile, List <Result> theResults, JavaDecl 
     
     // Handle JavaFile
     else if(aFile.getType().equals("java")) {
-        Project proj = getRootProject();
         JavaData jdata = JavaData.get(aFile);
         for(JavaDecl decl : jdata.getDecls())
-            if(decl.matches(proj, aDecl)) {
-                List <JNode> nodes = new ArrayList(); JavaDecl.getDeclMatches(proj, jdata.getJFile(), aDecl, nodes);
+            if(decl.matches(aDecl)) {
+                List <JNode> nodes = new ArrayList(); JavaDecl.getDeclMatches(jdata.getJFile(), aDecl, nodes);
                 for(JNode node : nodes)
                     theResults.add(new Result(node));
                 return;

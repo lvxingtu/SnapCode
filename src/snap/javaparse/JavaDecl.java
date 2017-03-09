@@ -11,6 +11,12 @@ import snap.util.*;
  * A class to represent a declaration of a Java Class, Method, Field or Constructor.
  */
 public class JavaDecl implements Comparable<JavaDecl> {
+    
+    // The JavaDecls that this decl belongs to
+    JavaDecls      _decls;
+    
+    // The project that this decl belongs to
+    Project        _proj;
 
     // The type
     Type           _type;
@@ -46,17 +52,20 @@ public class JavaDecl implements Comparable<JavaDecl> {
     public enum Type { Class, Field, Constructor, Method, Package, VarDecl }
     
     // Common shared decls
-    public static final JavaDecl INT_DECL = new JavaDecl(boolean.class);
-    public static final JavaDecl BOOL_DECL = new JavaDecl(boolean.class);
-    public static final JavaDecl OBJECT_DECL = new JavaDecl(Object.class);
-    public static final JavaDecl CLASS_DECL = new JavaDecl(Class.class);
-    public static final JavaDecl STRING_DECL = new JavaDecl(String.class);
+    public static final JavaDecl INT_DECL = new JavaDecl(null, boolean.class);
+    public static final JavaDecl BOOL_DECL = new JavaDecl(null, boolean.class);
+    public static final JavaDecl OBJECT_DECL = new JavaDecl(null, Object.class);
+    public static final JavaDecl CLASS_DECL = new JavaDecl(null, Class.class);
+    public static final JavaDecl STRING_DECL = new JavaDecl(null, String.class);
     
 /**
  * Creates a new JavaDecl for Class, Field, Constructor, Method, VarDecl or class name string.
  */
-public JavaDecl(Object anObj)
+public JavaDecl(JavaDecls theJDs, Object anObj)
 {
+    // Set JavaDecls
+    _decls = theJDs; _proj = theJDs!=null? theJDs.getProject() : null;
+    
     // Handle Class
     if(anObj instanceof Class) { Class cls = (Class)anObj; _type = Type.Class;
         _name = getTypeName(cls); _sname = cls.getSimpleName(); _cname = _name;
@@ -115,7 +124,8 @@ public JavaDecl(Object anObj)
 public static JavaDecl getPackageDecl(String aName)
 {
     JavaDecl pd = _pkgDecls.get(aName); if(pd!=null) return pd;
-    pd = new JavaDecl(aName); pd._type = Type.Package; pd._name = pd._pname = aName; pd._sname = getSimpleName(aName);
+    pd = new JavaDecl(null,aName); pd._type = Type.Package;
+    pd._name = pd._pname = aName; pd._sname = getSimpleName(aName);
     _pkgDecls.put(aName, pd);
     return pd;
 }
@@ -309,16 +319,16 @@ public String getReplaceString()
 /**
  * Returns the class or declaring class using the given project.
  */
-public Class getDeclClass(Project aProj)
+public Class getDeclClass()
 {
-    ClassLoader cldr = aProj!=null? aProj.getClassLoader() : ClassLoader.getSystemClassLoader();
+    ClassLoader cldr = _proj!=null? _proj.getClassLoader() : ClassLoader.getSystemClassLoader();
     return ClassUtils.getClass(_cname, cldr);
 }
 
 /**
  * Returns whether given declaration collides with this declaration.
  */
-public boolean matches(Project aProj, JavaDecl aDecl)
+public boolean matches(JavaDecl aDecl)
 {
     if(aDecl==this) return true;
     if(aDecl._type!=_type) return false;
@@ -327,7 +337,7 @@ public boolean matches(Project aProj, JavaDecl aDecl)
     
     // If field or method, see if declaring class matches
     if(isField() || isConstructor() || isMethod()) {
-        Class c1 = getDeclClass(aProj), c2 = aDecl.getDeclClass(aProj);
+        Class c1 = getDeclClass(), c2 = aDecl.getDeclClass();
         return c1==c2 || c1.isAssignableFrom(c2) || c2.isAssignableFrom(c1);
     }
     
@@ -373,63 +383,63 @@ public String toString()  { return getFullName(); }
 /**
  * Returns reference nodes in given JNode that match given JavaDecl.
  */
-public static void getMatches(Project aProj, JNode aNode, JavaDecl aDecl, List <JNode> theMatches)
+public static void getMatches(JNode aNode, JavaDecl aDecl, List <JNode> theMatches)
 {
     // If JType check name
     if(aNode instanceof JType || aNode instanceof JExprId) {
         JavaDecl decl = isPossibleMatch(aNode, aDecl)? aNode.getDecl() : null;
-        if(decl!=null && decl.matches(aProj, aDecl))
+        if(decl!=null && decl.matches(aDecl))
             theMatches.add(aNode);
     }
  
     // Recurse
     for(JNode child : aNode.getChildren())
-        getMatches(aProj, child, aDecl, theMatches);
+        getMatches(child, aDecl, theMatches);
 }
     
 /**
  * Returns reference nodes in given JNode that match given JavaDecl.
  */
-public static void getRefMatches(Project aProj, JNode aNode, JavaDecl aDecl, List <JNode> theMatches)
+public static void getRefMatches(JNode aNode, JavaDecl aDecl, List <JNode> theMatches)
 {
     // If JType check name
     if(aNode instanceof JType || aNode instanceof JExprId) {
         if(isPossibleMatch(aNode, aDecl) && !aNode.isDecl()) {
             JavaDecl decl = aNode.getDecl();
-            if(decl!=null && decl.matches(aProj, aDecl) && aNode.getParent(JImportDecl.class)==null)
+            if(decl!=null && decl.matches(aDecl) && aNode.getParent(JImportDecl.class)==null)
                 theMatches.add(aNode);
         }
     }
  
     // Recurse
     for(JNode child : aNode.getChildren())
-        getRefMatches(aProj, child, aDecl, theMatches);
+        getRefMatches(child, aDecl, theMatches);
 }
     
 /**
  * Returns declaration nodes in given JNode that match given JavaDecl.
  */
-public static JNode getDeclMatch(Project aProj, JNode aNode, JavaDecl aDecl)
+public static JNode getDeclMatch(JNode aNode, JavaDecl aDecl)
 {
-    List <JNode> matches = new ArrayList(); getDeclMatches(aProj, aNode, aDecl, matches);
+    List <JNode> matches = new ArrayList(); getDeclMatches(aNode, aDecl, matches);
     return matches.size()>0? matches.get(0) : null;
 }
 
 /**
  * Returns declaration nodes in given JNode that match given JavaDecl.
  */
-public static void getDeclMatches(Project aProj, JNode aNode, JavaDecl aDecl, List <JNode> theMatches)
+public static void getDeclMatches(JNode aNode, JavaDecl aDecl, List <JNode> theMatches)
 {
     // If JType check name
     if(aNode instanceof JType || aNode instanceof JExprId) {
         JavaDecl decl = aNode.isDecl() && isPossibleMatch(aNode, aDecl)? aNode.getDecl() : null;
-        if(decl!=null && decl.matches(aProj, aDecl))
+        if(decl!=null && decl.matches(aDecl))
             theMatches.add(aNode);
     }
  
     // Recurse
     for(JNode child : aNode.getChildren())
-        getDeclMatches(aProj, child, aDecl, theMatches);
+        getDeclMatches(child, aDecl, theMatches);
 }
     
 /** Returns whether node is a possible match. */

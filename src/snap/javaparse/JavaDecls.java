@@ -53,6 +53,11 @@ public JavaDecls(Project aProj, String aClassName)
 }
 
 /**
+ * Returns the project.
+ */
+public Project getProject()  { return _proj; }
+
+/**
  * Returns the super class decl.
  */
 public JavaDecls getSuperClassDecl()  { return _sdecl; }
@@ -72,7 +77,7 @@ public HashSet <JavaDecl> updateDecls()
 
     // Get class and make sure TypeParameters, superclass and interfaces are in refs
     if(_cdecl==null || _cdecl.getModifiers()!=cls.getModifiers()) {
-        JavaDecl decl = _cdecl = new JavaDecl(cls); addedDecls.add(decl); }
+        JavaDecl decl = _cdecl = new JavaDecl(this,cls); addedDecls.add(decl); }
     else removedDecls.remove(_cdecl);
     
     // Fields: add JavaDecl for each declared field - also make sure field type is in refs
@@ -80,7 +85,7 @@ public HashSet <JavaDecl> updateDecls()
     catch(Throwable e) { System.err.println(e + " in " + _cname); return null; }
     for(Field field : fields) {
         JavaDecl decl = getFieldDecl(field);
-        if(decl==null) { decl = new JavaDecl(field); addedDecls.add(decl); _fdecls.add(decl); }
+        if(decl==null) { decl = new JavaDecl(this,field); addedDecls.add(decl); _fdecls.add(decl); }
         else removedDecls.remove(decl);
     }
     
@@ -90,7 +95,7 @@ public HashSet <JavaDecl> updateDecls()
     for(Method meth : methods) {
         if(meth.isSynthetic()) continue;
         JavaDecl decl = getMethodDecl(meth);
-        if(decl==null) { decl = new JavaDecl(meth); addedDecls.add(decl); _mdecls.add(decl); }
+        if(decl==null) { decl = new JavaDecl(this,meth); addedDecls.add(decl); _mdecls.add(decl); }
         else removedDecls.remove(decl);
     }
     
@@ -100,7 +105,7 @@ public HashSet <JavaDecl> updateDecls()
     for(Constructor constr : constrs) {
         if(constr.isSynthetic()) continue;
         JavaDecl decl = getConstructorDecl(constr);
-        if(decl==null) { decl = new JavaDecl(constr); addedDecls.add(decl); _cdecls.add(decl); }
+        if(decl==null) { decl = new JavaDecl(this,constr); addedDecls.add(decl); _cdecls.add(decl); }
         else removedDecls.remove(decl);
     }
     
@@ -263,6 +268,13 @@ public static JavaDecl getJavaDecl(Project aProj, Object anObj)
     if(anObj instanceof Constructor) { Constructor constr = (Constructor)anObj; Class cls = constr.getDeclaringClass();
         JavaDecls decls = aProj.getJavaDecls(cls.getName());
         return decls.getConstructorDecl(constr);
+    }
+    
+    // Handle JVarDecl
+    if(anObj instanceof JVarDecl)  { JVarDecl vd = (JVarDecl)anObj;
+        JClassDecl cd = vd.getParent(JClassDecl.class);
+        JavaDecls decls = aProj.getJavaDecls(cd.getClassName());
+        return new JavaDecl(decls, vd);
     }
     
     // Handle string

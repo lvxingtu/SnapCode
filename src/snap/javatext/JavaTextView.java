@@ -217,11 +217,9 @@ protected void setSelectedTokensForNode(JNode aNode)
     JavaDecl decl = aNode!=null? aNode.getDecl() : null;
     if(decl!=null) {
         List <JNode> others = new ArrayList();
-        Project proj = Project.get(aNode.getFile().getSourceFile());
-        JavaDecl.getMatches(proj, aNode.getFile(), decl, others);
+        JavaDecl.getMatches(aNode.getFile(), decl, others);
         for(JNode other : others) {
             TextBoxToken tt = (TextBoxToken)other.getStartToken();
-            //if(tt.getLine().getText()==null) { System.err.println("JavaTextPane.setSelectedTokens: NPE"); continue; }
             tokens.add(tt);
         }
     }

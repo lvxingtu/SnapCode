@@ -114,7 +114,7 @@ protected JavaDecl getDeclImpl()
     Field field = getField();
     if(field!=null)
         return getJavaDecl(field);
-    return new JavaDecl(this);
+    return getJavaDecl(this);
 }
 
 /**
