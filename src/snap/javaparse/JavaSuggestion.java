@@ -27,15 +27,15 @@ public static JavaDecl[] getSuggestions(JNode aNode)
         getSuggestions((JExprId)aNode, list);
     
     // Get receiving class and, if 2 letters or less, filter out suggestions that don't apply (unless none do)
-    Class reccls = getReceivingClass(aNode); ClassLoader cldr = aNode.getClassLoader();
+    Class reccls = getReceivingClass(aNode);
     if(reccls!=null && list.size()>10 && aNode.getName().length()<=2) {
-        List l2 = list.stream().filter(p -> isRecivingClassAssignable(p, reccls, cldr)).collect(Collectors.toList());
+        List l2 = list.stream().filter(p -> isRecivingClassAssignable(p, reccls)).collect(Collectors.toList());
         if(l2.size()>0) list = l2;
     }
         
     // Get array and sort
     JavaDecl decls[] = list.toArray(new JavaDecl[0]);
-    Arrays.sort(decls, new DeclCompare(reccls, cldr));
+    Arrays.sort(decls, new DeclCompare(reccls));
     return decls;
 }
 
@@ -238,39 +238,38 @@ private static JVarDecl getVarDeclForInitializer(JNode aNode)
 /**
  * Returns whether suggestion is receiving class.
  */
-private static final boolean isRecivingClassAssignable(JavaDecl aJD, Class aRC, ClassLoader aCldr)
+private static final boolean isRecivingClassAssignable(JavaDecl aJD, Class aRC)
 {
-    return getRecivingClassAssignableScore(aJD, aRC, aCldr)>0;
+    return getRecivingClassAssignableScore(aJD, aRC)>0;
 }
     
 /**
  * Returns whether suggestion is receiving class.
  */
-private static final int getRecivingClassAssignableScore(JavaDecl aJD, Class aRC, ClassLoader aCldr)
+private static final int getRecivingClassAssignableScore(JavaDecl aJD, Class aRC)
 {
     if(aRC==null || aJD.isPackage()) return 0;
-    String tname = aJD.getTypeName(); if(tname==null) return 0;
-    Class tcls = ClassUtils.getClass(tname, aCldr); if(tcls==null) return 0;
-    return aRC==tcls? 2 : ClassUtils.isAssignable(aRC, tcls)? 1 : 0;
+    Class dcls = aJD.getEvalClass(); if(dcls==null) return 0;
+    return aRC==dcls? 2 : ClassUtils.isAssignable(aRC, dcls)? 1 : 0;
 }
     
 /**
  * A Comparator to sort JavaDecls.
  */
-private static class DeclCompare implements Comparator<JavaDecl> {
+private static class DeclCompare implements Comparator <JavaDecl> {
 
-    // The receiving class for suggestions and ClassLoader
-    Class _rclass = null; ClassLoader _cldr;
+    // The receiving class for suggestions
+    Class _rclass = null;
     
     /** Creates a DeclCompare. */
-    DeclCompare(Class aRC, ClassLoader aClassLoader)  { _rclass = aRC; _cldr = aClassLoader; }
+    DeclCompare(Class aRC)  { _rclass = aRC; }
 
     /** Standard compare to method.  */
     public int compare(JavaDecl o1, JavaDecl o2)
     {
         // Get whether either suggestion is of Assignable to ReceivingClass
-        int rca1 = getRecivingClassAssignableScore(o1, _rclass, _cldr);
-        int rca2 = getRecivingClassAssignableScore(o2, _rclass, _cldr);
+        int rca1 = getRecivingClassAssignableScore(o1, _rclass);
+        int rca2 = getRecivingClassAssignableScore(o2, _rclass);
         if(rca1!=rca2) return rca1>rca2? -1 : 1;
                 
         // If Suggestion Types differ, return by type
@@ -296,7 +295,7 @@ private static class DeclCompare implements Comparator<JavaDecl> {
     }
 
     /** Returns the type order. */
-    public static final int getOrder(JavaDecl.Type aType)
+    public static final int getOrder(JavaDecl.DeclType aType)
     {
         switch(aType) { case VarDecl: return 0; case Field: return 1; case Method: return 2; case Class: return 3;
             case Package: return 4; default: return 5; }

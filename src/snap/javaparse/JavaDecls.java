@@ -370,7 +370,7 @@ public static JavaDecl getJavaDecl(Project aProj, Object anObj)
 public static JavaDecl getPackageDecl(String aName)
 {
     JavaDecl pd = _pkgDecls.get(aName); if(pd!=null) return pd;
-    pd = new JavaDecl(null,aName); pd._type = JavaDecl.Type.Package;
+    pd = new JavaDecl(null,aName); pd._type = JavaDecl.DeclType.Package;
     pd._name = pd._pname = aName; pd._sname = JavaDecl.getSimpleName(aName);
     _pkgDecls.put(aName, pd);
     return pd;

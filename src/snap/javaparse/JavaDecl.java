@@ -19,7 +19,7 @@ public class JavaDecl implements Comparable<JavaDecl> {
     Project        _proj;
 
     // The type
-    Type           _type;
+    DeclType       _type;
     
     // The modifiers
     int            _mods;
@@ -46,10 +46,10 @@ public class JavaDecl implements Comparable<JavaDecl> {
     JVarDecl       _vdecl;
     
     // Constants for type
-    public enum Type { Class, Field, Constructor, Method, Package, VarDecl }
+    public enum DeclType { Class, Field, Constructor, Method, Package, VarDecl }
     
     // Common shared decls
-    public static final JavaDecl INT_DECL = new JavaDecl(null, boolean.class);
+    public static final JavaDecl INT_DECL = new JavaDecl(null, int.class);
     public static final JavaDecl BOOL_DECL = new JavaDecl(null, boolean.class);
     public static final JavaDecl OBJECT_DECL = new JavaDecl(null, Object.class);
     public static final JavaDecl CLASS_DECL = new JavaDecl(null, Class.class);
@@ -64,37 +64,37 @@ public JavaDecl(JavaDecls theJDs, Object anObj)
     _decls = theJDs; _proj = theJDs!=null? theJDs.getProject() : null;
     
     // Handle Class
-    if(anObj instanceof Class) { Class cls = (Class)anObj; _type = Type.Class;
+    if(anObj instanceof Class) { Class cls = (Class)anObj; _type = DeclType.Class;
         _name = getTypeName(cls); _sname = cls.getSimpleName(); _cname = _name;
         _mods = cls.getModifiers();
     }
 
     // Handle Field
-    else if(anObj instanceof Field) { Field field = (Field)anObj; _type = Type.Field;
+    else if(anObj instanceof Field) { Field field = (Field)anObj; _type = DeclType.Field;
         _name = _sname = field.getName(); _cname = field.getDeclaringClass().getName();
         _tname = getTypeName(field.getGenericType()); _mods = field.getModifiers();
     }
     
     // Handle Method
-    else if(anObj instanceof Method) { Method meth = (Method)anObj; _type = Type.Method;
+    else if(anObj instanceof Method) { Method meth = (Method)anObj; _type = DeclType.Method;
         _name = _sname = meth.getName(); _cname = meth.getDeclaringClass().getName();
         _tname = getTypeName(meth.getGenericReturnType()); _mods = meth.getModifiers();
         
         // Get GenericParameterTypes and names
-        java.lang.reflect.Type ptypes[] = meth.getGenericParameterTypes();
+        Type ptypes[] = meth.getGenericParameterTypes();
         _argTypeNames = new String[meth.getParameterCount()];
         for(int i=0,iMax=ptypes.length; i<iMax; i++)
             _argTypeNames[i] = getTypeName(ptypes[i]);
     }
     
     // Handle Constructor
-    else if(anObj instanceof Constructor) { Constructor constr = (Constructor)anObj; _type = Type.Constructor;
+    else if(anObj instanceof Constructor) { Constructor constr = (Constructor)anObj; _type = DeclType.Constructor;
         _name = _cname = _tname = constr.getName();
         _sname = constr.getDeclaringClass().getSimpleName();
         _mods = constr.getModifiers();
     
         // Get GenericParameterTypes (this can fail https://bugs.openjdk.java.net/browse/JDK-8075483))
-        java.lang.reflect.Type ptypes[] = constr.getGenericParameterTypes();
+        Type ptypes[] = constr.getGenericParameterTypes();
         if(ptypes.length<constr.getParameterCount()) ptypes = constr.getParameterTypes();
         _argTypeNames = new String[ptypes.length];
         for(int i=0,iMax=ptypes.length; i<iMax; i++)
@@ -102,12 +102,12 @@ public JavaDecl(JavaDecls theJDs, Object anObj)
     }
     
     // Handle VarDecl
-    else if(anObj instanceof JVarDecl) { _vdecl = (JVarDecl)anObj; _type = Type.VarDecl;
+    else if(anObj instanceof JVarDecl) { _vdecl = (JVarDecl)anObj; _type = DeclType.VarDecl;
         _name = _sname = _vdecl.getName(); _tname = _vdecl.getClassName();
     }
     
     // Handle String (assumed to be class name)
-    else if(anObj instanceof String) { String cname = (String)anObj; _type = Type.Class;
+    else if(anObj instanceof String) { String cname = (String)anObj; _type = DeclType.Class;
         _name = cname; _sname = getSimpleName(cname); _cname = cname;
     }
     
@@ -118,37 +118,37 @@ public JavaDecl(JavaDecls theJDs, Object anObj)
 /**
  * Returns the type.
  */
-public Type getType()  { return _type; }
+public DeclType getType()  { return _type; }
 
 /**
  * Returns whether is a class reference.
  */
-public boolean isClass()  { return _type==Type.Class; }
+public boolean isClass()  { return _type==DeclType.Class; }
 
 /**
  * Returns whether is a field reference.
  */
-public boolean isField()  { return _type==Type.Field; }
+public boolean isField()  { return _type==DeclType.Field; }
 
 /**
  * Returns whether is a constructor reference.
  */
-public boolean isConstructor()  { return _type==Type.Constructor; }
+public boolean isConstructor()  { return _type==DeclType.Constructor; }
 
 /**
  * Returns whether is a method reference.
  */
-public boolean isMethod()  { return _type==Type.Method; }
+public boolean isMethod()  { return _type==DeclType.Method; }
 
 /**
  * Returns whether is a package reference.
  */
-public boolean isPackage()  { return _type==Type.Package; }
+public boolean isPackage()  { return _type==DeclType.Package; }
 
 /**
  * Returns whether is a variable declaration reference.
  */
-public boolean isVarDecl()  { return _type==Type.VarDecl; }
+public boolean isVarDecl()  { return _type==DeclType.VarDecl; }
 
 /**
  * Returns the modifiers.
@@ -311,6 +311,16 @@ public Class getDeclClass()
 }
 
 /**
+ * Returns the class this decl evaluates to when referenced.
+ */
+public Class getEvalClass()
+{
+    ClassLoader cldr = _proj!=null? _proj.getClassLoader() : ClassLoader.getSystemClassLoader();
+    String cname = isClass()? _cname : _tname;
+    return ClassUtils.getClass(cname, cldr);
+}
+
+/**
  * Returns whether given declaration collides with this declaration.
  */
 public boolean matches(JavaDecl aDecl)
@@ -368,7 +378,7 @@ public String toString()  { return getFullName(); }
 /**
  * Returns the class name, converting primitive arrays to 'int[]' instead of '[I'.
  */
-public static String getTypeName(java.lang.reflect.Type aType)
+public static String getTypeName(Type aType)
 {
     // Handle Class
     if(aType instanceof Class) { Class cls = (Class)aType;
