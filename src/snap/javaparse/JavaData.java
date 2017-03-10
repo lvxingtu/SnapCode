@@ -188,7 +188,7 @@ public List <BuildIssue> getUnusedImports()
     // Iterate over references and remove used ones
     for(JavaDecl ref : refs) {
         if(ref.isClass() || ref.isConstructor()) continue;
-        String sname = ref.getTypeSimpleName();
+        String sname = ref.getEvalType().getSimpleName();
         JImportDecl idecl = jfile.getImport(sname);
         if(idecl!=null) {
             iset.remove(idecl); if(iset.size()==0) return Collections.EMPTY_LIST; }

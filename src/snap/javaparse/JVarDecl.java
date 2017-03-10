@@ -42,16 +42,36 @@ public boolean isTypeSet()  { return _type!=null; }
 public JType getType()
 {
     if(_type!=null) return _type;
-    JNode par = getParent();
-    if(par instanceof JFieldDecl) return ((JFieldDecl)par).getType();
-    if(par instanceof JStmtVarDecl) return ((JStmtVarDecl)par).getType();
-    return null;
+    
+    // Get parent type from JFieldDecl, JStmtVarDecl
+    _type = getParentType(); if(_type==null) return null;
+    
+    // If array count is set, replace with type to account for it
+    if(_arrayCount>0) {
+        JType type2 = new JType(); type2._name = _type._name; type2._startToken = type2._endToken = _startToken;
+        type2._primitive = _type._primitive; type2._arrayCount = _type._arrayCount;
+        _type = type2; _type._parent = this;
+    }
+    
+    // Return type
+    return _type;
 }
 
 /**
  * Sets the type.
  */
 public void setType(JType aType)  { replaceChild(_type, _type=aType); }
+
+/**
+ * Returns the parent type (JFieldDecl, JStmtVarDecl).
+ */
+private JType getParentType()
+{
+    JNode par = getParent();
+    if(par instanceof JFieldDecl) return ((JFieldDecl)par).getType();
+    if(par instanceof JStmtVarDecl) return ((JStmtVarDecl)par).getType();
+    return null;
+}
 
 /**
  * Returns the identifier.
@@ -111,33 +131,17 @@ public Class getDeclaringClass()
  */
 protected JavaDecl getDeclImpl()
 {
-    Field field = getField();
-    if(field!=null)
-        return getJavaDecl(field);
-    return getJavaDecl(this);
-}
-
-/**
- * Returns the class name.
- */
-public String getClassName()
-{
-    // Get name from type
-    JType typ = getType(); if(typ==null) return null;
-    String cname = typ.getClassName();
-    if(cname==null)
-        System.err.println("JVarDecl.getClassName: Can't find class for " + getName() + " in " + getFile().getName());
-    
-    // Handle array
-    if(_arrayCount>0) {
-        String pfix = "["; for(int i=1; i<_arrayCount; i++) pfix += "[";
-        if(typ.getArrayCount()>0) cname = pfix + cname;
-        else if(typ.isPrimitive()) cname = pfix + String.valueOf(Character.toUpperCase(cname.charAt(0)));
-        else cname = pfix + "L" + cname + ";";
+    // If part of a JFieldDecl, get JavaDecl for field
+    if(getParent() instanceof JFieldDecl) {
+        JClassDecl cd = getEnclosingClassDecl(); if(cd==null) return null;
+        JavaDecl decl = cd.getDecl();
+        JavaDecls decls = decl.getDecls();
+        JavaDecl fdecl = decls.getFieldDeclDeep(-1, getName(), null);
+        return fdecl;
     }
     
-    // Return name
-    return cname;
+    // Otherwise, return JavaDecl for this JVarDecl
+    return getJavaDecl(this);
 }
 
 /**

@@ -289,7 +289,7 @@ private void resolveClassNames(JNode aNode)
 {
     // Handle JType
     if(aNode instanceof JType || aNode instanceof JExprId)
-        aNode.getClassName();
+        aNode.getDecl();
         
     // Recurse for children
     for(JNode child : aNode.getChildren())

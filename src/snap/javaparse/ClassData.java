@@ -108,18 +108,34 @@ private JavaDecl getRef(ClassFileData.Constant aConst)
     
     // Handle method reference
     if(aConst.isConstructor()) {
+        
+        // Get declaring class name
         String cname = aConst.getDeclClassName(); if(cname.startsWith("[")) return null;
+        
+        // Get parameter type names and JavaDecl array
+        String pnames[] = aConst.getParameterTypes();
+        JavaDecl ptypes[] = new JavaDecl[pnames.length];
+        for(int i=0;i<pnames.length;i++) ptypes[i] = _proj.getJavaDecl(pnames[i]);
+        
+        // Get class decls and constructor from parameters
         JavaDecls decls = _proj.getJavaDecls(cname);
-        String ptypes[] = aConst.getParameterTypes();
         return decls.getConstructorDeclDeep(-1, ptypes);
     }
     
     // Handle method reference
     if(aConst.isMethod()) {
+        
+        // Get declaring class name and method name
         String cname = aConst.getDeclClassName(); if(cname.startsWith("[")) return null;
-        JavaDecls decls = _proj.getJavaDecls(cname);
         String name = aConst.getMemberName();
-        String ptypes[] = aConst.getParameterTypes();
+        
+        // Get parameter type names and JavaDecl array
+        String pnames[] = aConst.getParameterTypes();
+        JavaDecl ptypes[] = new JavaDecl[pnames.length];
+        for(int i=0;i<pnames.length;i++) ptypes[i] = _proj.getJavaDecl(pnames[i]);
+        
+        // Get class decls and method from name and parameters
+        JavaDecls decls = _proj.getJavaDecls(cname);
         return decls.getMethodDeclDeep(-1, name, null, ptypes);
     }
     

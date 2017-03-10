@@ -21,7 +21,7 @@ public class JavaDecls {
     JavaDecls        _sdecl;
     
     // The field decls
-    List <JavaDecl>  _fdecls = new ArrayList();
+    List <JavaDecl>  _fdecls;
 
     // The method decls
     List <JavaDecl>  _mdecls = new ArrayList();
@@ -50,9 +50,7 @@ public JavaDecls(Project aProj, String aClassName)
     else if(cls==Object.class) _cdecl = JavaDecl.OBJECT_DECL;
     else if(cls==Class.class) _cdecl = JavaDecl.CLASS_DECL;
     else if(cls==String.class) _cdecl = JavaDecl.STRING_DECL;
-    
-    // Do initial load
-    updateDecls();
+    else _cdecl = new JavaDecl(this, cls);
 }
 
 /**
@@ -70,6 +68,9 @@ public JavaDecls getSuperClassDecl()  { return _sdecl; }
  */
 public HashSet <JavaDecl> updateDecls()
 {
+    // If first time, set decls
+    if(_fdecls==null) _fdecls = new ArrayList();
+    
     // Get class
     Class cls = _proj.getClassForName(_cname);
     
@@ -78,10 +79,9 @@ public HashSet <JavaDecl> updateDecls()
     HashSet <JavaDecl> removedDecls = new HashSet(); if(_cdecl!=null) removedDecls.add(_cdecl);
     removedDecls.addAll(_fdecls); removedDecls.addAll(_mdecls); removedDecls.addAll(_cdecls);
 
-    // Get class and make sure TypeParameters, superclass and interfaces are in refs
-    if(_cdecl==null || _cdecl.getModifiers()!=cls.getModifiers()) {
-        JavaDecl decl = _cdecl = new JavaDecl(this,cls); addedDecls.add(decl); }
-    else removedDecls.remove(_cdecl);
+    // Make sure class decl is up to date
+    if(_cdecl.getModifiers()!=cls.getModifiers())
+        _cdecl._mods = cls.getModifiers();
     
     // Fields: add JavaDecl for each declared field - also make sure field type is in refs
     Field fields[]; try { fields = cls.getDeclaredFields(); }
@@ -133,17 +133,19 @@ public JavaDecl getFieldDecl(Field aField)
 {
     int mods = aField.getModifiers();
     String name = aField.getName();
-    String type = JavaDecl.getTypeName(aField.getGenericType());
+    JavaDecl type = getJavaDecl(aField.getGenericType());
     return getFieldDecl(mods, name, type);
 }
 
 /**
  * Returns a field decl for field name.
  */
-public JavaDecl getFieldDecl(int theMods, String aName, String aType)
+public JavaDecl getFieldDecl(int theMods, String aName, JavaDecl aType)
 {
+    if(_fdecls==null) updateDecls();
+    
     for(JavaDecl jd : _fdecls)
-        if(jd.getName().equals(aName) && (aType==null || jd.getTypeName().equals(aType)) &&
+        if(jd.getName().equals(aName) && (aType==null || jd.getEvalType().equals(aType)) &&
             (theMods<0 || jd.getModifiers()==theMods))
                 return jd;
     return null;
@@ -152,7 +154,7 @@ public JavaDecl getFieldDecl(int theMods, String aName, String aType)
 /**
  * Returns a field decl for field name.
  */
-public JavaDecl getFieldDeclDeep(int theMods, String aName, String aType)
+public JavaDecl getFieldDeclDeep(int theMods, String aName, JavaDecl aType)
 {
     JavaDecl decl = getFieldDecl(theMods, aName, aType);
     if(decl==null && _sdecl!=null) decl = _sdecl.getFieldDeclDeep(theMods, aName, aType);
@@ -166,21 +168,23 @@ public JavaDecl getMethodDecl(Method aMeth)
 {
     int mods = aMeth.getModifiers();
     String name = aMeth.getName();
-    String type = JavaDecl.getTypeName(aMeth.getGenericReturnType());
+    JavaDecl type = getJavaDecl(aMeth.getGenericReturnType());
     java.lang.reflect.Type ptypes[] = aMeth.getGenericParameterTypes();
-    String types[] = new String[ptypes.length];
-    for(int i=0;i<types.length;i++) types[i] = JavaDecl.getTypeName(ptypes[i]);
+    JavaDecl types[] = new JavaDecl[ptypes.length];
+    for(int i=0;i<types.length;i++) types[i] = getJavaDecl(ptypes[i]);
     return getMethodDecl(mods, name, type, types);
 }
 
 /**
  * Returns a method decl for method mods, name and return/parameter type names.
  */
-public JavaDecl getMethodDecl(int theMods, String aName, String aType, String theTypes[])
+public JavaDecl getMethodDecl(int theMods, String aName, JavaDecl aType, JavaDecl theTypes[])
 {
+    if(_fdecls==null) updateDecls();
+    
     for(JavaDecl jd : _mdecls)
-        if(jd.getName().equals(aName) && (aType==null || jd.getTypeName().equals(aType)) &&
-            Arrays.equals(jd._argTypeNames, theTypes) && (theMods<0 || jd.getModifiers()==theMods))
+        if(jd.getName().equals(aName) && (aType==null || jd.getEvalType().equals(aType)) &&
+            Arrays.equals(jd.getArgTypes(), theTypes) && (theMods<0 || jd.getModifiers()==theMods))
                 return jd;
     return null;
 }
@@ -188,7 +192,7 @@ public JavaDecl getMethodDecl(int theMods, String aName, String aType, String th
 /**
  * Returns a method decl for method mods, name and return/parameter type names.
  */
-public JavaDecl getMethodDeclDeep(int theMods, String aName, String aType, String theTypes[])
+public JavaDecl getMethodDeclDeep(int theMods, String aName, JavaDecl aType, JavaDecl theTypes[])
 {
     JavaDecl decl = getMethodDecl(theMods, aName, aType, theTypes);
     if(decl==null && _sdecl!=null) decl = _sdecl.getMethodDeclDeep(theMods, aName, aType, theTypes);
@@ -200,21 +204,23 @@ public JavaDecl getMethodDeclDeep(int theMods, String aName, String aType, Strin
  */
 public JavaDecl getConstructorDecl(Constructor aConstr)
 {
+    if(_fdecls==null) updateDecls();
+    
     int mods = aConstr.getModifiers();
     java.lang.reflect.Type ptypes[] = aConstr.getGenericParameterTypes();
     if(ptypes.length!=aConstr.getParameterCount()) ptypes = aConstr.getParameterTypes();
-    String types[] = new String[ptypes.length];
-    for(int i=0;i<types.length;i++) types[i] = JavaDecl.getTypeName(ptypes[i]);
+    JavaDecl types[] = new JavaDecl[ptypes.length];
+    for(int i=0;i<types.length;i++) types[i] = getJavaDecl(ptypes[i]);
     return getConstructorDecl(mods, types);
 }
 
 /**
  * Returns a decl for constructor types.
  */
-public JavaDecl getConstructorDecl(int theMods, String theTypes[])
+public JavaDecl getConstructorDecl(int theMods, JavaDecl theTypes[])
 {
     for(JavaDecl jd : _cdecls)
-        if(Arrays.equals(jd._argTypeNames, theTypes) && (theMods<0 || jd.getModifiers()==theMods))
+        if(Arrays.equals(jd.getArgTypes(), theTypes) && (theMods<0 || jd.getModifiers()==theMods))
             return jd;
     return null;
 }
@@ -222,7 +228,7 @@ public JavaDecl getConstructorDecl(int theMods, String theTypes[])
 /**
  * Returns a decl for constructor types.
  */
-public JavaDecl getConstructorDeclDeep(int theMods, String theTypes[])
+public JavaDecl getConstructorDeclDeep(int theMods, JavaDecl theTypes[])
 {
     JavaDecl decl = getConstructorDecl(theMods, theTypes);
     if(decl==null && _sdecl!=null) decl = _sdecl.getConstructorDeclDeep(theMods, theTypes);
@@ -321,6 +327,11 @@ private static boolean isPossibleMatch(JNode aNode, JavaDecl aDecl)
 /**
  * Returns a JavaDecl for object.
  */
+public JavaDecl getJavaDecl(Object anObj)  { return getJavaDecl(_proj, anObj); }
+
+/**
+ * Returns a JavaDecl for object.
+ */
 public static JavaDecl getJavaDecl(Project aProj, Object anObj)
 {
     // Handle Class
@@ -359,6 +370,12 @@ public static JavaDecl getJavaDecl(Project aProj, Object anObj)
         JavaDecls decls = cls!=null? aProj.getJavaDecls(cname) : null;
         return decls!=null? decls.getClassDecl() : null;
     }
+    
+    // Handle any type
+    if(anObj instanceof Type) { Type type = (Type)anObj;
+        Class cls = JavaDecl.getClass(type);
+        return getJavaDecl(aProj, cls);
+    }
 
     // Complain
     throw new RuntimeException("Project.getJavaDecl: Unsupported type " + anObj);
@@ -371,7 +388,7 @@ public static JavaDecl getPackageDecl(String aName)
 {
     JavaDecl pd = _pkgDecls.get(aName); if(pd!=null) return pd;
     pd = new JavaDecl(null,aName); pd._type = JavaDecl.DeclType.Package;
-    pd._name = pd._pname = aName; pd._sname = JavaDecl.getSimpleName(aName);
+    pd._name = aName; pd._sname = JavaDecl.getSimpleName(aName);
     _pkgDecls.put(aName, pd);
     return pd;
 }

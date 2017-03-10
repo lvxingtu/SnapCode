@@ -98,14 +98,8 @@ public JMemberDecl getEnclosingMemberDecl()  { return getParent(JMemberDecl.clas
  */
 public String getClassName()
 {
-    JavaDecl decl = getDecl(); if(decl==null) return null;
-    if(decl.isClass() || decl.isConstructor())
-        return decl.getClassName();
-    if(decl.isField() || decl.isMethod())
-        return decl.getTypeName();
-    if(decl.isVarDecl())
-        return decl.getVarDecl().getClassName();
-    return null;
+    JavaDecl decl = getDecl();
+    return decl!=null? decl.getEvalTypeName() : null;
 }
 
 /**
@@ -113,11 +107,8 @@ public String getClassName()
  */
 public Class getJClass()
 {
-    String cname = getClassName(); if(cname==null) return null;
-    Class cls = getClassForName(cname);
-    if(cls==null)
-        System.err.println("JNode.getJClass: Couldn't find class for name " + cname);
-    return cls;
+    JavaDecl decl = getDecl();
+    return decl!=null? decl.getEvalClass() : null;
 }
 
 /**

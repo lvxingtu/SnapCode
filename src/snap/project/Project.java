@@ -145,7 +145,13 @@ public JavaDecls getJavaDecls(String aCName)
 /**
  * Returns a JavaDecl for object.
  */
-public JavaDecl getJavaDecl(Object anObj)  { return JavaDecls.getJavaDecl(this, anObj); }
+public JavaDecl getJavaDecl(Object anObj)
+{
+    JavaDecl jd = JavaDecls.getJavaDecl(this, anObj);
+    if(jd==null)
+        jd = JavaDecls.getJavaDecl(this, anObj);
+    return jd;
+}
 
 /**
  * Returns the source file for given path.
