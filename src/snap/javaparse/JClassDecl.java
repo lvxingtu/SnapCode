@@ -281,9 +281,6 @@ public JClassDecl getClassDecl(String aName)
  */
 protected String getNameImpl()
 {
-    // If identifier is available, just return name
-    if(super.getNameImpl()!=null) return super.getNameImpl();
-    
     // If enclosing class, see if we are inner class
     JClassDecl ecd = getEnclosingClassDecl();
     if(ecd!=null) {
@@ -305,16 +302,23 @@ protected String getNameImpl()
 protected JavaDecl getDeclImpl()
 {
     // If enclosing class declaration, return ThatClassName$ThisName, otherwise return JFile.Name
-    String cname = null;
+    String cname = getName();
+    
+    // If enclosing class, get name from it
     JClassDecl ecd = getEnclosingClassDecl();
     if(ecd!=null) {
-        String ecname = ecd.getClassName(), name = getName();
-        cname = ecname!=null && name!=null? ecname + '$' + name : null; }
-    else cname = getFile().getName();
+        String ecname = ecd.getClassName();
+        if(ecname!=null) cname = ecname + '$' + cname;
+    }
+    
+    // Otherwise get full name from file
+    else {
+        String pname = getFile().getPackageName();
+        if(pname!=null && pname.length()>0) cname = pname + '.' + cname;
+    }
     
     // Return class name
-    Class cls = cname!=null? getClassForName(cname) : null;
-    return cls!=null? getJavaDecl(cls) : null;
+    return cname!=null? getJavaDecl(cname) : null;
 }
 
 /**

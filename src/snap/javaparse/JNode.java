@@ -37,61 +37,24 @@ public JFile getFile()  { return getParent(JFile.class); }
 public String getName()  { return _name!=null? _name : (_name=getNameImpl()); }
 
 /**
+ * Sets the node name, if it has one.
+ */
+public void setName(String aName)  { _name = aName; }
+
+/**
  * Resolves the name, if possible.
  */
 protected String getNameImpl()  { return null; }
 
 /**
- * Returns the class loader used to resolve classes.
+ * Tries to determine IdentiferType.
  */
-public ClassLoader getClassLoader()  { return getFile().getClassLoader(); }
+public JavaDecl getDecl()  { return _decl!=null? _decl : (_decl=getDeclImpl()); }
 
 /**
- * Returns the class for given name.
+ * Returns a JavaDeclRef for a JNode.
  */
-public Class getClassForName(String aName)
-{
-    ClassLoader cldr = getClassLoader();
-    return ClassUtils.getClass(aName, cldr);
-}
-
-/**
- * Returns whether given class name is known.
- */
-public boolean isKnownClassName(String aName)  { return getClassForName(aName)!=null; }
-
-/**
- * Returns whether given class name is known.
- */
-public boolean isKnownPackageName(String aName)
-{
-    // Bite me
-    if(aName.startsWith("java") && aName.equals(aName.toLowerCase())) {
-        if(aName.equals("java") || aName.startsWith("java.")) return true;
-        if(aName.equals("javax") || aName.startsWith("javax.")) return true;
-        if(aName.equals("javafx") || aName.startsWith("javafx.")) return true;
-    }
-    
-    ClassLoader cldr = getClassLoader();
-    String rname = aName.replace('.', '/');
-    java.net.URL url = cldr.getResource(rname);
-    return url!=null;
-}
-
-/**
- * Returns the enclosing class.
- */
-public JClassDecl getEnclosingClassDecl()  { return getParent(JClassDecl.class); }
-
-/**
- * Returns the enclosing method declaration, if in method.
- */
-public JMethodDecl getEnclosingMethodDecl()  { return getParent(JMethodDecl.class); }
-
-/**
- * Returns the enclosing member declaration, if in member.
- */
-public JMemberDecl getEnclosingMemberDecl()  { return getParent(JMemberDecl.class); }
+protected JavaDecl getDeclImpl()  { return null; }
 
 /**
  * Returns the class name for this node, if it has one.
@@ -122,24 +85,24 @@ public boolean isDecl()
 }
 
 /**
- * Tries to determine IdentiferType.
+ * Returns the enclosing class.
  */
-public JavaDecl getDecl()  { return _decl!=null? _decl : (_decl=getDeclImpl()); }
+public JClassDecl getEnclosingClassDecl()  { return getParent(JClassDecl.class); }
 
 /**
- * Returns a JavaDeclRef for a JNode.
+ * Returns the enclosing method declaration, if in method.
  */
-protected JavaDecl getDeclImpl()  { return null; }
+public JMethodDecl getEnclosingMethodDecl()  { return getParent(JMethodDecl.class); }
+
+/**
+ * Returns the enclosing member declaration, if in member.
+ */
+public JMemberDecl getEnclosingMemberDecl()  { return getParent(JMemberDecl.class); }
 
 /**
  * Returns the enclosing JavaDecl (JVarDecl, JConstrDecl, JMethodDecl or JClassDecl).
  */
 public JavaDecl getEnclosingDecl()  { JNode n = getEnclosingDeclNode(); return n!=null? n.getDecl() : null; }
-
-/**
- * Returns a JavaDecl for a Class, Field, Method, Constructor or class name string.
- */
-public JavaDecl getJavaDecl(Object anObj)  { return getFile().getJavaDecl(anObj); }
 
 /**
  * Returns the enclosing JavaDecl (JVarDecl, JConstrDecl, JMethodDecl or JClassDecl).
@@ -332,6 +295,29 @@ public String getNodePath(String aSep)
     for(JNode parent : parents) sb.append(parent.getNodeString()).append(aSep);
     sb.append(getNodeString());
     return sb.toString();
+}
+
+/**
+ * Returns a JavaDecl for a Class, Field, Method, Constructor or class name string.
+ */
+public JavaDecl getJavaDecl(Object anObj)  { return getFile().getJavaDecl(anObj); }
+
+/**
+ * Returns whether given class name is known.
+ */
+public boolean isKnownClassName(String aName)
+{
+    JavaDecl jd = getJavaDecl(aName);
+    return jd!=null && jd.isClass();
+}
+
+/**
+ * Returns whether given class name is known.
+ */
+public boolean isKnownPackageName(String aName)
+{
+    JavaDecl jd = getJavaDecl(aName);
+    return jd!=null && jd.isPackage();
 }
 
 /**

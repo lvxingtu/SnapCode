@@ -45,11 +45,6 @@ public WebFile getSourceFile()  { return _sourceFile; }
 public void setSourceFile(WebFile aFile)  { _sourceFile = aFile; _proj = Project.get(aFile); }
 
 /**
- * Returns the class loader used to resolve classes.
- */
-public ClassLoader getClassLoader()  { return _proj!=null? _proj.getClassLoader() : getClass().getClassLoader(); }
-
-/**
  * Returns the package declaration.
  */
 public JPackageDecl getPackageDecl()  { return _packageDecl; }
@@ -97,12 +92,7 @@ public JFile getFile()  { return this; }
 /**
  * Override to get name from ClassDecl.
  */
-protected String getNameImpl()
-{
-    JClassDecl cd = getClassDecl(); if(cd==null) return "NoClassDefined";
-    String cname = cd.getSimpleName(), pname = getPackageName();
-    return pname!=null && pname.length()>0? pname + '.' + cname : cname;
-}
+protected String getNameImpl()  { JavaDecl jd = getDecl(); return jd!=null? jd.getName() : null; }
 
 /**
  * Returns the type class of this file.
@@ -124,9 +114,9 @@ protected JavaDecl resolveName(JNode aNode)
     
     // See if it's a known class name using imports
     String cname = getImportClassName(name);
-    Class cls = cname!=null? getClassForName(cname) : null;
-    if(cls!=null)
-        return getJavaDecl(cls);
+    JavaDecl cd = cname!=null? getJavaDecl(cname) : null;
+    if(cd!=null)
+        return cd;
         
     // See if it's a known static import class member
     Field field = (Field)getImportClassMember(name, null);
@@ -140,7 +130,7 @@ protected JavaDecl resolveName(JNode aNode)
 /**
  * Returns a JavaDecl for a Class, Field, Method, Constructor or class name string.
  */
-public JavaDecl getJavaDecl(Object anObj)  { return _proj.getJavaDecl(anObj); }
+public JavaDecl getJavaDecl(Object anObj)  { return _proj!=null? _proj.getJavaDecl(anObj) : null; }
 
 /**
  * Returns an import that can be used to resolve the given name.
@@ -214,7 +204,8 @@ public String getImportClassName(String aName)
     if(aName.indexOf('.')>0) {
         String names[] = aName.split("\\.");
         String cname = getImportClassName(names[0]); if(cname==null) return null;
-        Class cls = getClassForName(cname);
+        JavaDecl cdecl = getJavaDecl(cname);
+        Class cls = cdecl!=null && cdecl.isClass()? cdecl.getEvalClass() : null;
         for(int i=1;cls!=null && i<names.length;i++)
             cls = ClassUtils.getClass(cls, names[i]);
         return cls!=null? cls.getName() : null;
@@ -232,9 +223,10 @@ public String getImportClassName(String aName)
             return cname; }
     
     // Try "java.lang" + name
-    try { return Class.forName("java.lang." + aName).getName(); }
-    catch(ClassNotFoundException e) { }
-    
+    JavaDecl jld = getJavaDecl("java.lang." + aName);
+    if(jld!=null && jld.isClass())
+        return jld.getName();
+
     // Return null since class not found
     return null;
 }

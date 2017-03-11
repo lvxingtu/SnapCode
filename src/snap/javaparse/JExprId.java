@@ -16,11 +16,6 @@ public JExprId()  { }
 public JExprId(String aName)  { setName(aName); }
 
 /**
- * Sets the name for Identifier or Method.
- */
-public void setName(String aName)  { _name = aName; }
-
-/**
  * Override to resolve id name from parents.
  */
 protected JavaDecl getDeclImpl()

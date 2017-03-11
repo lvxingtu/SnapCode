@@ -36,6 +36,7 @@ public void setId(JExprId anId)
 {
     if(_id==null) addChild(_id=anId, 0);
     else replaceChild(_id, _id=anId);
+    if(_id!=null) setName(_id.getName());
 }
 
 /**
@@ -96,11 +97,6 @@ public Method getMethod()
     // Return null since not found
     return null;
 }
-
-/**
- * Resolves the name from Identifier or Method.
- */
-protected String getNameImpl()  { return _id!=null? _id.getName() : null; }
 
 /**
  * Tries to resolve the method declaration for this node.

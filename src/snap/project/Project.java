@@ -150,7 +150,8 @@ public JavaDecl getJavaDecl(Object anObj)
             return createClassDecl(cls);
             
         // Since not found, just return
-        System.err.println("Project.getJavaDecl: Unknown string decl reference: " + name); return null;
+        //System.err.println("Project.getJavaDecl: Unknown string decl reference: " + name);
+        return null;
     }
     
     // Handle Class

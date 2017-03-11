@@ -27,11 +27,6 @@ public class JVarDecl extends JNode {
     List <JExpr>   _arrayInits = Collections.EMPTY_LIST;
 
 /**
- * Resolves the name from identifier.
- */
-protected String getNameImpl()  { return _id!=null? _id.getName() : null; }
-
-/**
  * Returns whether type is set.
  */
 public boolean isTypeSet()  { return _type!=null; }
@@ -81,7 +76,11 @@ public JExprId getId()  { return _id; }
 /**
  * Sets the identifier.
  */
-public void setId(JExprId anId)  { replaceChild(_id, _id=anId); }
+public void setId(JExprId anId)
+{
+    replaceChild(_id, _id=anId);
+    if(_id!=null) setName(_id.getName());
+}
 
 /**
  * Returns the array count.

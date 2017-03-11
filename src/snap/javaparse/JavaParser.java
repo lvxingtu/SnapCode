@@ -166,7 +166,7 @@ public static class PackageDeclHandler extends JNodeParseHandler <JPackageDecl> 
         
         // Handle Name
         else if(anId=="Name")
-            getPart().setIdentifier(aNode.getCustomNode(JExpr.class));
+            getPart().setId(aNode.getCustomNode(JExpr.class));
         
         // Otherwise ensure part is available
         else getPart();
@@ -382,7 +382,7 @@ public static class TypeParamHandler extends JNodeParseHandler <JTypeParam>
     {
         // Handle Identifier
         if(anId=="Identifier")
-            getPart().setIdentifier(aNode.getCustomNode(JExprId.class));
+            getPart().setId(aNode.getCustomNode(JExprId.class));
         
         // Handle ClassType
         else if(anId=="ClassType")

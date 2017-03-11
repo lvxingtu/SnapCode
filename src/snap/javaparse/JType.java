@@ -24,11 +24,6 @@ public class JType extends JNode {
     JavaDecl              _baseDecl;
     
 /**
- * Sets the type name.
- */
-public void setName(String aName)  { _name = aName; }
-
-/**
  * Returns the simple name.
  */
 public String getSimpleName()

@@ -64,7 +64,6 @@ public JavaDecl(Project aProj, JavaDecl aPar, Object anObj)
         _name = getClassName(cls); _sname = cls.getSimpleName(); _cname = _name;
         _mods = cls.getModifiers(); _enum = cls.isEnum(); _interface = cls.isInterface();
         _evalType = this;
-        _decls = new JavaDecls(this);
     }
 
     // Handle Field
@@ -208,16 +207,12 @@ public boolean isMemberClass()  { return _cname!=null? _cname.indexOf('$')>0 : f
 /**
  * Returns the JavaDecls for class.
  */
-public JavaDecls getDecls()  { return _decls; }
+public JavaDecls getDecls()  { return _decls!=null? _decls : (_decls = new JavaDecls(this)); }
 
 /**
  * Returns the enclosing class this decl.
  */
-public JavaDecl getParent()
-{
-    JavaDecl par = _decls!=null? _decls._cdecl : null;
-    return par!=this? par : null;
-}
+public JavaDecl getParent()  { return _par; }
 
 /**
  * Returns the JavaDecl for class this decl evaluates to when referenced.

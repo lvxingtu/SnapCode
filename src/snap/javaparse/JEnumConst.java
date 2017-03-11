@@ -34,14 +34,8 @@ public String getClassBody()  { return _classBody; }
 public void setClassBody(String aBody)  { _classBody = aBody; }
 
 /**
- * Resolves name from name identifier, if available.
- */
-protected String getNameImpl()  { return _id!=null? _id.getName() : null; }
-
-/**
  * Get class name from parent enum declaration.
  */
-@Override
 protected JavaDecl getDeclImpl()
 {
     Class cls = getParent().getJClass();
@@ -52,7 +46,6 @@ protected JavaDecl getDeclImpl()
 /**
  * Override to resolve enum id.
  */
-@Override
 protected JavaDecl resolveName(JNode aNode)  { return aNode==_id? getDecl() : super.resolveName(aNode); }
 
 }

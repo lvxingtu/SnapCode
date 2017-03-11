@@ -85,13 +85,10 @@ protected JavaDecl resolveName(JNode aNode)
         System.err.println("JExprChain.resolve: No parent decl for " + getName() + " in " + getName()); return null; }
     
     // Handle Parent is Package: Look for package sub-package or package class
-    if(parDecl.isPackage()) {
-        String pname = parDecl.getPackageName(), pname2 = pname + '.' + name;
-        if(isKnownPackageName(pname2))
-            return getJavaDecl(pname2);
-        String cname = pname + '.' + name;
-        if(isKnownClassName(cname))
-            return getJavaDecl(cname);
+    if(parDecl.isPackage()) { String pname = parDecl.getPackageName(), cpath = pname + '.' + name;
+        JavaDecl decl = getJavaDecl(cpath);
+        if(decl!=null)
+            return decl;
     }
         
     // Handle Parent is Class: Look for ".this", ".class", static field or inner class

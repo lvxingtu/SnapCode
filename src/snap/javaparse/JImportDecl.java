@@ -90,15 +90,6 @@ public String getImportClassName(String aName)
 }
 
 /**
- * Returns the class for a given name.
- */
-public Class getImportClass(String aName)
-{
-    String cname = getImportClassName(aName);
-    return cname!=null? getClassForName(cname) : null;
-}
-
-/**
  * Returns the member for given name and parameter types (if method) for static import.
  */
 public Member getImportMember(String aName, Class theParams[])
@@ -117,12 +108,11 @@ public JExpr getNameExpr()  { return _nameExpr; }
 /**
  * Sets the name expression.
  */
-public void setNameExpr(JExpr anExpr)  { replaceChild(_nameExpr, _nameExpr = anExpr); }
-
-/**
- * Resolves the name from identifier, if available.
- */
-protected String getNameImpl()  { return _nameExpr!=null? _nameExpr.getName() : null; }
+public void setNameExpr(JExpr anExpr)
+{
+    replaceChild(_nameExpr, _nameExpr = anExpr);
+    if(_nameExpr!=null) setName(_nameExpr.getName());
+}
 
 /**
  * Returns the list of child class names found by this import (if inclusive).

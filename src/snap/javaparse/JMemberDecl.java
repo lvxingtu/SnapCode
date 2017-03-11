@@ -23,11 +23,6 @@ public class JMemberDecl extends JNode {
     boolean         _superIsNull;
     
 /**
- * Returns the member name.
- */
-protected String getNameImpl()  { return _id!=null? _id.getName() : null; }
-
-/**
  * Returns the modifiers.
  */
 public JModifiers getModifiers()
@@ -55,8 +50,8 @@ public JExprId getId()  { return _id; }
  */
 public void setId(JExprId anId)
 {
-    //if(_id==null) addChild(_id=anId, 0); else
     replaceChild(_id, _id = anId);
+    if(_id!=null) setName(_id.getName());
 }
 
 /**
@@ -97,8 +92,7 @@ protected JavaDecl getSuperDeclImpl()  { return null; }
 public boolean isSuperDeclInterface()
 {
     JavaDecl sdecl = getSuperDecl(); if(sdecl==null) return false;
-    Class cls = getClassForName(sdecl.getClassName());
-    return cls!=null && cls.isInterface();
+    return sdecl!=null && sdecl.isInterface();
 }
 
 }

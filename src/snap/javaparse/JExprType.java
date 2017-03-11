@@ -21,7 +21,11 @@ public JType getType()  { return _type; }
 /**
  * Sets the cast JType.
  */
-public void setType(JType aType)  { replaceChild(_type, _type = aType); }
+public void setType(JType aType)
+{
+    replaceChild(_type, _type = aType);
+    if(_type!=null) setName(_type.getName());
+}
 
 /**
  * Returns the node name.
@@ -32,10 +36,5 @@ public String getNodeString()  { return "Type"; }
  * Override to return declaration of type.
  */
 protected JavaDecl getDeclImpl()  { return _type.getDecl(); }
-
-/**
- * Override to return type name.
- */
-protected String getNameImpl()  { return _type.getName(); }
 
 }

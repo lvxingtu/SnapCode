@@ -18,12 +18,16 @@ public class JTypeParam extends JNode {
 /**
  * Returns the identifier.
  */
-public JExprId getIdentifier()  { return _id; }
+public JExprId getId()  { return _id; }
 
 /**
  * Sets the identifier.
  */
-public void setIdentifier(JExprId anId)  { replaceChild(_id, _id = anId); }
+public void setId(JExprId anId)
+{
+    replaceChild(_id, _id = anId);
+    if(_id!=null) setName(_id.getName());
+}
 
 /**
  * Returns the types.
@@ -34,11 +38,6 @@ public List <JType> getTypes()  { return _types; }
  * Adds a type.
  */
 public void addType(JType aType)  { _types.add(aType); addChild(aType, -1); }
-
-/**
- * Resolves the name.
- */
-protected String getNameImpl()  { return _id!=null? _id.getName() : null; }
 
 /**
  * Returns a class name of first type (not sure I need to do this).

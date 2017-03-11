@@ -15,16 +15,6 @@ public class JPackageDecl extends JNode {
     JExpr        _id;
 
 /**
- * Returns the package name identifier.
- */
-public JExpr getIdentifier()  { return _id; }
-
-/**
- * Sets the package name identifier.
- */
-public void setIdentifier(JExpr anId)  { replaceChild(_id, _id = anId); }
-
-/**
  * Returns the modifiers.
  */
 public JModifiers getModifiers() { return _mods; }
@@ -39,8 +29,17 @@ public void setModifiers(JModifiers aValue)
 }
 
 /**
- * Resolves the package name from name identifier, if available.
+ * Returns the package name identifier.
  */
-protected String getNameImpl()  { return _id!=null? _id.getName() : null; }
+public JExpr getId()  { return _id; }
+
+/**
+ * Sets the package name identifier.
+ */
+public void setId(JExpr anId)
+{
+    replaceChild(_id, _id = anId);
+    if(_id!=null) setName(_id.getName());
+}
 
 }
