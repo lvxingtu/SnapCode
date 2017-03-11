@@ -43,6 +43,6 @@ protected String getNameImpl()  { return _id!=null? _id.getName() : null; }
 /**
  * Returns a class name of first type (not sure I need to do this).
  */
-protected JavaDecl getDeclImpl()  { return _types.size()>0? _types.get(0).getDecl() : JavaDecl.OBJECT_DECL; }
+protected JavaDecl getDeclImpl()  { return _types.size()>0? _types.get(0).getDecl() : getJavaDecl(Object.class); }
 
 }

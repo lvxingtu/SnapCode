@@ -12,12 +12,15 @@ import snap.util.*;
  */
 public class JavaDecl implements Comparable<JavaDecl> {
     
-    // The JavaDecls that this decl belongs to
-    JavaDecls      _decls;
-    
     // The project that this decl belongs to
     Project        _proj;
 
+    // The JavaDecl (class) that this decl belongs to
+    JavaDecl       _par;
+    
+    // The JavaDecls (children: fields, methods, constructors) that belong to this JavaDecl (class)
+    JavaDecls      _decls;
+    
     // The type
     DeclType       _type;
     
@@ -33,6 +36,9 @@ public class JavaDecl implements Comparable<JavaDecl> {
     // The class name of this declaration
     String         _cname;
     
+    // Whether class decl is enum or interface
+    boolean        _enum, _interface;
+    
     // The type this decl evaluates to when referenced
     JavaDecl       _evalType;
     
@@ -45,26 +51,20 @@ public class JavaDecl implements Comparable<JavaDecl> {
     // Constants for type
     public enum DeclType { Class, Field, Constructor, Method, Package, VarDecl }
     
-    // Common shared decls
-    public static final JavaDecl INT_DECL = new JavaDecl(null, int.class);
-    public static final JavaDecl BOOL_DECL = new JavaDecl(null, boolean.class);
-    public static final JavaDecl OBJECT_DECL = new JavaDecl(null, Object.class);
-    public static final JavaDecl CLASS_DECL = new JavaDecl(null, Class.class);
-    public static final JavaDecl STRING_DECL = new JavaDecl(null, String.class);
-    
 /**
  * Creates a new JavaDecl for Class, Field, Constructor, Method, VarDecl or class name string.
  */
-public JavaDecl(JavaDecls theJDs, Object anObj)
+public JavaDecl(Project aProj, JavaDecl aPar, Object anObj)
 {
     // Set JavaDecls
-    _decls = theJDs; _proj = theJDs!=null? theJDs.getProject() : null;
+    _proj = aProj; _par = aPar; if(aProj==null && aPar!=null) _proj = aPar._proj;
     
     // Handle Class
     if(anObj instanceof Class) { Class cls = (Class)anObj; _type = DeclType.Class;
         _name = getClassName(cls); _sname = cls.getSimpleName(); _cname = _name;
-        _mods = cls.getModifiers();
+        _mods = cls.getModifiers(); _enum = cls.isEnum(); _interface = cls.isInterface();
         _evalType = this;
+        _decls = new JavaDecls(this);
     }
 
     // Handle Field
@@ -104,13 +104,12 @@ public JavaDecl(JavaDecls theJDs, Object anObj)
     else if(anObj instanceof JVarDecl) { _vdecl = (JVarDecl)anObj; _type = DeclType.VarDecl;
         _name = _sname = _vdecl.getName();
         JType jt = _vdecl.getType();
-        _evalType = jt!=null? jt.getDecl() : OBJECT_DECL; // Can happen for Lambdas
+        _evalType = jt!=null? jt.getDecl() : getJavaDecl(Object.class); // Can happen for Lambdas
     }
     
-    // Handle String (assumed to be class name)
-    else if(anObj instanceof String) { String cname = (String)anObj; _type = DeclType.Class;
-        _name = cname; _sname = getSimpleName(cname); _cname = cname;
-    }
+    // Handle Package String
+    else if(anObj instanceof String) { String pname = (String)anObj; _type = DeclType.Package;
+        _name = pname; _sname = getSimpleName(pname); }
     
     // Throw exception for unknown type
     else throw new RuntimeException("JavaDecl.init: Unsupported type " + anObj);
@@ -125,6 +124,16 @@ public DeclType getType()  { return _type; }
  * Returns whether is a class reference.
  */
 public boolean isClass()  { return _type==DeclType.Class; }
+
+/**
+ * Returns whether is a enum reference.
+ */
+public boolean isEnum()  { return _type==DeclType.Class && _enum; }
+
+/**
+ * Returns whether is a interface reference.
+ */
+public boolean isInterface()  { return _type==DeclType.Class && _interface; }
 
 /**
  * Returns whether is a field reference.
@@ -220,6 +229,7 @@ public JavaDecl getEvalType()  { return _evalType; }
  */
 public Class getEvalClass()
 {
+    if(_evalType==null) return null;
     if(_evalType!=this) return _evalType.getEvalClass();
     ClassLoader cldr = _proj!=null? _proj.getClassLoader() : ClassLoader.getSystemClassLoader();
     String cname = getEvalTypeName();
@@ -355,7 +365,12 @@ public Class getDeclClass()
 /**
  * Returns a JavaDecl for given object.
  */
-public JavaDecl getJavaDecl(Object anObj)  { return JavaDecls.getJavaDecl(_proj, anObj); }
+public JavaDecl getJavaDecl(Object anObj)
+{
+    if(_proj==null)
+        return null;
+    return _proj.getJavaDecl(anObj);
+}
 
 /**
  * Returns whether given declaration collides with this declaration.
@@ -394,7 +409,7 @@ public int hashCode()  { return getFullName().hashCode(); }
 /**
  * Standard toString implementation.
  */
-public String toString()  { return getFullName(); }
+public String toString()  { return _type + ": " + getFullName(); }
 
 /**
  * Returns the class name, converting primitive arrays to 'int[]' instead of '[I'.
@@ -467,6 +482,61 @@ private static String getPackageName(String cname)
 {
     int i = cname.lastIndexOf('.'); cname = i>0? cname.substring(0,i) : "";
     return cname;
+}
+
+/**
+ * Returns a JavaDecl for object.
+ */
+public static JavaDecl getJavaDecl(Project aProj, Object anObj)
+{
+    // Handle Class
+    JavaDecl jd = null;
+    if(anObj instanceof Class) { Class cls = (Class)anObj;
+        JavaDecl decl = aProj.getJavaDecl(cls);
+        JavaDecls decls = decl.getDecls();
+        jd = decls.getClassDecl();
+    }
+    
+    // Handle Field
+    else if(anObj instanceof Field) { Field field = (Field)anObj; Class cls = field.getDeclaringClass();
+        JavaDecl decl = aProj.getJavaDecl(cls);
+        JavaDecls decls = decl.getDecls();
+        jd = decls.getFieldDecl(field);
+    }
+    
+    // Handle Method
+    else if(anObj instanceof Method) { Method meth = (Method)anObj; Class cls = meth.getDeclaringClass();
+        JavaDecl decl = aProj.getJavaDecl(cls);
+        JavaDecls decls = decl.getDecls();
+        jd = decls.getMethodDecl(meth);
+    }
+
+    // Handle Constructor
+    else if(anObj instanceof Constructor) { Constructor constr = (Constructor)anObj; Class cls = constr.getDeclaringClass();
+        JavaDecl decl = aProj.getJavaDecl(cls);
+        JavaDecls decls = decl.getDecls();
+        jd = decls.getConstructorDecl(constr);
+    }
+    
+    // Handle JVarDecl
+    else if(anObj instanceof JVarDecl)  { JVarDecl vd = (JVarDecl)anObj;
+        JClassDecl cd = vd.getParent(JClassDecl.class);
+        JavaDecl decl = cd.getDecl();
+        jd = new JavaDecl(aProj, decl, vd);
+    }
+    
+    // Handle Java.lang.refelect.Type
+    else if(anObj instanceof Type) { Type type = (Type)anObj;
+        Class cls = JavaDecl.getClass(type);
+        jd = aProj.getJavaDecl(cls);
+    }
+
+    // Complain
+    else throw new RuntimeException("Project.getJavaDecl: Unsupported type " + anObj);
+    
+    if(jd==null)
+        System.out.println("JavaDecl.getJavaDecl: Decl not found for " + anObj);
+    return jd;
 }
 
 }

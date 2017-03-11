@@ -19,8 +19,8 @@ public class JMemberDecl extends JNode {
     // The member that this member overrides or implements
     JavaDecl        _super;
     
-    // A bobus JavaDecl to stand in for null super decl
-    static JavaDecl NULL_DECL = JavaDecl.INT_DECL;
+    // Whether super is null
+    boolean         _superIsNull;
     
 /**
  * Returns the member name.
@@ -81,9 +81,9 @@ public JTypeParam getTypeParam(String aName)
  */
 public JavaDecl getSuperDecl()
 {
-    if(_super!=null) return _super!=NULL_DECL? _super : null;
-    if(_super==null) { _super = getSuperDeclImpl(); if(_super==null) _super = NULL_DECL; }
-    return _super!=NULL_DECL? _super : null;
+    if(_super!=null || _superIsNull) return _super;
+    _super = getSuperDeclImpl(); _superIsNull = _super==null;
+    return _super;
 }
 
 /**

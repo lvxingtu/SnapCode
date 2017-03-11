@@ -1,21 +1,17 @@
 package snap.javaparse;
 import java.lang.reflect.*;
 import java.util.*;
-import snap.project.Project;
 
 /**
  * This class manages JavaDecls for a class.
  */
 public class JavaDecls {
 
-    // The project this class works for
-    Project          _proj;
+    // The class decl this JavaDecls belongs to
+    JavaDecl         _cdecl;
     
     // The class name
     String           _cname;
-    
-    // The class decl
-    JavaDecl         _cdecl;
     
     // The super class decl
     JavaDecls        _sdecl;
@@ -35,28 +31,16 @@ public class JavaDecls {
 /**
  * Creates a new JavaDecls.
  */
-public JavaDecls(Project aProj, String aClassName)
+public JavaDecls(JavaDecl aCDecl)
 {
     // Set project, class name and super decl
-    _proj = aProj; _cname = aClassName;
-    Class cls = aProj.getClassForName(_cname);
+    _cdecl = aCDecl;
+    _cname = aCDecl.getClassName();
+    Class cls = aCDecl.getEvalClass();
     Class scls = cls.getSuperclass();
     if(scls!=null)
-        _sdecl = aProj.getJavaDecls(scls.getName());
-        
-    // Set base classes from JavaDecl constants
-    if(cls==int.class) _cdecl = JavaDecl.INT_DECL;
-    else if(cls==boolean.class) _cdecl = JavaDecl.BOOL_DECL;
-    else if(cls==Object.class) _cdecl = JavaDecl.OBJECT_DECL;
-    else if(cls==Class.class) _cdecl = JavaDecl.CLASS_DECL;
-    else if(cls==String.class) _cdecl = JavaDecl.STRING_DECL;
-    else _cdecl = new JavaDecl(this, cls);
+        _sdecl = aCDecl.getJavaDecl(scls.getName()).getDecls();
 }
-
-/**
- * Returns the project.
- */
-public Project getProject()  { return _proj; }
 
 /**
  * Returns the super class decl.
@@ -72,7 +56,7 @@ public HashSet <JavaDecl> updateDecls()
     if(_fdecls==null) _fdecls = new ArrayList();
     
     // Get class
-    Class cls = _proj.getClassForName(_cname);
+    Class cls = _cdecl.getEvalClass();
     
     // Create set for added/removed decls
     HashSet <JavaDecl> addedDecls = new HashSet();
@@ -88,7 +72,7 @@ public HashSet <JavaDecl> updateDecls()
     catch(Throwable e) { System.err.println(e + " in " + _cname); return null; }
     for(Field field : fields) {
         JavaDecl decl = getFieldDecl(field);
-        if(decl==null) { decl = new JavaDecl(this,field); addedDecls.add(decl); _fdecls.add(decl); }
+        if(decl==null) { decl = new JavaDecl(null,_cdecl,field); addedDecls.add(decl); _fdecls.add(decl); }
         else removedDecls.remove(decl);
     }
     
@@ -98,7 +82,7 @@ public HashSet <JavaDecl> updateDecls()
     for(Method meth : methods) {
         if(meth.isSynthetic()) continue;
         JavaDecl decl = getMethodDecl(meth);
-        if(decl==null) { decl = new JavaDecl(this,meth); addedDecls.add(decl); _mdecls.add(decl); }
+        if(decl==null) { decl = new JavaDecl(null,_cdecl,meth); addedDecls.add(decl); _mdecls.add(decl); }
         else removedDecls.remove(decl);
     }
     
@@ -108,7 +92,7 @@ public HashSet <JavaDecl> updateDecls()
     for(Constructor constr : constrs) {
         if(constr.isSynthetic()) continue;
         JavaDecl decl = getConstructorDecl(constr);
-        if(decl==null) { decl = new JavaDecl(this,constr); addedDecls.add(decl); _cdecls.add(decl); }
+        if(decl==null) { decl = new JavaDecl(null,_cdecl,constr); addedDecls.add(decl); _cdecls.add(decl); }
         else removedDecls.remove(decl);
     }
     
@@ -327,70 +311,6 @@ private static boolean isPossibleMatch(JNode aNode, JavaDecl aDecl)
 /**
  * Returns a JavaDecl for object.
  */
-public JavaDecl getJavaDecl(Object anObj)  { return getJavaDecl(_proj, anObj); }
-
-/**
- * Returns a JavaDecl for object.
- */
-public static JavaDecl getJavaDecl(Project aProj, Object anObj)
-{
-    // Handle Class
-    if(anObj instanceof Class) { Class cls = (Class)anObj;
-        JavaDecls decls = aProj.getJavaDecls(cls.getName());
-        return decls.getClassDecl();
-    }
-    
-    // Handle Field
-    if(anObj instanceof Field) { Field field = (Field)anObj; Class cls = field.getDeclaringClass();
-        JavaDecls decls = aProj.getJavaDecls(cls.getName());
-        return decls.getFieldDecl(field);
-    }
-    
-    // Handle Method
-    if(anObj instanceof Method) { Method meth = (Method)anObj; Class cls = meth.getDeclaringClass();
-        JavaDecls decls = aProj.getJavaDecls(cls.getName());
-        return decls.getMethodDecl(meth);
-    }
-
-    // Handle Constructor
-    if(anObj instanceof Constructor) { Constructor constr = (Constructor)anObj; Class cls = constr.getDeclaringClass();
-        JavaDecls decls = aProj.getJavaDecls(cls.getName());
-        return decls.getConstructorDecl(constr);
-    }
-    
-    // Handle JVarDecl
-    if(anObj instanceof JVarDecl)  { JVarDecl vd = (JVarDecl)anObj;
-        JClassDecl cd = vd.getParent(JClassDecl.class);
-        JavaDecls decls = aProj.getJavaDecls(cd.getClassName());
-        return new JavaDecl(decls, vd);
-    }
-    
-    // Handle string
-    if(anObj instanceof String) { String cname = (String)anObj; Class cls = aProj.getClassForName(cname);
-        JavaDecls decls = cls!=null? aProj.getJavaDecls(cname) : null;
-        return decls!=null? decls.getClassDecl() : null;
-    }
-    
-    // Handle any type
-    if(anObj instanceof Type) { Type type = (Type)anObj;
-        Class cls = JavaDecl.getClass(type);
-        return getJavaDecl(aProj, cls);
-    }
-
-    // Complain
-    throw new RuntimeException("Project.getJavaDecl: Unsupported type " + anObj);
-}
-
-/**
- * Returns the JavaDecl for given package name from shared cache.
- */
-public static JavaDecl getPackageDecl(String aName)
-{
-    JavaDecl pd = _pkgDecls.get(aName); if(pd!=null) return pd;
-    pd = new JavaDecl(null,aName); pd._type = JavaDecl.DeclType.Package;
-    pd._name = aName; pd._sname = JavaDecl.getSimpleName(aName);
-    _pkgDecls.put(aName, pd);
-    return pd;
-}
+public JavaDecl getJavaDecl(Object anObj)  { return _cdecl.getJavaDecl(anObj); }
 
 }

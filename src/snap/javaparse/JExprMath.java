@@ -69,15 +69,15 @@ protected JavaDecl getDeclImpl()
     switch(op) {
         case Add: case Subtract: case Multiply: case Divide: case Mod: return getDeclMath();
         case Equal: case NotEqual: case LessThan: case GreaterThan: case LessThanOrEqual: case GreaterThanOrEqual:
-        case Or: case And: case Not: return JavaDecl.BOOL_DECL;
+        case Or: case And: case Not: return getJavaDecl(boolean.class);
         case Conditional:     // Should probably take common ancestor of both
-            return getChildCount()>2? getOperand(1).getDecl() : JavaDecl.OBJECT_DECL;
+            return getChildCount()>2? getOperand(1).getDecl() : getJavaDecl(Object.class);
         case Assignment: return getOperand(0).getDecl();
         case BitOr: case BitXOr: case BitAnd: return getOperand(0).getDecl();
         case ShiftLeft: case ShiftRight: case ShiftRightUnsigned: return getOperand(0).getDecl();
         case PreIncrement: case PreDecrement: case Negate: case BitComp: return getOperand(0).getDecl();
         case PostIncrement: case PostDecrement: return getOperand(0).getDecl();
-        default: return JavaDecl.BOOL_DECL;
+        default: return getJavaDecl(boolean.class);
     }
 }
 

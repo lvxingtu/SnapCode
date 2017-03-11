@@ -155,7 +155,7 @@ public static JType getCommonType(JType aTyp0, JType aTyp1)
     // Return Object
     if(tstr0.equals("Object")) return aTyp0;
     if(tstr1.equals("Object")) return aTyp1;
-    JType type = new JType(); type.setName("Object"); JavaParseUtils.setDecl(type, JavaDecl.OBJECT_DECL);
+    JType type = new JType(); type.setName("Object");
     type.setParent(aTyp0.getParent());
     return type;
 }

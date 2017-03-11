@@ -88,7 +88,7 @@ protected JavaDecl resolveName(JNode aNode)
     if(parDecl.isPackage()) {
         String pname = parDecl.getPackageName(), pname2 = pname + '.' + name;
         if(isKnownPackageName(pname2))
-            return JavaDecls.getPackageDecl(pname2);
+            return getJavaDecl(pname2);
         String cname = pname + '.' + name;
         if(isKnownClassName(cname))
             return getJavaDecl(cname);
@@ -100,7 +100,7 @@ protected JavaDecl resolveName(JNode aNode)
         if(name.equals("this"))
             return parDecl; // was FieldName
         if(name.equals("class"))
-            return JavaDecl.CLASS_DECL; // was FieldName
+            return getJavaDecl(Class.class); // was FieldName
         Class cls = pclass!=null? ClassUtils.getClass(pclass, name) : null;
         if(cls!=null)
             return getJavaDecl(cls); // was ClassName
@@ -112,7 +112,7 @@ protected JavaDecl resolveName(JNode aNode)
     // Handle any parent with class: Look for field
     else if(parExpr.getJClass()!=null) { Class pclass = parExpr.getJClass();
         if(pclass.isArray() && name.equals("length"))
-            return JavaDecl.INT_DECL; // was FieldName;
+            return getJavaDecl(int.class); // was FieldName;
         Field field = pclass!=null? ClassUtils.getField(pclass, name) : null;
         if(field!=null)
             return getJavaDecl(field); // was FieldName;

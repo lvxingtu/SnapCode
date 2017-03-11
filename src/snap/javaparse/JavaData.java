@@ -72,9 +72,11 @@ public Set <WebFile> updateDependencies()
     Set <JavaDecl> ndecls = new HashSet();
     if(cfiles!=null) for(WebFile cfile : cfiles) {
         String cname = proj.getClassName(cfile);
-        JavaDecls decls = proj.getJavaDecls(cname);
+        JavaDecl decl = proj.getJavaDecl(cname);
+        JavaDecls decls = decl.getDecls();
         try { ndecls.addAll(decls.updateDecls()); }
-        catch(Throwable t) { System.err.printf("JavaData.updateDepends failed to get decls in %s: %s\n", cfile, t); }
+        //catch(Throwable t) { System.err.printf("JavaData.updateDepends failed to get decls in %s: %s\n", cfile, t); }
+        catch(Throwable t) { t.printStackTrace(); }
     }
     
     // If declarations have changed, get set of update files

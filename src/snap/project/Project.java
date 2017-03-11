@@ -46,7 +46,7 @@ public class Project extends SnapObject {
     ProjectSet                         _projSet = new ProjectSet(this);
     
     // A map of JavaDecls objects to provide JavaDecls for project
-    Map <String,JavaDecls>             _decls = new HashMap();
+    Map <String,JavaDecl>              _decls = new HashMap();
     
     // Constants for Project Settings
     public static final String         RemoteURL = "RemoteSourceURL";
@@ -132,25 +132,57 @@ public Project[] getProjects()  { return _projSet.getProjects(); }
 public ProjectSet getProjectSet()  { return _projSet; }
 
 /**
- * Returns the JavaDecls for given class name.
- */
-public JavaDecls getJavaDecls(String aCName)
-{
-    Project rproj = getRootProject(); if(rproj!=this) return rproj.getJavaDecls(aCName);
-    JavaDecls decls = _decls.get(aCName);
-    if(decls==null) _decls.put(aCName, decls=new JavaDecls(this, aCName));
-    return decls;
-}
-
-/**
  * Returns a JavaDecl for object.
  */
 public JavaDecl getJavaDecl(Object anObj)
 {
-    JavaDecl jd = JavaDecls.getJavaDecl(this, anObj);
-    if(jd==null)
-        jd = JavaDecls.getJavaDecl(this, anObj);
-    return jd;
+    // If not RootProject, forward to RootProject
+    Project rproj = getRootProject(); if(rproj!=this) return rproj.getJavaDecl(anObj);
+    
+    // Handle String (class or package name)
+    if(anObj instanceof String) { String name = (String)anObj;
+        JavaDecl jd = _decls.get(name); if(jd!=null) return jd;
+        
+        // If class exists, create JavaDecl, add to Decls map and return
+        ClassLoader cldr = getClassLoader();
+        Class cls = ClassUtils.getClass(name, cldr);
+        if(cls!=null)
+            return createClassDecl(cls);
+            
+        // Since not found, just return
+        System.err.println("Project.getJavaDecl: Unknown string decl reference: " + name); return null;
+    }
+    
+    // Handle Class
+    if(anObj instanceof Class) { Class cls = (Class)anObj; String name = cls.getName();
+        JavaDecl jd = _decls.get(name);
+        if(jd==null) _decls.put(name, jd = createClassDecl(cls));
+        return jd;
+    }
+    
+    // Do normal version
+    return JavaDecl.getJavaDecl(this, anObj);
+}
+
+/**
+ * Creates a class decl.
+ */
+private JavaDecl createClassDecl(Class aClass)
+{
+    // Create decls for class packages if needed
+    Package pkg = aClass.getPackage(); String pname = pkg!=null? pkg.getName() : null;
+    while(pname!=null && pname.length()>0 && _decls.get(pname)==null) {
+        _decls.put(pname, new JavaDecl(this, null, pname));
+        int ind = pname.lastIndexOf('.');
+        pname = ind>=0? pname.substring(0,ind) : null;
+    }
+    
+    // Create and add JavaDecl for class
+    JavaDecl decl = new JavaDecl(this, null, aClass);
+    _decls.put(aClass.getName(), decl);
+    if(aClass.isArray())
+        _decls.put(JavaDecl.getClassName(aClass), decl);
+    return decl;
 }
 
 /**
@@ -297,7 +329,7 @@ public ClassLoader getClassLoader()
 
 /** Needs unique name so that when debugging SnapCode, we can ignore classes loaded by Project. */
 public static class ProjectClassLoaderX extends URLClassLoader {
-    public ProjectClassLoaderX(URL urls[], ClassLoader aPar) { super(urls, aPar); } }
+    public ProjectClassLoaderX(URL urls[], ClassLoader aPar) { super(urls, aPar); }}
 
 /**
  * Returns the project class loader.

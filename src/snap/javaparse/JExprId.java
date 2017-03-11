@@ -44,23 +44,15 @@ public boolean isClassId()  { JavaDecl jd = getDecl(); return jd!=null && jd.isC
 /**
  * Returns whether this is Enum identifier.
  */
-public boolean isEnumId()
-{
-    if(!isClassId()) return false;
-    Class cls = getJClass();
-    return cls!=null && cls.isEnum();
-}
+public boolean isEnumId()  { JavaDecl jd = getDecl(); return jd!=null && jd.getEvalType().isEnum(); }
 
 /**
  * Returns whether this is Enum identifier.
  */
 public boolean isEnumConstId()
 {
-    if(!isFieldId() || isVarDeclId()) return false;
-    JavaDecl jd = getDecl(); if(jd==null) return false;
-    String cname = jd.getClassName(); if(cname==null) return false;
-    Class cls = getClassForName(cname);
-    return cls!=null && cls.isEnum();
+    JavaDecl jd = getDecl();
+    return jd!=null && jd.isField() && jd.getEvalType().isEnum();
 }
 
 /**
