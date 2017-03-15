@@ -99,7 +99,7 @@ public void addEnumConstant(JEnumConst anEC)  { _enumConstants.add(anEC); addChi
  */
 public Class getSuperClass()
 {
-    Class sc = _extendsTypes.size()>0? _extendsTypes.get(0).getJClass() : null;
+    Class sc = _extendsTypes.size()>0? _extendsTypes.get(0).getEvalClass() : null;
     return sc!=null? sc : Object.class;
 }
 
@@ -110,7 +110,7 @@ public Class[] getInterfaces()
 {
     List <Class> classes = new ArrayList();
     for(JType interfType : _implementsTypes) {
-        Class iclass = interfType.getJClass();
+        Class iclass = interfType.getEvalClass();
         if(iclass!=null)
             classes.add(iclass);
     }
@@ -307,7 +307,7 @@ protected JavaDecl getDeclImpl()
     // If enclosing class, get name from it
     JClassDecl ecd = getEnclosingClassDecl();
     if(ecd!=null) {
-        String ecname = ecd.getClassName();
+        String ecname = ecd.getEvalClassName();
         if(ecname!=null) cname = ecname + '$' + cname;
     }
     
@@ -360,7 +360,7 @@ protected JavaDecl resolveName(JNode aNode)
     
     // Check interfaces
     if(isId) for(JType tp : getImplementsTypes()) {
-        Class cls = tp.getJClass();
+        Class cls = tp.getEvalClass();
         Field fd = cls!=null? ClassUtils.getField(cls, name) : null;
         if(fd!=null)
             return getJavaDecl(fd);
@@ -372,7 +372,7 @@ protected JavaDecl resolveName(JNode aNode)
         return tp.getDecl();
     
     // Look for InnerClass of given name
-    Class cdClass = getJClass();
+    Class cdClass = getEvalClass();
     Class cls = null; try { cls = cdClass!=null? ClassUtils.getClass(cdClass, name) : null; } catch(Throwable t) { }
     if(cls!=null)
         return getJavaDecl(cls);

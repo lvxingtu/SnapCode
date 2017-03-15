@@ -25,7 +25,7 @@ protected JavaDecl getDeclImpl()
 public Constructor getConstructor()
 {
     JClassDecl cd = getEnclosingClassDecl();
-    Class cls = cd!=null? cd.getJClass() : null; if(cls==null) return null;
+    Class cls = cd!=null? cd.getEvalClass() : null; if(cls==null) return null;
     try { return cls.getDeclaredConstructor(getParametersTypes()); }
     catch(NoSuchMethodException e) { return null; }
 }

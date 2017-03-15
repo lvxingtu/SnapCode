@@ -52,26 +52,26 @@ protected String getNameImpl()  { return null; }
 public JavaDecl getDecl()  { return _decl!=null? _decl : (_decl=getDeclImpl()); }
 
 /**
- * Returns a JavaDeclRef for a JNode.
+ * Returns JavaDecl that represents what this node evaluates to.
  */
 protected JavaDecl getDeclImpl()  { return null; }
 
 /**
- * Returns the class name for this node, if it has one.
- */
-public String getClassName()
-{
-    JavaDecl decl = getDecl();
-    return decl!=null? decl.getEvalTypeName() : null;
-}
-
-/**
  * Returns the Class of this node, if it has one.
  */
-public Class getJClass()
+public Class getEvalClass()
 {
     JavaDecl decl = getDecl();
     return decl!=null? decl.getEvalClass() : null;
+}
+
+/**
+ * Returns the class name for this node, if it has one.
+ */
+public String getEvalClassName()
+{
+    JavaDecl decl = getDecl();
+    return decl!=null? decl.getEvalTypeName() : null;
 }
 
 /**

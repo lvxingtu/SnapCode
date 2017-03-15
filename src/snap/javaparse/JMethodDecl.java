@@ -82,7 +82,7 @@ public Class[] getParametersTypes()
 {
     Class ptypes[] = new Class[_params.size()];
     for(int i=0, iMax=_params.size(); i<iMax; i++) { JVarDecl vd = _params.get(i);
-        ptypes[i] = vd.getJClass(); }
+        ptypes[i] = vd.getEvalClass(); }
     return ptypes;
 }
 
@@ -207,7 +207,7 @@ protected JavaDecl getSuperDeclImpl()
 public Method getMethod()
 {
     JClassDecl cd = getEnclosingClassDecl();
-    Class cls = cd!=null? cd.getJClass() : null; if(cls==null) return null;
+    Class cls = cd!=null? cd.getEvalClass() : null; if(cls==null) return null;
     String name = getName(); if(name==null) return null;
     try { return cls.getDeclaredMethod(getName(), getParametersTypes()); }
     catch(Throwable e) { return null; }

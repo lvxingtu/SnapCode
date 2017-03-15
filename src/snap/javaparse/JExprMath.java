@@ -85,8 +85,8 @@ protected JavaDecl getDeclImpl()
 private JavaDecl getDeclMath() { String cname = getClassNameMath(); return cname!=null? getJavaDecl(cname) : null; }
 private String getClassNameMath()
 {
-    String c1 = getChildCount()>0? getOperand(0).getClassName() : null;
-    String c2 = getChildCount()>1? getOperand(1).getClassName() : null;
+    String c1 = getChildCount()>0? getOperand(0).getEvalClassName() : null;
+    String c2 = getChildCount()>1? getOperand(1).getEvalClassName() : null;
     if(c1==null) return c2; if(c2==null) return c1; if(c1.equals(c2)) return c1;
     if(c1.endsWith("ouble")) return c1; if(c2.endsWith("ouble")) return c2;
     if(c1.endsWith("loat")) return c1; if(c2.endsWith("loat")) return c2;

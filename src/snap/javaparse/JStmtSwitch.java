@@ -48,7 +48,7 @@ protected JavaDecl resolveName(JNode aNode)
     
     // See if it's a switch label enum
     if(!isType && _expr!=null && aNode.getStart()>getExpr().getEnd()) {
-        Class cls = getExpr().getJClass();
+        Class cls = getExpr().getEvalClass();
         Field field = cls!=null? ClassUtils.getField(cls, name) : null;
         if(field!=null)
             return getJavaDecl(field);

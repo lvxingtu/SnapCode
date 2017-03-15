@@ -50,7 +50,7 @@ public String getNodeString()  { return "ArrayIndex"; }
  */
 protected JavaDecl getDeclImpl()
 {
-    Class pclass = _arrayExpr!=null? _arrayExpr.getJClass() : null;
+    Class pclass = _arrayExpr!=null? _arrayExpr.getEvalClass() : null;
     Class iclass = pclass!=null && pclass.isArray()? pclass.getComponentType() : Object.class;
     return getJavaDecl(iclass);
 }

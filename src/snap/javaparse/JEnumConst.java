@@ -38,7 +38,7 @@ public void setClassBody(String aBody)  { _classBody = aBody; }
  */
 protected JavaDecl getDeclImpl()
 {
-    Class cls = getParent().getJClass();
+    Class cls = getParent().getEvalClass();
     Field field = cls!=null? ClassUtils.getField(cls, getName()) : null;
     return field!=null? getJavaDecl(field) : null;
 }

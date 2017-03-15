@@ -84,7 +84,7 @@ public void writeJFile(JFile aJFile)
     
     // Write main method
     if(aJFile.getClassDecl().getSimpleName().equals("HelloWorld"))
-        endln().append(aJFile.getClassDecl().getClassName()).append(".main(null);\n");
+        endln().append(aJFile.getEvalClassName()).append(".main(null);\n");
 }
 
 /**
@@ -185,13 +185,13 @@ public void writeJClassDecl(JClassDecl aCDecl)
     if(!isInterface) {
     
         // Write class
-        String cpath = aCDecl.getClassName().replace('$','.');
+        String cpath = aCDecl.getEvalClassName().replace('$','.');
         append(cname).append("[\"__class\"] = \"").append(cpath).append("\";").endln();
         
         // Write interfaces
         if(itypes.size()>0) {
             append(cname).append("[\"__interfaces\"] = [");
-            for(JType ityp : itypes) { String cp = ityp.getClassName().replace('$','.');
+            for(JType ityp : itypes) { String cp = ityp.getEvalClassName().replace('$','.');
                 append('"').append(cp).append('"'); if(ityp!=ilast) append(","); }
             append("];").endln();
         }
@@ -870,7 +870,7 @@ public void writeJExprAlloc(JExprAlloc aExpr)
     
     // Append ClassDecl
     if(aExpr.getClassDecl()!=null)
-        System.err.println("Need to write ClassDecl for " + aExpr.getClassDecl().getClassName());
+        System.err.println("Need to write ClassDecl for " + aExpr.getClassDecl().getEvalClassName());
 }
 
 /**
@@ -914,13 +914,13 @@ public void writeJExprId(JExprId aExpr)
 {
     // If Enum class id append enclosing class
     if(aExpr.isEnumId() && aExpr.getParentExpr()==null) { JavaDecl decl = aExpr.getDecl();
-        Class cls = aExpr.getJClass(), ecls = cls!=null? cls.getEnclosingClass() : null;
+        Class cls = aExpr.getEvalClass(), ecls = cls!=null? cls.getEnclosingClass() : null;
         if(ecls!=null) append(ecls.getSimpleName()).append('.');
     }
     
     // If Enum constant id append class and enclosing class and parent
     else if(aExpr.isEnumConstId() && aExpr.getParentExpr()==null) { JavaDecl decl = aExpr.getDecl();
-        Class cls = aExpr.getJClass(), ecls = cls!=null? cls.getEnclosingClass() : null;
+        Class cls = aExpr.getEvalClass(), ecls = cls!=null? cls.getEnclosingClass() : null;
         if(ecls!=null) append(ecls.getSimpleName()).append('.');
         if(cls!=null) append(cls.getSimpleName()).append('.');
     }
@@ -1092,7 +1092,7 @@ public boolean writeJExprMethodCallSpecial(JExprMethodCall aExpr)
     if(name.equals("copyOf")) {
         
         // If not 3 args or last arg not class or method not from java.util.Arrays, just return
-        if(aExpr.getArgCount()!=3 || !(aExpr.getArg(2).getJClass() instanceof Class)) return false;
+        if(aExpr.getArgCount()!=3 || !(aExpr.getArg(2).getEvalClass() instanceof Class)) return false;
         JavaDecl decl = id.getDecl();if(decl==null || !decl.getClassName().startsWith("java.util.Arrays")) return false;
     
         // Write method with only two args
@@ -1110,7 +1110,7 @@ public boolean writeJExprMethodCallSpecial(JExprMethodCall aExpr)
  */
 public void writeJExprMethodRef(JExprMethodRef aExpr)
 {
-    System.out.println("TSWriter: Need to write method ref: " + aExpr.getFile().getClassName());
+    System.out.println("TSWriter: Need to write method ref: " + aExpr.getFile().getEvalClassName());
 }
 
 /**

@@ -72,7 +72,7 @@ public Class[] getArgClasses()
     List <JExpr> args = getArgs();
     Class classes[] = new Class[args.size()];
     for(int i=0, iMax=args.size(); i<iMax; i++) { JExpr arg = args.get(i);
-        classes[i] = arg!=null? arg.getJClass() : null; }
+        classes[i] = arg!=null? arg.getEvalClass() : null; }
     return classes;
 }
 

@@ -56,7 +56,7 @@ public void setCodeBlocks()
 {
     // Get SelectedNode (or first node parent with class) and its class
     _node = getTextView().getSelectedNode();
-    while(_node!=null && _node.getJClass()==null) _node = _node.getParent();
+    while(_node!=null && _node.getEvalClass()==null) _node = _node.getParent();
     
     // Get suggested CodeBlocks for class and set in Suggestions list
     Object items[] = getCodeBlocks(_node);
@@ -70,7 +70,7 @@ public void setCodeBlocks()
 private CodeBlock[] getCodeBlocks(JNode aNode)
 {
     List list = new ArrayList();
-    Class cls = _node!=null? _node.getJClass() : null;
+    Class cls = _node!=null? _node.getEvalClass() : null;
     Method methods[] = cls!=null? cls.getMethods() : new Method[0];
     for(Method method : methods) {
         if(method.getDeclaringClass()==Object.class) continue;
@@ -108,7 +108,7 @@ public void initUI()
  */
 public void resetUI()
 {
-    setViewValue("ClassText", _node!=null? _node.getJClass().getSimpleName() + " Methods" : "No Selection");
+    setViewValue("ClassText", _node!=null? _node.getEvalClass().getSimpleName() + " Methods" : "No Selection");
 }
 
 /**

@@ -155,7 +155,7 @@ public boolean equals(Object anObj)
     if(!other.getSimpleName().equals(getSimpleName())) return false;
 
     // Check Class names
-    String cn1 = getClassName(), cn2 = other.getClassName(); if(cn1!=null && cn2!=null) return cn1.equals(cn2);
+    String cn1 = getEvalClassName(), cn2 = other.getEvalClassName(); if(cn1!=null && cn2!=null) return cn1.equals(cn2);
     return SnapUtils.equals(_name, other._name); // Check name
 }
 

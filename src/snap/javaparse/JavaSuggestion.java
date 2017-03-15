@@ -85,7 +85,7 @@ private static void getSuggestions(JExprId anId, List <JavaDecl> theSuggestions)
         }
         
         // Handle anything else with a parent class
-        else if(parExpr.getJClass()!=null) { Class pclass = parExpr.getJClass();
+        else if(parExpr.getEvalClass()!=null) { Class pclass = parExpr.getEvalClass();
             if(pclass.isArray()) // If array, add array field
                 theSuggestions.add(anId.getJavaDecl(getLengthField()));
             for(Field field : pclass.getFields()) // Add class fields
@@ -107,11 +107,11 @@ private static void getSuggestions(JExprId anId, List <JavaDecl> theSuggestions)
         
         // Add methods of enclosing class
         JClassDecl ecd = anId.getEnclosingClassDecl();
-        Class ec = ecd!=null? ecd.getJClass() : null;
+        Class ec = ecd!=null? ecd.getEvalClass() : null;
         while(ecd!=null && ec!=null) {
             for(Method meth : ClassUtils.getMethods(ec, prefix))
                 theSuggestions.add(anId.getJavaDecl(meth));
-            ecd = ecd.getEnclosingClassDecl(); ec = ecd!=null? ecd.getJClass() : null;
+            ecd = ecd.getEnclosingClassDecl(); ec = ecd!=null? ecd.getEvalClass() : null;
         }
 
         // If starts with upper case or is greater than 3 chars, add classes with prefix that are public
@@ -149,12 +149,12 @@ private static Class getReceivingClass(JNode aNode)
     JExprMath assExpr = getExpression(aNode, JExprMath.Op.Assignment);
     JExpr lhs = assExpr!=null? assExpr.getOperand(0) : null;
     if(lhs!=null)
-        return lhs.getJClass();
+        return lhs.getEvalClass();
     
     // If node is JVarDecl Initializer, return JVarDecl class
     JVarDecl vd = getVarDeclForInitializer(aNode);
     if(vd!=null)
-        return vd.getJClass();
+        return vd.getEvalClass();
         
     // If node is JExprMath, return op class
     JExprMath me = aNode.getParent(JExprMath.class);

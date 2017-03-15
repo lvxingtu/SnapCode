@@ -788,7 +788,7 @@ public void writeJExprMethodCall(JExprMethodCall aExpr)
  */
 public void writeJExprMethodRef(JExprMethodRef aExpr)
 {
-    System.out.println("TSWriter: Need to write method ref: " + aExpr.getFile().getClassName());
+    System.out.println("TSWriter: Need to write method ref: " + aExpr.getFile().getEvalClassName());
 }
 
 /**

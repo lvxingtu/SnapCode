@@ -122,7 +122,7 @@ public void setArrayInits(List <JExpr> theArrayInits)
  */
 public Class getDeclaringClass()
 {
-    return getParent() instanceof JFieldDecl? getParent(JClassDecl.class).getJClass() : null;
+    return getParent() instanceof JFieldDecl? getParent(JClassDecl.class).getEvalClass() : null;
 }
 
 /**
@@ -161,7 +161,7 @@ public Field getField()
 {
     if(!(getParent() instanceof JFieldDecl)) return null;
     JClassDecl cd = getEnclosingClassDecl();
-    Class cls = cd!=null? cd.getJClass() : null; if(cls==null) return null;
+    Class cls = cd!=null? cd.getEvalClass() : null; if(cls==null) return null;
     try { return cls.getDeclaredField(getName()); }
     catch(Throwable e) { return null; }
 }

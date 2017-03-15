@@ -63,7 +63,7 @@ public void setInclusive(boolean aValue)  { _inclusive = aValue; }
 /**
  * Returns whether import is class name.
  */
-public boolean isClassName()  { return getDecl().isClass(); }
+public boolean isClassName()  { JavaDecl jd = getDecl(); return jd!=null && jd.isClass(); }
 
 /**
  * Returns class or package declaration.
@@ -95,7 +95,7 @@ protected JavaDecl getDeclImpl()
  */
 public String getImportClassName(String aName)
 {
-    String cname = isClassName()? getClassName() : getName();
+    String cname = isClassName()? getEvalClassName() : getName();
     if(_inclusive) {
         if(!isStatic() || !cname.endsWith(aName))
             cname += (isClassName()? '$' : '.') + aName;
@@ -108,7 +108,7 @@ public String getImportClassName(String aName)
  */
 public Member getImportMember(String aName, Class theParams[])
 {
-    Class cls = getJClass(); if(cls==null) return null;
+    Class cls = getEvalClass(); if(cls==null) return null;
     if(theParams==null)
         return ClassUtils.getField(cls, aName);
     return ClassUtils.getMethod(cls, aName, theParams);

@@ -20,7 +20,7 @@ public static String getTypeString(JType aType, boolean includeTypeParams)
 {
     // Get name
     String name = aType.getName();
-    String cname = aType.getClassName();
+    String cname = aType.getEvalClassName();
     
     // Map core TypeScript types
     if(name.equals("void")) name = "";
@@ -35,7 +35,7 @@ public static String getTypeString(JType aType, boolean includeTypeParams)
         name = name + "[]";
         
     // If enum, add class name
-    Class cls = aType.getJClass();
+    Class cls = aType.getEvalClass();
     if(cls!=null && cls.isEnum()) {
         Class ecls = cls.getEnclosingClass();
         if(ecls!=null) name = ecls.getSimpleName() + '.' + name;

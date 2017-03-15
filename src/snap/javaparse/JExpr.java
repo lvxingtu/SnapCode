@@ -31,11 +31,11 @@ public Class getParentClass()
     // Get parent expression, and if found, return its type class
     JExpr parentExpr = getParentExpr();
     if(parentExpr!=null)
-        return parentExpr.getJClass();
+        return parentExpr.getEvalClass();
     
     // Otherwise, return enclosing class
     JClassDecl eclass = getEnclosingClassDecl();
-    return eclass!=null? eclass.getJClass() : null;
+    return eclass!=null? eclass.getEvalClass() : null;
 }
 
 /**

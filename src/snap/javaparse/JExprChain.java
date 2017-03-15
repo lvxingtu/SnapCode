@@ -81,7 +81,7 @@ protected JavaDecl resolveName(JNode aNode)
         
     // Handle Parent is Class: Look for ".this", ".class", static field or inner class
     else if(parDecl.isClass()) {
-        Class pclass = parExpr.getJClass();
+        Class pclass = parExpr.getEvalClass();
         if(name.equals("this"))
             return parDecl; // was FieldName
         if(name.equals("class"))
@@ -95,7 +95,7 @@ protected JavaDecl resolveName(JNode aNode)
     }
     
     // Handle any parent with class: Look for field
-    else if(parExpr.getJClass()!=null) { Class pclass = parExpr.getJClass();
+    else if(parExpr.getEvalClass()!=null) { Class pclass = parExpr.getEvalClass();
         if(pclass.isArray() && name.equals("length"))
             return getJavaDecl(int.class); // was FieldName;
         Field field = pclass!=null? ClassUtils.getField(pclass, name) : null;

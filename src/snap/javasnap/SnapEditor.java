@@ -93,7 +93,7 @@ public Class getSelectedPartClass()
     JNodeView spart = getSelectedPart(); if(spart==null) spart = getFilePart();
     JNode jnode = spart.getJNode(); Class cls = null;
     for(JNode jn=jnode; jn!=null && cls==null; jn=jn.getParent())
-        cls = jn.getJClass();
+        cls = jn.getEvalClass();
     return cls;
 }
 
@@ -106,7 +106,7 @@ public Class getSelectedPartEnclClass()
     JNodeView spart = getSelectedPart(); if(spart==null) spart = getFilePart();
     JNode jnode = spart.getJNode(); Class cls = null;
     for(JNode jn=jnode; jn!=null && (cls==null || cls.isPrimitive()); jn=jn.getParent())
-        cls = jn.getJClass();
+        cls = jn.getEvalClass();
     return cls;
 }
 
@@ -175,7 +175,7 @@ public void insertNode(JNode aBaseNode, JNode aNewNode, int aPos)
     if(aBaseNode instanceof JFile) { System.out.println("Can't add to file"); return; }
     
     if(aBaseNode instanceof JStmtExpr && aNewNode instanceof JStmtExpr &&
-        aBaseNode.getJClass()==getSelectedPartClass() && aBaseNode.getJClass()!=void.class) {
+        aBaseNode.getEvalClass()==getSelectedPartClass() && aBaseNode.getEvalClass()!=void.class) {
         int index = aBaseNode.getEnd();
         String nodeStr = aNewNode.getString(), str = '.' + nodeStr;
         replaceText(str, index - 1, index);

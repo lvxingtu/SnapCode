@@ -47,7 +47,7 @@ public Class[] getArgClasses()
     List <JExpr> args = getArgs();
     Class classes[] = new Class[args.size()];
     for(int i=0, iMax=args.size(); i<iMax; i++) { JExpr arg = args.get(i);
-        classes[i] = arg!=null? arg.getJClass() : null; }
+        classes[i] = arg!=null? arg.getEvalClass() : null; }
     return classes;
 }
 
@@ -67,7 +67,7 @@ protected JavaDecl getDeclImpl()
 public Constructor getConstructor()
 {
     JClassDecl cd = getEnclosingClassDecl();
-    Class cls = cd!=null? cd.getJClass() : null; if(cls==null) return null;
+    Class cls = cd!=null? cd.getEvalClass() : null; if(cls==null) return null;
     try { return cls.getSuperclass().getDeclaredConstructor(getArgClasses()); }
     catch(Throwable e) { return null; }
 }

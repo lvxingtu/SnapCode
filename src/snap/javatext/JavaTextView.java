@@ -193,7 +193,7 @@ public void setSelectedNode(JNode aNode)
 /**
  * Returns the class name for the currently selected JNode.
  */
-public Class getSelectedNodeClass()  { return _selNode!=null? _selNode.getJClass() : null; }
+public Class getSelectedNodeClass()  { return _selNode!=null? _selNode.getEvalClass() : null; }
 
 /**
  * Returns the list of selected tokens.
