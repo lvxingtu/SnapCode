@@ -48,6 +48,9 @@ public class Project extends SnapObject {
     // A map of JavaDecls objects to provide JavaDecls for project
     Map <String,JavaDecl>              _decls = new HashMap();
     
+    // The current project
+    static Project                     _current;
+    
     // Constants for Project Settings
     public static final String         RemoteURL = "RemoteSourceURL";
     
@@ -74,6 +77,9 @@ protected Project(WebSite aSite)
     // If Project has TypeScript create builder
     if(aSite.getName().equals("TypeScript"))
         _tsBuilder = new TSFileBuilder(this);
+        
+    // Set as current project
+    _current = this;
 }
 
 /**
@@ -612,5 +618,10 @@ public static synchronized Project get(WebSite aSite, boolean doCreate)
     if(proj==null && doCreate) proj = new Project(aSite);
     return proj;
 }
+
+/**
+ * Returns the current project.
+ */
+public static Project getCurrent()  { return _current; }
 
 }

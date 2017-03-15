@@ -45,6 +45,11 @@ public WebFile getSourceFile()  { return _sourceFile; }
 public void setSourceFile(WebFile aFile)  { _sourceFile = aFile; _proj = Project.get(aFile); }
 
 /**
+ * Returns the project.
+ */
+public Project getProject()  { return _proj!=null? _proj : Project.getCurrent(); }
+
+/**
  * Returns the package declaration.
  */
 public JPackageDecl getPackageDecl()  { return _packageDecl; }
@@ -130,7 +135,11 @@ protected JavaDecl resolveName(JNode aNode)
 /**
  * Returns a JavaDecl for a Class, Field, Method, Constructor or class name string.
  */
-public JavaDecl getJavaDecl(Object anObj)  { return _proj!=null? _proj.getJavaDecl(anObj) : null; }
+public JavaDecl getJavaDecl(Object anObj)
+{
+    Project proj = getProject(); if(proj==null) return null;
+    return proj.getJavaDecl(anObj);
+}
 
 /**
  * Returns an import that can be used to resolve the given name.

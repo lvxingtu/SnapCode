@@ -12,37 +12,62 @@ import snap.util.*;
  */
 public class JavaSuggestion {
     
+    // The node
+    JNode            _node;
+    
+    // The list of suggestions
+    List <JavaDecl>  _list = new ArrayList();
+    
 /**
  * Returns completion for JNode (should be JType or JIdentifier).
  */
-public static JavaDecl[] getSuggestions(JNode aNode)
+public JavaDecl[] getSuggestions(JNode aNode)
 {
-    // Create list
-    List <JavaDecl> list = new ArrayList();
-
+    // Set node
+    _node = aNode;
+    
     // Add suggestions for node
     if(aNode instanceof JType)
-        getSuggestions((JType)aNode, list);
+        getSuggestions((JType)aNode);
     else if(aNode instanceof JExprId)
-        getSuggestions((JExprId)aNode, list);
+        getSuggestions((JExprId)aNode);
     
     // Get receiving class and, if 2 letters or less, filter out suggestions that don't apply (unless none do)
     Class reccls = getReceivingClass(aNode);
-    if(reccls!=null && list.size()>10 && aNode.getName().length()<=2) {
-        List l2 = list.stream().filter(p -> isRecivingClassAssignable(p, reccls)).collect(Collectors.toList());
-        if(l2.size()>0) list = l2;
+    if(reccls!=null && _list.size()>10 && aNode.getName().length()<=2) {
+        List l2 = _list.stream().filter(p -> isRecivingClassAssignable(p, reccls)).collect(Collectors.toList());
+        if(l2.size()>0) _list = l2;
     }
         
     // Get array and sort
-    JavaDecl decls[] = list.toArray(new JavaDecl[0]);
+    JavaDecl decls[] = _list.toArray(new JavaDecl[0]);
     Arrays.sort(decls, new DeclCompare(reccls));
     return decls;
 }
 
 /**
+ * Adds a JavaDecl for object.
+ */
+private void addDecl(Object anObj)
+{
+    JavaDecl jd = _node.getJavaDecl(anObj);
+    addDecl(jd);
+}
+
+/**
+ * Adds suggestions.
+ */
+private void addDecl(JavaDecl aDecl)
+{
+    if(aDecl==null)
+        return;
+    _list.add(aDecl);
+}
+
+/**
  * Find suggestions for JType.
  */
-private static void getSuggestions(JType aJType, List <JavaDecl> theSuggestions)
+private void getSuggestions(JType aJType)
 {
     ClassPathInfo cpinfo = ClassPathInfo.get(aJType);
     String prefix = aJType.getName();
@@ -54,16 +79,16 @@ private static void getSuggestions(JType aJType, List <JavaDecl> theSuggestions)
             if(cls==null || !Modifier.isPublic(cls.getModifiers())) continue;
             Constructor cstrs[] = null; try { cstrs = cls.getConstructors(); } catch(Throwable t) { }
             if(cstrs!=null) for(Constructor cstr : cstrs)
-                theSuggestions.add(aJType.getJavaDecl(cstr));
+                addDecl(cstr);
         }
-        else theSuggestions.add(aJType.getJavaDecl(cname));
+        else addDecl(cname);
     }
 }
 
 /**
  * Find suggestions for JExprId.
  */
-private static void getSuggestions(JExprId anId, List <JavaDecl> theSuggestions)
+private void getSuggestions(JExprId anId)
 {
     // Get prefix string
     String prefix = anId.getName();
@@ -77,23 +102,21 @@ private static void getSuggestions(JExprId anId, List <JavaDecl> theSuggestions)
         if(parExpr instanceof JExprId && ((JExprId)parExpr).isPackageName()) { JExprId parId = (JExprId)parExpr;
             String parPkg = parId.getPackageName();
             for(String cname : cpinfo.getPackageClassNames(parPkg, prefix))
-                theSuggestions.add(anId.getJavaDecl(cname));
-            for(String pname : cpinfo.getPackageChildrenNames(parPkg, prefix)) {
-                JavaDecl pd = anId.getJavaDecl(pname);
-                if(pd!=null) theSuggestions.add(pd);
-            }
+                addDecl(cname);
+            for(String pname : cpinfo.getPackageChildrenNames(parPkg, prefix))
+                addDecl(pname);
         }
         
         // Handle anything else with a parent class
         else if(parExpr.getEvalClass()!=null) { Class pclass = parExpr.getEvalClass();
             if(pclass.isArray()) // If array, add array field
-                theSuggestions.add(anId.getJavaDecl(getLengthField()));
+                addDecl(getLengthField());
             for(Field field : pclass.getFields()) // Add class fields
                 if(StringUtils.startsWithIC(field.getName(), prefix))
-                    theSuggestions.add(anId.getJavaDecl(field));
+                    addDecl(field);
             for(Method method : pclass.getMethods()) // Add class methods
                 if(StringUtils.startsWithIC(method.getName(), prefix))
-                    theSuggestions.add(anId.getJavaDecl(method));
+                    addDecl(method);
         }
     }
     
@@ -103,14 +126,14 @@ private static void getSuggestions(JExprId anId, List <JavaDecl> theSuggestions)
         // Get variables with prefix of name and add to suggestions
         List <JVarDecl> varDecls = anId.getVarDecls(prefix, new ArrayList());
         for(JVarDecl vdecl : varDecls)
-            theSuggestions.add(vdecl.getDecl());
+            addDecl(vdecl.getDecl());
         
         // Add methods of enclosing class
         JClassDecl ecd = anId.getEnclosingClassDecl();
         Class ec = ecd!=null? ecd.getEvalClass() : null;
         while(ecd!=null && ec!=null) {
             for(Method meth : ClassUtils.getMethods(ec, prefix))
-                theSuggestions.add(anId.getJavaDecl(meth));
+                addDecl(meth);
             ecd = ecd.getEnclosingClassDecl(); ec = ecd!=null? ecd.getEvalClass() : null;
         }
 
@@ -119,15 +142,13 @@ private static void getSuggestions(JExprId anId, List <JavaDecl> theSuggestions)
         for(String cname : cnames) {
             Class cls = cpinfo.getClass(cname);
             if(cls==null || !Modifier.isPublic(cls.getModifiers())) continue;
-            theSuggestions.add(anId.getJavaDecl(cname));
+            addDecl(cname);
         }
 
         // Add packages with prefix
         List <String> pnames = cpinfo.getAllPackageNames(prefix);
-        for(String name : pnames) {
-            JavaDecl pd = anId.getJavaDecl(name);
-            if(pd!=null) theSuggestions.add(pd);
-        }
+        for(String name : pnames)
+            addDecl(name);
     }
 }
 
