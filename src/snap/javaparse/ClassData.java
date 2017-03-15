@@ -29,11 +29,6 @@ public class ClassData {
 public ClassData(WebFile aFile)  { _file = aFile; _proj = Project.get(_file); }
 
 /**
- * Returns the project.
- */
-private Project getProj()  { return _proj; }
-
-/**
  * Returns the set of JavaDecls that this class references.
  */
 public void getRefs(Set <JavaDecl> theRefs)
