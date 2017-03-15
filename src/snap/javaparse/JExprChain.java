@@ -22,17 +22,6 @@ public JExprChain()  { }
 public JExprChain(JExpr ... theExprs)  { for(JExpr expr : theExprs) addExpr(expr); }
 
 /**
- * Returns the name for Identifier or Method.
- */
-protected String getNameImpl()
-{
-    StringBuffer sb = new StringBuffer();
-    if(getExprCount()>0) sb.append(getExpr(0).getName());
-    for(int i=1, iMax=getExprCount(); i<iMax; i++) sb.append('.').append(getExpr(i).getName());
-    return sb.toString();
-}
-
-/**
  * Returns the number of expressions.
  */
 public int getExprCount()  { return _children.size(); }
@@ -65,7 +54,6 @@ protected JavaDecl getDeclImpl()
 /**
  * Override to resolve names in chain.
  */
-@Override
 protected JavaDecl resolveName(JNode aNode)
 {
     // Get node info

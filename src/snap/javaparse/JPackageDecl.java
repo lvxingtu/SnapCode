@@ -22,7 +22,7 @@ public JExpr getNameExpr()  { return _nameExpr; }
 public void setNameExpr(JExpr anExpr)
 {
     replaceChild(_nameExpr, _nameExpr = anExpr);
-    if(_nameExpr!=null) setName(_nameExpr.getName());
+    if(_nameExpr!=null) setName(_nameExpr.getString());
 }
 
 }
