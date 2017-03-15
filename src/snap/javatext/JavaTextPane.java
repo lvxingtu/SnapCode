@@ -238,9 +238,9 @@ public void saveChanges()
  */
 public String getJavaDocText()
 {
-    Class cls = getTextView().getSelectedNodeClass();
-    String className = cls!=null? cls.getSimpleName() : null;
-    return className + " Doc";
+    Class cls = getTextView().getSelectedNodeClass(); if(cls==null) return null;
+    if(cls.isArray()) cls = cls.getComponentType();
+    return cls.getSimpleName() + " Doc";
 }
 
 /**
@@ -250,26 +250,27 @@ public String getJavaDocURL()
 {
     // Get class name for selected JNode
     Class cls = getTextView().getSelectedNodeClass(); if(cls==null) return null;
-    String className = cls.getName();
+    if(cls.isArray()) cls = cls.getComponentType();
+    String cname = cls.getName();
     
     // Handle reportmill class
     String url = null;
-    if(className.startsWith("snap"))
-        url = "http://reportmill.com/snap1/javadoc/index.html?" + className.replace('.', '/') + ".html";
-    else if(className.startsWith("com.reportmill"))
-        url = "http://reportmill.com/rm14/javadoc/index.html?" + className.replace('.', '/') + ".html";
+    if(cname.startsWith("snap."))
+        url = "http://reportmill.com/snap1/javadoc/index.html?" + cname.replace('.', '/') + ".html";
+    else if(cname.startsWith("com.reportmill."))
+        url = "http://reportmill.com/rm14/javadoc/index.html?" + cname.replace('.', '/') + ".html";
     
     // Handle standard java classes
-    else if(className.startsWith("java.") || className.startsWith("javax."))
-        url = "http://docs.oracle.com/javase/8/docs/api/index.html?" + className.replace('.', '/') + ".html";
+    else if(cname.startsWith("java.") || cname.startsWith("javax."))
+        url = "http://docs.oracle.com/javase/8/docs/api/index.html?" + cname.replace('.', '/') + ".html";
     
     // Handle JavaFX classes
-    else if(className.startsWith("javafx."))
-        url = "http://docs.oracle.com/javafx/2/api/index.html?" + className.replace('.', '/') + ".html";
+    else if(cname.startsWith("javafx."))
+        url = "http://docs.oracle.com/javafx/2/api/index.html?" + cname.replace('.', '/') + ".html";
     
     // Handle Greenfoot classes
-    else if(className.startsWith("greenfoot."))
-        url = "https://www.greenfoot.org/files/javadoc/index.html?" + className.replace('.', '/') + ".html";
+    else if(cname.startsWith("greenfoot."))
+        url = "https://www.greenfoot.org/files/javadoc/index.html?" + cname.replace('.', '/') + ".html";
     
     // Return url
     return url;
