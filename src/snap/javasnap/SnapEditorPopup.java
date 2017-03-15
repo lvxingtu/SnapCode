@@ -51,7 +51,7 @@ public void activatePopupList(JNodeView aPart, String aString, int anIndex)
     if(SnapUtils.equals(id.getName(), _idText)) return; _idText = id.getName();
 
     // Get suggestions
-    JavaDecl suggestions[] = new JavaSuggestion().getSuggestions(id);
+    JavaDecl suggestions[] = new JavaCompleter().getSuggestions(id);
     if(suggestions.length==0) { hide(); return; }
     
     // If multiple suggestions

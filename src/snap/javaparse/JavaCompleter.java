@@ -8,9 +8,9 @@ import java.util.stream.Collectors;
 import snap.util.*;
 
 /**
- * A class to represent a completion suggestion for a given prefix.
+ * A class to provide code completion suggestions for a given JNode.
  */
-public class JavaSuggestion {
+public class JavaCompleter {
     
     // The node
     JNode            _node;

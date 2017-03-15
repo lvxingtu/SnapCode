@@ -80,7 +80,7 @@ public void activatePopupList()
 {
     // Get suggestions
     JNode selectedNode = getSelectedNode();
-    JavaDecl sugs[] = new JavaSuggestion().getSuggestions(selectedNode);
+    JavaDecl sugs[] = new JavaCompleter().getSuggestions(selectedNode);
     if(sugs.length==0) return; // || !doReplace && !isVariableFieldOrMethod(suggestions[0]))
     
     // If one suggestion and doReplace, perform replace
@@ -102,7 +102,7 @@ public void updatePopupList()
     // If Java Popup is visible, get new suggestions and set
     if(getPopup().isShowing()) {
         JNode node = getSelectedNode(); boolean atEnd = isSelEmpty() && getSelStart()==node.getEnd();
-        JavaDecl sugs[] = atEnd? new JavaSuggestion().getSuggestions(node) : null;
+        JavaDecl sugs[] = atEnd? new JavaCompleter().getSuggestions(node) : null;
         if(sugs!=null && sugs.length>0) getPopup().setItems(sugs);
         else getPopup().hide();
     }
