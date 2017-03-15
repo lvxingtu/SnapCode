@@ -46,10 +46,15 @@ public static JExpr join(JExpr e1, JExpr e2)
     // Handle null expression: Just return second expression
     if(e1==null) return e2;
 
-    // Handle MethodCall, MethodRef or ArrayIndex with missing prefix expression: Set prefix expression and return
+    // Handle MethodCall or MethodRef with missing prefix expression: Set prefix expression and return
     if(e2 instanceof JExprMethodCall && ((JExprMethodCall)e2).getId()==null) return setExpr(e1, e2);
     if(e2 instanceof JExprMethodRef && ((JExprMethodRef)e2).getExpr()==null) return setExpr(e1, e2);
-    if(e2 instanceof JExprArrayIndex && ((JExprArrayIndex)e2).getArrayExpr()==null) return setExpr(e1, e2);
+    
+    // If ArrayIndex with missing ArrayExpr, set and return
+    if(e2 instanceof JExprArrayIndex) { JExprArrayIndex aexpr = (JExprArrayIndex)e2;
+        if(aexpr.getArrayExpr()!=null) System.err.println("JExpr.join: ArrayIndex.ArrayExpr not null");
+        aexpr.setArrayExpr(e1); return aexpr;
+    }
         
     // Handle ExprChain
     if(e1 instanceof JExprChain) {
@@ -59,7 +64,7 @@ public static JExpr join(JExpr e1, JExpr e2)
     return new JExprChain(e1, e2);
 }
 
-/** Sets a given expression in given MethodCall, MethodRef or ArrayIndex and returns the head expression. */
+/** Sets a given expression in given MethodCall or MethodRef and returns the head expression. */
 private static JExpr setExpr(JExpr e1, JExpr e2)
 {
     // If given expression chain, pick off last expression, set it instead and return chain
@@ -67,13 +72,11 @@ private static JExpr setExpr(JExpr e1, JExpr e2)
          JExpr e = (JExpr)ec._children.remove(ecnt-1);
          setExpr(e, e2); ec.addExpr(e2); return e1; }
         
-    // Set Expr in MethodCall, MethodRef or ArrayIndex and return 
+    // Set Expr in MethodCall or MethodRef and return 
     if(e2 instanceof JExprMethodCall) { JExprMethodCall mc = (JExprMethodCall)e2;
         if(e1 instanceof JExprId) mc.setId((JExprId)e1); }
     else if(e2 instanceof JExprMethodRef) { JExprMethodRef mr = (JExprMethodRef)e2;
         mr.setExpr(e1); }
-    else if(e2 instanceof JExprArrayIndex) { JExprArrayIndex ai = (JExprArrayIndex)e2;
-        ai.setArrayExpr(e1); }
     return e2;
 }
 
