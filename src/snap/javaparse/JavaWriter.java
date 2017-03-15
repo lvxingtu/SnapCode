@@ -106,7 +106,7 @@ public void writeJClassDecl(JClassDecl aCDecl)
 {
     // Append class label with modifiers: public class XXX ...
     String cname = aCDecl.getSimpleName();
-    JModifiers mods = aCDecl.getModifiers();
+    JModifiers mods = aCDecl.getMods();
     writeJModifiers(mods);
     append(aCDecl.isClass()? "class " : aCDecl.isInterface()? "interface " : "enum ");
     append(cname).append(' ');
@@ -163,7 +163,7 @@ public void writeJEnumConst(JEnumConst aConst)  { append(aConst.getName()); }
 public void writeJFieldDecl(JFieldDecl aFDecl)
 {
     // Write modifiers
-    JModifiers mods = aFDecl.getModifiers();
+    JModifiers mods = aFDecl.getMods();
     writeJModifiers(mods);
 
     // Get first var decl
@@ -180,7 +180,7 @@ public void writeJFieldDecl(JFieldDecl aFDecl)
 public void writeJMethodDecl(JMethodDecl aMDecl)
 {
     // Write modifiers
-    JModifiers mods = aMDecl.getModifiers();
+    JModifiers mods = aMDecl.getMods();
     writeJModifiers(mods);
 
     // Write return type (if not empty/void)

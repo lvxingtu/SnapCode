@@ -21,12 +21,12 @@ public class JStmtVarDecl extends JStmt
 /**
  * Returns the modifiers.
  */
-public JModifiers getModifiers()  { return _mods; }
+public JModifiers getMods()  { return _mods; }
 
 /**
  * Sets the modifiers.
  */
-public void setModifiers(JModifiers theMods)
+public void setMods(JModifiers theMods)
 {
     if(_mods==null) addChild(_mods=theMods);
     else replaceChild(_mods, _mods=theMods);

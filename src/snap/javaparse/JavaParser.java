@@ -161,12 +161,11 @@ public static class PackageDeclHandler extends JNodeParseHandler <JPackageDecl> 
     protected void parsedOne(ParseNode aNode, String anId)
     {
         // Handle Modifiers
-        if(anId=="Modifiers")
-            getPart().setModifiers(aNode.getCustomNode(JModifiers.class));
+        //if(anId=="Modifiers") getPart().setMods(aNode.getCustomNode(JModifiers.class));
         
         // Handle Name
-        else if(anId=="Name")
-            getPart().setId(aNode.getCustomNode(JExpr.class));
+        if(anId=="Name")
+            getPart().setNameExpr(aNode.getCustomNode(JExpr.class));
         
         // Otherwise ensure part is available
         else getPart();
@@ -216,7 +215,7 @@ public static class TypeDeclHandler extends JNodeParseHandler <JClassDecl> {
         // Handle ClassDecl, EnumDecl or AnnotationDecl
         else if(aNode.getCustomNode() instanceof JClassDecl) {
             _part = aNode.getCustomNode(JClassDecl.class);
-            _part.setModifiers(_mods); _mods = null;
+            _part.setMods(_mods); _mods = null;
         }
     }
 }
@@ -297,7 +296,7 @@ public static class ClassBodyDeclHandler extends JNodeParseHandler <JMemberDecl>
         // Handle Member
         else if(aNode.getCustomNode() instanceof JMemberDecl) {
             _part = aNode.getCustomNode(JMemberDecl.class);
-            _part.setModifiers(_mods); _mods = null;
+            _part.setMods(_mods); _mods = null;
         }
     }
 }
@@ -356,7 +355,7 @@ public static class EnumConstantHandler extends JNodeParseHandler <JEnumConst>
     {
         // Handle Modifiers
         if(anId=="Modifiers")
-            getPart().setModifiers(aNode.getCustomNode(JModifiers.class));
+            getPart().setMods(aNode.getCustomNode(JModifiers.class));
         
         // Handle name Identifier
         else if(anId=="Identifier")
@@ -711,7 +710,7 @@ public static class VarDeclStmtHandler extends JNodeParseHandler<JStmtVarDecl>
     {
         // Handle Modifiers
         if(anId=="Modifiers")
-            getPart().setModifiers(aNode.getCustomNode(JModifiers.class));
+            getPart().setMods(aNode.getCustomNode(JModifiers.class));
         
         // Handle Type
         else if(anId=="Type")

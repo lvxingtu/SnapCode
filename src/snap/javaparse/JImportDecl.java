@@ -15,10 +15,10 @@ public class JImportDecl extends JNode {
     JExpr          _nameExpr;
     
     // Whether import is static
-    boolean        isStatic;
+    boolean        _static;
     
     // Whether import is inclusive (ends with '.*')
-    boolean        isInclusive;
+    boolean        _inclusive;
     
     // Whether import is used
     boolean        _used;
@@ -27,24 +27,38 @@ public class JImportDecl extends JNode {
     Set <String>  _found = Collections.EMPTY_SET;
     
 /**
+ * Returns the name expression.
+ */
+public JExpr getNameExpr()  { return _nameExpr; }
+
+/**
+ * Sets the name expression.
+ */
+public void setNameExpr(JExpr anExpr)
+{
+    replaceChild(_nameExpr, _nameExpr = anExpr);
+    if(_nameExpr!=null) setName(_nameExpr.getName());
+}
+
+/**
  * Returns whether import is static.
  */
-public boolean isStatic()  { return isStatic; }
+public boolean isStatic()  { return _static; }
 
 /**
  * Sets whether import is static.
  */
-public void setStatic(boolean aValue)  { isStatic = aValue; }
+public void setStatic(boolean aValue)  { _static = aValue; }
 
 /**
  * Returns whether import is inclusive.
  */
-public boolean isInclusive()  { return isInclusive; }
+public boolean isInclusive()  { return _inclusive; }
 
 /**
  * Sets whether import is inclusive.
  */
-public void setInclusive(boolean aValue)  { isInclusive = aValue; }
+public void setInclusive(boolean aValue)  { _inclusive = aValue; }
 
 /**
  * Returns whether import is class name.
@@ -57,7 +71,7 @@ public boolean isClassName()  { return getDecl().isClass(); }
 protected JavaDecl getDeclImpl()
 {
     String name = getName(); if(name==null) return null;
-    if(isInclusive && isKnownPackageName(name)) return getJavaDecl(name);
+    if(_inclusive && isKnownPackageName(name)) return getJavaDecl(name);
     
     // Iterate up parts of import till we find Class in case import is like: import path.Class.InnerClass;
     while(name!=null) {
@@ -82,7 +96,7 @@ protected JavaDecl getDeclImpl()
 public String getImportClassName(String aName)
 {
     String cname = isClassName()? getClassName() : getName();
-    if(isInclusive) {
+    if(_inclusive) {
         if(!isStatic() || !cname.endsWith(aName))
             cname += (isClassName()? '$' : '.') + aName;
     }
@@ -98,20 +112,6 @@ public Member getImportMember(String aName, Class theParams[])
     if(theParams==null)
         return ClassUtils.getField(cls, aName);
     return ClassUtils.getMethod(cls, aName, theParams);
-}
-
-/**
- * Returns the name expression.
- */
-public JExpr getNameExpr()  { return _nameExpr; }
-
-/**
- * Sets the name expression.
- */
-public void setNameExpr(JExpr anExpr)
-{
-    replaceChild(_nameExpr, _nameExpr = anExpr);
-    if(_nameExpr!=null) setName(_nameExpr.getName());
 }
 
 /**

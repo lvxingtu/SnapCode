@@ -153,7 +153,7 @@ public JImportDecl getImport(String aName)
                 match = imp; break; }}
     
         // If import is inclusive ("import xxx.*") and ImportName.aName is known class, return class name
-        else if(imp.isInclusive && match==null) { String cname = iname + '.' + aName;
+        else if(imp.isInclusive() && match==null) { String cname = iname + '.' + aName;
             if(isKnownClassName(cname) || imp.isClassName() && isKnownClassName(iname + '$' + aName))
                 match = imp; }
         

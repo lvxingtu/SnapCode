@@ -224,7 +224,7 @@ public JMethodDecl[] getMethodDecls(String aName, boolean isStatic)
 {
     List <JMethodDecl> mdecls = new ArrayList();
     for(JMethodDecl md : getMethodDecls())
-        if(md.getName().equals(aName) && md.getModifiers().isStatic()==isStatic)
+        if(md.getName().equals(aName) && md.getMods().isStatic()==isStatic)
             mdecls.add(md);
     return mdecls.toArray(new JMethodDecl[mdecls.size()]);
 }

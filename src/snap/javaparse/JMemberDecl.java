@@ -25,16 +25,16 @@ public class JMemberDecl extends JNode {
 /**
  * Returns the modifiers.
  */
-public JModifiers getModifiers()
+public JModifiers getMods()
 {
-    if(_mods==null) setModifiers(new JModifiers());
+    if(_mods==null) setMods(new JModifiers());
     return _mods;
 }
 
 /**
  * Sets the modifiers.
  */
-public void setModifiers(JModifiers aValue)
+public void setMods(JModifiers aValue)
 {
     if(_mods==null) addChild(_mods=aValue);
     else replaceChild(_mods, _mods=aValue);

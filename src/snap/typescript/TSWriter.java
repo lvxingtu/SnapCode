@@ -131,7 +131,7 @@ public void writeJClassDecl(JClassDecl aCDecl)
         append("export ");
 
     // Append class label with modifiers: public class/interface XXX ...
-    JModifiers mods = aCDecl.getModifiers();
+    JModifiers mods = aCDecl.getMods();
     String mstr = mods!=null && mods.isAbstract()? "abstract " : "";
     append(mstr);
     append(isInterface? "interface " : "class ");
@@ -221,7 +221,7 @@ public void writeJClassDeclEnum(JClassDecl aCDecl)
         append("export ");
 
     // Append class label with modifiers: public class/interface XXX ...
-    JModifiers mods = aCDecl.getModifiers();
+    JModifiers mods = aCDecl.getMods();
     String mstr = mods!=null && mods.isAbstract()? "abstract " : "";
     append(mstr);
     append("enum ");
@@ -251,7 +251,7 @@ public void writeJEnumConst(JEnumConst aConst)  { append(aConst.getName()); }
 public void writeJFieldDecl(JFieldDecl aFDecl)
 {
     // Get modifiers and JVarDecls
-    JModifiers mods = aFDecl.getModifiers();
+    JModifiers mods = aFDecl.getMods();
     List <JVarDecl> vds = aFDecl.getVarDecls();
     
     // Iterate over VarDecls and write mods, var decl and statement/line terminator
@@ -268,7 +268,7 @@ public void writeJFieldDecl(JFieldDecl aFDecl)
 public void writeJConstrDecl(JConstrDecl aCDecl)
 {
     // Write modifiers
-    JModifiers mods = aCDecl.getModifiers();
+    JModifiers mods = aCDecl.getMods();
     writeJModifiers(mods);
 
     // Write 'constructor' label and start char
@@ -294,7 +294,7 @@ public void writeJConstrDecls(JConstrDecl theCDecls[])
 {
     // Get common return type and parameter types
     TSWriterUtils.sort(theCDecls);
-    JModifiers mods = theCDecls[0].getModifiers();
+    JModifiers mods = theCDecls[0].getMods();
     JVarDecl params[] = TSWriterUtils.getCommonParams(theCDecls);
     writeJMethodDeclHead(mods, "constructor", null, Arrays.asList(params), true);
     
@@ -340,7 +340,7 @@ public void writeJConstrDecls(JConstrDecl theCDecls[])
 public void writeJMethodDecl(JMethodDecl aMDecl)
 {
     // Get parts and write actual declaration line
-    JModifiers mods = aMDecl.getModifiers();
+    JModifiers mods = aMDecl.getMods();
     String name = aMDecl.getName();
     JType rtype = aMDecl.getType();
     List <JVarDecl> params = aMDecl.getParameters();
@@ -387,7 +387,7 @@ public void writeJMethodDecls(JMethodDecl theMDecls[])
     // Get method declaration parts and write header: "public method(arg? : type, ...) : type""
     TSWriterUtils.sort(theMDecls);
     JMethodDecl md0 = theMDecls[0];
-    JModifiers mods = md0.getModifiers();
+    JModifiers mods = md0.getMods();
     String name = md0.getName();
     JType rtype = TSWriterUtils.getCommonReturnType(theMDecls);
     JVarDecl params[] = TSWriterUtils.getCommonParams(theMDecls);
@@ -411,7 +411,7 @@ public void writeJMethodDecls(JMethodDecl theMDecls[])
     // Write actual methods with new names: method_type_type(args)
     for(JMethodDecl md : theMDecls) {
         String mname = TSWriterUtils.getMethodNameUnique(md);
-        writeJMethodDeclHead(md.getModifiers(), mname, md.getType(), md.getParameters(), false);
+        writeJMethodDeclHead(md.getMods(), mname, md.getType(), md.getParameters(), false);
         writeJStmtBlock(md.getBlock(), false); endln();
     }
 }

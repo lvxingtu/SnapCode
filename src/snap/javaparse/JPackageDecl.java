@@ -8,38 +8,21 @@ package snap.javaparse;
  */
 public class JPackageDecl extends JNode {
 
-    // The modifiers
-    JModifiers   _mods;
-    
     // The package name identifier
-    JExpr        _id;
+    JExpr        _nameExpr;
 
 /**
- * Returns the modifiers.
+ * Returns the name expression.
  */
-public JModifiers getModifiers() { return _mods; }
+public JExpr getNameExpr()  { return _nameExpr; }
 
 /**
- * Sets the modifiers.
+ * Sets the name expression.
  */
-public void setModifiers(JModifiers aValue)
+public void setNameExpr(JExpr anExpr)
 {
-    if(_mods==null) addChild(_mods=aValue);
-    else replaceChild(_mods, _mods=aValue);
-}
-
-/**
- * Returns the package name identifier.
- */
-public JExpr getId()  { return _id; }
-
-/**
- * Sets the package name identifier.
- */
-public void setId(JExpr anId)
-{
-    replaceChild(_id, _id = anId);
-    if(_id!=null) setName(_id.getName());
+    replaceChild(_nameExpr, _nameExpr = anExpr);
+    if(_nameExpr!=null) setName(_nameExpr.getName());
 }
 
 }
