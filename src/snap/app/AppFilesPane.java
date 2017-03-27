@@ -161,6 +161,7 @@ protected void initUI()
     // Create RootFiles for TreeView (one for each open project)
     _filesTree.setItems(getRootFiles());
     _filesTree.expandItem(getRootFiles().get(0));
+    _filesTree.expandItem(_filesTree.getItems().get(1));
     
     // Enable events to get MouseUp on TreeView
     enableEvents(_filesTree, MousePress, MouseRelease); enableEvents(_filesTree, DragEvents);

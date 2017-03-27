@@ -22,7 +22,12 @@ public class JNodeView <JNODE extends JNode> extends JNodeViewBase {
     public static Color PieceColor = Color.get("#4C67d6");
     public static Color BlockStmtColor = Color.get("#8f56e3");
     public static Color MemberDeclColor = Color.get("#f0a822");
-    
+
+/**
+ * Create JNodeView.
+ */
+public JNodeView()  { enableEvents(DragEvents); }
+
 /**
  * Returns the JNode.
  */

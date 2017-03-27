@@ -156,6 +156,7 @@ protected void replaceText(String aString, int aStart, int anEnd)
     JavaTextView tview = getJavaTextView();
     tview.undoerSaveChanges();
     tview.replaceChars(aString, null, aStart, anEnd, true);
+    rebuildUI();
 }
 
 /**

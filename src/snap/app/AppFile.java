@@ -106,8 +106,8 @@ protected AppFile createChildAppFile(WebFile aFile)
         fitem._type = FileType.PACKAGE_DIR; fitem._priority = -1; }
     
     // Set priorities for special files
-    if(type.equals("proj")) fitem._priority = 2;
     if(type.equals("java")) fitem._priority = 1;
+    if(type.equals("snp")) fitem._priority = 1;
 
     // Otherwise just add FileItem
     return fitem;

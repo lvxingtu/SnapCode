@@ -43,9 +43,9 @@ public void initUI()
     enableEvents("AddSnapKit", MouseEvents);
     enableEvents("AddSnapTea", MouseEvents);
     enableEvents("SnapDocs", MouseEvents);
-    enableEvents("RMDocs", MouseEvents);
+    enableEvents("NewSnapScene", MouseEvents);
     enableEvents("NewReport", MouseEvents);
-    enableEvents("RMUserGuide", MouseEvents);
+    enableEvents("RMDocs", MouseEvents);
 }
 
 /**
@@ -101,9 +101,12 @@ public void respondUI(ViewEvent anEvent)
     if(anEvent.equals("SnapDocs") && anEvent.isMouseRelease())
         GFXEnv.getEnv().openURL("http://www.reportmill.com/snap1/javadoc");
 
-    // Handle RMDocs
-    if(anEvent.equals("RMDocs") && anEvent.isMouseRelease())
-        GFXEnv.getEnv().openURL("http://www.reportmill.com/support");
+    // Handle NewSnapScene
+    if(anEvent.equals("NewSnapScene") && anEvent.isMouseRelease()) {
+        ProjectPane ppane = ProjectPane.get(getRootSite());
+        ppane.addProject("SnapKit", "https://github.com/reportmill/SnapKit.git");
+        addSceneFiles(getRootSite(), "Scene1");
+    }
     
     // Handle NewReport
     if(anEvent.equals("NewReport") && anEvent.isMouseRelease()) {
@@ -117,26 +120,81 @@ public void respondUI(ViewEvent anEvent)
         catch(Exception e) { getBrowser().showException(file.getURL(), e); }
     }
     
-    // Handle RMUserGuide
-    if(anEvent.equals("RMUserGuide") && anEvent.isMouseRelease())
-        getBrowser().setURLString("http://www.reportmill.com/support/UserGuide.pdf");
+    // Handle RMDocs
+    if(anEvent.equals("RMDocs") && anEvent.isMouseRelease())
+        GFXEnv.getEnv().openURL("http://www.reportmill.com/support");
+        //getBrowser().setURLString("http://www.reportmill.com/support/UserGuide.pdf");
 }
 
-/** Makes given site a Studio project. */
-/*public static WebFile makeStudioProject(WebSite aSite) {
-    WebFile stdFile = StudioFilesPane.makeStudioProject(aSite);
-    SitePane spane = SitePane.get(aSite); spane.setUseSnapEditor(true); spane.setHomePageURL(stdFile.getURL());
+/**
+ * Makes given site a Studio project.
+ */
+public void addSceneFiles(WebSite aSite, String aName)
+{
+    // Create/add Scene Java and UI files
+    addSceneJavaFile(aSite, aName);
+    WebFile snpFile = addSceneUIFile(aSite, aName);
+    if(snpFile==null)
+        return;
+        
+    // Add run config
+    SitePane spane = SitePane.get(aSite); spane.setUseSnapEditor(true);
     RunConfigs rc = RunConfigs.get(aSite); if(rc.getRunConfig()==null) {
         rc.getRunConfigs().add(new RunConfig().setName("StudioApp").setMainClassName("Scene1")); rc.writeFile(); }
-    return stdFile; }
-/** Configure new SnapScene java file. */
-//public static void configureJavaStarterFile(WebFile aFile) {
-//    StringBuffer sb = new StringBuffer(); sb.append("import snap.viewx.*;\n\n");
-//    sb.append("/**\n * A custom class.\n */\n");
-//    sb.append("public class ").append(aFile.getSimpleName()).append(" extends SnapScene {\n\n");
-//    sb.append("/**\n * Enter custom code here!\n */\n");
-//    sb.append("public void main()\n{\n"); sb.append("    println(\"Change this\");\n").append("}\n\n");sb.append("}");
-//    aFile.setBytes(StringUtils.getBytes(sb.toString())); }
+        
+    // Select and show snp file
+    getBrowser().setFile(snpFile);
+    getAppPane().getFilesPane().showInTree(snpFile);
+}
+
+/**
+ * Creates the Scene1.snp file.
+ */
+protected WebFile addSceneUIFile(WebSite aSite, String aName)
+{
+    // Get snap file (return if already exists)
+    String path = "/src/" + aName + ".snp";
+    WebFile sfile = aSite.getFile(path); if(sfile!=null) return null;
+    
+    // Create content
+    snap.viewx.SnapScene scene = new snap.viewx.SnapScene(); scene.setSize(720,405);
+    String str = new ViewArchiver().writeObject(scene).toString();
+
+    // Create file, set content, save and return
+    sfile = aSite.createFile(path, false);
+    sfile.setText(str);
+    try { sfile.save(); }
+    catch(Exception e) { throw new RuntimeException(e); }
+    return sfile;
+}
+
+/**
+ * Creates the Scene file.
+ */
+protected WebFile addSceneJavaFile(WebSite aSite, String aName)
+{
+    // Get snap file (return if already exists)
+    String path = "/src/" + aName + ".java";
+    WebFile jfile = aSite.getFile(path); if(jfile!=null) return null;
+    
+    // Create content
+    StringBuffer sb = new StringBuffer();
+    sb.append("import snap.viewx.*;\n\n");
+    sb.append("/**\n").append(" * A SnapStudio SceneOwner class.\n").append(" */\n");
+    sb.append("public class Scene1 extends SnapSceneOwner {\n\n");
+    sb.append("public Scene1()\n").append("{\n}\n\n");
+    sb.append("public void act()\n").append("{\n}\n\n");
+    sb.append("public static void main(String args[])\n{\n");
+    sb.append("    new Scene1().setWindowVisible(true);\n}\n\n");
+    sb.append("}");
+
+    // Create file, set content, save and return
+    jfile = aSite.createFile(path, false);
+    jfile.setText(sb.toString());
+    try { jfile.save(); }
+    catch(Exception e) { throw new RuntimeException(e); }
+    return jfile;
+}
 
 /**
  * Return better title.

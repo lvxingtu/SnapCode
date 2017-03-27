@@ -94,17 +94,17 @@
         </RichText>
       </TextView>
     </SpringView>
-    <SpringView Name="RMDocs" x="321" y="469" width="255" height="130" PrefWidth="255" PrefHeight="130">
+    <SpringView Name="NewSnapScene" x="321" y="469" width="255" height="130" PrefWidth="255" PrefHeight="130">
       <RectView width="255" height="130" GrowWidth="true" GrowHeight="true" LeanX="CENTER" LeanY="CENTER">
         <LineBorder />
         <fill type="image" resource="354017466" />
       </RectView>
-      <TextView x="7" y="6.547" width="242" height="117.842" Align="CENTER_LEFT" Rich="true" Editable="false" WrapText="true">
+      <TextView x="7" y="6.547" width="242" height="118" Align="CENTER_LEFT" Rich="true" Editable="false" WrapText="true">
         <effect type="shadow" radius="5" dx="2" dy="2" color="#00000086" />
         <RichText>
           <font name="Arial Bold" size="24" />
           <pgraph align="center" />
-          <string>ReportMill Docs</string>
+          <string>New SnapScene   File</string>
         </RichText>
       </TextView>
     </SpringView>
@@ -123,7 +123,7 @@
         </RichText>
       </TextView>
     </SpringView>
-    <SpringView Name="RMUserGuide" x="321" y="621" width="255" height="130" PrefWidth="255" PrefHeight="130">
+    <SpringView Name="RMDocs" x="321" y="621" width="255" height="130" PrefWidth="255" PrefHeight="130">
       <RectView width="255" height="130" GrowWidth="true" GrowHeight="true" LeanX="CENTER" LeanY="CENTER">
         <LineBorder />
         <fill type="image" resource="354017466" />
