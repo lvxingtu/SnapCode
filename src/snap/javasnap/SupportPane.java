@@ -165,7 +165,9 @@ private View createBlocksPane()
 protected JNodeView createSnapPartStmt(String aString)
 {
     JNode node = _stmtParser.parseCustom(aString, JNode.class);
-    return JNodeView.createView(node);
+    JNodeView nview = JNodeView.createView(node);
+    nview.getEventAdapter().disableEvents(DragEvents);
+    return nview;
 }
 
 /**

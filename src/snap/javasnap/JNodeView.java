@@ -24,11 +24,6 @@ public class JNodeView <JNODE extends JNode> extends JNodeViewBase {
     public static Color MemberDeclColor = Color.get("#f0a822");
 
 /**
- * Create JNodeView.
- */
-public JNodeView()  { enableEvents(DragEvents); }
-
-/**
  * Returns the JNode.
  */
 public JNODE getJNode()  { return _jnode; }
@@ -59,7 +54,7 @@ protected void updateUI()
             getVBox().addChild(child);
     }
 
-    if(getParent(JFileView.class)==null) return;
+    if(_jnode.getFile()==null) return;
     enableEvents(DragEvents);
 }
 
