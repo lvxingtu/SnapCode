@@ -39,11 +39,11 @@ public void initUI()
 {
     enableEvents("Header", MouseRelease);
     enableEvents("NewJavaFile", MouseEvents);
-    enableEvents("NewSnapFile", MouseEvents);
+    enableEvents("NewSnapScene", MouseEvents);
     enableEvents("AddSnapKit", MouseEvents);
     enableEvents("AddSnapTea", MouseEvents);
     enableEvents("SnapDocs", MouseEvents);
-    enableEvents("NewSnapScene", MouseEvents);
+    enableEvents("NewFile", MouseEvents);
     enableEvents("NewReport", MouseEvents);
     enableEvents("RMDocs", MouseEvents);
 }
@@ -71,16 +71,11 @@ public void respondUI(ViewEvent anEvent)
     if(anEvent.equals("NewJavaFile") && anEvent.isMouseRelease())
         getAppPane().showNewFilePanel();
     
-    // Handle NewSnapFile
-    if(anEvent.equals("NewSnapFile") && anEvent.isMouseRelease()) {
-        WebFile file = getRootSite().createFile("/Untitled.snp", false);
-        WebPage page = getBrowser().createPage(file);
-        file = page.showNewFilePanel(getBrowser());
-        if(file!=null) try {
-            file.save();
-            getBrowser().setFile(file);
-        }
-        catch(Exception e) { getBrowser().showException(file.getURL(), e); }
+    // Handle NewSnapScene
+    if(anEvent.equals("NewSnapScene") && anEvent.isMouseRelease()) {
+        ProjectPane ppane = ProjectPane.get(getRootSite());
+        ppane.addProject("SnapKit", "https://github.com/reportmill/SnapKit.git");
+        addSceneFiles(getRootSite(), "Scene1");
     }
     
     // Handle AddSnapKit
@@ -101,12 +96,9 @@ public void respondUI(ViewEvent anEvent)
     if(anEvent.equals("SnapDocs") && anEvent.isMouseRelease())
         GFXEnv.getEnv().openURL("http://www.reportmill.com/snap1/javadoc");
 
-    // Handle NewSnapScene
-    if(anEvent.equals("NewSnapScene") && anEvent.isMouseRelease()) {
-        ProjectPane ppane = ProjectPane.get(getRootSite());
-        ppane.addProject("SnapKit", "https://github.com/reportmill/SnapKit.git");
-        addSceneFiles(getRootSite(), "Scene1");
-    }
+    // Handle NewFile
+    if(anEvent.equals("NewFile") && anEvent.isMouseRelease())
+        getAppPane().showNewFilePanel();
     
     // Handle NewReport
     if(anEvent.equals("NewReport") && anEvent.isMouseRelease()) {

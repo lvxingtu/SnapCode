@@ -38,7 +38,7 @@
         <effect type="shadow" radius="6" dx="2" dy="2" color="#00000086" />
       </ImageView>
     </SpringView>
-    <SpringView Name="NewSnapFile" x="321" y="165" width="255" height="130" PrefWidth="255" PrefHeight="130">
+    <SpringView Name="NewSnapScene" x="321" y="165" width="255" height="130" PrefWidth="255" PrefHeight="130">
       <RectView width="255" height="130" GrowWidth="true" GrowHeight="true" LeanX="CENTER" LeanY="CENTER">
         <LineBorder />
         <fill type="image" resource="354017466" />
@@ -48,7 +48,7 @@
         <RichText>
           <font name="Arial Bold" size="24" />
           <pgraph align="center" />
-          <string>New Snap UI File</string>
+          <string>New Snap Scene</string>
         </RichText>
       </TextView>
     </SpringView>
@@ -94,7 +94,7 @@
         </RichText>
       </TextView>
     </SpringView>
-    <SpringView Name="NewSnapScene" x="321" y="469" width="255" height="130" PrefWidth="255" PrefHeight="130">
+    <SpringView Name="NewFile" x="321" y="469" width="255" height="130" PrefWidth="255" PrefHeight="130">
       <RectView width="255" height="130" GrowWidth="true" GrowHeight="true" LeanX="CENTER" LeanY="CENTER">
         <LineBorder />
         <fill type="image" resource="354017466" />
@@ -104,7 +104,7 @@
         <RichText>
           <font name="Arial Bold" size="24" />
           <pgraph align="center" />
-          <string>New SnapScene   File</string>
+          <string>New File</string>
         </RichText>
       </TextView>
     </SpringView>
