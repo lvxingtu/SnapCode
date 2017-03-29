@@ -1,4 +1,5 @@
 package snap.app;
+import snap.javasnap.SnapEditorPage;
 import snap.javatext.JavaPage;
 import snap.viewx.*;
 import snap.web.*;
@@ -56,7 +57,11 @@ protected Class <? extends WebPage> getPageClass(WebResponse aResp)
     
     // Handle app files
     if(file!=null && file.isRoot() && getAppPane().getSites().contains(file.getSite())) return SitePage.class;
-    if(type.equals("java")) return JavaPage.class;
+    if(type.equals("java")) {
+        if(snap.javasnap.SnapEditorPage.isSnapEditSet(file))
+            return snap.javasnap.SnapEditorPage.class;
+        return JavaPage.class;
+    }
     if(type.equals("rpt")) return getPageClass("com.reportmill.app.ReportPageEditor", TextPage.class);
     if(type.equals("snp") || type.equals("rib") || type.equals("jfx")) return studio.app.EditorPage.class;
     if(type.equals("diff")) return snap.app.DiffPage.class;

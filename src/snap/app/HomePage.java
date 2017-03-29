@@ -172,10 +172,13 @@ protected WebFile addSceneJavaFile(WebSite aSite, String aName)
     // Create content
     StringBuffer sb = new StringBuffer();
     sb.append("import snap.viewx.*;\n\n");
-    sb.append("/**\n").append(" * A SnapStudio SceneOwner class.\n").append(" */\n");
+    sb.append("/**\n").append(" * A SnapStudio SceneOwner subclass. SnapEdit=true.\n").append(" */\n");
     sb.append("public class Scene1 extends SnapSceneOwner {\n\n");
+    sb.append("/**\n").append(" * Creates a new " + aName + ".\n").append(" */\n");
     sb.append("public Scene1()\n").append("{\n}\n\n");
+    sb.append("/**\n").append(" * Called on every frame.\n").append(" */\n");
     sb.append("public void act()\n").append("{\n}\n\n");
+    sb.append("/**\n").append(" * Standard main method.\n").append(" */\n");
     sb.append("public static void main(String args[])\n{\n");
     sb.append("    new Scene1().setWindowVisible(true);\n}\n\n");
     sb.append("}");
