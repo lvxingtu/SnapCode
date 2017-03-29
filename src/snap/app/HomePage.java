@@ -149,7 +149,7 @@ protected WebFile addSceneUIFile(WebSite aSite, String aName)
     WebFile sfile = aSite.getFile(path); if(sfile!=null) return null;
     
     // Create content
-    snap.viewx.SnapScene scene = new snap.viewx.SnapScene(); scene.setSize(720,405);
+    snap.viewx.SnapScene scene = new snap.viewx.SnapScene(); scene.setSize(800,500);
     String str = new ViewArchiver().writeObject(scene).toString();
 
     // Create file, set content, save and return
@@ -157,6 +157,7 @@ protected WebFile addSceneUIFile(WebSite aSite, String aName)
     sfile.setText(str);
     try { sfile.save(); }
     catch(Exception e) { throw new RuntimeException(e); }
+    sfile.setProp("OpenInEditor", true);
     return sfile;
 }
 
