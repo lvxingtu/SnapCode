@@ -64,8 +64,8 @@ public static void main1(String args[]) throws Exception
     // Create URLClassLoader for main jar file, get App class and invoke main
     URLClassLoader ucl = new URLClassLoader(new URL[] { jar.toURI().toURL() });
     Class cls = ucl.loadClass(MainClass); //ucl.close();
-    Method meth = cls.getMethod("main", new Class[] { String[].class });
-    meth.invoke(null, new Object[] { args });
+    Method meth = cls.getMethod("main", String[].class);
+    meth.invoke(null, (Object)args);
     if(cls==Object.class) ucl.close(); // Getting rid of warning message for ucl
 }
 
