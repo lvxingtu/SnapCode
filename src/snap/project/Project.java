@@ -324,6 +324,9 @@ public String getPackageName(WebFile aFile)
  */
 public ClassLoader getClassLoader()
 {
+    // If RootProject, return RootProject.ClassLoader
+    Project rproj = getRootProject(); if(rproj!=this) return rproj.getClassLoader();
+    
     // If already set, just return
     if(_clsLdr!=null) return _clsLdr;
     
@@ -355,10 +358,16 @@ public ClassLoader createLibClassLoader()
  */
 protected void clearClassLoader()
 {
+    // If ClassLoader closeable, close it and clear
     if(_clsLdr instanceof Closeable)
         try { ((Closeable)_clsLdr).close(); }
         catch(Exception e) { throw new RuntimeException(e); }
     _clsLdr = null;
+    
+    // If parent, forward on
+    Project parent = getParent();
+    if(parent!=null)
+        parent.clearClassLoader();
 }
 
 /**
