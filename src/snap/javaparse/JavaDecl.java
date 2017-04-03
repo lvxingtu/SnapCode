@@ -58,6 +58,7 @@ public JavaDecl(Project aProj, JavaDecl aPar, Object anObj)
 {
     // Set JavaDecls
     _proj = aProj; _par = aPar; if(aProj==null && aPar!=null) _proj = aPar._proj;
+    if(_proj==null) System.err.println("JavaDecl: No Project?"); // I don't think this can happen
     
     // Handle Class
     if(anObj instanceof Class) { Class cls = (Class)anObj; _type = DeclType.Class;
@@ -362,9 +363,8 @@ public Class getDeclClass()
  */
 public JavaDecl getJavaDecl(Object anObj)
 {
-    if(_proj==null)
-        return null;
-    return _proj.getJavaDecl(anObj);
+    JavaDecl jd = _proj!=null? _proj.getJavaDecl(anObj) : null;
+    return jd;
 }
 
 /**

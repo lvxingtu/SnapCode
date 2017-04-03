@@ -133,7 +133,7 @@ protected JavaDecl getDeclImpl()
     // If part of a JFieldDecl, get JavaDecl for field
     if(getParent() instanceof JFieldDecl) {
         JClassDecl cd = getEnclosingClassDecl(); if(cd==null) return null;
-        JavaDecl decl = cd.getDecl();
+        JavaDecl decl = cd.getDecl(); if(decl==null) {System.err.println("JVarDecl.getDeclImp: No class");return null;}
         JavaDecls decls = decl.getDecls();
         JavaDecl fdecl = decls.getFieldDeclDeep(-1, getName(), null);
         return fdecl;
