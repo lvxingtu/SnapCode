@@ -39,7 +39,12 @@ public boolean isClassId()  { JavaDecl jd = getDecl(); return jd!=null && jd.isC
 /**
  * Returns whether this is Enum identifier.
  */
-public boolean isEnumId()  { JavaDecl jd = getDecl(); return jd!=null && jd.getEvalType().isEnum(); }
+public boolean isEnumId()
+{
+    JavaDecl jd = getDecl();
+    JavaDecl evalType = jd!=null? jd.getEvalType() : null;
+    return evalType!=null && evalType.isEnum();
+}
 
 /**
  * Returns whether this is Enum identifier.

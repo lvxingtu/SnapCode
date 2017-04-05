@@ -3,14 +3,12 @@
   <Label x="9" y="220" width="300" height="27" text="Select or Create Project:">
     <font name="Arial Bold" size="14" />
   </Label>
-  <ScrollView x="9" y="247" width="382" height="193" GrowWidth="true" GrowHeight="true">
-    <TableView Name="SitesTable">
-      <binding aspect="Items" key="Sites" />
-      <binding aspect="SelectedItem" key="SelectedSite" />
-      <TableCol PrefWidth="120" ItemKey="Name" Header="Name" />
-      <TableCol GrowWidth="true" ItemKey="RemoteURLString" Header="URL" />
-    </TableView>
-  </ScrollView>
+  <TableView Name="SitesTable" x="9" y="247" width="382" height="193" GrowWidth="true" GrowHeight="true">
+    <binding aspect="Items" key="Sites" />
+    <binding aspect="SelectedItem" key="SelectedSite" />
+    <TableCol PrefWidth="120" ItemKey="Name" Header="Name" />
+    <TableCol GrowWidth="true" ItemKey="RemoteURLString" Header="URL" />
+  </TableView>
   <Button Name="QuitButton" x="24" y="447" width="80" height="22" LeanY="BOTTOM" text="Quit" />
   <Button Name="NewButton" x="114" y="447" width="80" height="22" LeanY="BOTTOM" text="New..." />
   <Button Name="RemoveButton" x="204" y="447" width="80" height="22" LeanY="BOTTOM" text="Remove" />
