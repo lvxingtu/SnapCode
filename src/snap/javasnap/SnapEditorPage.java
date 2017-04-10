@@ -68,10 +68,10 @@ public static boolean isSnapEditSet(WebFile aFile)
     //JavaData jdata = JavaData.get(aFile); Class cls = jdata.getJFile().getEvalClass();
     //for(Class c=cls;c!=null;c=c.getSuperclass()) if(c.getSimpleName().equals("SnapActor")) return true;
     
-    String str = aFile.getText();
-    if(str!=null && str.contains("SnapEdit=true"))
-        return true;
-    return false;
+    // Return true if 'SnapEdit=true' is found in the first comment
+    String str = aFile.getText(); if(str==null) return false;
+    str = str.substring(0, str.indexOf("*/")+1); 
+    return str.contains("SnapEdit=true");
 }
 
 }
