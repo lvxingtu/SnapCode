@@ -140,9 +140,9 @@ public void setUnderDrag(boolean aValue)  { _fg.setFill(aValue? Color.get("#FFFF
 /**
  * Override to resize rects.
  */
-protected void layoutChildren()
+protected void layoutImpl()
 {
-    super.layoutChildren();
+    super.layoutImpl();
     double w = getWidth(), h = getHeight(); resizeBG(_bg, w, h); resizeBG(_fg, w, h);
 }
 
