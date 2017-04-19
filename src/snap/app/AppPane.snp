@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <SplitView PrefWidth="958" PrefHeight="684" GrowHeight="true">
-  <SplitView Name="FilesSplitView" PrefWidth="220" Vertical="true" />
+  <SplitView Name="SideBarSplitView" PrefWidth="220" Vertical="true" />
   <SplitView Name="BrowserBox" Vertical="true">
     <VBox Name="BrowserAndStatusBar" Padding="0,4,0,4" GrowHeight="true" FillWidth="true">
       <View Name="Browser" GrowHeight="true" Class="snap.app.AppBrowser" />

@@ -145,10 +145,15 @@ protected View createUI()
     uin.addChild(mbtn);
     
     // Add FileTabsPane pane
-    _fileTabsPane = new HBox(); _fileTabsPane.setSpacing(4); _fileTabsPane.setPadding(4,0,0,4);
-    _fileTabsPane.setBounds(0,45,uin.getWidth(),24); _fileTabsPane.setAutosizing("-~-,--~");
+    _fileTabsPane = new HBox(); _fileTabsPane.setPadding(4,0,0,4);
+    _fileTabsPane.setBounds(0,45,uin.getWidth()-10,24); _fileTabsPane.setAutosizing("-~-,~--");
     uin.addChild(_fileTabsPane);
     buildFileTabs();
+    
+    // Add Expand button
+    Button ebtn = new Button("E"); ebtn.setName("ExpandButton");
+    ebtn.setBounds(uin.getWidth()-20,uin.getHeight()-20,16,16); ebtn.setAutosizing("~--,~--");
+    uin.addChild(ebtn);
     
     // Set min height and return
     uin.setMinHeight(uin.getHeight());
@@ -241,6 +246,10 @@ public void respondUI(ViewEvent anEvent)
     // Handle SearchComboBox
     if(anEvent.equals("SearchComboBox"))
         handleSearchComboBox(anEvent);
+        
+    // Handle ExpandButton
+    if(anEvent.equals("ExpandButton"))
+        getAppPane().setShowSideBar(!getAppPane().isShowSideBar());
 }
 
 /**

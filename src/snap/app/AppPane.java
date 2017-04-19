@@ -18,6 +18,12 @@ public class AppPane extends ViewOwner implements PropChangeListener, DeepChange
     // The AppPaneToolBar
     AppPaneToolBar                _toolBar = new AppPaneToolBar(this);
     
+    // The main SplitView that holds sidebar and browser
+    SplitView                     _mainSplit;
+    
+    // The SplitView that holds FilesPane and ProcPane
+    SplitView                     _sideBarSplit;
+    
     // The FilesPane
     AppFilesPane                  _filesPane = new AppFilesPane(this);
     
@@ -78,6 +84,22 @@ public AppFilesPane getFilesPane()  { return _filesPane; }
  * Returns the processes pane.
  */
 public ProcPane getProcPane()  { return _procPane; }
+
+/**
+ * Returns whether is showing SideBar (holds FilesPane and ProcPane).
+ */
+public boolean isShowSideBar()  { return _filesPane.getUI().isShowing(); }
+
+/**
+ * Sets whether to show SideBar (holds FilesPane and ProcPane).
+ */
+public void setShowSideBar(boolean aValue)
+{
+    if(aValue==isShowSideBar()) return;
+    if(aValue)
+        _mainSplit.addItemWithAnim(_sideBarSplit,220,0);
+    else _mainSplit.removeItemWithAnim(_sideBarSplit);
+}
 
 /**
  * Returns whether SupportTray is visible.
@@ -302,9 +324,9 @@ public void deepChange(PropChangeListener aSource, PropChange anEvent)
  */
 protected View createUI()
 {
-    View view = super.createUI();
+    _mainSplit = (SplitView)super.createUI();
     VBox vbox = new VBox(); vbox.setFillWidth(true);
-    vbox.setChildren(_toolBar.getUI(), view);
+    vbox.setChildren(_toolBar.getUI(), _mainSplit);
     return vbox;
 }
 
@@ -318,11 +340,11 @@ protected void initUI()
     _browser.setAppPane(this);
     _browser.addPropChangeListener(this);
     
-    // Add the FilesPane, ProcPane
-    SplitView fspane = getView("FilesSplitView", SplitView.class); fspane.setBorder(null);
+    // Get SideBarSplit and add FilesPane, ProcPane
+    _sideBarSplit = getView("SideBarSplitView", SplitView.class); _sideBarSplit.setBorder(null);
     View filesPaneUI = _filesPane.getUI(); filesPaneUI.setGrowHeight(true);
     View procPaneUI = _procPane.getUI(); procPaneUI.setPrefHeight(250);
-    fspane.setItems(filesPaneUI, procPaneUI);
+    _sideBarSplit.setItems(filesPaneUI, procPaneUI);
     
     // Get browser box
     _browserBox = getView("BrowserBox", SplitView.class);
@@ -350,7 +372,7 @@ public void resetUI()
     // Reset window title
     WebPage page = getBrowser().getPage();
     getWindow().setTitle(page!=null? page.getTitle() : "SnapCode");
-
+    
     // Set ActivityText, StatusText
     setViewText("ActivityText", getBrowser().getActivity());
     setViewText("StatusText", getBrowser().getStatus());
