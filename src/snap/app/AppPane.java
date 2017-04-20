@@ -88,7 +88,7 @@ public ProcPane getProcPane()  { return _procPane; }
 /**
  * Returns whether is showing SideBar (holds FilesPane and ProcPane).
  */
-public boolean isShowSideBar()  { return _showSideBar; } boolean _showSideBar;
+public boolean isShowSideBar()  { return _showSideBar; } boolean _showSideBar = true;
 
 /**
  * Sets whether to show SideBar (holds FilesPane and ProcPane).
@@ -346,6 +346,7 @@ protected void initUI()
     View filesPaneUI = _filesPane.getUI(); filesPaneUI.setGrowHeight(true);
     View procPaneUI = _procPane.getUI(); procPaneUI.setPrefHeight(250);
     _sideBarSplit.setItems(filesPaneUI, procPaneUI);
+    _sideBarSplit.setClipToBounds(true);
     
     // Get browser box
     _browserBox = getView("BrowserBox", SplitView.class);
