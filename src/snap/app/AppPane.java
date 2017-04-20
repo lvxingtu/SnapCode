@@ -88,7 +88,7 @@ public ProcPane getProcPane()  { return _procPane; }
 /**
  * Returns whether is showing SideBar (holds FilesPane and ProcPane).
  */
-public boolean isShowSideBar()  { return _filesPane.getUI().isShowing(); }
+public boolean isShowSideBar()  { return _showSideBar; } boolean _showSideBar;
 
 /**
  * Sets whether to show SideBar (holds FilesPane and ProcPane).
@@ -96,6 +96,7 @@ public boolean isShowSideBar()  { return _filesPane.getUI().isShowing(); }
 public void setShowSideBar(boolean aValue)
 {
     if(aValue==isShowSideBar()) return;
+    _showSideBar = aValue;
     if(aValue)
         _mainSplit.addItemWithAnim(_sideBarSplit,220,0);
     else _mainSplit.removeItemWithAnim(_sideBarSplit);

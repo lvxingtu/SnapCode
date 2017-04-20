@@ -38,6 +38,10 @@ public class AppPaneToolBar extends ViewOwner {
     static Border            TAB_CLOSE_BORDER1 = Border.createLineBorder(Color.BLACK,.5);
     static Border            TAB_CLOSE_BORDER2 = Border.createLineBorder(Color.BLACK,1);
     
+    // Shared images
+    static Image             SIDEBAR_EXPAND = Image.get(AppPane.class, "SideBar_Expand.png");
+    static Image             SIDEBAR_COLLAPSE = Image.get(AppPane.class, "SideBar_Collapse.png");
+    
 /**
  * Creates a new AppPaneToolBar.
  */
@@ -151,7 +155,8 @@ protected View createUI()
     buildFileTabs();
     
     // Add Expand button
-    Button ebtn = new Button("E"); ebtn.setName("ExpandButton");
+    Button ebtn = new Button("E"); ebtn.setName("ExpandButton"); ebtn.setShowBorder(false);
+    ebtn.setImage(SIDEBAR_EXPAND);
     ebtn.setBounds(uin.getWidth()-20,uin.getHeight()-20,16,16); ebtn.setAutosizing("~--,~--");
     uin.addChild(ebtn);
     
@@ -183,6 +188,15 @@ protected void initUI()
     // Enable events on buttons
     String bnames[] = { "HomeButton", "BackButton", "NextButton", "RefreshButton", "RunButton" };
     for(String name : bnames) enableEvents(name, MouseRelease, MouseEnter, MouseExit);
+}
+
+/**
+ * Reset UI.
+ */
+protected void resetUI()
+{
+    Image img = getAppPane().isShowSideBar()? SIDEBAR_EXPAND : SIDEBAR_COLLAPSE;
+    getView("ExpandButton", Button.class).setImage(img);
 }
 
 /**
