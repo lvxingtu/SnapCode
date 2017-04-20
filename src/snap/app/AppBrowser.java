@@ -1,6 +1,7 @@
 package snap.app;
 import snap.javasnap.SnapEditorPage;
 import snap.javatext.JavaPage;
+import snap.util.SnapUtils;
 import snap.viewx.*;
 import snap.web.*;
 
@@ -35,6 +36,10 @@ public void setPage(WebPage aPage)
     WebFile file = aPage!=null? aPage.getFile() : null;
     getAppPane().setSelectedFile(file);
     getAppPane().getToolBar().setSelectedFile(file);
+    
+    // Update ShowSideBar
+    boolean showSideBar = !SnapUtils.boolValue(aPage!=null? aPage.getUI().getProp("HideSideBar") : null);
+    getAppPane().setShowSideBar(showSideBar);
 }
 
 /**

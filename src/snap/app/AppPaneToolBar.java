@@ -226,7 +226,7 @@ public void respondUI(ViewEvent anEvent)
             rconfs.getRunConfigs().remove(rconf);
             rconfs.getRunConfigs().add(0, rconf);
             rconfs.writeFile();
-            getAppPane().getToolBar().setRunMenuButtonItems();
+            appPane.getToolBar().setRunMenuButtonItems();
             appPane._filesPane.run();
         }
     }
@@ -248,8 +248,13 @@ public void respondUI(ViewEvent anEvent)
         handleSearchComboBox(anEvent);
         
     // Handle ExpandButton
-    if(anEvent.equals("ExpandButton"))
-        getAppPane().setShowSideBar(!getAppPane().isShowSideBar());
+    if(anEvent.equals("ExpandButton")) {
+        boolean showSideBar = !appPane.isShowSideBar();
+        appPane.setShowSideBar(showSideBar);
+        WebPage page = appPane.getBrowser().getPage();
+        if(page!=null)
+            page.getUI().setProp("HideSideBar", !showSideBar);
+    }
 }
 
 /**
