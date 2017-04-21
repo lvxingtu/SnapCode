@@ -70,6 +70,24 @@ public JNodeView getSelectedPart()  { return _editor.getSelectedPart(); }
 public void setSelectedPart(JNodeView aPart)  { _editor.setSelectedPart(aPart); }
 
 /**
+ * Returns the string for the JavaDocButton. Called from binding set up in rib file.
+ */
+public String getJavaDocText()
+{
+    String str = _javaPane.getJavaDocText();
+    return str;
+}
+
+/**
+ * Returns the JavaDoc url for currently selected type.
+ */
+public String getJavaDocURL()
+{
+    String str = _javaPane.getJavaDocURL();
+    return str;
+}
+
+/**
  * Create UI.
  */
 protected View createUI()

@@ -22,6 +22,17 @@ public class JNodeView <JNODE extends JNode> extends JNodeViewBase {
     public static Color PieceColor = Color.get("#4C67d6");
     public static Color BlockStmtColor = Color.get("#8f56e3");
     public static Color MemberDeclColor = Color.get("#f0a822");
+    public static Color ClassDeclColor = MemberDeclColor; //Color.get("#27B31E");
+
+/**
+ * Creates a new JNodeView.
+ */
+public JNodeView()  { }
+
+/**
+ * Creates a new JNodeView for given JNode.
+ */
+public JNodeView(JNODE aJN)  { setJNode(aJN); }
 
 /**
  * Returns the JNode.
@@ -208,6 +219,7 @@ public static JNodeView createView(JNode aNode)
     else if(aNode instanceof JMemberDecl) np = JMemberDeclView.createView(aNode);
     else if(aNode instanceof JStmt) np = JStmtView.createView(aNode);
     else if(aNode instanceof JExpr) np = JExprView.createView(aNode);
+    else if(aNode instanceof JType) np = new JTypeView();
     if(np==null) return null;
     np.setJNode(aNode);
     return np;

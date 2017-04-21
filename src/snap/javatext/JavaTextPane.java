@@ -238,9 +238,16 @@ public void saveChanges()
  */
 public String getJavaDocText()
 {
+    // Get class name for selected JNode
     Class cls = getTextView().getSelectedNodeClass(); if(cls==null) return null;
     if(cls.isArray()) cls = cls.getComponentType();
-    return cls.getSimpleName() + " Doc";
+    
+    // Iterate up through class parents until URL found or null
+    while(cls!=null) {
+        String url = getJavaDocURL(cls); if(url!=null) return cls.getSimpleName() + " Doc";
+        Class scls = cls.getSuperclass(); cls = scls!=null && scls!=Object.class? scls : null;
+    }
+    return null;
 }
 
 /**
@@ -251,7 +258,22 @@ public String getJavaDocURL()
     // Get class name for selected JNode
     Class cls = getTextView().getSelectedNodeClass(); if(cls==null) return null;
     if(cls.isArray()) cls = cls.getComponentType();
-    String cname = cls.getName();
+    
+    // Iterate up through class parents until URL found or null
+    while(cls!=null) {
+        String url = getJavaDocURL(cls); if(url!=null) return url;
+        Class scls = cls.getSuperclass(); cls = scls!=null && scls!=Object.class? scls : null;
+    }
+    return null;
+}
+
+/**
+ * Returns the JavaDoc url for currently selected type.
+ */
+public String getJavaDocURL(Class aClass)
+{
+    // Get class name for selected JNode
+    String cname = aClass.getName();
     
     // Handle reportmill class
     String url = null;
@@ -271,7 +293,7 @@ public String getJavaDocURL()
     // Handle Greenfoot classes
     else if(cname.startsWith("greenfoot."))
         url = "https://www.greenfoot.org/files/javadoc/index.html?" + cname.replace('.', '/') + ".html";
-    
+        
     // Return url
     return url;
 }

@@ -35,7 +35,7 @@ public class JNodeViewBase extends VBox {
     Path          _selShape;
     
     // Constants for type
-    public enum Type { Piece, BlockStmt, MemberDecl, None }
+    public enum Type { Piece, BlockStmt, MemberDecl, Plain, None }
     
     // Constants for segment position
     public enum Seg { Only, First, Middle, Last }
@@ -130,6 +130,7 @@ public void setSelected(boolean aValue)
 {
     _selected = aValue;
     _fg.setBorder(aValue? Border.createLineBorder(Color.get("#FFFFFFCC"),2) : null);
+    _fg.setVisible(aValue);
 }
 
 /**
@@ -156,6 +157,7 @@ protected void resizeBG(PathView aPath, double aW, double aH)
         case Piece: resizeBGPiece(aPath, aW, aH); break;
         case BlockStmt: resizeBGBlock(aPath, aW, aH, true); break;
         case MemberDecl: resizeBGBlock(aPath, aW, aH, false); break;
+        case Plain: resizeBGPlain(aPath, aW, aH); break;
     }
 }
 
@@ -245,6 +247,15 @@ protected void resizeBGBlock(PathView aPath, double aW, double aH, boolean doOut
     if(doOuter) { p.hlineTo(28); p.lineTo(25,aH+3); p.hlineTo(15); p.lineTo(12,aH); }
     p.hlineTo(r); p.arcTo(0,aH,0,aH-r);
     p.vlineTo(r); p.arcTo(0,0,r,0); p.close();
+}
+
+/**
+ * Resizes background Path to size as simple puzzle piece.
+ */
+protected void resizeBGPlain(PathView aPath, double aW, double aH)
+{
+    Path p = aPath.getPath(); p.clear(); double r = 0; //e.add(new MoveTo(r,0));
+    p.append(new RoundRect(1,1,aW-2,aH-2,5));
 }
 
 }

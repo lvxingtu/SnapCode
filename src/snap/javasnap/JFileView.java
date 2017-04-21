@@ -54,8 +54,13 @@ public void updateUI()
 protected List <JNodeView> createJNodeViews()
 {
     List <JNodeView> children = new ArrayList();
+    
+    // Get ClassDecl and add
     JFile jfile = getJNode();
     JClassDecl cdecl = jfile.getClassDecl(); if(cdecl==null) return children;
+    JClassDeclView cdview = new JClassDeclView(cdecl);
+    children.add(cdview);
+    
     for(JMemberDecl md : cdecl.getMemberDecls()) {
         JNodeView mdp = JMemberDeclView.createView(md); if(mdp==null) continue;
         children.add(mdp);

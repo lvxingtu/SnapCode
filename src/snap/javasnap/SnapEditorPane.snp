@@ -13,5 +13,9 @@
   <Button Name="RedoButton" PrefWidth="22" PrefHeight="22" ToolTip="Redo" image="/snap/viewx/pkg.images/Edit_Redo.png" ShowBorder="false">
     <binding aspect="Enabled" key="JavaView.Undoer.hasRedos" />
   </Button>
+  <Button Name="JavaDocButton" PrefWidth="116" PrefHeight="22" LeanX="RIGHT" text="Documentation">
+    <binding aspect="Visible" key="JavaDocURL" />
+    <binding aspect="Text" key="JavaDocText" />
+  </Button>
   <Button Name="JavaButton" PrefWidth="80" PrefHeight="22" LeanX="RIGHT" ToolTip="Java Code" text="Java Code" />
 </HBox>
