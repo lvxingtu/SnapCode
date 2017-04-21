@@ -186,9 +186,9 @@ public void insertNode(JNode aBaseNode, JNode aNewNode, int aPos)
     else {
         int index = aPos<0? getBeforeNode(aBaseNode) : aPos>0? getAfterNode(aBaseNode) : getInNode(aBaseNode);
         String indent = getIndent(aBaseNode, aPos);
-        String nodeStr = aNewNode.getString().replace("\n", "\n" + indent);
+        String nodeStr = aNewNode.getString();//.replace("\n", "\n" + indent);
         String str = indent + nodeStr;
-        replaceText(str + '\n', index, index);
+        replaceText(str, index, index);
         setTextSelection(index + indent.length(), index + indent.length() + nodeStr.trim().length());
     }
 }
