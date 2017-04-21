@@ -172,11 +172,16 @@ protected WebFile addSceneJavaFile(WebSite aSite, String aName)
     
     // Create content
     StringBuffer sb = new StringBuffer();
+    sb.append("import snap.view.*;\n\n");
     sb.append("import snap.viewx.*;\n\n");
     sb.append("/**\n").append(" * A SnapStudio SceneOwner subclass. SnapEdit=true.\n").append(" */\n");
     sb.append("public class Scene1 extends SnapSceneOwner {\n\n");
-    sb.append("/**\n").append(" * Creates a new " + aName + ".\n").append(" */\n");
-    sb.append("public Scene1()\n").append("{\n}\n\n");
+    sb.append("/**\n").append(" * Initialize UI.\n").append(" */\n");
+    sb.append("protected void initUI()\n").append("{\n}\n\n");
+    sb.append("/**\n").append(" * Reset UI.\n").append(" */\n");
+    sb.append("protected void resetUI()\n").append("{\n}\n\n");
+    sb.append("/**\n").append(" * Respond to UI changes.\n").append(" */\n");
+    sb.append("protected void respondUI(ViewEvent anEvent)\n").append("{\n}\n\n");
     sb.append("/**\n").append(" * Called on every frame.\n").append(" */\n");
     sb.append("public void act()\n").append("{\n}\n\n");
     sb.append("/**\n").append(" * Standard main method.\n").append(" */\n");

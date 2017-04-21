@@ -2,6 +2,7 @@ package snap.javasnap;
 import snap.gfx.*;
 import snap.javaparse.*;
 import snap.javatext.*;
+import snap.util.URLUtils;
 import snap.view.*;
 
 /**
@@ -166,6 +167,9 @@ protected void respondUI(ViewEvent anEvent)
     // Handle UndoButton, RedoButton
     if(anEvent.equals("UndoButton")) undo();
     if(anEvent.equals("RedoButton")) redo();
+    
+    // Handle JavaDocButton
+    else if(anEvent.equals("JavaDocButton")) URLUtils.openURL(getJavaDocURL());
     
     // Handle JavaButton
     if(anEvent.equals("JavaButton")) _snapPage.openAsJavaText();
