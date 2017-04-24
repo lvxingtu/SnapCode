@@ -1,6 +1,7 @@
 package snap.app;
 import java.io.File;
-import java.util.List;
+import java.text.DecimalFormat;
+import java.util.*;
 import snap.debug.RunApp;
 import snap.javatext.JavaPage;
 import snap.project.*;
@@ -505,6 +506,55 @@ public void respondUI(ViewEvent anEvent)
         else if(getView("ProjectPathsList").isFocused())
             removeProject(getSelectedProjectPath());
     }
+    
+    // Handle LOCButton (Lines of Code)
+    if(anEvent.equals("LOCTitleView")) {
+        TitleView titleView = getView("LOCTitleView", TitleView.class); if(titleView.isExpanded()) return;
+        TextView tview = getView("LOCText", TextView.class);
+        tview.setText(getLinesOfCodeText());
+    }
+}
+
+/**
+ * Returns the line of code text.
+ */
+private String getLinesOfCodeText()
+{
+    // Declare loop variables
+    StringBuffer sb = new StringBuffer("Lines of Code:\n\n");
+    DecimalFormat fmt = new DecimalFormat("#,##0");
+    int total = 0;
+    
+    // Get projects
+    Project proj = getProject();
+    List <Project> projs = new ArrayList(); projs.add(proj); Collections.addAll(projs, proj.getProjects());
+    
+    // Iterate over projects and add: ProjName: xxx
+    for(Project prj : projs) {
+        int loc = getLinesOfCode(prj.getSourceDir()); total += loc;
+        sb.append(prj.getName()).append(": ").append(fmt.format(loc)).append('\n');
+    }
+    
+    // Add total and return string (trimmed)
+    sb.append("\nTotal: ").append(fmt.format(total)).append('\n');
+    return sb.toString().trim();
+}
+
+/**
+ * Returns lines of code in a file (recursive).
+ */
+private int getLinesOfCode(WebFile aFile)
+{
+    int loc = 0;
+
+    if(aFile.isFile() && (aFile.getType().equals("java") || aFile.getType().equals("snp"))) {
+        String text = aFile.getText();
+        for(int i=text.indexOf('\n');i>=0;i=text.indexOf('\n',i+1)) loc++; }
+        
+    else if(aFile.isDir()) {
+        for(WebFile child : aFile.getFiles()) loc += getLinesOfCode(child); }
+    
+    return loc;
 }
 
 /**
