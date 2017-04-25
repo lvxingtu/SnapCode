@@ -3,6 +3,7 @@ import java.io.File;
 import java.text.DecimalFormat;
 import java.util.*;
 import snap.debug.RunApp;
+import snap.javaparse.*;
 import snap.javatext.JavaPage;
 import snap.project.*;
 import snap.util.*;
@@ -513,6 +514,10 @@ public void respondUI(ViewEvent anEvent)
         TextView tview = getView("LOCText", TextView.class);
         tview.setText(getLinesOfCodeText());
     }
+    
+    // Shows symbol check
+    if(anEvent.equals("SymbolCheckTitleView"))
+        showSymbolCheck();
 }
 
 /**
@@ -555,6 +560,69 @@ private int getLinesOfCode(WebFile aFile)
         for(WebFile child : aFile.getFiles()) loc += getLinesOfCode(child); }
     
     return loc;
+}
+
+/**
+ * Shows a list of symbols that are undefined in project source files.
+ */
+public void showSymbolCheck()
+{
+    TitleView titleView = getView("SymbolCheckTitleView", TitleView.class); if(titleView.isExpanded()) return;
+    _symText = getView("SymbolCheckText", TextView.class); if(_symText.length()>0) return;
+    _symText.addChars("Undefined Symbols:\n"); _symText.setSel(0,0);
+    
+    Runnable run = () -> findUndefines(getProject().getSourceDir());
+    new Thread(run).start();
+}
+
+TextView _symText;
+JFile _symFile;
+
+/**
+ * Loads the undefined symbols in file.
+ */
+private void findUndefines(WebFile aFile)
+{
+    if(aFile.isFile() && aFile.getType().equals("java")) {
+        JavaData jdata = JavaData.get(aFile);
+        JNode jfile = jdata.getJFile();
+        findUndefines(jfile);
+    }
+    else if(aFile.isDir())
+        for(WebFile child : aFile.getFiles())
+            findUndefines(child);
+}
+
+/**
+ * Loads the undefined symbols in file.
+ */
+private void findUndefines(JNode aNode)
+{
+    if(_symText.length()>2000) return;
+    if(aNode.getDecl()==null && JavaParseUtils.isDeclExpected(aNode)) {
+        aNode.getDecl();
+        if(aNode.getFile()!=_symFile) {
+            _symFile = aNode.getFile(); showSymText("\n" + aNode.getFile().getSourceFile().getName() + ":\n\n"); }
+        try { showSymText("    " + aNode + '\n'); }
+        catch(Exception e) { showSymText(e.toString()); }
+    }
+    else if(aNode.getChildCount()>0)
+        for(JNode child : aNode.getChildren())
+            findUndefines(child);
+}
+
+private void showSymText(String aStr)
+{
+    runLater(() -> _symText.replaceChars(aStr, null, _symText.length(), _symText.length(), false));
+    try { Thread.sleep(80); } catch(Exception e) { }
+}
+
+private boolean includeNode(JNode aNode)
+{
+    if(aNode instanceof JStmtBlock) return false;
+    if(aNode instanceof JModifiers) return false;
+    if(aNode instanceof JPackageDecl) return false;
+    return true;
 }
 
 /**

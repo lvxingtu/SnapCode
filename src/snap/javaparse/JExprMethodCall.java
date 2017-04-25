@@ -82,15 +82,16 @@ public Class[] getArgClasses()
 public Method getMethod()
 {
     Class pclass = getParentClass();
+    Class argClasses[] = getArgClasses();
     for(Class c=pclass; c!=null; c=c.getEnclosingClass()) {
-        Method meth = null; try { meth = ClassUtils.getMethod(c, getName(), getArgClasses()); }
+        Method meth = null; try { meth = ClassUtils.getMethod(c, getName(), argClasses); }
         catch(Throwable t) { }  // Since the compiled app can be in any weird state
         if(meth!=null)
             return meth;
     }
     
     // See if method is from static import
-    Member mem = getFile().getImportClassMember(getName(), getArgClasses());
+    Member mem = getFile().getImportClassMember(getName(), argClasses);
     if(mem instanceof Method)
         return (Method)mem;
         

@@ -50,4 +50,12 @@
       <LineBorder Color="#808080" />
     </TextView>
   </TitleView>
+  <TitleView name="SymbolCheckTitleView" PrefWidth="120" PrefHeight="22" Title="Show Undefined Symbols" TitleStyle="Plain" Collapsible="true" Expanded="false">
+    <ScrollView PrefWidth="800" PrefHeight="350">
+      <TextView name="SymbolCheckText" Padding="5">
+        <Font2 name="Arial" size="12" />
+        <LineBorder Color="#808080" />
+      </TextView>
+    </ScrollView>
+  </TitleView>
 </VBox>

@@ -150,6 +150,11 @@ public int getEnd()  { return _endToken!=null? _endToken.getInputEnd() : 0; }
 public int getLineIndex()  { return _startToken.getLineIndex(); }
 
 /**
+ * Returns the char index of this node in line.
+ */
+public int getLineCharIndex()  { return _startToken.getColumnIndex(); }
+
+/**
  * Returns the parent node.
  */
 public JNode getParent()  { return _parent; }
@@ -337,7 +342,8 @@ public String toString()
 {
     StringBuffer sb = new StringBuffer(getClass().getSimpleName()).append(" { ");
     if(getFile()!=null) sb.append("File:").append(getFile().getName()).append(", ");
-    sb.append("Line:").append(getLineIndex()).append(", Start:").append(getStart()).append(", End:").append(getEnd());
+    sb.append("Line:").append(getLineIndex()+1).append(", Start:").append(getLineCharIndex());
+    sb.append(", Len:").append(getEnd()-getStart());
     if(getName()!=null && getName().length()>0) sb.append(", Name:").append(getName());
     sb.append(" } ");
     String str = getString(); int ind = str.indexOf('\n'); if(ind>0) str = str.substring(0,ind) + " ...";

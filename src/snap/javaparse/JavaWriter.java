@@ -185,7 +185,7 @@ public void writeJMethodDecl(JMethodDecl aMDecl)
 
     // Write return type (if not empty/void)
     JType rtype = aMDecl.getType();
-    writeJType(rtype); append(' ');
+    if(rtype!=null) writeJType(rtype); append(' ');
     
     // Write method name and args start char
     append(aMDecl.getName()).append("(");
