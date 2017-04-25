@@ -44,7 +44,7 @@
   <CheckBox text="Build Project Automatically">
     <binding aspect="Selected" key="SitePane.AutoBuild" />
   </CheckBox>
-  <TitleView name="LOCTitleView" PrefWidth="120" PrefHeight="22" Title="Show Lines of Code" TitleStyle="Plain" Expandable="true" Expanded="false">
+  <TitleView name="LOCTitleView" PrefWidth="120" PrefHeight="22" Title="Show Lines of Code" TitleStyle="Plain" Collapsible="true" Expanded="false">
     <TextView name="LOCText" PrefWidth="300" Padding="5">
       <Font name="Arial" size="14" />
       <LineBorder Color="#808080" />

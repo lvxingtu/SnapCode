@@ -712,10 +712,10 @@ private void configureFilesListCell(ListCell <AppFile> aCell)
     aCell.setGraphic(item.getGraphic()); aCell.setGrowWidth(true); aCell.getStringView().setGrowWidth(true);
     Polygon poly = new Polygon(0,2,2,0,5,3,8,0,10,2,7,5,10,8,8,10,5,7,2,10,0,8,3,5);
     
-    ShapeView snode = new ShapeView(poly); snode.setProp("File", item.getFile());
-    snode.setBorder(CLOSE_BOX_BORDER1); snode.setFill(Color.WHITE); snode.setPrefSize(11,11);
-    snode.addEventFilter(e->handleBookmarkEvent(e), MouseEnter, MouseExit, MouseRelease);
-    aCell.setGraphicAfter(snode);
+    ShapeView sview = new ShapeView(poly); sview.setPrefSize(11,11); sview.setFillSize(true);
+    sview.setFill(Color.WHITE); sview.setBorder(CLOSE_BOX_BORDER1); sview.setProp("File", item.getFile());
+    sview.addEventFilter(e->handleBookmarkEvent(e), MouseEnter, MouseExit, MouseRelease);
+    aCell.setGraphicAfter(sview);
 }
 
 /**
