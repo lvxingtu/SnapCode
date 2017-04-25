@@ -155,8 +155,7 @@ protected View createUI()
     buildFileTabs();
     
     // Add Expand button
-    Button ebtn = new Button("E"); ebtn.setName("ExpandButton"); ebtn.setShowBorder(false);
-    ebtn.setImage(SIDEBAR_EXPAND);
+    Button ebtn = new Button(); ebtn.setName("ExpandButton"); ebtn.setImage(SIDEBAR_EXPAND); ebtn.setShowBorder(false);
     ebtn.setBounds(uin.getWidth()-20,uin.getHeight()-20,16,16); ebtn.setAutosizing("~--,~--");
     uin.addChild(ebtn);
     
