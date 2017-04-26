@@ -17,8 +17,8 @@ public class JavaDecl implements Comparable<JavaDecl> {
     // The JavaDecl (class) that this decl was declared in
     JavaDecl       _par;
     
-    // The JavaDecls (children: fields, methods, constructors) that belong to this JavaDecl (class)
-    JavaDecls      _decls;
+    // The JavaDeclHpr (children: fields, methods, constructors, inner classes) that belong to this JavaDecl (class)
+    JavaDeclHpr    _hpr;
     
     // The type
     DeclType       _type;
@@ -230,9 +230,9 @@ public String getRootClassName()
 public boolean isMemberClass()  { return isClass() && _par!=null; }
 
 /**
- * Returns the JavaDecls for class.
+ * Returns the JavaDeclHpr for class child decls.
  */
-public JavaDecls getDecls()  { return _decls!=null? _decls : (_decls = new JavaDecls(this)); }
+public JavaDeclHpr getHpr()  { return _hpr!=null? _hpr : (_hpr = new JavaDeclHpr(this)); }
 
 /**
  * Returns the JavaDecl for class this decl evaluates to when referenced.

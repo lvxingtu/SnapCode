@@ -9,7 +9,7 @@ import snap.util.ClassUtils;
 public abstract class JavaDeclOwner {
 
     // A map of JavaDecls objects to provide JavaDecls for project
-    Map <String,JavaDecl>              _decls = new HashMap();
+    Map <String,JavaDecl>   _decls = new HashMap();
     
 /**
  * Returns a JavaDecl for object.
@@ -27,7 +27,7 @@ public JavaDecl getJavaDecl(Object anObj)
             return createClassDecl(cls);
             
         // Since not found, just return
-        //System.err.println("Project.getJavaDecl: Unknown string decl reference: " + name);
+        //System.err.println("JavaDeclOwner.getJavaDecl: Unknown string decl reference: " + name);
         return null;
     }
     
@@ -111,29 +111,29 @@ private static JavaDecl getJavaDecl(JavaDeclOwner aProj, Object anObj)
         if(dcls==null)
             return aProj.getJavaDecl(cls);
         JavaDecl decl = aProj.getJavaDecl(dcls);
-        JavaDecls decls = decl.getDecls();
-        jd = decls.getClassDecl(cls);
+        JavaDeclHpr declHpr = decl.getHpr();
+        jd = declHpr.getClassDecl(cls);
     }
     
     // Handle Field
     else if(anObj instanceof Field) { Field field = (Field)anObj; Class cls = field.getDeclaringClass();
         JavaDecl decl = aProj.getJavaDecl(cls);
-        JavaDecls decls = decl.getDecls();
-        jd = decls.getFieldDecl(field);
+        JavaDeclHpr declHpr = decl.getHpr();
+        jd = declHpr.getFieldDecl(field);
     }
     
     // Handle Method
     else if(anObj instanceof Method) { Method meth = (Method)anObj; Class cls = meth.getDeclaringClass();
         JavaDecl decl = aProj.getJavaDecl(cls);
-        JavaDecls decls = decl.getDecls();
-        jd = decls.getMethodDecl(meth);
+        JavaDeclHpr declHpr = decl.getHpr();
+        jd = declHpr.getMethodDecl(meth);
     }
 
     // Handle Constructor
     else if(anObj instanceof Constructor) { Constructor constr = (Constructor)anObj; Class cls = constr.getDeclaringClass();
         JavaDecl decl = aProj.getJavaDecl(cls);
-        JavaDecls decls = decl.getDecls();
-        jd = decls.getConstructorDecl(constr);
+        JavaDeclHpr declHpr = decl.getHpr();
+        jd = declHpr.getConstructorDecl(constr);
     }
     
     // Handle JVarDecl
@@ -150,7 +150,7 @@ private static JavaDecl getJavaDecl(JavaDeclOwner aProj, Object anObj)
     }
 
     // Complain
-    else throw new RuntimeException("Project.getJavaDecl: Unsupported type " + anObj);
+    else throw new RuntimeException("JavaDeclOwner.getJavaDecl: Unsupported type " + anObj);
     
     if(jd==null)
         System.out.println("JavaDecl.getJavaDecl: Decl not found for " + anObj);

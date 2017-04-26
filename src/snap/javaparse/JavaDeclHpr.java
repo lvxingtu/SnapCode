@@ -5,13 +5,13 @@ import java.util.*;
 /**
  * This class manages JavaDecls for a class.
  */
-public class JavaDecls {
+public class JavaDeclHpr {
 
     // The class decl this JavaDecls belongs to
     JavaDecl         _cdecl;
     
-    // The super class decl
-    JavaDecls        _sdecl;
+    // The super class decl helper
+    JavaDeclHpr      _sdeclHpr;
     
     // The field decls
     List <JavaDecl>  _fdecls;
@@ -26,27 +26,22 @@ public class JavaDecls {
     List <JavaDecl>  _icdecls = new ArrayList();
 
 /**
- * Creates a new JavaDecls.
+ * Creates a new JavaDeclClass.
  */
-public JavaDecls(JavaDecl aCDecl)
+public JavaDeclHpr(JavaDecl aCDecl)
 {
     // Set project, class name and super decl
     _cdecl = aCDecl;
     Class cls = aCDecl.getEvalClass();
     Class scls = cls.getSuperclass();
     if(scls!=null)
-        _sdecl = aCDecl.getJavaDecl(scls.getName()).getDecls();
+        _sdeclHpr = aCDecl.getJavaDecl(scls.getName()).getHpr();
 }
 
 /**
  * Returns the class decl.
  */
 public JavaDecl getClassDecl()  { return _cdecl; }
-
-/**
- * Returns the super class decl.
- */
-public JavaDecls getSuperClassDecl()  { return _sdecl; }
 
 /**
  * Updates JavaDecls.
@@ -148,7 +143,7 @@ public JavaDecl getFieldDecl(int theMods, String aName, JavaDecl aType)
 public JavaDecl getFieldDeclDeep(int theMods, String aName, JavaDecl aType)
 {
     JavaDecl decl = getFieldDecl(theMods, aName, aType);
-    if(decl==null && _sdecl!=null) decl = _sdecl.getFieldDeclDeep(theMods, aName, aType);
+    if(decl==null && _sdeclHpr!=null) decl = _sdeclHpr.getFieldDeclDeep(theMods, aName, aType);
     return decl;
 }
 
@@ -186,7 +181,7 @@ public JavaDecl getMethodDecl(int theMods, String aName, JavaDecl aType, JavaDec
 public JavaDecl getMethodDeclDeep(int theMods, String aName, JavaDecl aType, JavaDecl theTypes[])
 {
     JavaDecl decl = getMethodDecl(theMods, aName, aType, theTypes);
-    if(decl==null && _sdecl!=null) decl = _sdecl.getMethodDeclDeep(theMods, aName, aType, theTypes);
+    if(decl==null && _sdeclHpr!=null) decl = _sdeclHpr.getMethodDeclDeep(theMods, aName, aType, theTypes);
     return decl;
 }
 
@@ -222,7 +217,7 @@ public JavaDecl getConstructorDecl(int theMods, JavaDecl theTypes[])
 public JavaDecl getConstructorDeclDeep(int theMods, JavaDecl theTypes[])
 {
     JavaDecl decl = getConstructorDecl(theMods, theTypes);
-    if(decl==null && _sdecl!=null) decl = _sdecl.getConstructorDeclDeep(theMods, theTypes);
+    if(decl==null && _sdeclHpr!=null) decl = _sdeclHpr.getConstructorDeclDeep(theMods, theTypes);
     return decl;
 }
 
@@ -250,7 +245,7 @@ public JavaDecl getClassDecl(String aName)
 public JavaDecl getClassDeclDeep(String aName)
 {
     JavaDecl decl = getClassDecl(aName);
-    if(decl==null && _sdecl!=null) decl = _sdecl.getClassDeclDeep(aName);
+    if(decl==null && _sdeclHpr!=null) decl = _sdeclHpr.getClassDeclDeep(aName);
     return decl;
 }
 

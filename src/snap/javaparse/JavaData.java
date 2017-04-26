@@ -73,8 +73,8 @@ public Set <WebFile> updateDependencies()
     if(cfiles!=null) for(WebFile cfile : cfiles) {
         String cname = proj.getClassName(cfile);
         JavaDecl decl = proj.getJavaDecl(cname); if(decl==null) return Collections.EMPTY_SET;
-        JavaDecls decls = decl.getDecls();
-        try { ndecls.addAll(decls.updateDecls()); }
+        JavaDeclHpr declHpr = decl.getHpr();
+        try { ndecls.addAll(declHpr.updateDecls()); }
         //catch(Throwable t) { System.err.printf("JavaData.updateDepends failed to get decls in %s: %s\n", cfile, t); }
         catch(Throwable t) { t.printStackTrace(); }
     }
