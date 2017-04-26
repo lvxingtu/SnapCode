@@ -10,9 +10,6 @@ public class JavaDecls {
     // The class decl this JavaDecls belongs to
     JavaDecl         _cdecl;
     
-    // The class name
-    String           _cname;
-    
     // The super class decl
     JavaDecls        _sdecl;
     
@@ -28,9 +25,6 @@ public class JavaDecls {
     // The inner class decls
     List <JavaDecl>  _icdecls = new ArrayList();
 
-    // Map of package name to JavaDecls
-    static Map <String,JavaDecl>  _pkgDecls = new HashMap();
-    
 /**
  * Creates a new JavaDecls.
  */
@@ -38,7 +32,6 @@ public JavaDecls(JavaDecl aCDecl)
 {
     // Set project, class name and super decl
     _cdecl = aCDecl;
-    _cname = aCDecl.getClassName();
     Class cls = aCDecl.getEvalClass();
     Class scls = cls.getSuperclass();
     if(scls!=null)
@@ -65,6 +58,7 @@ public HashSet <JavaDecl> updateDecls()
     
     // Get class
     Class cls = _cdecl.getEvalClass();
+    String cname = _cdecl.getClassName();
     
     // Create set for added/removed decls
     HashSet <JavaDecl> addedDecls = new HashSet();
@@ -77,7 +71,7 @@ public HashSet <JavaDecl> updateDecls()
     
     // Fields: add JavaDecl for each declared field - also make sure field type is in refs
     Field fields[]; try { fields = cls.getDeclaredFields(); }
-    catch(Throwable e) { System.err.println(e + " in " + _cname); return null; }
+    catch(Throwable e) { System.err.println(e + " in " + cname); return null; }
     for(Field field : fields) {
         JavaDecl decl = getFieldDecl(field);
         if(decl==null) { decl = new JavaDecl(null,_cdecl,field); addedDecls.add(decl); _fdecls.add(decl); }
@@ -86,7 +80,7 @@ public HashSet <JavaDecl> updateDecls()
     
     // Methods: Add JavaDecl for each declared method - also make sure return/parameter types are in refs
     Method methods[]; try { methods = cls.getDeclaredMethods(); }
-    catch(Throwable e) { System.err.println(e + " in " + _cname); return null; }
+    catch(Throwable e) { System.err.println(e + " in " + cname); return null; }
     for(Method meth : methods) {
         if(meth.isSynthetic()) continue;
         JavaDecl decl = getMethodDecl(meth);
@@ -96,7 +90,7 @@ public HashSet <JavaDecl> updateDecls()
     
     // Constructors: Add JavaDecl for each constructor - also make sure parameter types are in refs
     Constructor constrs[]; try { constrs = cls.getDeclaredConstructors(); }
-    catch(Throwable e) { System.err.println(e + " in " + _cname); return null; }
+    catch(Throwable e) { System.err.println(e + " in " + cname); return null; }
     for(Constructor constr : constrs) {
         if(constr.isSynthetic()) continue;
         JavaDecl decl = getConstructorDecl(constr);
@@ -106,7 +100,7 @@ public HashSet <JavaDecl> updateDecls()
     
     // Inner Classes: Add JavaDecl for each inner class
     Class iclss[]; try { iclss = cls.getDeclaredClasses(); }
-    catch(Throwable e) { System.err.println(e + " in " + _cname); return null; }
+    catch(Throwable e) { System.err.println(e + " in " + cname); return null; }
     for(Class icls : iclss) {
         if(icls.isSynthetic()) continue;
         JavaDecl decl = getClassDecl(icls);
@@ -273,81 +267,7 @@ public void removeDecl(JavaDecl aDecl)
 /**
  * Standard toString implementation.
  */
-public String toString()  { return "ClassDecl { ClassName=" + _cname + " }"; }
-
-/**
- * Returns reference nodes in given JNode that match given JavaDecl.
- */
-public static void getMatches(JNode aNode, JavaDecl aDecl, List <JNode> theMatches)
-{
-    // If JType check name
-    if(aNode instanceof JType || aNode instanceof JExprId) {
-        JavaDecl decl = isPossibleMatch(aNode, aDecl)? aNode.getDecl() : null;
-        if(decl!=null && decl.matches(aDecl))
-            theMatches.add(aNode);
-    }
- 
-    // Recurse
-    for(JNode child : aNode.getChildren())
-        getMatches(child, aDecl, theMatches);
-}
-    
-/**
- * Returns reference nodes in given JNode that match given JavaDecl.
- */
-public static void getRefMatches(JNode aNode, JavaDecl aDecl, List <JNode> theMatches)
-{
-    // If JType check name
-    if(aNode instanceof JType || aNode instanceof JExprId) {
-        if(isPossibleMatch(aNode, aDecl) && !aNode.isDecl()) {
-            JavaDecl decl = aNode.getDecl();
-            if(decl!=null && decl.matches(aDecl) && aNode.getParent(JImportDecl.class)==null)
-                theMatches.add(aNode);
-        }
-    }
- 
-    // Recurse
-    for(JNode child : aNode.getChildren())
-        getRefMatches(child, aDecl, theMatches);
-}
-    
-/**
- * Returns declaration nodes in given JNode that match given JavaDecl.
- */
-public static JNode getDeclMatch(JNode aNode, JavaDecl aDecl)
-{
-    List <JNode> matches = new ArrayList(); getDeclMatches(aNode, aDecl, matches);
-    return matches.size()>0? matches.get(0) : null;
-}
-
-/**
- * Returns declaration nodes in given JNode that match given JavaDecl.
- */
-public static void getDeclMatches(JNode aNode, JavaDecl aDecl, List <JNode> theMatches)
-{
-    // If JType check name
-    if(aNode instanceof JType || aNode instanceof JExprId) {
-        JavaDecl decl = aNode.isDecl() && isPossibleMatch(aNode, aDecl)? aNode.getDecl() : null;
-        if(decl!=null && decl.matches(aDecl))
-            theMatches.add(aNode);
-    }
- 
-    // Recurse
-    for(JNode child : aNode.getChildren())
-        getDeclMatches(child, aDecl, theMatches);
-}
-    
-/** Returns whether node is a possible match. */
-private static boolean isPossibleMatch(JNode aNode, JavaDecl aDecl)
-{
-    if(aNode instanceof JType) { JType type = (JType)aNode;
-        if(type.getSimpleName().equals(aDecl.getSimpleName()))
-            return true; }
-    else if(aNode instanceof JExprId) { JExprId id = (JExprId)aNode;
-        if(id.getName().equals(aDecl.getSimpleName()))
-            return true; }
-    return false;
-}
+public String toString()  { return "ClassDecl { ClassName=" + _cdecl.getClassName() + " }"; }
 
 /**
  * Returns a JavaDecl for object.

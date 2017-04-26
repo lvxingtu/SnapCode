@@ -4,7 +4,6 @@
 package snap.javaparse;
 import java.lang.reflect.*;
 import java.util.*;
-import snap.project.Project;
 import snap.util.*;
 
 /**
@@ -12,8 +11,8 @@ import snap.util.*;
  */
 public class JavaDecl implements Comparable<JavaDecl> {
     
-    // The project that this decl belongs to
-    Project        _proj;
+    // The JavaDeclOwner that this decl belongs to
+    JavaDeclOwner  _owner;
 
     // The JavaDecl (class) that this decl was declared in
     JavaDecl       _par;
@@ -51,11 +50,11 @@ public class JavaDecl implements Comparable<JavaDecl> {
 /**
  * Creates a new JavaDecl for Class, Field, Constructor, Method, VarDecl or class name string.
  */
-public JavaDecl(Project aProj, JavaDecl aPar, Object anObj)
+public JavaDecl(JavaDeclOwner anOwner, JavaDecl aPar, Object anObj)
 {
     // Set JavaDecls
-    _proj = aProj; _par = aPar; if(aProj==null && aPar!=null) _proj = aPar._proj;
-    if(_proj==null) System.err.println("JavaDecl: No Project?"); // I don't think this can happen
+    _owner = anOwner; _par = aPar; if(anOwner==null && aPar!=null) _owner = aPar._owner;
+    if(_owner==null) System.err.println("JavaDecl: No Owner?"); // I don't think this can happen
     
     // Handle any Member
     if(anObj instanceof Member) { Member mem = (Member)anObj;
@@ -247,7 +246,7 @@ public Class getEvalClass()
 {
     if(_evalType==null) return null;
     if(_evalType!=this) return _evalType.getEvalClass();
-    ClassLoader cldr = _proj!=null? _proj.getClassLoader() : ClassLoader.getSystemClassLoader();
+    ClassLoader cldr = _owner!=null? _owner.getClassLoader() : ClassLoader.getSystemClassLoader();
     String cname = getEvalTypeName();
     return ClassUtils.getClass(cname, cldr);
 }
@@ -382,11 +381,7 @@ public String getReplaceString()
 /**
  * Returns a JavaDecl for given object.
  */
-public JavaDecl getJavaDecl(Object anObj)
-{
-    JavaDecl jd = _proj!=null? _proj.getJavaDecl(anObj) : null;
-    return jd;
-}
+public JavaDecl getJavaDecl(Object anObj)  { return _owner.getJavaDecl(anObj); }
 
 /**
  * Returns whether given declaration collides with this declaration.
@@ -477,63 +472,6 @@ public static String getSimpleName(String cname)
 {
     int i = cname.lastIndexOf('$'); if(i<0) i = cname.lastIndexOf('.'); if(i>0) cname = cname.substring(i+1);
     return cname;
-}
-
-/**
- * Returns a JavaDecl for object.
- */
-public static JavaDecl getJavaDecl(Project aProj, Object anObj)
-{
-    // Handle Class
-    JavaDecl jd = null;
-    if(anObj instanceof Class) { Class cls = (Class)anObj, dcls = cls.getDeclaringClass();
-        if(dcls==null)
-            return aProj.getJavaDecl(cls);
-        JavaDecl decl = aProj.getJavaDecl(dcls);
-        JavaDecls decls = decl.getDecls();
-        jd = decls.getClassDecl(cls);
-    }
-    
-    // Handle Field
-    else if(anObj instanceof Field) { Field field = (Field)anObj; Class cls = field.getDeclaringClass();
-        JavaDecl decl = aProj.getJavaDecl(cls);
-        JavaDecls decls = decl.getDecls();
-        jd = decls.getFieldDecl(field);
-    }
-    
-    // Handle Method
-    else if(anObj instanceof Method) { Method meth = (Method)anObj; Class cls = meth.getDeclaringClass();
-        JavaDecl decl = aProj.getJavaDecl(cls);
-        JavaDecls decls = decl.getDecls();
-        jd = decls.getMethodDecl(meth);
-    }
-
-    // Handle Constructor
-    else if(anObj instanceof Constructor) { Constructor constr = (Constructor)anObj; Class cls = constr.getDeclaringClass();
-        JavaDecl decl = aProj.getJavaDecl(cls);
-        JavaDecls decls = decl.getDecls();
-        jd = decls.getConstructorDecl(constr);
-    }
-    
-    // Handle JVarDecl
-    else if(anObj instanceof JVarDecl)  { JVarDecl vd = (JVarDecl)anObj;
-        JClassDecl cd = vd.getParent(JClassDecl.class);
-        JavaDecl decl = cd.getDecl();
-        jd = new JavaDecl(aProj, decl, vd);
-    }
-    
-    // Handle Java.lang.refelect.Type
-    else if(anObj instanceof Type) { Type type = (Type)anObj;
-        Class cls = JavaDecl.getClass(type);
-        jd = aProj.getJavaDecl(cls);
-    }
-
-    // Complain
-    else throw new RuntimeException("Project.getJavaDecl: Unsupported type " + anObj);
-    
-    if(jd==null)
-        System.out.println("JavaDecl.getJavaDecl: Decl not found for " + anObj);
-    return jd;
 }
 
 }

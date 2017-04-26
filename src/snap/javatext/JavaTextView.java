@@ -217,7 +217,7 @@ protected void setSelectedTokensForNode(JNode aNode)
     JavaDecl decl = aNode!=null? aNode.getDecl() : null;
     if(decl!=null) {
         List <JNode> others = new ArrayList();
-        JavaDecls.getMatches(aNode.getFile(), decl, others);
+        JavaDeclOwner.getMatches(aNode.getFile(), decl, others);
         for(JNode other : others) {
             TextBoxToken tt = (TextBoxToken)other.getStartToken();
             tokens.add(tt);

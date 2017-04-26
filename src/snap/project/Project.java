@@ -46,7 +46,7 @@ public class Project extends SnapObject {
     ProjectSet                         _projSet = new ProjectSet(this);
     
     // A map of JavaDecls objects to provide JavaDecls for project
-    Map <String,JavaDecl>              _decls = new HashMap();
+    JavaDeclOwner                      _javaDeclOwnr = new ProjJavaDeclOwner();
     
     // The current project
     static Project                     _current;
@@ -145,83 +145,17 @@ public JavaDecl getJavaDecl(Object anObj)
     // If not RootProject, forward to RootProject
     Project rproj = getRootProject(); if(rproj!=this) return rproj.getJavaDecl(anObj);
     
-    // Handle String (class or package name)
-    if(anObj instanceof String) { String name = (String)anObj;
-        JavaDecl jd = _decls.get(name); if(jd!=null) return jd;
-        
-        // If class exists, create JavaDecl, add to Decls map and return
-        ClassLoader cldr = getClassLoader();
-        Class cls = ClassUtils.getClass(name, cldr);
-        if(cls!=null)
-            return createClassDecl(cls);
-            
-        // Since not found, just return
-        //System.err.println("Project.getJavaDecl: Unknown string decl reference: " + name);
-        return null;
-    }
-    
-    // Handle Class
-    if(anObj instanceof Class) { Class cls = (Class)anObj; String name = cls.getName();
-        JavaDecl jd = _decls.get(name);
-        if(jd==null) _decls.put(name, jd = createClassDecl(cls));
-        return jd;
-    }
-    
-    // Do normal version
-    return JavaDecl.getJavaDecl(this, anObj);
+    // Forward to JavaDeclOwner
+    return _javaDeclOwnr.getJavaDecl(anObj);
 }
 
 /**
- * Creates a class decl.
+ * An JavaDeclOwner subclass.
  */
-private JavaDecl createClassDecl(Class aClass)
-{
-    // Get parent decl
-    JavaDecl parDecl = null;
-    Class dcls = aClass.getDeclaringClass();
-    if(dcls!=null)
-        parDecl = getJavaDecl(dcls);
-    else {
-        Package pkg = aClass.getPackage();
-        String pname = pkg!=null? pkg.getName() : null;
-        if(pname!=null && pname.length()>0)
-            parDecl = getPackageDecl(pname);
-    }
+private class ProjJavaDeclOwner extends JavaDeclOwner {
     
-    // Create and add JavaDecl for class
-    JavaDecl decl = new JavaDecl(this, parDecl, aClass);
-    _decls.put(aClass.getName(), decl);
-    if(aClass.isArray())
-        _decls.put(JavaDecl.getClassName(aClass), decl);
-    return decl;
-}
-
-/**
- * Returns a package decl.
- */
-private JavaDecl getPackageDecl(String aName)
-{
-    if(aName==null || aName.length()==0) return null;  // If bogus package name, just return
-    JavaDecl pdecl = _decls.get(aName);
-    if(pdecl==null) _decls.put(aName, createPackageDecl(aName));
-    return pdecl;
-}
-
-/**
- * Returns a package decl.
- */
-private JavaDecl createPackageDecl(String aName)
-{
-    // Get parent decl
-    JavaDecl parDecl = null;
-    int ind = aName.lastIndexOf('.');
-    if(ind>=0) { String pname = aName.substring(0,ind);
-        parDecl = getPackageDecl(pname); }
-        
-    // Create new decl
-    JavaDecl pdecl = new JavaDecl(this, parDecl, aName);
-    _decls.put(aName, pdecl);
-    return pdecl;
+    /** Override to return project ClassLoader. */
+    public ClassLoader getClassLoader()  { return Project.this.getClassLoader(); }
 }
 
 /**
