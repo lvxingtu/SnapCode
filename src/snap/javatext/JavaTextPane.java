@@ -118,13 +118,22 @@ public void resetUI()
     while(nodePathBox.getChildCount()>1) nodePathBox.removeChild(1); Font font = Font.get("Arial",11);
     
     // Iterate up from DeepPart and add parts
-    for(JNode part=getTextView()._deepNode, spart=getTextView().getSelectedNode(); part!=null; part=part.getParent()) {
+    JNode deepNode = getTextView()._deepNode, selNode = getTextView().getSelectedNode();
+    for(JNode part=deepNode, spart=selNode; part!=null; part=part.getParent()) {
         Label label = new Label(); label.setText(part.getNodeString()); label.setFont(font);
         label.setName("NodePathLabel"); label.setProp("JNode", part);
         if(part==spart) label.setFill(Color.LIGHTGRAY);
         nodePathBox.addChild(label,1); label.setOwner(this); enableEvents(label, MouseRelease);
         Label div = new Label(); div.setText(" \u2022 "); div.setFont(font); if(part.getParent()==null) break;
         nodePathBox.addChild(div,1);
+    }
+    
+    // Add Eval Type Name of selected node to end
+    JavaDecl decl = selNode!=null? selNode.getDecl() : null;
+    if(decl!=null) {
+        String str = " (" + decl.getEvalType().getSimpleName() + ')';
+        Label label = new Label(); label.setText(str); label.setFont(font); label.setToolTip(decl.getFullName());
+        nodePathBox.addChild(label);
     }
 }
 
