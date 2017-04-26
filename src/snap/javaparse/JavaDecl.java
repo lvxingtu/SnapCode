@@ -17,9 +17,6 @@ public class JavaDecl implements Comparable<JavaDecl> {
     // The JavaDecl (class) that this decl was declared in
     JavaDecl       _par;
     
-    // The JavaDeclHpr (children: fields, methods, constructors, inner classes) that belong to this JavaDecl (class)
-    JavaDeclHpr    _hpr;
-    
     // The type
     DeclType       _type;
     
@@ -44,6 +41,9 @@ public class JavaDecl implements Comparable<JavaDecl> {
     // The VariableDecl
     JVarDecl       _vdecl;
     
+    // The JavaDeclHpr to access children of this class JavaDecl (fields, methods, constructors, inner classes)
+    JavaDeclHpr    _hpr;
+    
     // Constants for type
     public enum DeclType { Class, Field, Constructor, Method, Package, VarDecl }
     
@@ -53,8 +53,7 @@ public class JavaDecl implements Comparable<JavaDecl> {
 public JavaDecl(JavaDeclOwner anOwner, JavaDecl aPar, Object anObj)
 {
     // Set JavaDecls
-    _owner = anOwner; _par = aPar; if(anOwner==null && aPar!=null) _owner = aPar._owner;
-    if(_owner==null) System.err.println("JavaDecl: No Owner?"); // I don't think this can happen
+    _owner = anOwner; _par = aPar; assert(_owner!=null);
     
     // Handle any Member
     if(anObj instanceof Member) { Member mem = (Member)anObj;
@@ -246,9 +245,8 @@ public Class getEvalClass()
 {
     if(_evalType==null) return null;
     if(_evalType!=this) return _evalType.getEvalClass();
-    ClassLoader cldr = _owner!=null? _owner.getClassLoader() : ClassLoader.getSystemClassLoader();
     String cname = getEvalTypeName();
-    return ClassUtils.getClass(cname, cldr);
+    return _owner.getClass(cname);
 }
 
 /**

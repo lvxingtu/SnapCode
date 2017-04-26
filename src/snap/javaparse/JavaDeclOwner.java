@@ -8,7 +8,7 @@ import snap.util.ClassUtils;
  */
 public abstract class JavaDeclOwner {
 
-    // A map of JavaDecls objects to provide JavaDecls for project
+    // A map of class/package names to JavaDecls to provide JavaDecls for project
     Map <String,JavaDecl>   _decls = new HashMap();
     
 /**
@@ -18,28 +18,77 @@ public JavaDecl getJavaDecl(Object anObj)
 {
     // Handle String (class or package name)
     if(anObj instanceof String) { String name = (String)anObj;
+    
+        // If decl exists for name, just return
         JavaDecl jd = _decls.get(name); if(jd!=null) return jd;
         
-        // If class exists, create JavaDecl, add to Decls map and return
-        ClassLoader cldr = getClassLoader();
-        Class cls = ClassUtils.getClass(name, cldr);
+        // If class exists, forward to getClassDecl()
+        Class cls = getClass(name);
         if(cls!=null)
-            return createClassDecl(cls);
-            
-        // Since not found, just return
-        //System.err.println("JavaDeclOwner.getJavaDecl: Unknown string decl reference: " + name);
+            return getClassDecl(cls);
         return null;
     }
     
     // Handle Class
-    if(anObj instanceof Class) { Class cls = (Class)anObj; String name = cls.getName();
-        JavaDecl jd = _decls.get(name);
-        if(jd==null) _decls.put(name, jd = createClassDecl(cls));
-        return jd;
+    JavaDecl jd = null;
+    if(anObj instanceof Class) { Class cls = (Class)anObj;
+        jd = getClassDecl(cls); }
+    
+    // Handle Field
+    else if(anObj instanceof Field) { Field field = (Field)anObj; Class cls = field.getDeclaringClass();
+        JavaDecl decl = getJavaDecl(cls);
+        JavaDeclHpr declHpr = decl.getHpr();
+        jd = declHpr.getFieldDecl(field);
     }
     
-    // Do normal version
-    return getJavaDecl(this, anObj);
+    // Handle Method
+    else if(anObj instanceof Method) { Method meth = (Method)anObj; Class cls = meth.getDeclaringClass();
+        JavaDecl decl = getJavaDecl(cls);
+        JavaDeclHpr declHpr = decl.getHpr();
+        jd = declHpr.getMethodDecl(meth);
+    }
+
+    // Handle Constructor
+    else if(anObj instanceof Constructor) { Constructor constr = (Constructor)anObj; Class cls = constr.getDeclaringClass();
+        JavaDecl decl = getJavaDecl(cls);
+        JavaDeclHpr declHpr = decl.getHpr();
+        jd = declHpr.getConstructorDecl(constr);
+    }
+    
+    // Handle JVarDecl
+    else if(anObj instanceof JVarDecl)  { JVarDecl vd = (JVarDecl)anObj;
+        JClassDecl cd = vd.getParent(JClassDecl.class);
+        JavaDecl decl = cd.getDecl();
+        jd = new JavaDecl(this, decl, vd);
+    }
+    
+    // Handle Java.lang.refelect.Type
+    else if(anObj instanceof Type) { Type type = (Type)anObj;
+        Class cls = JavaDecl.getClass(type);
+        jd = getJavaDecl(cls);
+    }
+
+    // Complain
+    else throw new RuntimeException("JavaDeclOwner.getJavaDecl: Unsupported type " + anObj);
+    
+    if(jd==null)
+        System.out.println("JavaDecl.getJavaDecl: Decl not found for " + anObj);
+    return jd;
+}
+
+/**
+ * Returns a class decl.
+ */
+private JavaDecl getClassDecl(Class aClass)
+{
+    String cname = aClass.getName();
+    JavaDecl decl = _decls.get(cname);
+    if(decl==null) {
+        _decls.put(cname, decl = createClassDecl(aClass));
+        if(aClass.isArray())
+            _decls.put(JavaDecl.getClassName(aClass), decl);
+    }
+    return decl;
 }
 
 /**
@@ -47,24 +96,25 @@ public JavaDecl getJavaDecl(Object anObj)
  */
 private JavaDecl createClassDecl(Class aClass)
 {
-    // Get parent decl
-    JavaDecl parDecl = null;
+    // If declaring class, get decl from parent decl
     Class dcls = aClass.getDeclaringClass();
-    if(dcls!=null)
-        parDecl = getJavaDecl(dcls);
-    else {
-        Package pkg = aClass.getPackage();
-        String pname = pkg!=null? pkg.getName() : null;
-        if(pname!=null && pname.length()>0)
-            parDecl = getPackageDecl(pname);
+    if(dcls!=null) {
+        JavaDecl parDecl = getJavaDecl(dcls);
+        JavaDeclHpr declHpr = parDecl.getHpr();
+        JavaDecl decl = declHpr.getClassDecl(aClass);
+        if(decl==null) System.err.println("JavaDeclOwner.createClassDecl: Inner class not found " + aClass);
+        return decl;
     }
     
+    // Get parent decl
+    JavaDecl parDecl = null;
+    Package pkg = aClass.getPackage();
+    String pname = pkg!=null? pkg.getName() : null;
+    if(pname!=null && pname.length()>0)
+        parDecl = getPackageDecl(pname);
+    
     // Create and add JavaDecl for class
-    JavaDecl decl = new JavaDecl(this, parDecl, aClass);
-    _decls.put(aClass.getName(), decl);
-    if(aClass.isArray())
-        _decls.put(JavaDecl.getClassName(aClass), decl);
-    return decl;
+    return new JavaDecl(this, parDecl, aClass);
 }
 
 /**
@@ -79,7 +129,7 @@ private JavaDecl getPackageDecl(String aName)
 }
 
 /**
- * Returns a package decl.
+ * Creates a package decl.
  */
 private JavaDecl createPackageDecl(String aName)
 {
@@ -101,60 +151,13 @@ private JavaDecl createPackageDecl(String aName)
 public abstract ClassLoader getClassLoader();
 
 /**
- * Returns a JavaDecl for object.
+ * Returns a Class for given name.
  */
-private static JavaDecl getJavaDecl(JavaDeclOwner aProj, Object anObj)
+public Class getClass(String aName)
 {
-    // Handle Class
-    JavaDecl jd = null;
-    if(anObj instanceof Class) { Class cls = (Class)anObj, dcls = cls.getDeclaringClass();
-        if(dcls==null)
-            return aProj.getJavaDecl(cls);
-        JavaDecl decl = aProj.getJavaDecl(dcls);
-        JavaDeclHpr declHpr = decl.getHpr();
-        jd = declHpr.getClassDecl(cls);
-    }
-    
-    // Handle Field
-    else if(anObj instanceof Field) { Field field = (Field)anObj; Class cls = field.getDeclaringClass();
-        JavaDecl decl = aProj.getJavaDecl(cls);
-        JavaDeclHpr declHpr = decl.getHpr();
-        jd = declHpr.getFieldDecl(field);
-    }
-    
-    // Handle Method
-    else if(anObj instanceof Method) { Method meth = (Method)anObj; Class cls = meth.getDeclaringClass();
-        JavaDecl decl = aProj.getJavaDecl(cls);
-        JavaDeclHpr declHpr = decl.getHpr();
-        jd = declHpr.getMethodDecl(meth);
-    }
-
-    // Handle Constructor
-    else if(anObj instanceof Constructor) { Constructor constr = (Constructor)anObj; Class cls = constr.getDeclaringClass();
-        JavaDecl decl = aProj.getJavaDecl(cls);
-        JavaDeclHpr declHpr = decl.getHpr();
-        jd = declHpr.getConstructorDecl(constr);
-    }
-    
-    // Handle JVarDecl
-    else if(anObj instanceof JVarDecl)  { JVarDecl vd = (JVarDecl)anObj;
-        JClassDecl cd = vd.getParent(JClassDecl.class);
-        JavaDecl decl = cd.getDecl();
-        jd = new JavaDecl(aProj, decl, vd);
-    }
-    
-    // Handle Java.lang.refelect.Type
-    else if(anObj instanceof Type) { Type type = (Type)anObj;
-        Class cls = JavaDecl.getClass(type);
-        jd = aProj.getJavaDecl(cls);
-    }
-
-    // Complain
-    else throw new RuntimeException("JavaDeclOwner.getJavaDecl: Unsupported type " + anObj);
-    
-    if(jd==null)
-        System.out.println("JavaDecl.getJavaDecl: Decl not found for " + anObj);
-    return jd;
+    ClassLoader cldr = getClassLoader();
+    Class cls = ClassUtils.getClass(aName, cldr);
+    return cls;
 }
 
 /**
