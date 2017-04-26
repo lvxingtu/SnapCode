@@ -15,7 +15,7 @@ public class JavaDecl implements Comparable<JavaDecl> {
     // The project that this decl belongs to
     Project        _proj;
 
-    // The JavaDecl (class) that this decl belongs to
+    // The JavaDecl (class) that this decl was declared in
     JavaDecl       _par;
     
     // The JavaDecls (children: fields, methods, constructors) that belong to this JavaDecl (class)
@@ -32,9 +32,6 @@ public class JavaDecl implements Comparable<JavaDecl> {
     
     // The simple name of the declaration member
     String         _sname;
-    
-    // The class name of this declaration
-    String         _cname;
     
     // Whether class decl is enum or interface
     boolean        _enum, _interface;
@@ -60,44 +57,47 @@ public JavaDecl(Project aProj, JavaDecl aPar, Object anObj)
     _proj = aProj; _par = aPar; if(aProj==null && aPar!=null) _proj = aPar._proj;
     if(_proj==null) System.err.println("JavaDecl: No Project?"); // I don't think this can happen
     
+    // Handle any Member
+    if(anObj instanceof Member) { Member mem = (Member)anObj;
+        _mods = mem.getModifiers(); }
+    
     // Handle Class
     if(anObj instanceof Class) { Class cls = (Class)anObj; _type = DeclType.Class;
-        _name = getClassName(cls); _sname = cls.getSimpleName(); _cname = _name;
-        _mods = cls.getModifiers(); _enum = cls.isEnum(); _interface = cls.isInterface();
+        _mods = cls.getModifiers();
+        _name = getClassName(cls); _sname = cls.getSimpleName();
+        _enum = cls.isEnum(); _interface = cls.isInterface();
         _evalType = this;
     }
-
-    // Handle Field
-    else if(anObj instanceof Field) { Field field = (Field)anObj; _type = DeclType.Field;
-        _name = _sname = field.getName(); _cname = field.getDeclaringClass().getName();
-        _evalType = getJavaDecl(field.getGenericType()); _mods = field.getModifiers();
-    }
     
-    // Handle Method
-    else if(anObj instanceof Method) { Method meth = (Method)anObj; _type = DeclType.Method;
-        _name = _sname = meth.getName(); _cname = meth.getDeclaringClass().getName();
-        _evalType = getJavaDecl(meth.getGenericReturnType()); _mods = meth.getModifiers();
+    // Handle Member (Field, Method, Constructor)
+    else if(anObj instanceof Member) { Member mem = (Member)anObj;
+    
+        // Set mods, name, simple name
+        _mods = mem.getModifiers();
+        _name = _sname = mem.getName();
         
-        // Get GenericParameterTypes and names
-        Type ptypes[] = meth.getGenericParameterTypes();
-        _argTypes = new JavaDecl[meth.getParameterCount()];
-        for(int i=0,iMax=ptypes.length; i<iMax; i++)
-            _argTypes[i] = getJavaDecl(ptypes[i]);
-    }
-    
-    // Handle Constructor
-    else if(anObj instanceof Constructor) { Constructor constr = (Constructor)anObj; _type = DeclType.Constructor;
-        Class dcls = constr.getDeclaringClass();
-        _name = _cname = constr.getName(); _sname = dcls.getSimpleName();
-        _mods = constr.getModifiers();
-        _evalType = getJavaDecl(dcls);
-    
-        // Get GenericParameterTypes (this can fail https://bugs.openjdk.java.net/browse/JDK-8075483))
-        Type ptypes[] = constr.getGenericParameterTypes();
-        if(ptypes.length<constr.getParameterCount()) ptypes = constr.getParameterTypes();
-        _argTypes = new JavaDecl[ptypes.length];
-        for(int i=0,iMax=ptypes.length; i<iMax; i++)
-            _argTypes[i] = getJavaDecl(ptypes[i]);
+        // Handle Field
+        if(mem instanceof Field) { Field field = (Field)mem; _type = DeclType.Field;
+            _evalType = getJavaDecl(field.getGenericType()); }
+            
+        // Handle Executable (Method, Constructor)
+        else { Executable exec = (Executable)mem;
+            
+            // Handle Method
+            if(exec instanceof Method) { Method meth = (Method)exec; _type = DeclType.Method;
+                _evalType = getJavaDecl(meth.getGenericReturnType()); }
+                
+            // Handle Constructor
+            else if(exec instanceof Constructor) { Constructor constr = (Constructor)exec; _type = DeclType.Constructor;
+                _evalType = getJavaDecl(constr.getDeclaringClass()); }
+            
+            // Get GenericParameterTypes (this can fail https://bugs.openjdk.java.net/browse/JDK-8075483))
+            Type ptypes[] = exec.getGenericParameterTypes();
+            if(ptypes.length<exec.getParameterCount()) ptypes = exec.getParameterTypes();
+            _argTypes = new JavaDecl[ptypes.length];
+            for(int i=0,iMax=ptypes.length; i<iMax; i++)
+                _argTypes[i] = getJavaDecl(ptypes[i]);
+        }
     }
     
     // Handle VarDecl
@@ -183,37 +183,57 @@ public String getSimpleName()  { return _sname; }
 /**
  * Returns the class name.
  */
-public String getClassName()  { return _cname; }
+public String getClassName()  { return isClass()? getName() : _par!=null? _par.getClassName() : null; }
 
 /**
- * Returns the class name.
+ * Returns the class simple name.
  */
-public String getClassSimpleName()  { return getSimpleName(_cname); }
-
-/**
- * Returns the parent class name.
- */
-public String getParentClassName()  { return _cname!=null? getParentClassName(_cname) : null; }
-
-/**
- * Returns the top level class name.
- */
-public String getRootClassName()  { return _cname!=null? getRootClassName(_cname) : null; }
-
-/**
- * Returns whether class is member.
- */
-public boolean isMemberClass()  { return _cname!=null? _cname.indexOf('$')>0 : false; }
-
-/**
- * Returns the JavaDecls for class.
- */
-public JavaDecls getDecls()  { return _decls!=null? _decls : (_decls = new JavaDecls(this)); }
+public String getClassSimpleName() { return isClass()? getSimpleName() : _par!=null? _par.getClassSimpleName() : null; }
 
 /**
  * Returns the enclosing class this decl.
  */
 public JavaDecl getParent()  { return _par; }
+
+/**
+ * Returns the enclosing class this decl.
+ */
+public JavaDecl getParent(DeclType aType)
+{
+    if(_par==null) return null;
+    if(_par.getType()==aType) return _par;
+    return _par.getParent(aType);
+}
+
+/**
+ * Returns the parent class.
+ */
+public Class getParentClass()  { return _par!=null? _par.getEvalClass() : null; }
+
+/**
+ * Returns the parent class name.
+ */
+public String getParentClassName()  { return _par!=null? _par.getClassName() : null; }
+
+/**
+ * Returns the top level class name.
+ */
+public String getRootClassName()
+{
+    if(_par!=null && _par.isClass()) return _par.getRootClassName();
+    if(isClass()) return getClassName();
+    return null;
+}
+
+/**
+ * Returns whether class is member.
+ */
+public boolean isMemberClass()  { return isClass() && _par!=null; }
+
+/**
+ * Returns the JavaDecls for class.
+ */
+public JavaDecls getDecls()  { return _decls!=null? _decls : (_decls = new JavaDecls(this)); }
 
 /**
  * Returns the JavaDecl for class this decl evaluates to when referenced.
@@ -263,9 +283,19 @@ public String[] getArgTypeSimpleNames()
 }
 
 /**
+ * Returns the package decl.
+ */
+public JavaDecl getPackageDecl()
+{
+    if(isPackage()) return this;
+    if(_par!=null) return _par.getPackageDecl();
+    return null;
+}
+
+/**
  * Returns the package name.
  */
-public String getPackageName() { return isPackage()? _name : getPackageName(getClassName()); }
+public String getPackageName() { JavaDecl pd = getPackageDecl(); return pd!=null? pd.getName() : null; }
 
 /**
  * Returns the variable declaration name.
@@ -277,7 +307,7 @@ public JVarDecl getVarDecl() { return _vdecl; }
  */
 public String getPrettyName()
 {
-    String name = _cname;
+    String name = getClassName();
     if(isMethod() || isField()) name += '.' + _name;
     if(isMethod() || isConstructor()) name +=  '(' + StringUtils.join(getArgTypeSimpleNames(), ",") + ')';
     if(isPackage()) return _name;
@@ -290,7 +320,7 @@ public String getPrettyName()
  */
 public String getMatchName()
 {
-    String name = _cname;
+    String name = getClassName();
     if(isMethod() || isField()) name += '.' + _name;
     if(isMethod() || isConstructor()) name +=  '(' + StringUtils.join(getArgTypeNames(), ",") + ')';
     if(isPackage()) return _name;
@@ -340,22 +370,13 @@ public String getReplaceString()
     switch(getType()) {
         case Class: return getSimpleName();
         case Constructor: return getPrettyName().replace(getParentClassName() + '.', "");
-        case Method: return getPrettyName().replace(_cname + '.', "");
+        case Method: return getPrettyName().replace(getClassName() + '.', "");
         case Package: {
             String name = getPackageName(); int index = name.lastIndexOf('.');
             return index>0? name.substring(index+1) : name;
         }
         default: return getName();
     }
-}
-
-/**
- * Returns the class or declaring class using the given project.
- */
-public Class getDeclClass()
-{
-    ClassLoader cldr = _proj!=null? _proj.getClassLoader() : ClassLoader.getSystemClassLoader();
-    return ClassUtils.getClass(_cname, cldr);
 }
 
 /**
@@ -379,7 +400,7 @@ public boolean matches(JavaDecl aDecl)
     
     // If field or method, see if declaring class matches
     if(isField() || isConstructor() || isMethod()) {
-        Class c1 = getDeclClass(), c2 = aDecl.getDeclClass();
+        Class c1 = getParentClass(), c2 = aDecl.getParentClass();
         return c1==c2 || c1.isAssignableFrom(c2) || c2.isAssignableFrom(c1);
     }
     
@@ -458,27 +479,6 @@ public static String getSimpleName(String cname)
     return cname;
 }
 
-/** Returns the parent class name. */
-private static String getParentClassName(String cname)
-{
-   int i = cname.lastIndexOf('$'); if(i<0) i = cname.lastIndexOf('.'); if(i>0) cname = cname.substring(0,i);
-   return cname;
-}
-
-/** Returns the top level class name. */
-private static String getRootClassName(String cname)
-{
-   int i = cname.indexOf('$'); if(i>0) cname = cname.substring(0,i);
-   return cname;
-}
-
-/** Returns a package name for a class name. */
-private static String getPackageName(String cname)
-{
-    int i = cname.lastIndexOf('.'); cname = i>0? cname.substring(0,i) : "";
-    return cname;
-}
-
 /**
  * Returns a JavaDecl for object.
  */
@@ -486,10 +486,12 @@ public static JavaDecl getJavaDecl(Project aProj, Object anObj)
 {
     // Handle Class
     JavaDecl jd = null;
-    if(anObj instanceof Class) { Class cls = (Class)anObj;
-        JavaDecl decl = aProj.getJavaDecl(cls);
+    if(anObj instanceof Class) { Class cls = (Class)anObj, dcls = cls.getDeclaringClass();
+        if(dcls==null)
+            return aProj.getJavaDecl(cls);
+        JavaDecl decl = aProj.getJavaDecl(dcls);
         JavaDecls decls = decl.getDecls();
-        jd = decls.getClassDecl();
+        jd = decls.getClassDecl(cls);
     }
     
     // Handle Field

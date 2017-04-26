@@ -25,6 +25,9 @@ public class JavaDecls {
     // The constructor decls
     List <JavaDecl>  _cdecls = new ArrayList();
 
+    // The inner class decls
+    List <JavaDecl>  _icdecls = new ArrayList();
+
     // Map of package name to JavaDecls
     static Map <String,JavaDecl>  _pkgDecls = new HashMap();
     
@@ -41,6 +44,11 @@ public JavaDecls(JavaDecl aCDecl)
     if(scls!=null)
         _sdecl = aCDecl.getJavaDecl(scls.getName()).getDecls();
 }
+
+/**
+ * Returns the class decl.
+ */
+public JavaDecl getClassDecl()  { return _cdecl; }
 
 /**
  * Returns the super class decl.
@@ -96,6 +104,16 @@ public HashSet <JavaDecl> updateDecls()
         else removedDecls.remove(decl);
     }
     
+    // Inner Classes: Add JavaDecl for each inner class
+    Class iclss[]; try { iclss = cls.getDeclaredClasses(); }
+    catch(Throwable e) { System.err.println(e + " in " + _cname); return null; }
+    for(Class icls : iclss) {
+        if(icls.isSynthetic()) continue;
+        JavaDecl decl = getClassDecl(icls);
+        if(decl==null) { decl = new JavaDecl(null,_cdecl,icls); addedDecls.add(decl); _icdecls.add(decl); }
+        else removedDecls.remove(decl);
+    }
+    
     // Remove unused decls
     for(JavaDecl jd : removedDecls) removeDecl(jd);
     
@@ -104,11 +122,6 @@ public HashSet <JavaDecl> updateDecls()
     allDecls.addAll(_fdecls); allDecls.addAll(_mdecls); allDecls.addAll(_cdecls);
     return allDecls;
 }
-
-/**
- * Returns the class decl.
- */
-public JavaDecl getClassDecl()  { return _cdecl; }
 
 /**
  * Returns the field decl for field.
@@ -216,6 +229,34 @@ public JavaDecl getConstructorDeclDeep(int theMods, JavaDecl theTypes[])
 {
     JavaDecl decl = getConstructorDecl(theMods, theTypes);
     if(decl==null && _sdecl!=null) decl = _sdecl.getConstructorDeclDeep(theMods, theTypes);
+    return decl;
+}
+
+/**
+ * Returns a Class decl for inner class name.
+ */
+public JavaDecl getClassDecl(Class aClass)  { return getClassDecl(aClass.getName()); }
+
+/**
+ * Returns a Class decl for inner class name.
+ */
+public JavaDecl getClassDecl(String aName)
+{
+    if(_fdecls==null) updateDecls();
+    
+    for(JavaDecl jd : _icdecls)
+        if(jd.getName().equals(aName))
+                return jd;
+    return null;
+}
+
+/**
+ * Returns a Class decl for inner class name.
+ */
+public JavaDecl getClassDeclDeep(String aName)
+{
+    JavaDecl decl = getClassDecl(aName);
+    if(decl==null && _sdecl!=null) decl = _sdecl.getClassDeclDeep(aName);
     return decl;
 }
 

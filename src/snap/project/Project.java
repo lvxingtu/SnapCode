@@ -176,20 +176,52 @@ public JavaDecl getJavaDecl(Object anObj)
  */
 private JavaDecl createClassDecl(Class aClass)
 {
-    // Create decls for class packages if needed
-    Package pkg = aClass.getPackage(); String pname = pkg!=null? pkg.getName() : null;
-    while(pname!=null && pname.length()>0 && _decls.get(pname)==null) {
-        _decls.put(pname, new JavaDecl(this, null, pname));
-        int ind = pname.lastIndexOf('.');
-        pname = ind>=0? pname.substring(0,ind) : null;
+    // Get parent decl
+    JavaDecl parDecl = null;
+    Class dcls = aClass.getDeclaringClass();
+    if(dcls!=null)
+        parDecl = getJavaDecl(dcls);
+    else {
+        Package pkg = aClass.getPackage();
+        String pname = pkg!=null? pkg.getName() : null;
+        if(pname!=null && pname.length()>0)
+            parDecl = getPackageDecl(pname);
     }
     
     // Create and add JavaDecl for class
-    JavaDecl decl = new JavaDecl(this, null, aClass);
+    JavaDecl decl = new JavaDecl(this, parDecl, aClass);
     _decls.put(aClass.getName(), decl);
     if(aClass.isArray())
         _decls.put(JavaDecl.getClassName(aClass), decl);
     return decl;
+}
+
+/**
+ * Returns a package decl.
+ */
+private JavaDecl getPackageDecl(String aName)
+{
+    if(aName==null || aName.length()==0) return null;  // If bogus package name, just return
+    JavaDecl pdecl = _decls.get(aName);
+    if(pdecl==null) _decls.put(aName, createPackageDecl(aName));
+    return pdecl;
+}
+
+/**
+ * Returns a package decl.
+ */
+private JavaDecl createPackageDecl(String aName)
+{
+    // Get parent decl
+    JavaDecl parDecl = null;
+    int ind = aName.lastIndexOf('.');
+    if(ind>=0) { String pname = aName.substring(0,ind);
+        parDecl = getPackageDecl(pname); }
+        
+    // Create new decl
+    JavaDecl pdecl = new JavaDecl(this, parDecl, aName);
+    _decls.put(aName, pdecl);
+    return pdecl;
 }
 
 /**
