@@ -36,21 +36,21 @@ public JavaDecl getJavaDecl(Object anObj)
     
     // Handle Field
     else if(anObj instanceof Field) { Field field = (Field)anObj; Class cls = field.getDeclaringClass();
-        JavaDecl decl = getJavaDecl(cls);
+        JavaDecl decl = getClassDecl(cls);
         JavaDeclHpr declHpr = decl.getHpr();
         jd = declHpr.getFieldDecl(field);
     }
     
     // Handle Method
     else if(anObj instanceof Method) { Method meth = (Method)anObj; Class cls = meth.getDeclaringClass();
-        JavaDecl decl = getJavaDecl(cls);
+        JavaDecl decl = getClassDecl(cls);
         JavaDeclHpr declHpr = decl.getHpr();
         jd = declHpr.getMethodDecl(meth);
     }
 
     // Handle Constructor
     else if(anObj instanceof Constructor) { Constructor constr = (Constructor)anObj; Class cls = constr.getDeclaringClass();
-        JavaDecl decl = getJavaDecl(cls);
+        JavaDecl decl = getClassDecl(cls);
         JavaDeclHpr declHpr = decl.getHpr();
         jd = declHpr.getConstructorDecl(constr);
     }
@@ -65,7 +65,7 @@ public JavaDecl getJavaDecl(Object anObj)
     // Handle Java.lang.refelect.Type
     else if(anObj instanceof Type) { Type type = (Type)anObj;
         Class cls = getClass(type);
-        jd = getJavaDecl(cls);
+        jd = getClassDecl(cls);
     }
 
     // Complain
@@ -158,6 +158,43 @@ public Class getClass(String aName)
     ClassLoader cldr = getClassLoader();
     Class cls = ClassUtils.getClass(aName, cldr);
     return cls;
+}
+
+/**
+ * Returns the class name, converting primitive arrays to 'int[]' instead of '[I'.
+ */
+public static String getTypeName(Type aType)
+{
+    // Handle Class
+    if(aType instanceof Class) { Class cls = (Class)aType;
+        return cls.getName(); }
+
+    // Handle GenericArrayType
+    if(aType instanceof GenericArrayType) { GenericArrayType gat = (GenericArrayType)aType;
+        return getTypeName(gat.getGenericComponentType()) + "[]"; }
+        
+    // Handle ParameterizedType (e.g., Class <T>, List <T>, Map <K,V>)
+    if(aType instanceof ParameterizedType) { ParameterizedType pt = (ParameterizedType)aType;
+        Type base = pt.getRawType();
+        StringBuffer sb = new StringBuffer(getTypeName(base)).append('<');
+        Type types[] = pt.getActualTypeArguments(), last = types[types.length-1];
+        for(Type ta : types) { sb.append(getTypeName(ta)); if(ta!=last) sb.append(','); }
+        return sb.append('>').toString();
+    }
+        
+    // Handle TypeVariable
+    if(aType instanceof TypeVariable)
+        return getTypeName(((TypeVariable)aType).getBounds()[0]);
+        
+    // Handle WildcardType
+    if(aType instanceof WildcardType) { WildcardType wc = (WildcardType)aType;
+        if(wc.getLowerBounds().length>0)
+            return getTypeName(wc.getLowerBounds()[0]);
+        return getTypeName(wc.getUpperBounds()[0]);
+    }
+    
+    // Complain about anything else
+    throw new RuntimeException("JavaDecl: Can't get Type name from type: " + aType);
 }
 
 /**
