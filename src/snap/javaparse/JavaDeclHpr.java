@@ -59,7 +59,8 @@ public HashSet <JavaDecl> updateDecls()
     // Create set for added/removed decls
     HashSet <JavaDecl> addedDecls = new HashSet();
     HashSet <JavaDecl> removedDecls = new HashSet(); if(_cdecl!=null) removedDecls.add(_cdecl);
-    removedDecls.addAll(_fdecls); removedDecls.addAll(_mdecls); removedDecls.addAll(_cdecls);
+    removedDecls.addAll(_fdecls); removedDecls.addAll(_mdecls);
+    removedDecls.addAll(_cdecls); removedDecls.addAll(_icdecls);
 
     // Make sure class decl is up to date
     if(_cdecl.getModifiers()!=cls.getModifiers())
@@ -108,7 +109,7 @@ public HashSet <JavaDecl> updateDecls()
     
     // Return all decls
     HashSet <JavaDecl> allDecls = new HashSet(); allDecls.add(_cdecl);
-    allDecls.addAll(_fdecls); allDecls.addAll(_mdecls); allDecls.addAll(_cdecls);
+    allDecls.addAll(_fdecls); allDecls.addAll(_mdecls); allDecls.addAll(_cdecls); allDecls.addAll(_icdecls);
     return allDecls;
 }
 
@@ -257,6 +258,7 @@ public void removeDecl(JavaDecl aDecl)
     if(aDecl.isField()) _fdecls.remove(aDecl);
     else if(aDecl.isMethod()) _mdecls.remove(aDecl);
     else if(aDecl.isConstructor()) _cdecls.remove(aDecl);
+    else if(aDecl.isClass()) _icdecls.remove(aDecl);
 }
 
 /**

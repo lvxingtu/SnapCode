@@ -64,7 +64,7 @@ public JavaDecl getJavaDecl(Object anObj)
     
     // Handle Java.lang.refelect.Type
     else if(anObj instanceof Type) { Type type = (Type)anObj;
-        Class cls = JavaDecl.getClass(type);
+        Class cls = getClass(type);
         jd = getJavaDecl(cls);
     }
 
@@ -86,7 +86,7 @@ private JavaDecl getClassDecl(Class aClass)
     if(decl==null) {
         _decls.put(cname, decl = createClassDecl(aClass));
         if(aClass.isArray())
-            _decls.put(JavaDecl.getClassName(aClass), decl);
+            _decls.put(getClassName(aClass), decl);
     }
     return decl;
 }
@@ -161,6 +161,51 @@ public Class getClass(String aName)
 }
 
 /**
+ * Returns the class name, converting primitive arrays to 'int[]' instead of '[I'.
+ */
+public static Class getClass(Type aType)
+{
+    // Handle Class
+    if(aType instanceof Class)
+        return (Class)aType;
+
+    // Handle GenericArrayType
+    if(aType instanceof GenericArrayType) { GenericArrayType gat = (GenericArrayType)aType;
+        Class cls = getClass(gat.getGenericComponentType());
+        return Array.newInstance(cls,0).getClass();
+    }
+        
+    // Handle ParameterizedType (e.g., Class <T>, List <T>, Map <K,V>)
+    if(aType instanceof ParameterizedType)
+        return getClass(((ParameterizedType)aType).getRawType());
+        
+    // Handle TypeVariable
+    if(aType instanceof TypeVariable)
+        return getClass(((TypeVariable)aType).getBounds()[0]);
+        
+    // Handle WildcardType
+    if(aType instanceof WildcardType) { WildcardType wc = (WildcardType)aType;
+        if(wc.getLowerBounds().length>0)
+            return getClass(wc.getLowerBounds()[0]);
+        return getClass(wc.getUpperBounds()[0]);
+    }
+    
+    // Complain about anything else
+    throw new RuntimeException("JavaDecl: Can't get Type name from type: " + aType);
+}
+
+/**
+ * Returns the class name, converting primitive arrays to 'int[]' instead of '[I'.
+ */
+public static String getClassName(Type aType)
+{
+    Class cls = getClass(aType);
+    if(cls.isArray())
+        return cls.getComponentType().getName() + "[]";
+    return cls.getName();
+}
+
+/**
  * Returns reference nodes in given JNode that match given JavaDecl.
  */
 public static void getMatches(JNode aNode, JavaDecl aDecl, List <JNode> theMatches)
@@ -232,6 +277,15 @@ private static boolean isPossibleMatch(JNode aNode, JavaDecl aDecl)
         if(id.getName().equals(aDecl.getSimpleName()))
             return true; }
     return false;
+}
+
+/**
+ * Returns a simple class name.
+ */
+public static String getSimpleName(String cname)
+{
+    int i = cname.lastIndexOf('$'); if(i<0) i = cname.lastIndexOf('.'); if(i>0) cname = cname.substring(i+1);
+    return cname;
 }
 
 }

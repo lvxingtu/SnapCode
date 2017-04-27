@@ -55,49 +55,14 @@ public JavaDecl(JavaDeclOwner anOwner, JavaDecl aPar, Object anObj)
     // Set JavaDecls
     _owner = anOwner; _par = aPar; assert(_owner!=null);
     
-    // Handle any Member
-    if(anObj instanceof Member) { Member mem = (Member)anObj;
-        _mods = mem.getModifiers(); }
-    
-    // Handle Class
-    if(anObj instanceof Class) { Class cls = (Class)anObj; _type = DeclType.Class;
-        _mods = cls.getModifiers();
-        _name = getClassName(cls); _sname = cls.getSimpleName();
-        _enum = cls.isEnum(); _interface = cls.isInterface();
-        _evalType = this;
-    }
+    // Handle Type
+    if(anObj instanceof Type)
+        initType((Type)anObj);
     
     // Handle Member (Field, Method, Constructor)
-    else if(anObj instanceof Member) { Member mem = (Member)anObj;
-    
-        // Set mods, name, simple name
-        _mods = mem.getModifiers();
-        _name = _sname = mem.getName();
-        
-        // Handle Field
-        if(mem instanceof Field) { Field field = (Field)mem; _type = DeclType.Field;
-            _evalType = getJavaDecl(field.getGenericType()); }
-            
-        // Handle Executable (Method, Constructor)
-        else { Executable exec = (Executable)mem;
-            
-            // Handle Method
-            if(exec instanceof Method) { Method meth = (Method)exec; _type = DeclType.Method;
-                _evalType = getJavaDecl(meth.getGenericReturnType()); }
-                
-            // Handle Constructor
-            else if(exec instanceof Constructor) { Constructor constr = (Constructor)exec; _type = DeclType.Constructor;
-                _evalType = getJavaDecl(constr.getDeclaringClass()); }
-            
-            // Get GenericParameterTypes (this can fail https://bugs.openjdk.java.net/browse/JDK-8075483))
-            Type ptypes[] = exec.getGenericParameterTypes();
-            if(ptypes.length<exec.getParameterCount()) ptypes = exec.getParameterTypes();
-            _argTypes = new JavaDecl[ptypes.length];
-            for(int i=0,iMax=ptypes.length; i<iMax; i++)
-                _argTypes[i] = getJavaDecl(ptypes[i]);
-        }
-    }
-    
+    else if(anObj instanceof Member)
+        initMember((Member)anObj);
+
     // Handle VarDecl
     else if(anObj instanceof JVarDecl) { _vdecl = (JVarDecl)anObj; _type = DeclType.VarDecl;
         _name = _sname = _vdecl.getName();
@@ -107,10 +72,63 @@ public JavaDecl(JavaDeclOwner anOwner, JavaDecl aPar, Object anObj)
     
     // Handle Package String
     else if(anObj instanceof String) { String pname = (String)anObj; _type = DeclType.Package;
-        _name = pname; _sname = getSimpleName(pname); }
+        _name = pname; _sname = JavaDeclOwner.getSimpleName(pname); }
     
     // Throw exception for unknown type
     else throw new RuntimeException("JavaDecl.init: Unsupported type " + anObj);
+}
+
+/**
+ * Initialize types (Class, ParameterizedType, TypeVariable).
+ */
+private void initType(Type aType)
+{
+    // Handle ParameterizedType
+    //if(aType instanceof ParameterizedType) { ParameterizedType pt = (ParameterizedType)aType; }
+    
+    // Handle TypeVariable
+    //else if(aType instanceof TypeVariable) { TypeVariable tv = (TypeVariable)aType; _name = _sname = tv.getName(); }
+    
+    // Handle Class
+    if(aType instanceof Class) { Class cls = (Class)aType; _type = DeclType.Class;
+        _mods = cls.getModifiers();
+        _name = JavaDeclOwner.getClassName(cls); _sname = cls.getSimpleName();
+        _enum = cls.isEnum(); _interface = cls.isInterface();
+        _evalType = this;
+    }
+}
+
+/**
+ * Initialize member (Field, Method, Constructor).
+ */
+private void initMember(Member aMmbr)
+{
+    // Set mods, name, simple name
+    _mods = aMmbr.getModifiers();
+    _name = _sname = aMmbr.getName();
+    
+    // Handle Field
+    if(aMmbr instanceof Field) { Field field = (Field)aMmbr; _type = DeclType.Field;
+        _evalType = getJavaDecl(field.getGenericType()); }
+        
+    // Handle Executable (Method, Constructor)
+    else { Executable exec = (Executable)aMmbr;
+        
+        // Handle Method
+        if(exec instanceof Method) { Method meth = (Method)exec; _type = DeclType.Method;
+            _evalType = getJavaDecl(meth.getGenericReturnType()); }
+            
+        // Handle Constructor
+        else if(exec instanceof Constructor) { Constructor constr = (Constructor)exec; _type = DeclType.Constructor;
+            _evalType = getJavaDecl(constr.getDeclaringClass()); }
+        
+        // Get GenericParameterTypes (this can fail https://bugs.openjdk.java.net/browse/JDK-8075483))
+        Type ptypes[] = exec.getGenericParameterTypes();
+        if(ptypes.length<exec.getParameterCount()) ptypes = exec.getParameterTypes();
+        _argTypes = new JavaDecl[ptypes.length];
+        for(int i=0,iMax=ptypes.length; i<iMax; i++)
+            _argTypes[i] = getJavaDecl(ptypes[i]);
+    }
 }
 
 /**
@@ -419,57 +437,5 @@ public int hashCode()  { return getFullName().hashCode(); }
  * Standard toString implementation.
  */
 public String toString()  { return _type + ": " + getFullName(); }
-
-/**
- * Returns the class name, converting primitive arrays to 'int[]' instead of '[I'.
- */
-public static Class getClass(Type aType)
-{
-    // Handle Class
-    if(aType instanceof Class)
-        return (Class)aType;
-
-    // Handle GenericArrayType
-    if(aType instanceof GenericArrayType) { GenericArrayType gat = (GenericArrayType)aType;
-        Class cls = getClass(gat.getGenericComponentType());
-        return Array.newInstance(cls,0).getClass();
-    }
-        
-    // Handle ParameterizedType (e.g., Class <T>, List <T>, Map <K,V>)
-    if(aType instanceof ParameterizedType)
-        return getClass(((ParameterizedType)aType).getRawType());
-        
-    // Handle TypeVariable
-    if(aType instanceof TypeVariable)
-        return getClass(((TypeVariable)aType).getBounds()[0]);
-        
-    // Handle WildcardType
-    if(aType instanceof WildcardType) { WildcardType wc = (WildcardType)aType;
-        if(wc.getLowerBounds().length>0)
-            return getClass(wc.getLowerBounds()[0]);
-        return getClass(wc.getUpperBounds()[0]);
-    }
-    
-    // Complain about anything else
-    throw new RuntimeException("JavaDecl: Can't get Type name from type: " + aType);
-}
-
-/**
- * Returns the class name, converting primitive arrays to 'int[]' instead of '[I'.
- */
-public static String getClassName(Type aType)
-{
-    Class cls = getClass(aType);
-    if(cls.isArray())
-        return cls.getComponentType().getName() + "[]";
-    return cls.getName();
-}
-
-/** Returns a simple class name. */
-public static String getSimpleName(String cname)
-{
-    int i = cname.lastIndexOf('$'); if(i<0) i = cname.lastIndexOf('.'); if(i>0) cname = cname.substring(i+1);
-    return cname;
-}
 
 }
