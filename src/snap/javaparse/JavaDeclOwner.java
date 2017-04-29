@@ -63,9 +63,11 @@ public JavaDecl getJavaDecl(Object anObj)
     }
     
     // Handle Java.lang.refelect.Type
-    else if(anObj instanceof Type) { Type type = (Type)anObj;
-        Class cls = getClass(type);
-        jd = getClassDecl(cls);
+    else if(anObj instanceof Type) { Type type = (Type)anObj; //Class cls = getClass(type);
+        try { jd = getTypeDecl(type, null); }
+        catch(Exception e) {
+            e.printStackTrace();
+        }
     }
 
     // Complain
@@ -74,6 +76,34 @@ public JavaDecl getJavaDecl(Object anObj)
     if(jd==null)
         System.out.println("JavaDecl.getJavaDecl: Decl not found for " + anObj);
     return jd;
+}
+
+/**
+ * Returns a JavaDecl for type.
+ */
+public JavaDecl getTypeDecl(Type aType, JavaDecl aPar)
+{
+    String name = getTypeName(aType);
+    JavaDecl decl = _decls.get(name); if(decl!=null) return decl;
+
+    // Handle ParameterizedType
+    if(aType instanceof ParameterizedType)
+        decl = new JavaDecl(this, null, aType);
+        
+    // Handle TypeVariable
+    else if(aType instanceof TypeVariable) { TypeVariable tv = (TypeVariable)aType;
+        decl = aPar.getTypeVar(name);
+        return decl;
+    }
+        
+    // Handle Class
+    else {
+        Class cls = getClass(aType);
+        return getClassDecl(cls);
+    }
+    
+    _decls.put(name, decl);
+    return decl;
 }
 
 /**
@@ -183,14 +213,53 @@ public static String getTypeName(Type aType)
     }
         
     // Handle TypeVariable
-    if(aType instanceof TypeVariable)
-        return getTypeName(((TypeVariable)aType).getBounds()[0]);
+    if(aType instanceof TypeVariable) { TypeVariable tv = (TypeVariable)aType;
+        //Type typ = tv.getBounds()[0]; return getTypeName(typ);
+        return tv.getName();
+    }
         
     // Handle WildcardType
     if(aType instanceof WildcardType) { WildcardType wc = (WildcardType)aType;
         if(wc.getLowerBounds().length>0)
             return getTypeName(wc.getLowerBounds()[0]);
         return getTypeName(wc.getUpperBounds()[0]);
+    }
+    
+    // Complain about anything else
+    throw new RuntimeException("JavaDecl: Can't get Type name from type: " + aType);
+}
+
+/**
+ * Returns the class simple name, converting primitive arrays to 'int[]' instead of '[I'.
+ */
+public static String getTypeSimpleName(Type aType)
+{
+    // Handle Class
+    if(aType instanceof Class) { Class cls = (Class)aType;
+        return cls.getSimpleName(); }
+
+    // Handle GenericArrayType
+    if(aType instanceof GenericArrayType) { GenericArrayType gat = (GenericArrayType)aType;
+        return getTypeSimpleName(gat.getGenericComponentType()) + "[]"; }
+        
+    // Handle ParameterizedType (e.g., Class <T>, List <T>, Map <K,V>)
+    if(aType instanceof ParameterizedType) { ParameterizedType pt = (ParameterizedType)aType;
+        Type base = pt.getRawType();
+        StringBuffer sb = new StringBuffer(getTypeSimpleName(base)).append('<');
+        Type types[] = pt.getActualTypeArguments(), last = types[types.length-1];
+        for(Type ta : types) { sb.append(getTypeSimpleName(ta)); if(ta!=last) sb.append(','); }
+        return sb.append('>').toString();
+    }
+        
+    // Handle TypeVariable
+    if(aType instanceof TypeVariable) { TypeVariable tv = (TypeVariable)aType;
+        return tv.getName(); }
+        
+    // Handle WildcardType
+    if(aType instanceof WildcardType) { WildcardType wc = (WildcardType)aType;
+        if(wc.getLowerBounds().length>0)
+            return getTypeSimpleName(wc.getLowerBounds()[0]);
+        return getTypeSimpleName(wc.getUpperBounds()[0]);
     }
     
     // Complain about anything else
@@ -240,6 +309,77 @@ public static String getClassName(Type aType)
     if(cls.isArray())
         return cls.getComponentType().getName() + "[]";
     return cls.getName();
+}
+
+/**
+ * Returns an id string for given Java part.
+ */
+public static String getId(Object anObj)
+{
+    // Handle Class: <Name>
+    if(anObj instanceof Class) { Class cls = (Class)anObj;
+        return cls.getName(); }
+    
+    // Create StringBuffer
+    StringBuffer sb = new StringBuffer();
+    
+    // Handle Field: DeclClassName.<Name>
+    if(anObj instanceof Field) { Field field = (Field)anObj;
+        sb.append(field.getDeclaringClass()).append('.').append(field.getName());
+    }
+    
+    // Handle Method: DeclClassName.Name(<ParamType>,...)
+    else if(anObj instanceof Method) { Method meth = (Method)anObj;
+        sb.append(meth.getDeclaringClass()).append('.').append(meth.getName()).append('(');
+        Class ptypes[] = meth.getParameterTypes(), last = ptypes.length>0? ptypes[ptypes.length-1] : null;
+        for(Class ptype : ptypes) { sb.append(ptype.getName()); if(ptype!=last) sb.append(','); }
+        sb.append(')');
+    }
+    
+    // Handle Constructor: DeclClassName(<ParamType>,...)
+    else if(anObj instanceof Constructor) { Constructor constr = (Constructor)anObj;
+        sb.append(constr.getDeclaringClass()).append('(');
+        Class ptypes[] = constr.getParameterTypes(), last = ptypes.length>0? ptypes[ptypes.length-1] : null;
+        for(Class ptype : ptypes) { sb.append(ptype.getName()); if(ptype!=last) sb.append(','); }
+        sb.append(')');
+    }
+    
+    // Handle ParameterizedType: RawType<TypeArg,...>
+    else if(anObj instanceof ParameterizedType) { ParameterizedType pt = (ParameterizedType)anObj;
+        sb.append(pt.getRawType()).append('<');
+        Type types[] = pt.getActualTypeArguments(), last = types.length>0? types[types.length-1] : null;
+        for(Type type : types) { sb.append(getId(type)); if(type!=last) sb.append(','); }
+        sb.append('>');
+    }
+    
+    // Handle TypeVariable: DeclType.Name
+    else if(anObj instanceof TypeVariable) { TypeVariable tv = (TypeVariable)anObj;
+        sb.append(getId(tv.getGenericDeclaration())).append('.').append(tv.getName()); }
+    
+    // Handle GenericArrayType: CompType[]
+    else if(anObj instanceof GenericArrayType) { GenericArrayType gat = (GenericArrayType)anObj;
+        sb.append(gat.getGenericComponentType()).append("[]"); }
+        
+    // Handle WildcardType
+    else if(anObj instanceof WildcardType) { WildcardType wc = (WildcardType)anObj;
+        if(wc.getLowerBounds().length>0)
+            sb.append(wc.getLowerBounds()[0]);
+        else sb.append(wc.getUpperBounds()[0]);
+    }
+    
+    // Handle JVarDecl
+    else if(anObj instanceof JVarDecl) { JVarDecl vd = (JVarDecl)anObj;
+        sb.append("JVarDecl").append(vd.getName()); }
+        
+    // Handle String (package name)
+    else if(anObj instanceof String)
+        sb.append(anObj);
+    
+    // Complain about anything else
+    else throw new RuntimeException("Unsupported type");
+    
+    // Return string
+    return sb.toString();
 }
 
 /**

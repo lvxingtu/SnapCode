@@ -1,6 +1,7 @@
 package snap.javaparse;
 import java.lang.reflect.*;
 import java.util.*;
+import snap.util.ArrayUtils;
 
 /**
  * This class manages JavaDecls for a class.
@@ -24,7 +25,7 @@ public class JavaDeclHpr {
 
     // The inner class decls
     List <JavaDecl>  _icdecls = new ArrayList();
-
+    
 /**
  * Creates a new JavaDeclClass.
  */
@@ -65,13 +66,21 @@ public HashSet <JavaDecl> updateDecls()
     // Make sure class decl is up to date
     if(_cdecl.getModifiers()!=cls.getModifiers())
         _cdecl._mods = cls.getModifiers();
-    
+        
     // Inner Classes: Add JavaDecl for each inner class
     Class iclss[]; try { iclss = cls.getDeclaredClasses(); }
     catch(Throwable e) { System.err.println(e + " in " + cname); return null; }
     for(Class icls : iclss) {   //if(icls.isSynthetic()) continue;
         JavaDecl decl = getClassDecl(icls);
-        if(decl==null) { decl = new JavaDecl(owner,_cdecl,icls); addedDecls.add(decl); _icdecls.add(decl); }
+        if(decl==null) { decl = new JavaDecl(owner,_cdecl,icls); addedDecls.add(decl); addDecl(decl); }
+        else removedDecls.remove(decl);
+    }
+    
+    // TypeVariables: Add JavaDecl for each Type parameter
+    Collections.addAll(removedDecls, _cdecl._typeVars);
+    for(TypeVariable tv : cls.getTypeParameters()) { String name = tv.getName();
+        JavaDecl decl = _cdecl.getTypeVar(name);
+        if(decl==null) { decl = new JavaDecl(owner,_cdecl,tv); addedDecls.add(decl); addDecl(decl); }
         else removedDecls.remove(decl);
     }
     
@@ -80,7 +89,7 @@ public HashSet <JavaDecl> updateDecls()
     catch(Throwable e) { System.err.println(e + " in " + cname); return null; }
     for(Field field : fields) {
         JavaDecl decl = getFieldDecl(field);
-        if(decl==null) { decl = new JavaDecl(owner,_cdecl,field); addedDecls.add(decl); _fdecls.add(decl); }
+        if(decl==null) { decl = new JavaDecl(owner,_cdecl,field); addedDecls.add(decl); addDecl(decl); }
         else removedDecls.remove(decl);
     }
     
@@ -90,7 +99,7 @@ public HashSet <JavaDecl> updateDecls()
     for(Method meth : methods) {
         if(meth.isSynthetic()) continue;
         JavaDecl decl = getMethodDecl(meth);
-        if(decl==null) { decl = new JavaDecl(owner,_cdecl,meth); addedDecls.add(decl); _mdecls.add(decl); }
+        if(decl==null) { decl = new JavaDecl(owner,_cdecl,meth); addedDecls.add(decl); addDecl(decl); }
         else removedDecls.remove(decl);
     }
     
@@ -100,7 +109,7 @@ public HashSet <JavaDecl> updateDecls()
     for(Constructor constr : constrs) {
         if(constr.isSynthetic()) continue;
         JavaDecl decl = getConstructorDecl(constr);
-        if(decl==null) { decl = new JavaDecl(owner,_cdecl,constr); addedDecls.add(decl); _cdecls.add(decl); }
+        if(decl==null) { decl = new JavaDecl(owner,_cdecl,constr); addedDecls.add(decl); addDecl(decl); }
         else removedDecls.remove(decl);
     }
     
@@ -223,7 +232,7 @@ public JavaDecl getConstructorDeclDeep(int theMods, JavaDecl theTypes[])
 }
 
 /**
- * Returns a Class decl for inner class name.
+ * Returns a Class decl for inner class.
  */
 public JavaDecl getClassDecl(Class aClass)  { return getClassDecl(aClass.getName()); }
 
@@ -251,14 +260,40 @@ public JavaDecl getClassDeclDeep(String aName)
 }
 
 /**
+ * Adds a TypeVar decl.
+ */
+private void addTypeVarDecl(JavaDecl aDecl)  { _cdecl._typeVars = ArrayUtils.add(_cdecl._typeVars,aDecl); }
+
+/**
+ * Adds a decl.
+ */
+public void addDecl(JavaDecl aDecl)
+{
+    JavaDecl.DeclType type = aDecl.getType();
+    switch(type) {
+        case Field: _fdecls.add(aDecl); break;
+        case Method: _mdecls.add(aDecl); break;
+        case Constructor: _cdecls.add(aDecl); break;
+        case Class: _icdecls.add(aDecl); break;
+        case TypeVar: addTypeVarDecl(aDecl); break;
+        default: throw new RuntimeException("JavaDeclHpr.addDecl: Invalid type " + type);
+    }
+}
+
+/**
  * Removes a decl.
  */
 public void removeDecl(JavaDecl aDecl)
 {
-    if(aDecl.isField()) _fdecls.remove(aDecl);
-    else if(aDecl.isMethod()) _mdecls.remove(aDecl);
-    else if(aDecl.isConstructor()) _cdecls.remove(aDecl);
-    else if(aDecl.isClass()) _icdecls.remove(aDecl);
+    JavaDecl.DeclType type = aDecl.getType();
+    switch(type) {
+        case Field: _fdecls.remove(aDecl); break;
+        case Method: _mdecls.remove(aDecl); break;
+        case Constructor: _cdecls.remove(aDecl); break;
+        case Class: _icdecls.remove(aDecl); break;
+        case TypeVar: _cdecl._typeVars = ArrayUtils.remove(_cdecl._typeVars, aDecl); break;
+        default: throw new RuntimeException("JavaDeclHpr.removeDecl: Invalid type " + type);
+    }
 }
 
 /**
