@@ -10,6 +10,30 @@ package snap.javaparse;
 public abstract class JExpr extends JNode {
 
 /**
+ * Returns the node the expression should be evaluated against.
+ */
+public JNode getScopeNode()
+{
+    // Get parent expression, and if found, return its type class
+    JExpr parentExpr = getParentExpr();
+    if(parentExpr!=null)
+        return parentExpr;
+    
+    // Otherwise, return enclosing class
+    return getEnclosingClassDecl();
+}
+
+/**
+ * Returns the ScopeNode EvalType.
+ */
+public JavaDecl getScopeNodeEvalType()  { JNode sn = getScopeNode(); return sn!=null? sn.getEvalType() : null; }
+
+/**
+ * Returns the ScopeNode EvalClass.
+ */
+public Class getScopeNodeEvalClass()  { JNode sn = getScopeNode(); return sn!=null? sn.getEvalClass() : null; }
+
+/**
  * Returns the expression prior to this expression, if parent is JExprChain and this expression isn't first.
  */
 public JExpr getParentExpr()
@@ -21,36 +45,6 @@ public JExpr getParentExpr()
             if(expr==this)
                 return i>0? echain.getExpr(i-1) : null; } }
     return null; // Return null, since no parent expression
-}
-
-/**
- * Returns the parent JClassRef.
- */
-public JavaDecl getParentExprEvalType()
-{
-    // Get parent expression, and if found, return its type class
-    JExpr parentExpr = getParentExpr();
-    if(parentExpr!=null)
-        return parentExpr.getEvalType();
-    
-    // Otherwise, return enclosing class
-    JClassDecl eclass = getEnclosingClassDecl();
-    return eclass!=null? eclass.getEvalType() : null;
-}
-
-/**
- * Returns the parent JClassRef.
- */
-public Class getParentExprEvalClass()
-{
-    // Get parent expression, and if found, return its type class
-    JExpr parentExpr = getParentExpr();
-    if(parentExpr!=null)
-        return parentExpr.getEvalClass();
-    
-    // Otherwise, return enclosing class
-    JClassDecl eclass = getEnclosingClassDecl();
-    return eclass!=null? eclass.getEvalClass() : null;
 }
 
 /**

@@ -81,17 +81,23 @@ public Class[] getArgClasses()
  */
 public Method getMethod()
 {
-    // Get method name, args and base class
+    // Get method name, args and scope class for expression
     String name = getName();
     Class argClasses[] = getArgClasses();
-    Class pclass = getParentExprEvalClass();
+    Class sclass = getScopeNodeEvalClass();
     
     // Iterate up enclosing classes until we find method
-    for(Class c=pclass; c!=null; c=c.getEnclosingClass()) {
+    for(Class c=sclass; c!=null; c=c.getEnclosingClass()) {
         Method meth = null; try { meth = ClassUtils.getMethod(c, name, argClasses); }
         catch(Throwable t) { }  // Since the compiled app can be in any weird state
         if(meth!=null)
             return meth;
+    }
+    
+    // If scope class is interface, try evaluating on Object
+    if(sclass!=null && sclass.isInterface()) {
+        try { return ClassUtils.getMethod(Object.class, name, argClasses); }
+        catch(Throwable t) { }  // Since the compiled app can be in any weird state
     }
     
     // See if method is from static import
@@ -139,7 +145,7 @@ protected JavaDecl getEvalTypeImpl(JNode aNode)
     else if(aNode==this) {
         JavaDecl decl = aNode.getDecl(); if(decl==null) return null;
         JavaDecl etype = decl.getEvalType();
-        JavaDecl parType = getParentExprEvalType();
+        JavaDecl parType = getScopeNodeEvalType();
         if(etype.isTypeVar() && parType.isParamType())
             return parType.getTypeVars()[0];
     }
