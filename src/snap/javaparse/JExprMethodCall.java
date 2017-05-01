@@ -140,7 +140,7 @@ protected JavaDecl getEvalTypeImpl(JNode aNode)
         JavaDecl decl = aNode.getDecl(); if(decl==null) return null;
         JavaDecl etype = decl.getEvalType();
         JavaDecl parType = getParentExprEvalType();
-        if(etype.isTypeVar() && parType.isParamClass())
+        if(etype.isTypeVar() && parType.isParamType())
             return parType.getTypeVars()[0];
     }
     

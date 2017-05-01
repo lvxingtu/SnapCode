@@ -51,7 +51,7 @@ public class JavaDecl implements Comparable<JavaDecl> {
     JavaDeclHpr    _hpr;
     
     // Constants for type
-    public enum DeclType { Class, Field, Constructor, Method, Package, VarDecl, ParamClass, TypeVar }
+    public enum DeclType { Class, Field, Constructor, Method, Package, VarDecl, ParamType, TypeVar }
     
     // Shared empty TypeVar array
     private static JavaDecl[] EMPTY_DECLS = new JavaDecl[0];
@@ -95,7 +95,7 @@ private void initType(Type aType)
 {
     // Handle ParameterizedType
     if(aType instanceof ParameterizedType) { ParameterizedType pt = (ParameterizedType)aType;
-        _type = DeclType.ParamClass;
+        _type = DeclType.ParamType;
         _name = JavaDeclOwner.getTypeName(pt); _sname = JavaDeclOwner.getTypeSimpleName(pt);
         _par = _owner.getTypeDecl(pt.getRawType(), _par);
         Type typArgs[] = pt.getActualTypeArguments();
@@ -215,7 +215,7 @@ public boolean isVarDecl()  { return _type==DeclType.VarDecl; }
 /**
  * Returns whether is a parameterized class.
  */
-public boolean isParamClass()  { return _type==DeclType.ParamClass; }
+public boolean isParamType()  { return _type==DeclType.ParamType; }
 
 /**
  * Returns whether is a TypeVar.
@@ -228,7 +228,7 @@ public boolean isTypeVar()  { return _type==DeclType.TypeVar; }
 public boolean isResolvedType()
 {
     if(isTypeVar()) return false;
-    if(isParamClass()) {
+    if(isParamType()) {
         if(getParent().isTypeVar()) return false;
         for(JavaDecl tv : getTypeVars())
             if(tv.isTypeVar())
@@ -238,9 +238,9 @@ public boolean isResolvedType()
 }
 
 /**
- * Returns whether is a Type (Class, ParamClass, TypeVar).
+ * Returns whether is a Type (Class, ParamType, TypeVar).
  */
-public boolean isType()  { return isClass() || isParamClass() || isTypeVar(); }
+public boolean isType()  { return isClass() || isParamType() || isTypeVar(); }
 
 /**
  * Returns the modifiers.
@@ -390,7 +390,7 @@ public JavaDecl getTypeVar(String aName)
 }
 
 /**
- * Returns the type args (ParamClass).
+ * Returns the type args (ParamType).
  */
 public JavaDecl[] getTypeArgs()  { return _typeVars; }
 
