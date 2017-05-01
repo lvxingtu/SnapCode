@@ -12,11 +12,19 @@ public class JConstrDecl extends JMethodDecl {
 /**
  * Override to get declaration from actual Constructor.
  */
-@Override
 protected JavaDecl getDeclImpl()
 {
     Constructor c = getConstructor();
     return c!=null? getJavaDecl(c) : null;
+}
+
+/**
+ * Override to check field declarations for id.
+ */
+protected JavaDecl getDeclImpl(JNode aNode)
+{
+    if(aNode==_id) return getDecl();
+    return super.getDeclImpl(aNode);
 }
 
 /**

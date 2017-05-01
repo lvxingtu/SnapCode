@@ -146,12 +146,10 @@ protected JavaDecl getDeclImpl()
 /**
  * Override to resolve id node.
  */
-@Override
-protected JavaDecl resolveName(JNode aNode)
+protected JavaDecl getDeclImpl(JNode aNode)
 {
-    if(aNode==_id)
-        return getDecl();
-    return super.resolveName(aNode);
+    if(aNode==_id) return getDecl();
+    return super.getDeclImpl(aNode);
 }
 
 /**

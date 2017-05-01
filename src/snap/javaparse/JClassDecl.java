@@ -324,16 +324,14 @@ protected JavaDecl getDeclImpl()
 /**
  * Override to check field declarations for id.
  */
-@Override
-protected JavaDecl resolveName(JNode aNode)
+protected JavaDecl getDeclImpl(JNode aNode)
 {
     // If class id, return class declaration
-    if(aNode==_id)
-        return getDecl();
+    if(aNode==_id) return getDecl();
     
     // If Extends or Implements node, forward on
     if(aNode.getParent()==this)
-        return super.resolveName(aNode);
+        return super.getDeclImpl(aNode);
     
     // If it's "this", set class and return ClassField
     String name = aNode.getName(); boolean isId = aNode instanceof JExprId, isType = !isId;
@@ -378,7 +376,7 @@ protected JavaDecl resolveName(JNode aNode)
         return getJavaDecl(cls);
     
     // Do normal version
-    return super.resolveName(aNode);
+    return super.getDeclImpl(aNode);
 }
 
 /**

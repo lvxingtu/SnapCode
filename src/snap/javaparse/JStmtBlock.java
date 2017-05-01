@@ -38,18 +38,18 @@ public JStmtBlock getBlock()  { return this; }
 /**
  * Override to check inner variable declaration statements.
  */
-protected JavaDecl resolveName(JNode aNode)
+protected JavaDecl getDeclImpl(JNode aNode)
 {
-    JavaDecl decl = resolveName(aNode, getStatements());
+    JavaDecl decl = getDeclImpl(aNode, getStatements());
     if(decl!=null)
         return decl;
-    return super.resolveName(aNode);
+    return super.getDeclImpl(aNode);
 }
 
 /**
  * Override to check inner variable declaration statements.
  */
-public static JavaDecl resolveName(JNode aNode, List <JStmt> theStmts)
+public static JavaDecl getDeclImpl(JNode aNode, List <JStmt> theStmts)
 {
     // Get node info
     String name = aNode.getName(); boolean isType = aNode instanceof JExprType;

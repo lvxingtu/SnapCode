@@ -90,13 +90,12 @@ public static class CatchBlock extends JNode {
     public void setBlock(JStmtBlock aStmtBlock)  { replaceChild(_block, _block=aStmtBlock); }
     
     /** Override to check param. */
-    @Override
-    protected JavaDecl resolveName(JNode aNode)
+    protected JavaDecl getDeclImpl(JNode aNode)
     {
         String name = aNode.getName(); boolean isType = aNode instanceof JExprType;
         if(!isType && _param!=null && SnapUtils.equals(_param.getName(), aNode.getName()))
             return _param.getDecl();
-        return super.resolveName(aNode);
+        return super.getDeclImpl(aNode);
     }
 }
 

@@ -107,8 +107,7 @@ protected JavaDecl getDeclImpl()  { JClassDecl cd = getClassDecl(); return cd!=n
 /**
  * Override to check for package name, import class name, static import class member.
  */
-@Override
-protected JavaDecl resolveName(JNode aNode)
+protected JavaDecl getDeclImpl(JNode aNode)
 {
     // Get node info
     String name = aNode.getName();
@@ -129,7 +128,7 @@ protected JavaDecl resolveName(JNode aNode)
         return getJavaDecl(field);
 
     // Do normal version
-    return super.resolveName(aNode);
+    return super.getDeclImpl(aNode);
 }
 
 /**

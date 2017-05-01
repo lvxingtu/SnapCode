@@ -46,6 +46,10 @@ protected JavaDecl getDeclImpl()
 /**
  * Override to resolve enum id.
  */
-protected JavaDecl resolveName(JNode aNode)  { return aNode==_id? getDecl() : super.resolveName(aNode); }
+protected JavaDecl getDeclImpl(JNode aNode)
+{
+    if(aNode==_id) return getDecl();
+    return super.getDeclImpl(aNode);
+}
 
 }

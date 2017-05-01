@@ -106,8 +106,7 @@ public void setBlock(JStmtBlock aBlock)  { setStatement(aBlock); }
 /**
  * Override to check init declaration.
  */
-@Override
-protected JavaDecl resolveName(JNode aNode)
+protected JavaDecl getDeclImpl(JNode aNode)
 {
     // Get node info
     String name = aNode.getName(); boolean isType = aNode instanceof JExprType;
@@ -118,7 +117,7 @@ protected JavaDecl resolveName(JNode aNode)
             return vd.getDecl();
 
     // Do normal version
-    return super.resolveName(aNode);
+    return super.getDeclImpl(aNode);
 }
 
 }

@@ -119,9 +119,13 @@ protected JavaDecl getDeclImpl()
 }
 
 /**
- * Override to resolve method name.
+ * Override to handle method name.
  */
-protected JavaDecl resolveName(JNode aNode)  { return aNode==_id? getDecl() : super.resolveName(aNode); }
+protected JavaDecl getDeclImpl(JNode aNode)
+{
+    if(aNode==_id) return getDecl();
+    return super.getDeclImpl(aNode);
+}
         
 /**
  * Override to resolve Decl.EvalType from ParentExpr.EvalType.
@@ -129,8 +133,7 @@ protected JavaDecl resolveName(JNode aNode)  { return aNode==_id? getDecl() : su
 protected JavaDecl getEvalTypeImpl(JNode aNode)
 {
     // Handle MethodCall id
-    if(aNode==_id)
-        return getEvalType();
+    if(aNode==_id) return getEvalType();
 
     // Handle this node
     else if(aNode==this) {

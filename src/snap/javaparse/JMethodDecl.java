@@ -119,7 +119,6 @@ public void setBlock(JStmtBlock aBlock)  { replaceChild(_block, _block = aBlock)
 /**
  * Override to get decl from method.
  */
-@Override
 protected JavaDecl getDeclImpl()
 {
     Method meth = getMethod();
@@ -129,12 +128,10 @@ protected JavaDecl getDeclImpl()
 /**
  * Override to check formal parameters.
  */
-@Override
-protected JavaDecl resolveName(JNode aNode)
+protected JavaDecl getDeclImpl(JNode aNode)
 {
     // If node is method name, return method decl
-    if(aNode==_id)
-        return getDecl();
+    if(aNode==_id) return getDecl();
     
     // Iterate over formalParams
     String name = aNode.getName();
@@ -148,7 +145,7 @@ protected JavaDecl resolveName(JNode aNode)
         return tp.getDecl();
     
     // Do normal version
-    return super.resolveName(aNode);
+    return super.getDeclImpl(aNode);
 }
 
 /**

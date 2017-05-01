@@ -58,13 +58,12 @@ public void setStmt(JStmt aStmt)  { replaceChild(_stmt, _stmt=aStmt); }
 /**
  * Override to handle label variable declaration.
  */
-@Override
-protected JavaDecl resolveName(JNode aNode)
+protected JavaDecl getDeclImpl(JNode aNode)
 {
     String name = aNode.getName(); boolean isType = aNode instanceof JExprType;
     if(!isType && SnapUtils.equals(getLabelName(), name))
         return getLabelVarDecl().getDecl();
-    return super.resolveName(aNode);
+    return super.getDeclImpl(aNode);
 }
 
 }

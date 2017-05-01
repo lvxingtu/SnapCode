@@ -70,21 +70,25 @@ public JavaDecl getDecl()  { return _decl!=null? _decl : (_decl=getDeclImpl()); 
 protected JavaDecl getDeclImpl()  { return null; }
 
 /**
- * Resolve a name.
+ * Returns the JavaDecl most closely associated with given child JNode.
  */
-protected JavaDecl resolveName(JNode aNode)  { return _parent!=null? _parent.resolveName(aNode) : null; }
+protected JavaDecl getDeclImpl(JNode aNode)  { return _parent!=null? _parent.getDeclImpl(aNode) : null; }
 
 /**
  * Returns the JavaDecl that this nodes evaluates to (resolved, if TypeVar).
  */
-public JavaDecl getEvalType()
+public JavaDecl getEvalType()  { return _evalType!=null? _evalType : (_evalType=getEvalTypeImpl()); }
+
+/**
+ * Returns the JavaDecl that this nodes evaluates to (resolved, if TypeVar).
+ */
+protected JavaDecl getEvalTypeImpl()
 {
-    if(_evalType!=null) return _evalType;
     JavaDecl decl = getDecl(); if(decl==null) return null;
     JavaDecl etype = decl.getEvalType();
     if(etype!=null && !etype.isResolvedType())
         etype = getEvalTypeImpl(this);
-    return _evalType = etype;
+    return etype;
 }
 
 /**

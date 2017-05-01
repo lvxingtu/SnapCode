@@ -32,6 +32,11 @@ public int getExprCount()  { return _children.size(); }
 public JExpr getExpr(int anIndex)  { return (JExpr)_children.get(anIndex); }
 
 /**
+ * Returns the individual expression at given index.
+ */
+public JExpr getExprLast()  { int pc = getExprCount(); return pc>0? getExpr(pc-1) : null; }
+
+/**
  * Returns the expressions list.
  */
 public List <JExpr> getExpressions()  { return (List)_children; }
@@ -44,28 +49,23 @@ public void addExpr(JExpr anExpr)  { addChild(anExpr, getChildCount()); }
 /**
  * Tries to resolve the class declaration for this node.
  */
-protected JavaDecl getDeclImpl()
-{   
-    int pc = getExprCount();
-    JExpr p = pc>0? getExpr(pc-1) : null;
-    return p!=null? p.getDecl() : null;
-}
+protected JavaDecl getDeclImpl()  { JExpr p = getExprLast(); return p!=null? p.getDecl() : null; }
 
 /**
  * Override to resolve names in chain.
  */
-protected JavaDecl resolveName(JNode aNode)
+protected JavaDecl getDeclImpl(JNode aNode)
 {
     // Get node info
     String name = aNode.getName(); boolean isId = aNode instanceof JExprId, isType = !isId;
     if(isType)
-        return super.resolveName(aNode);
+        return super.getDeclImpl(aNode);
     
     // Get parent expression - if not found (first in chain) do normal version
     JExprId id = (JExprId)aNode;
     JExpr parExpr = id.getParentExpr();
     if(parExpr==null)
-        return super.resolveName(aNode);
+        return super.getDeclImpl(aNode);
     
     // Get parent declaration
     JavaDecl parDecl = parExpr.getDecl();
@@ -104,8 +104,13 @@ protected JavaDecl resolveName(JNode aNode)
     }
 
     // Do normal version
-    return super.resolveName(aNode);
+    return super.getDeclImpl(aNode);
 }
+
+/**
+ * Returns the resolved eval type for child node, if this ancestor can.
+ */
+protected JavaDecl getEvalTypeImpl()  { JExpr p = getExprLast(); return p!=null? p.getEvalType() : null; }
 
 /**
  * Returns the part name.

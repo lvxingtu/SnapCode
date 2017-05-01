@@ -18,13 +18,7 @@ public JExprId(String aName)  { setName(aName); }
 /**
  * Override to resolve id name from parents.
  */
-protected JavaDecl getDeclImpl()
-{
-    JavaDecl decl = resolveName(this);
-    //if(decl==null)
-    //    System.err.println("Unresolved: " + getFile().getSourceFile() + " :" + getLineIndex() + " " + getName());
-    return decl;
-}
+protected JavaDecl getDeclImpl()  { return getDeclImpl(this); }
 
 /**
  * Returns whether this is variable identifier.

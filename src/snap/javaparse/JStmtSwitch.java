@@ -40,8 +40,7 @@ public void addSwitchLabel(SwitchLabel aSL)  { _switchLabels.add(aSL); addChild(
 /**
  * Override to see if id is enum name.
  */
-@Override
-protected JavaDecl resolveName(JNode aNode)
+protected JavaDecl getDeclImpl(JNode aNode)
 {
     // Get node info
     String name = aNode.getName(); boolean isType = aNode instanceof JExprType;
@@ -55,7 +54,7 @@ protected JavaDecl resolveName(JNode aNode)
     }
 
     // Do normal version
-    return super.resolveName(aNode);
+    return super.getDeclImpl(aNode);
 }
 
 /**
@@ -91,12 +90,12 @@ public static class SwitchLabel extends JNode
     public void addStatement(JStmt aStmt)  { _stmts.add(aStmt); addChild(aStmt, -1); }
     
     /** Override to check inner variable declaration statements. */
-    protected JavaDecl resolveName(JNode aNode)
+    protected JavaDecl getDeclImpl(JNode aNode)
     {
-        JavaDecl decl = JStmtBlock.resolveName(aNode, getStatements());
+        JavaDecl decl = JStmtBlock.getDeclImpl(aNode, getStatements());
         if(decl!=null)
             return decl;
-        return super.resolveName(aNode);
+        return super.getDeclImpl(aNode);
     }
 }
 

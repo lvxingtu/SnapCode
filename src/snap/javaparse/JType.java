@@ -99,7 +99,7 @@ protected JavaDecl getBaseDecl()
     
     // If not primitive, try to resolve
     if(decl==null)
-        decl = resolveName(this);
+        decl = getDeclImpl(this);
 
     // Return declaration
     //if(decl==null) System.err.println("Unresolved Type: " + this);
