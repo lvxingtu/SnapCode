@@ -223,6 +223,21 @@ public boolean isParamClass()  { return _type==DeclType.ParamClass; }
 public boolean isTypeVar()  { return _type==DeclType.TypeVar; }
 
 /**
+ * Returns whether is Type is explicit (doesn't contain any type variables).
+ */
+public boolean isResolvedType()
+{
+    if(isTypeVar()) return false;
+    if(isParamClass()) {
+        if(getParent().isTypeVar()) return false;
+        for(JavaDecl tv : getTypeVars())
+            if(tv.isTypeVar())
+                return false;
+    }
+    return true;
+}
+
+/**
  * Returns whether is a Type (Class, ParamClass, TypeVar).
  */
 public boolean isType()  { return isClass() || isParamClass() || isTypeVar(); }

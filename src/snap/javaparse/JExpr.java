@@ -26,7 +26,22 @@ public JExpr getParentExpr()
 /**
  * Returns the parent JClassRef.
  */
-public Class getParentClass()
+public JavaDecl getParentExprEvalType()
+{
+    // Get parent expression, and if found, return its type class
+    JExpr parentExpr = getParentExpr();
+    if(parentExpr!=null)
+        return parentExpr.getEvalType();
+    
+    // Otherwise, return enclosing class
+    JClassDecl eclass = getEnclosingClassDecl();
+    return eclass!=null? eclass.getEvalType() : null;
+}
+
+/**
+ * Returns the parent JClassRef.
+ */
+public Class getParentExprEvalClass()
 {
     // Get parent expression, and if found, return its type class
     JExpr parentExpr = getParentExpr();

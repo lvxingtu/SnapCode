@@ -129,10 +129,10 @@ public void resetUI()
     }
     
     // Add Eval Type Name of selected node to end
-    JavaDecl decl = selNode!=null? selNode.getDecl() : null;
-    if(decl!=null) {
-        String str = " (" + decl.getEvalType().getSimpleName() + ')';
-        Label label = new Label(); label.setText(str); label.setFont(font); label.setToolTip(decl.getFullName());
+    JavaDecl etype = selNode!=null? selNode.getEvalType() : null;
+    if(etype!=null) {
+        String str = " (" + etype.getSimpleName() + ')';
+        Label label = new Label(); label.setText(str); label.setFont(font); label.setToolTip(etype.getName());
         nodePathBox.addChild(label);
     }
 }

@@ -23,8 +23,11 @@ public class JNode {
     // The list of child nodes
     List <JNode>        _children = Collections.EMPTY_LIST;
     
-    // The declaration for this node
+    // The declaration most closely associated with this node
     JavaDecl            _decl;
+    
+    // The type this node evaluates to (resolved, if TypeVar)
+    JavaDecl            _evalType;
 
 /**
  * Returns the parent file node (root).
@@ -47,34 +50,6 @@ public void setName(String aName)  { _name = aName; }
 protected String getNameImpl()  { return null; }
 
 /**
- * Tries to determine IdentiferType.
- */
-public JavaDecl getDecl()  { return _decl!=null? _decl : (_decl=getDeclImpl()); }
-
-/**
- * Returns JavaDecl that represents what this node evaluates to.
- */
-protected JavaDecl getDeclImpl()  { return null; }
-
-/**
- * Returns the Class of this node, if it has one.
- */
-public Class getEvalClass()
-{
-    JavaDecl decl = getDecl();
-    return decl!=null? decl.getEvalClass() : null;
-}
-
-/**
- * Returns the class name for this node, if it has one.
- */
-public String getEvalClassName()
-{
-    JavaDecl decl = getDecl();
-    return decl!=null? decl.getEvalTypeName() : null;
-}
-
-/**
  * Returns whether node is a declaration name (JClassDecl JMethodDecl, JFieldDecl, JVarDecl).
  */
 public boolean isDecl()
@@ -82,6 +57,66 @@ public boolean isDecl()
     JExprId id = this instanceof JExprId? (JExprId)this : null; if(id==null) return false;
     JNode par = id.getParent();
     return par instanceof JMemberDecl || par instanceof JEnumConst || par instanceof JVarDecl;
+}
+
+/**
+ * Returns the JavaDecl most closely associated with this JNode.
+ */
+public JavaDecl getDecl()  { return _decl!=null? _decl : (_decl=getDeclImpl()); }
+
+/**
+ * Returns the JavaDecl most closely associated with this JNode.
+ */
+protected JavaDecl getDeclImpl()  { return null; }
+
+/**
+ * Resolve a name.
+ */
+protected JavaDecl resolveName(JNode aNode)  { return _parent!=null? _parent.resolveName(aNode) : null; }
+
+/**
+ * Returns the JavaDecl that this nodes evaluates to (resolved, if TypeVar).
+ */
+public JavaDecl getEvalType()
+{
+    if(_evalType!=null) return _evalType;
+    JavaDecl decl = getDecl(); if(decl==null) return null;
+    JavaDecl etype = decl.getEvalType();
+    if(etype!=null && !etype.isResolvedType())
+        etype = getEvalTypeImpl(this);
+    return _evalType = etype;
+}
+
+/**
+ * Returns the resolved eval type for child node, if this ancestor can.
+ */
+protected JavaDecl getEvalTypeImpl(JNode aNode)  { return _parent!=null? _parent.getEvalTypeImpl(aNode) : null; }
+
+/**
+ * Returns the JavaDecl that this nodes evaluates to.
+ */
+public String getEvalTypeName()
+{
+    JavaDecl etype = getEvalType();
+    return etype!=null? etype.getName() : null;
+}
+
+/**
+ * Returns the Class of this node, if it has one.
+ */
+public Class getEvalClass()
+{
+    JavaDecl etype = getEvalType();
+    return etype!=null? etype.getEvalClass() : null;
+}
+
+/**
+ * Returns the class name for this node, if it has one.
+ */
+public String getEvalClassName()
+{
+    JavaDecl etype = getEvalType();
+    return etype!=null? etype.getClassName() : null;
 }
 
 /**
@@ -264,11 +299,6 @@ public JNode getNodeAtCharIndex(int aStart, int anEnd)
             return node.getNodeAtCharIndex(aStart, anEnd); }
     return this; // Return this node
 }
-
-/**
- * Resolve a name.
- */
-protected JavaDecl resolveName(JNode aNode)  { return _parent!=null? _parent.resolveName(aNode) : null; }
 
 /**
  * Fills a given list with variables that start with given prefix.

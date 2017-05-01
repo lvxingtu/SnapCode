@@ -81,17 +81,21 @@ public Class[] getArgClasses()
  */
 public Method getMethod()
 {
-    Class pclass = getParentClass();
+    // Get method name, args and base class
+    String name = getName();
     Class argClasses[] = getArgClasses();
+    Class pclass = getParentExprEvalClass();
+    
+    // Iterate up enclosing classes until we find method
     for(Class c=pclass; c!=null; c=c.getEnclosingClass()) {
-        Method meth = null; try { meth = ClassUtils.getMethod(c, getName(), argClasses); }
+        Method meth = null; try { meth = ClassUtils.getMethod(c, name, argClasses); }
         catch(Throwable t) { }  // Since the compiled app can be in any weird state
         if(meth!=null)
             return meth;
     }
     
     // See if method is from static import
-    Member mem = getFile().getImportClassMember(getName(), argClasses);
+    Member mem = getFile().getImportClassMember(name, argClasses);
     if(mem instanceof Method)
         return (Method)mem;
         
@@ -119,6 +123,28 @@ protected JavaDecl getDeclImpl()
  */
 protected JavaDecl resolveName(JNode aNode)  { return aNode==_id? getDecl() : super.resolveName(aNode); }
         
+/**
+ * Override to resolve Decl.EvalType from ParentExpr.EvalType.
+ */
+protected JavaDecl getEvalTypeImpl(JNode aNode)
+{
+    // Handle MethodCall id
+    if(aNode==_id)
+        return getEvalType();
+
+    // Handle this node
+    else if(aNode==this) {
+        JavaDecl decl = aNode.getDecl(); if(decl==null) return null;
+        JavaDecl etype = decl.getEvalType();
+        JavaDecl parType = getParentExprEvalType();
+        if(etype.isTypeVar() && parType.isParamClass())
+            return parType.getTypeVars()[0];
+    }
+    
+    // Do normal version
+    return super.getEvalTypeImpl(aNode);
+}
+
 /**
  * Returns the part name.
  */
