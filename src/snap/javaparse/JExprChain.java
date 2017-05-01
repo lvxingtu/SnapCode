@@ -95,12 +95,16 @@ protected JavaDecl getDeclImpl(JNode aNode)
     }
     
     // Handle any parent with class: Look for field
-    else if(parExpr.getEvalClass()!=null) { Class pclass = parExpr.getEvalClass();
-        if(pclass.isArray() && name.equals("length"))
+    else if(parExpr.getEvalType()!=null) { JavaDecl pdecl = parExpr.getEvalType();
+        if(pdecl.isArrayClass() && name.equals("length"))
             return getJavaDecl(int.class); // was FieldName;
-        Field field = pclass!=null? ClassUtils.getField(pclass, name) : null;
-        if(field!=null)
-            return getJavaDecl(field); // was FieldName;
+        if(pdecl.isParamType())
+            pdecl = pdecl.getParent();
+        if(pdecl.isClass()) {
+            JavaDecl jd = pdecl.getHpr().getFieldDeclDeep(-1,name,null);
+            if(jd!=null)
+                return jd;
+        }
     }
 
     // Do normal version

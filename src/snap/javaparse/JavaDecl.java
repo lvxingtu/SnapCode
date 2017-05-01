@@ -188,6 +188,11 @@ public boolean isEnum()  { return _type==DeclType.Class && _enum; }
 public boolean isInterface()  { return _type==DeclType.Class && _interface; }
 
 /**
+ * Returns whether is an array.
+ */
+public boolean isArrayClass()  { return _type==DeclType.Class && _name.endsWith("[]"); }
+
+/**
  * Returns whether is a field reference.
  */
 public boolean isField()  { return _type==DeclType.Field; }
