@@ -127,10 +127,22 @@ public HashSet <JavaDecl> updateDecls()
  */
 public JavaDecl getFieldDecl(Field aField)
 {
-    int mods = aField.getModifiers();
-    String name = aField.getName();
-    JavaDecl type = getJavaDecl(aField.getGenericType());
-    return getFieldDecl(mods, name, type);
+    String id = JavaDeclOwner.getId(aField);
+    JavaDecl decl = getFieldDecl(id); if(decl==null) return null;
+    int mods = aField.getModifiers(); if(mods!=decl.getModifiers()) return null;
+    //JavaDecl type = _cdecl._owner.getTypeDecl(aField.getGenericType(), _cdecl);
+    //if(type!=decl.getEvalType()) return null;
+    return decl;
+}
+
+/**
+ * Returns the field decl for id string.
+ */
+public JavaDecl getFieldDecl(String anId)
+{
+    if(_fdecls==null) updateDecls();
+    for(JavaDecl jd : _fdecls) if(jd.getId().equals(anId)) return jd;
+    return null;
 }
 
 /**
@@ -162,13 +174,24 @@ public JavaDecl getFieldDeclDeep(int theMods, String aName, JavaDecl aType)
  */
 public JavaDecl getMethodDecl(Method aMeth)
 {
-    int mods = aMeth.getModifiers();
-    String name = aMeth.getName();
-    JavaDecl type = getJavaDecl(aMeth.getGenericReturnType());
-    java.lang.reflect.Type ptypes[] = aMeth.getGenericParameterTypes();
-    JavaDecl types[] = new JavaDecl[ptypes.length];
-    for(int i=0;i<types.length;i++) types[i] = getJavaDecl(ptypes[i]);
-    return getMethodDecl(mods, name, type, types);
+    String id = JavaDeclOwner.getId(aMeth);
+    JavaDecl decl = getMethodDecl(id); if(decl==null) return null;
+    int mods = aMeth.getModifiers(); if(mods!=decl.getModifiers()) return null;
+    //java.lang.reflect.Type ptypes[] = aMeth.getGenericParameterTypes();
+    //if(ptypes.length!=aMeth.getParameterCount()) ptypes = aMeth.getParameterTypes();
+    //JavaDecl types[] = new JavaDecl[ptypes.length];
+    //for(int i=0;i<types.length;i++) types[i] = getTypeDecl(ptypes[i]);
+    return decl;
+}
+
+/**
+ * Returns the method decl for id string.
+ */
+public JavaDecl getMethodDecl(String anId)
+{
+    if(_fdecls==null) updateDecls();
+    for(JavaDecl jd : _mdecls) if(jd.getId().equals(anId)) return jd;
+    return null;
 }
 
 /**
@@ -202,12 +225,24 @@ public JavaDecl getConstructorDecl(Constructor aConstr)
 {
     if(_fdecls==null) updateDecls();
     
-    int mods = aConstr.getModifiers();
-    java.lang.reflect.Type ptypes[] = aConstr.getGenericParameterTypes();
-    if(ptypes.length!=aConstr.getParameterCount()) ptypes = aConstr.getParameterTypes();
-    JavaDecl types[] = new JavaDecl[ptypes.length];
-    for(int i=0;i<types.length;i++) types[i] = getJavaDecl(ptypes[i]);
-    return getConstructorDecl(mods, types);
+    String id = JavaDeclOwner.getId(aConstr);
+    JavaDecl decl = getConstructorDecl(id); if(decl==null) return null;
+    int mods = aConstr.getModifiers(); if(mods!=decl.getModifiers()) return null;
+    //java.lang.reflect.Type ptypes[] = aConstr.getGenericParameterTypes();
+    //if(ptypes.length!=aConstr.getParameterCount()) ptypes = aConstr.getParameterTypes();
+    //JavaDecl types[] = new JavaDecl[ptypes.length];
+    //for(int i=0;i<types.length;i++) types[i] = getJavaDecl(ptypes[i]);
+    return decl;
+}
+
+/**
+ * Returns the Constructor decl for id string.
+ */
+public JavaDecl getConstructorDecl(String anId)
+{
+    if(_fdecls==null) updateDecls();
+    for(JavaDecl jd : _cdecls) if(jd.getId().equals(anId)) return jd;
+    return null;
 }
 
 /**

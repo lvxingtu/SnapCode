@@ -108,10 +108,7 @@ private void initType(Type aType)
     else if(aType instanceof TypeVariable) { TypeVariable tv = (TypeVariable)aType; _type = DeclType.TypeVar;
         _name = _sname = tv.getName();
         Type etypes[] = tv.getBounds();
-        try { _evalType = _owner.getTypeDecl(etypes[0], _par); }
-        catch(Exception e) {
-            e.printStackTrace();
-        }
+        _evalType = _owner.getTypeDecl(etypes[0], _par);
     }
     
     // Handle Class
@@ -164,6 +161,11 @@ private void initMember(Member aMmbr)
             _argTypes[i] = _owner.getTypeDecl(ptypes[i], this);
     }
 }
+
+/**
+ * Returns the id.
+ */
+public String getId()  { return _id; }
 
 /**
  * Returns the type.
@@ -367,7 +369,7 @@ public JavaDecl getTypeVar(String aName)
     for(JavaDecl tv : _typeVars)
         if(tv.getName().equals(aName))
             return tv;
-    if(_par.isClass())
+    if(_par!=null && _par.isClass())
         return _par.getTypeVar(aName);
     return null;
 }
