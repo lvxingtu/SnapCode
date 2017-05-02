@@ -99,8 +99,8 @@ private void initType(Type aType)
         _name = JavaDeclOwner.getTypeName(pt); _sname = JavaDeclOwner.getTypeSimpleName(pt);
         _par = _owner.getTypeDecl(pt.getRawType(), _par);
         Type typArgs[] = pt.getActualTypeArguments();
-        _typeVars = new JavaDecl[typArgs.length];
-        for(int i=0,iMax=typArgs.length;i<iMax;i++) _typeVars[i] = _owner.getTypeDecl(typArgs[i], _par);
+        _argTypes = new JavaDecl[typArgs.length];
+        for(int i=0,iMax=typArgs.length;i<iMax;i++) _argTypes[i] = _owner.getTypeDecl(typArgs[i], _par);
         _evalType = this;
     }
     
@@ -134,8 +134,8 @@ private void initMember(Member aMmbr)
         _evalType = _owner.getTypeDecl(field.getGenericType(), _par); }
         
     // Handle Executable (Method, Constructor)
-    else { Executable exec = (Executable)aMmbr;
-    
+    else { Executable exec = (Executable)aMmbr; _type = exec instanceof Method? DeclType.Method : DeclType.Constructor;
+        
         // Get TypeVars
         TypeVariable tvars[] = exec.getTypeParameters();
         _typeVars = new JavaDecl[tvars.length];
@@ -144,14 +144,6 @@ private void initMember(Member aMmbr)
         // Get Return Type
         Type rtype = exec.getAnnotatedReturnType().getType();
         _evalType = _owner.getTypeDecl(rtype, this);
-        
-        // Handle Method
-        if(exec instanceof Method) { Method meth = (Method)exec; _type = DeclType.Method; }
-        //    _evalType = getJavaDecl(meth.getGenericReturnType()); }
-            
-        // Handle Constructor
-        else if(exec instanceof Constructor) { Constructor constr = (Constructor)exec; _type = DeclType.Constructor; }
-        //    _evalType = getJavaDecl(constr.getDeclaringClass()); }
         
         // Get GenericParameterTypes (this can fail https://bugs.openjdk.java.net/browse/JDK-8075483))
         Type ptypes[] = exec.getGenericParameterTypes();
@@ -386,18 +378,27 @@ public JavaDecl[] getTypeVars()  { return _typeVars; }
  */
 public JavaDecl getTypeVar(String aName)
 {
-    for(JavaDecl tv : _typeVars)
-        if(tv.getName().equals(aName))
-            return tv;
-    if(_par!=null && _par.isClass())
+    if(isClass())
+        return getHpr().getTypeVarDecl(aName);
+        
+    else if(isParamType()) {
+        int ind = _par.getHpr().getTypeVarDeclIndex(aName);
+        if(ind>=0 && ind<_argTypes.length)
+            return _argTypes[ind];
+    }
+    
+    else if(isMethod()) {
+        for(JavaDecl tvar : _typeVars)
+            if(tvar.getName().equals(aName))
+                return tvar;
         return _par.getTypeVar(aName);
+    }
+    
+    else if(isConstructor())
+        return _par.getTypeVar(aName);
+
     return null;
 }
-
-/**
- * Returns the type args (ParamType).
- */
-public JavaDecl[] getTypeArgs()  { return _typeVars; }
 
 /**
  * Returns the package decl.
@@ -533,11 +534,11 @@ public int compareTo(JavaDecl aDecl)
 /**
  * Standard hashcode implementation.
  */
-public int hashCode()  { return getFullName().hashCode(); }
+public int hashCode()  { return getId().hashCode(); }
 
 /**
  * Standard toString implementation.
  */
-public String toString()  { return _type + ": " + getFullName(); }
+public String toString()  { return _type + ": " + getId(); }
 
 }

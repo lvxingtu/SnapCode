@@ -1,7 +1,6 @@
 package snap.javaparse;
 import java.lang.reflect.*;
 import java.util.*;
-import snap.util.ArrayUtils;
 
 /**
  * This class manages JavaDecls for a class.
@@ -25,6 +24,9 @@ public class JavaDeclHpr {
 
     // The inner class decls
     List <JavaDecl>  _icdecls = new ArrayList();
+    
+    // The type var decls
+    List <JavaDecl>  _tvdecls = new ArrayList();
     
 /**
  * Creates a new JavaDeclClass.
@@ -79,7 +81,7 @@ public HashSet <JavaDecl> updateDecls()
     // TypeVariables: Add JavaDecl for each Type parameter
     Collections.addAll(removedDecls, _cdecl._typeVars);
     for(TypeVariable tv : cls.getTypeParameters()) { String name = tv.getName();
-        JavaDecl decl = _cdecl.getTypeVar(name);
+        JavaDecl decl = getTypeVarDecl(name);
         if(decl==null) { decl = new JavaDecl(owner,_cdecl,tv); addedDecls.add(decl); addDecl(decl); }
         else removedDecls.remove(decl);
     }
@@ -295,9 +297,30 @@ public JavaDecl getClassDeclDeep(String aName)
 }
 
 /**
- * Adds a TypeVar decl.
+ * Returns a TypeVar decl for inner class name.
  */
-private void addTypeVarDecl(JavaDecl aDecl)  { _cdecl._typeVars = ArrayUtils.add(_cdecl._typeVars,aDecl); }
+public JavaDecl getTypeVarDecl(String aName)
+{
+    if(_fdecls==null) updateDecls();
+    
+    for(JavaDecl jd : _tvdecls)
+        if(jd.getName().equals(aName))
+                return jd;
+    return null;
+}
+
+/**
+ * Returns a TypeVar decl for inner class name.
+ */
+public int getTypeVarDeclIndex(String aName)
+{
+    if(_fdecls==null) updateDecls();
+    
+    for(int i=0,iMax=_tvdecls.size();i<iMax;i++) { JavaDecl jd = _tvdecls.get(i);
+        if(jd.getName().equals(aName))
+                return i; }
+    return -1;
+}
 
 /**
  * Adds a decl.
@@ -310,7 +333,7 @@ public void addDecl(JavaDecl aDecl)
         case Method: _mdecls.add(aDecl); break;
         case Constructor: _cdecls.add(aDecl); break;
         case Class: _icdecls.add(aDecl); break;
-        case TypeVar: addTypeVarDecl(aDecl); break;
+        case TypeVar: _tvdecls.add(aDecl); break;
         default: throw new RuntimeException("JavaDeclHpr.addDecl: Invalid type " + type);
     }
 }
@@ -326,7 +349,7 @@ public void removeDecl(JavaDecl aDecl)
         case Method: _mdecls.remove(aDecl); break;
         case Constructor: _cdecls.remove(aDecl); break;
         case Class: _icdecls.remove(aDecl); break;
-        case TypeVar: _cdecl._typeVars = ArrayUtils.remove(_cdecl._typeVars, aDecl); break;
+        case TypeVar: _tvdecls.remove(aDecl); break;
         default: throw new RuntimeException("JavaDeclHpr.removeDecl: Invalid type " + type);
     }
 }

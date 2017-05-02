@@ -145,9 +145,11 @@ protected JavaDecl getEvalTypeImpl(JNode aNode)
     else if(aNode==this) {
         JavaDecl decl = aNode.getDecl(); if(decl==null) return null;
         JavaDecl etype = decl.getEvalType();
-        JavaDecl parType = getScopeNodeEvalType();
-        if(etype.isTypeVar() && parType.isParamType())
-            return parType.getTypeVars()[0];
+        JavaDecl scopeType = getScopeNodeEvalType();
+        if(etype.isTypeVar() && scopeType.isParamType()) {
+            String name = etype.getName();
+            return scopeType.getTypeVar(name);
+        }
     }
     
     // Do normal version
