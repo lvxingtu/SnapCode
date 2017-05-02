@@ -111,6 +111,11 @@ public String getNodeString()  { return "Allocation"; }
  */
 protected JavaDecl getDeclImpl()
 {
+    // If array alloc, just return Type decl
+    if(_arrayDims!=null)
+        return getType().getDecl();
+        
+    // Otherwise, get constructor decl
     Constructor cstr = getConstructor();
     return cstr!=null? getJavaDecl(cstr) : null;
 }
