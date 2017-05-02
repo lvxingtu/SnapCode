@@ -83,8 +83,8 @@ public JavaDecl getJavaDecl(Object anObj)
  */
 public JavaDecl getTypeDecl(Type aType, JavaDecl aPar)
 {
-    String name = getTypeName(aType);
-    JavaDecl decl = _decls.get(name); if(decl!=null) return decl;
+    String id = getId(aType);
+    JavaDecl decl = _decls.get(id); if(decl!=null) return decl;
 
     // Handle ParameterizedType
     if(aType instanceof ParameterizedType)
@@ -92,7 +92,7 @@ public JavaDecl getTypeDecl(Type aType, JavaDecl aPar)
         
     // Handle TypeVariable
     else if(aType instanceof TypeVariable) { TypeVariable tv = (TypeVariable)aType;
-        decl = aPar.getTypeVar(name);
+        decl = aPar.getTypeVar(tv.getName());
         return decl;
     }
         
@@ -102,7 +102,7 @@ public JavaDecl getTypeDecl(Type aType, JavaDecl aPar)
         return getClassDecl(cls);
     }
     
-    _decls.put(name, decl);
+    _decls.put(id, decl);
     return decl;
 }
 
@@ -197,7 +197,9 @@ public static String getTypeName(Type aType)
 {
     // Handle Class
     if(aType instanceof Class) { Class cls = (Class)aType;
-        return cls.getName(); }
+        if(cls.isArray()) return getTypeName(cls.getComponentType()) + "[]";
+        return cls.getName();
+    }
 
     // Handle GenericArrayType
     if(aType instanceof GenericArrayType) { GenericArrayType gat = (GenericArrayType)aType;
@@ -306,8 +308,7 @@ public static Class getClass(Type aType)
 public static String getClassName(Type aType)
 {
     Class cls = getClass(aType);
-    if(cls.isArray())
-        return cls.getComponentType().getName() + "[]";
+    if(cls.isArray()) return getClassName(cls.getComponentType()) + "[]";
     return cls.getName();
 }
 
@@ -318,7 +319,9 @@ public static String getId(Object anObj)
 {
     // Handle Class: <Name>
     if(anObj instanceof Class) { Class cls = (Class)anObj;
-        return cls.getName(); }
+        if(cls.isArray()) return getId(cls.getComponentType()) + "[]";
+        return cls.getName();
+    }
     
     // Create StringBuffer
     StringBuffer sb = new StringBuffer();
@@ -332,7 +335,7 @@ public static String getId(Object anObj)
     else if(anObj instanceof Method) { Method meth = (Method)anObj;
         sb.append(meth.getDeclaringClass()).append('.').append(meth.getName()).append('(');
         Class ptypes[] = meth.getParameterTypes(), last = ptypes.length>0? ptypes[ptypes.length-1] : null;
-        for(Class ptype : ptypes) { sb.append(ptype.getName()); if(ptype!=last) sb.append(','); }
+        for(Class ptype : ptypes) { sb.append(getId(ptype)); if(ptype!=last) sb.append(','); }
         sb.append(')');
     }
     
@@ -340,7 +343,7 @@ public static String getId(Object anObj)
     else if(anObj instanceof Constructor) { Constructor constr = (Constructor)anObj;
         sb.append(constr.getDeclaringClass()).append('(');
         Class ptypes[] = constr.getParameterTypes(), last = ptypes.length>0? ptypes[ptypes.length-1] : null;
-        for(Class ptype : ptypes) { sb.append(ptype.getName()); if(ptype!=last) sb.append(','); }
+        for(Class ptype : ptypes) { sb.append(getId(ptype)); if(ptype!=last) sb.append(','); }
         sb.append(')');
     }
     
