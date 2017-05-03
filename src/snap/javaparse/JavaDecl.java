@@ -80,9 +80,9 @@ public JavaDecl(JavaDeclOwner anOwner, JavaDecl aPar, Object anObj)
         _evalType = jt!=null? jt.getDecl() : getJavaDecl(Object.class); // Can happen for Lambdas
     }
     
-    // Handle Package String
-    else if(anObj instanceof String) { String pname = (String)anObj; _type = DeclType.Package;
-        _name = pname; _sname = JavaDeclOwner.getSimpleName(pname); }
+    // Handle String
+    else if(anObj instanceof String)
+        initWithString((String)anObj);
     
     // Throw exception for unknown type
     else throw new RuntimeException("JavaDecl.init: Unsupported type " + anObj);
@@ -152,6 +152,35 @@ private void initMember(Member aMmbr)
         for(int i=0,iMax=ptypes.length; i<iMax; i++)
             _argTypes[i] = _owner.getTypeDecl(ptypes[i], this);
     }
+}
+
+/**
+ * Initialize from String (Package, ParamType).
+ */
+private void initWithString(String aStr)
+{
+    // Handle ParamType string
+    if(aStr.indexOf('<')>0) { _type = DeclType.ParamType;
+
+        // Get parts from string
+        String cname = aStr.substring(0,aStr.indexOf('<'));
+        String pnamesStr = aStr.substring(aStr.indexOf('<')+1,aStr.length()-1);
+        String pnames[] = pnamesStr.split(",");
+        
+        // Set parts
+        _name = aStr; _par = getJavaDecl(cname);
+        _argTypes = new JavaDecl[pnames.length];
+        for(int i=0,iMax=pnames.length;i<iMax;i++) _argTypes[i] = getJavaDecl(pnames[i]);
+        _evalType = this;
+        
+        // Build simple name
+        _sname = _par.getSimpleName() + '<'; JavaDecl last = _argTypes[_argTypes.length-1];
+        for(JavaDecl a : _argTypes) { _sname += a.getSimpleName(); if(a!=last) _sname += ','; }
+        _sname += '>';
+    }
+        
+    // Handle Package string
+    else { _type = DeclType.Package; _name = aStr; _sname = JavaDeclOwner.getSimpleName(aStr); }
 }
 
 /**

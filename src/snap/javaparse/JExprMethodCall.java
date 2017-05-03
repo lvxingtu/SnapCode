@@ -77,6 +77,18 @@ public Class[] getArgClasses()
 }
 
 /**
+ * Returns the arg eval types.
+ */
+public JavaDecl[] getArgEvalTypes()
+{
+    List <JExpr> args = getArgs();
+    JavaDecl etypes[] = new JavaDecl[args.size()];
+    for(int i=0, iMax=args.size(); i<iMax; i++) { JExpr arg = args.get(i);
+        etypes[i] = arg!=null? arg.getEvalType() : null; }
+    return etypes;
+}
+
+/**
  * Returns the method from parent class and arg types.
  */
 public Method getMethod()
@@ -143,17 +155,72 @@ protected JavaDecl getEvalTypeImpl(JNode aNode)
 
     // Handle this node
     else if(aNode==this) {
-        JavaDecl decl = aNode.getDecl(); if(decl==null) return null;
-        JavaDecl etype = decl.getEvalType();
+        JavaDecl mdecl = aNode.getDecl(); if(mdecl==null) return null;
+        JavaDecl etype = mdecl.getEvalType();
         JavaDecl scopeType = getScopeNodeEvalType();
-        if(etype.isTypeVar() && scopeType.isParamType()) {
-            String name = etype.getName();
-            return scopeType.getTypeVar(name);
+        
+        // If eval type is TypeVar, try to resolve
+        if(etype.isTypeVar()) { String name = etype.getName();
+            
+            // See if TypeVar can be resolved by method
+            JavaDecl resolvedDecl = getResolvedTypeVarForMethod(name, mdecl);
+            if(resolvedDecl!=null)
+                return resolvedDecl;
+            
+            // See if TypeVar can be resolved by ScopeNode.Type
+            if(scopeType.isParamType()) {
+                resolvedDecl = scopeType.getTypeVar(name);
+                if(resolvedDecl!=null)
+                    return resolvedDecl;
+            }
         }
     }
     
     // Do normal version
     return super.getEvalTypeImpl(aNode);
+}
+
+/**
+ * Resolves a TypeVar for given method decl and arg types.
+ */
+public JavaDecl getResolvedTypeVarForMethod(String aName, JavaDecl aMethDecl)
+{
+    // If no type var for given name, just return
+    if(aMethDecl.getTypeVar(aName)==null)
+        return null;
+        
+    // Iterate over method arg types to see if any can resolve the type var
+    JavaDecl argTypes[] = aMethDecl.getArgTypes();
+    for(int i=0,iMax=argTypes.length;i<iMax;i++) { JavaDecl arg = argTypes[i];
+    
+        // If method arg is TypeVar with same name, return arg expr eval type (if not null)
+        if(arg.isTypeVar() && arg.getName().equals(aName)) {
+            JExpr argExpr = getArg(i); if(argExpr==null) continue;
+            JavaDecl argEvalType = argExpr.getEvalType();
+            return argEvalType;
+        }
+        
+        // If method arg is ParamType with matching param TypeVar,
+        if(arg.isParamType()) {
+            
+            // Iterate over ParamType params
+            for(JavaDecl parg : arg.getArgTypes()) {
+                
+                // If TypeVar with matching name, see if arg eval type can resolve
+                if(parg.isTypeVar() && parg.getName().equals(aName)) {
+                    
+                    // Get arg expr and eval type
+                    JExpr argExpr = getArg(i); if(argExpr==null) continue;
+                    JavaDecl argEvalType = argExpr.getEvalType(); if(argEvalType==null) continue;
+                    if(argEvalType.isParamType())
+                        return argEvalType.getArgTypes()[0];
+                }
+            }
+        }
+    }
+    
+    // Return null since TypeVar name couldn't be resolved by method args
+    return null;
 }
 
 /**

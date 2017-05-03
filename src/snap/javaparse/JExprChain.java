@@ -82,13 +82,21 @@ protected JavaDecl getDeclImpl(JNode aNode)
     // Handle Parent is Class: Look for ".this", ".class", static field or inner class
     else if(parDecl.isClass()) {
         Class pclass = parExpr.getEvalClass();
+        
+        // Handle Class.this: Return parent declaration
         if(name.equals("this"))
             return parDecl; // was FieldName
-        if(name.equals("class"))
-            return getJavaDecl(Class.class); // was FieldName
+            
+        // Handle Class.class: Return ParamType
+        if(name.equals("class")) { String cname = "java.lang.Class<" + parDecl.getId() + '>';
+            return getJavaDecl(cname); } // Was: getJavaDecl(Class.class);
+            
+        // Handle inner class
         Class cls = pclass!=null? ClassUtils.getClass(pclass, name) : null;
         if(cls!=null)
-            return getJavaDecl(cls); // was ClassName
+            return getJavaDecl(cls);
+            
+        // Handle Field
         Field field = pclass!=null? ClassUtils.getField(pclass, name) : null;
         if(field!=null) // && Modifier.isStatic(field.getModifiers()))
             return getJavaDecl(field); // was FieldName

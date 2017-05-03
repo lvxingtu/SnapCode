@@ -16,14 +16,18 @@ public abstract class JavaDeclOwner {
  */
 public JavaDecl getJavaDecl(Object anObj)
 {
-    // Handle String (class or package name)
-    if(anObj instanceof String) { String name = (String)anObj;
+    // Handle String (Class, ParamType or package name)
+    if(anObj instanceof String) { String id = (String)anObj;
     
         // If decl exists for name, just return
-        JavaDecl jd = _decls.get(name); if(jd!=null) return jd;
+        JavaDecl jd = _decls.get(id); if(jd!=null) return jd;
+        
+        // If name is Parameterized class, create
+        if(id.indexOf('<')>0)
+            return getParamTypeForId(id);
         
         // If class exists, forward to getClassDecl()
-        Class cls = getClass(name);
+        Class cls = getClass(id);
         if(cls!=null)
             return getClassDecl(cls);
         return null;
@@ -173,6 +177,16 @@ private JavaDecl createPackageDecl(String aName)
     JavaDecl pdecl = new JavaDecl(this, parDecl, aName);
     _decls.put(aName, pdecl);
     return pdecl;
+}
+
+/**
+ * Returns the param type with given name.
+ */
+private JavaDecl getParamTypeForId(String aId)
+{
+    JavaDecl jd = _decls.get(aId); if(jd!=null) return jd;
+    _decls.put(aId, jd = new JavaDecl(this, null, aId));
+    return jd;
 }
 
 /**
