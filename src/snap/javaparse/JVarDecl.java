@@ -135,7 +135,7 @@ protected JavaDecl getDeclImpl()
         JClassDecl cd = getEnclosingClassDecl(); if(cd==null) return null;
         JavaDecl decl = cd.getDecl(); if(decl==null) {System.err.println("JVarDecl.getDeclImp: No class");return null;}
         JavaDeclHpr declHpr = decl.getHpr();
-        JavaDecl fdecl = declHpr.getFieldDeclDeep(-1, getName(), null);
+        JavaDecl fdecl = declHpr.getFieldDeep(getName());
         return fdecl;
     }
     

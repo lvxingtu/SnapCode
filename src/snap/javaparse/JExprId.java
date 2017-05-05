@@ -127,10 +127,13 @@ public String getPackageName()  { return getDecl().getPackageName(); }
  */
 public String getNodeString()
 {
-    if(getDecl()==null) return "UnknownId";
-    switch(getDecl().getType()) {
+    JavaDecl decl = getDecl(); if(decl==null) return "UnknownId";
+    switch(decl.getType()) {
         case Class: return "ClassId";
-        case Field: return "ClassFieldId";
+        case Field: {
+            JavaDecl pdecl = decl.getParent(); if(pdecl!=null && pdecl.isEnum()) return "EnumId";
+            return "FieldId";
+        }
         case Method: return "MethodId";
         case Package: return "PackageId";
         case VarDecl: return "VariableId";

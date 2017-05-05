@@ -2,9 +2,7 @@
  * Copyright (c) 2010, ReportMill Software. All rights reserved.
  */
 package snap.javaparse;
-import java.lang.reflect.Field;
 import java.util.*;
-import snap.util.ClassUtils;
 
 /**
  * A Java statement for SwitchStatement.
@@ -36,26 +34,6 @@ public List<SwitchLabel> getSwitchLabels()  { return _switchLabels; }
  * Adds a switch label.
  */
 public void addSwitchLabel(SwitchLabel aSL)  { _switchLabels.add(aSL); addChild(aSL, -1); }
-
-/**
- * Override to see if id is enum name.
- */
-protected JavaDecl getDeclImpl(JNode aNode)
-{
-    // Get node info
-    String name = aNode.getName(); boolean isType = aNode instanceof JExprType;
-    
-    // See if it's a switch label enum
-    if(!isType && _expr!=null && aNode.getStart()>getExpr().getEnd()) {
-        Class cls = getExpr().getEvalClass();
-        Field field = cls!=null? ClassUtils.getField(cls, name) : null;
-        if(field!=null)
-            return getJavaDecl(field);
-    }
-
-    // Do normal version
-    return super.getDeclImpl(aNode);
-}
 
 /**
  * A class to represent individual labels in a switch statement.
@@ -92,9 +70,25 @@ public static class SwitchLabel extends JNode
     /** Override to check inner variable declaration statements. */
     protected JavaDecl getDeclImpl(JNode aNode)
     {
+        // If node is case label and is id, try to evaluate against Switch expression enum type
+        if(aNode==_expr && _expr instanceof JExprId) { String name = _expr.getName();
+            JStmtSwitch swStmt = getParent(JStmtSwitch.class);
+            JExpr swExpr = swStmt.getExpr();
+            JavaDecl sdecl = swExpr!=null? swExpr.getEvalType() : null;
+            if(sdecl!=null && sdecl.isEnum()) {
+                JavaDeclHpr hpr = sdecl.getHpr();
+                JavaDecl enumConst = hpr.getField(name);
+                if(enumConst!=null)
+                    return enumConst;
+            }
+        }
+        
+        // If statements (as block) can resolve node, return decl
         JavaDecl decl = JStmtBlock.getDeclImpl(aNode, getStatements());
         if(decl!=null)
             return decl;
+            
+        // Do normal version
         return super.getDeclImpl(aNode);
     }
 }

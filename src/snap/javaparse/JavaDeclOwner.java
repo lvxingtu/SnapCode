@@ -42,7 +42,7 @@ public JavaDecl getJavaDecl(Object anObj)
     else if(anObj instanceof Field) { Field field = (Field)anObj; Class cls = field.getDeclaringClass();
         JavaDecl decl = getClassDecl(cls);
         JavaDeclHpr declHpr = decl.getHpr();
-        jd = declHpr.getFieldDecl(field);
+        jd = declHpr.getField(field);
     }
     
     // Handle Method

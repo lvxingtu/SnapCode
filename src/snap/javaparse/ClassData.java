@@ -97,7 +97,7 @@ private JavaDecl getRef(ClassFileData.Constant aConst)
         String cname = aConst.getDeclClassName(); if(cname.startsWith("[")) return null;
         JavaDecl decl = _proj.getJavaDecl(cname);
         String name = aConst.getMemberName();
-        return decl.getHpr().getFieldDeclDeep(-1, name, null); //aConst.getType();
+        return decl.getHpr().getFieldDeep(name);
     }
     
     // Handle method reference

@@ -90,7 +90,7 @@ public HashSet <JavaDecl> updateDecls()
     Field fields[]; try { fields = cls.getDeclaredFields(); }
     catch(Throwable e) { System.err.println(e + " in " + cname); return null; }
     for(Field field : fields) {
-        JavaDecl decl = getFieldDecl(field);
+        JavaDecl decl = getField(field);
         if(decl==null) { decl = new JavaDecl(owner,_cdecl,field); addedDecls.add(decl); addDecl(decl); }
         else removedDecls.remove(decl);
     }
@@ -127,10 +127,10 @@ public HashSet <JavaDecl> updateDecls()
 /**
  * Returns the field decl for field.
  */
-public JavaDecl getFieldDecl(Field aField)
+public JavaDecl getField(Field aField)
 {
-    String id = JavaDeclOwner.getId(aField);
-    JavaDecl decl = getFieldDecl(id); if(decl==null) return null;
+    String name = aField.getName();
+    JavaDecl decl = getField(name); if(decl==null) return null;
     int mods = aField.getModifiers(); if(mods!=decl.getModifiers()) return null;
     //JavaDecl type = _cdecl._owner.getTypeDecl(aField.getGenericType(), _cdecl);
     //if(type!=decl.getEvalType()) return null;
@@ -138,36 +138,23 @@ public JavaDecl getFieldDecl(Field aField)
 }
 
 /**
- * Returns the field decl for id string.
- */
-public JavaDecl getFieldDecl(String anId)
-{
-    if(_fdecls==null) updateDecls();
-    for(JavaDecl jd : _fdecls) if(jd.getId().equals(anId)) return jd;
-    return null;
-}
-
-/**
  * Returns a field decl for field name.
  */
-public JavaDecl getFieldDecl(int theMods, String aName, JavaDecl aType)
+public JavaDecl getField(String aName)
 {
     if(_fdecls==null) updateDecls();
     
-    for(JavaDecl jd : _fdecls)
-        if(jd.getName().equals(aName) && (aType==null || jd.getEvalType().equals(aType)) &&
-            (theMods<0 || jd.getModifiers()==theMods))
-                return jd;
+    for(JavaDecl jd : _fdecls) if(jd.getName().equals(aName)) return jd;
     return null;
 }
 
 /**
  * Returns a field decl for field name.
  */
-public JavaDecl getFieldDeclDeep(int theMods, String aName, JavaDecl aType)
+public JavaDecl getFieldDeep(String aName)
 {
-    JavaDecl decl = getFieldDecl(theMods, aName, aType);
-    if(decl==null && _sdeclHpr!=null) decl = _sdeclHpr.getFieldDeclDeep(theMods, aName, aType);
+    JavaDecl decl = getField(aName);
+    if(decl==null && _sdeclHpr!=null) decl = _sdeclHpr.getFieldDeep(aName);
     return decl;
 }
 

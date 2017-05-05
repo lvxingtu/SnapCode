@@ -109,9 +109,9 @@ protected JavaDecl getDeclImpl(JNode aNode)
         if(pdecl.isParamType())
             pdecl = pdecl.getParent();
         if(pdecl.isClass()) {
-            JavaDecl jd = pdecl.getHpr().getFieldDeclDeep(-1,name,null);
-            if(jd!=null)
-                return jd;
+            JavaDecl fd = pdecl.getHpr().getFieldDeep(name);
+            if(fd!=null)
+                return fd;
         }
     }
 
