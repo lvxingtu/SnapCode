@@ -67,33 +67,52 @@ public void setOperand(JExpr anExpr, int anIndex)
 protected JavaDecl getDeclImpl()
 {
     switch(op) {
-        case Add: case Subtract: case Multiply: case Divide: case Mod: return getDeclMath();
+        case Add: case Subtract: case Multiply: case Divide: case Mod: return getEvalTypeMath();
         case Equal: case NotEqual: case LessThan: case GreaterThan: case LessThanOrEqual: case GreaterThanOrEqual:
         case Or: case And: case Not: return getJavaDecl(boolean.class);
-        case Conditional:     // Should probably take common ancestor of both
-            return getChildCount()>2? getOperand(1).getDecl() : getJavaDecl(Object.class);
-        case Assignment: return getOperand(0).getDecl();
-        case BitOr: case BitXOr: case BitAnd: return getOperand(0).getDecl();
-        case ShiftLeft: case ShiftRight: case ShiftRightUnsigned: return getOperand(0).getDecl();
-        case PreIncrement: case PreDecrement: case Negate: case BitComp: return getOperand(0).getDecl();
-        case PostIncrement: case PostDecrement: return getOperand(0).getDecl();
+        case Conditional: return getEvalTypeConditional();
+        case Assignment: return getOperand(0).getEvalType();
+        case BitOr: case BitXOr: case BitAnd: return getOperand(0).getEvalType();
+        case ShiftLeft: case ShiftRight: case ShiftRightUnsigned: return getOperand(0).getEvalType();
+        case PreIncrement: case PreDecrement: case Negate: case BitComp: return getOperand(0).getEvalType();
+        case PostIncrement: case PostDecrement: return getOperand(0).getEvalType();
         default: return getJavaDecl(boolean.class);
     }
 }
 
 /** Returns the class name for math expression. */
-private JavaDecl getDeclMath() { String cname = getClassNameMath(); return cname!=null? getJavaDecl(cname) : null; }
-private String getClassNameMath()
+private JavaDecl getEvalTypeMath()
 {
-    String c1 = getChildCount()>0? getOperand(0).getEvalClassName() : null;
-    String c2 = getChildCount()>1? getOperand(1).getEvalClassName() : null;
-    if(c1==null) return c2; if(c2==null) return c1; if(c1.equals(c2)) return c1;
-    if(c1.endsWith("ouble")) return c1; if(c2.endsWith("ouble")) return c2;
-    if(c1.endsWith("loat")) return c1; if(c2.endsWith("loat")) return c2;
-    if(c1.endsWith("ong")) return c1; if(c2.endsWith("ong")) return c2;
-    if(c1.endsWith("nt") || c1.endsWith("Integer")) return c1;
-    if(c2.endsWith("nt") || c2.endsWith("Integer")) return c2;
-    return c1;
+    // Get operand eval types (just return if either is null)
+    int cc = getChildCount();
+    JavaDecl e1 = cc>0? getOperand(0).getEvalType() : null;
+    JavaDecl e2 = cc>1? getOperand(1).getEvalType() : null;
+    if(e1==null || e1==e2) return e2; if(e2==null) return e1;
+    
+    // Handle promotions: String, Double, Float, Long, Int
+    String c1 = e1.getClassName(), c2 = e2.getClassName();
+    if(isString(c1)) return e1; if(isString(c2)) return e2;
+    if(isDouble(c1)) return e1; if(isDouble(c2)) return e2;
+    if(isFloat(c1)) return e1; if(isFloat(c2)) return e2;
+    if(isLong(c1)) return e1; if(isLong(c2)) return e2;
+    if(isInt(c1)) return e1; if(isInt(c2)) return e2;
+    return e1;
+}
+
+/** Returns whether type names are numbers. */
+private boolean isString(String aName)  { return aName.equals("java.lang.String"); }
+private boolean isDouble(String aName)  { return aName.equals("double") || aName.equals("java.lang.Double"); }
+private boolean isFloat(String aName)  { return aName.equals("float") || aName.equals("java.lang.Float"); }
+private boolean isLong(String aName)  { return aName.equals("long") || aName.equals("java.lang.Long"); }
+private boolean isInt(String aName)  { return aName.equals("int") || aName.equals("java.lang.Integer"); }
+
+/** Returns common ancestor of two decls. */
+private JavaDecl getEvalTypeConditional()
+{
+    if(getChildCount()<3) return getJavaDecl(Object.class);
+    JavaDecl d0 = getOperand(1).getEvalType(), d1 = getOperand(2).getEvalType();
+    if(d0==null) return d1; if(d1==null) return d0;
+    return d0.getCommonAncestor(d1);
 }
 
 /**

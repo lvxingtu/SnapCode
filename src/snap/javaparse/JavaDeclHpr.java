@@ -250,17 +250,17 @@ public JavaDecl getConstructorDeclDeep(JavaDecl theTypes[])
 /**
  * Returns a Class decl for inner class.
  */
-public JavaDecl getClassDecl(Class aClass)  { return getClassDecl(aClass.getName()); }
+public JavaDecl getClassDecl(Class aClass)  { return getClassDecl(aClass.getSimpleName()); }
 
 /**
- * Returns a Class decl for inner class name.
+ * Returns a Class decl for inner class simple name.
  */
 public JavaDecl getClassDecl(String aName)
 {
     if(_fdecls==null) updateDecls();
     
     for(JavaDecl jd : _icdecls)
-        if(jd.getName().equals(aName))
+        if(jd.getSimpleName().equals(aName))
                 return jd;
     return null;
 }

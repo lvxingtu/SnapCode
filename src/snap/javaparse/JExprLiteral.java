@@ -118,7 +118,9 @@ protected JavaDecl getDeclImpl()
 {
     Object val = getValue(); if(val==null) return null;
     Class cls = val.getClass();
-    return getJavaDecl(cls);
+    JavaDecl decl = getJavaDecl(cls);
+    JavaDecl declPrim = decl.getPrimitive(); if(declPrim!=null) decl = declPrim;
+    return decl;
 }
         
 /**
