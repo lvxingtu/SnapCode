@@ -16,12 +16,6 @@ public class JMemberDecl extends JNode {
     // The name identifier
     JExprId         _id;
     
-    // The member that this member overrides or implements
-    JavaDecl        _super;
-    
-    // Whether super is null
-    boolean         _superIsNull;
-    
 /**
  * Returns the modifiers.
  */
@@ -76,15 +70,9 @@ public JTypeParam getTypeParam(String aName)
  */
 public JavaDecl getSuperDecl()
 {
-    if(_super!=null || _superIsNull) return _super;
-    _super = getSuperDeclImpl(); _superIsNull = _super==null;
-    return _super;
+    JavaDecl decl = getDecl();
+    return decl!=null && (decl.isMethod() || decl.isConstructor())? decl.getSuper() : null;
 }
-
-/**
- * Returns the member that this member overrides or implements, if available.
- */
-protected JavaDecl getSuperDeclImpl()  { return null; }
 
 /**
  * Returns whether super declaration is interface.
@@ -92,7 +80,8 @@ protected JavaDecl getSuperDeclImpl()  { return null; }
 public boolean isSuperDeclInterface()
 {
     JavaDecl sdecl = getSuperDecl(); if(sdecl==null) return false;
-    return sdecl!=null && sdecl.isInterface();
+    JavaDecl cdecl = sdecl.getClassType(); if(cdecl==null) return false;
+    return cdecl.isInterface();
 }
 
 }

@@ -347,7 +347,7 @@ public static String getId(Object anObj)
     
     // Handle Method: DeclClassName.Name(<ParamType>,...)
     else if(anObj instanceof Method) { Method meth = (Method)anObj;
-        sb.append(meth.getDeclaringClass()).append('.').append(meth.getName()).append('(');
+        sb.append(getId(meth.getDeclaringClass())).append('.').append(meth.getName()).append('(');
         Class ptypes[] = meth.getParameterTypes(), last = ptypes.length>0? ptypes[ptypes.length-1] : null;
         for(Class ptype : ptypes) { sb.append(getId(ptype)); if(ptype!=last) sb.append(','); }
         sb.append(')');
@@ -355,7 +355,7 @@ public static String getId(Object anObj)
     
     // Handle Constructor: DeclClassName(<ParamType>,...)
     else if(anObj instanceof Constructor) { Constructor constr = (Constructor)anObj;
-        sb.append(constr.getDeclaringClass()).append('(');
+        sb.append(getId(constr.getDeclaringClass())).append('(');
         Class ptypes[] = constr.getParameterTypes(), last = ptypes.length>0? ptypes[ptypes.length-1] : null;
         for(Class ptype : ptypes) { sb.append(getId(ptype)); if(ptype!=last) sb.append(','); }
         sb.append(')');
@@ -375,13 +375,13 @@ public static String getId(Object anObj)
     
     // Handle GenericArrayType: CompType[]
     else if(anObj instanceof GenericArrayType) { GenericArrayType gat = (GenericArrayType)anObj;
-        sb.append(gat.getGenericComponentType()).append("[]"); }
+        sb.append(getId(gat.getGenericComponentType())).append("[]"); }
         
     // Handle WildcardType
     else if(anObj instanceof WildcardType) { WildcardType wc = (WildcardType)anObj;
         if(wc.getLowerBounds().length>0)
-            sb.append(wc.getLowerBounds()[0]);
-        else sb.append(wc.getUpperBounds()[0]);
+            sb.append(getId(wc.getLowerBounds()[0]));
+        else sb.append(getId(wc.getUpperBounds()[0]));
     }
     
     // Handle JVarDecl

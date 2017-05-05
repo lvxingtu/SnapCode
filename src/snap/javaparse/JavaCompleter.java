@@ -162,9 +162,9 @@ static Field getLengthField() { try { return Array.class.getField("length"); } c
 private static Class getReceivingClass(JNode aNode)
 {
     // If MethocCall arg, return arg class
-    Class cls = getMethodCallArgClass(aNode);
-    if(cls!=null)
-        return cls;
+    JavaDecl argType = getMethodCallArgType(aNode);
+    if(argType!=null)
+        return argType.getEvalClass();
     
     // If node is Assignment Right-Hand-Side, return assignment Left-Hand-Side class
     JExprMath assExpr = getExpression(aNode, JExprMath.Op.Assignment);
@@ -210,13 +210,12 @@ private static JExprMethodCall getMethodCall(JNode aNode)
 }
 
 /** Return the method call arg class of node, if node is MethodCall arg. */
-private static Class getMethodCallArgClass(JNode aNode)
+private static JavaDecl getMethodCallArgType(JNode aNode)
 {
     JExprMethodCall methodCall = getMethodCall(aNode); if(methodCall==null) return null;
     int argIndex = getMethodCallArgIndex(methodCall, aNode); if(argIndex<0) return null;
-    Method method = methodCall.getMethod(); if(method==null) return null;
-    Class argClasses[] = method.getParameterTypes();
-    return argIndex<argClasses.length? argClasses[argIndex] : null;
+    JavaDecl mdecl = methodCall.getDecl(); if(mdecl==null) return null;
+    return argIndex<mdecl.getParamCount()? mdecl.getParamType(argIndex) : null;
 }
 
 /** Return the method call arg index of node. */

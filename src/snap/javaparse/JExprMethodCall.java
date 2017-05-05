@@ -173,6 +173,9 @@ protected JavaDecl getEvalTypeImpl(JNode aNode)
                 if(resolvedDecl!=null)
                     return resolvedDecl;
             }
+            
+            // Otherwise, just return TypeVar default
+            return etype.getEvalType();
         }
     }
     

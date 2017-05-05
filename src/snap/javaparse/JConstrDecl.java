@@ -34,26 +34,6 @@ protected JavaDecl getDeclImpl(JNode aNode)
     return super.getDeclImpl(aNode);
 }
 
-/**
- * Returns the member that this member overrides or implements, if available.
- */
-protected JavaDecl getSuperDeclImpl()
-{
-    // Get enclosing class and super class and method parameter types
-    JClassDecl ecd = getEnclosingClassDecl(); if(ecd==null) return null;
-    Class sclass = ecd.getSuperClass(); if(sclass==null) return null;
-    Class ptypes[] = getParamClasses();
-    
-    // Iterate over superclasses and return if any have method
-    for(Class cls=sclass; cls!=null; cls=cls.getSuperclass()) {
-        try { return getJavaDecl(cls.getDeclaredConstructor(ptypes)); }
-        catch(Exception e) { }
-    }
-    
-    // Return null since not found
-    return null;
-}
-
 /** Returns the part name. */
 public String getNodeString()  { return "ConstrDecl"; }
 

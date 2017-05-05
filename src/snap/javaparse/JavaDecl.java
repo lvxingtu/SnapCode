@@ -401,6 +401,16 @@ public Class getEvalClass()
 }
 
 /**
+ * Returns the number of Method/ParamType parameters.
+ */
+public int getParamCount()  { return _argTypes.length; }
+
+/**
+ * Returns the individual Method parameter type at index.
+ */
+public JavaDecl getParamType(int anIndex)  { return _argTypes[anIndex]; }
+
+/**
  * Returns the arg types.
  */
 public JavaDecl[] getArgTypes()  { return _argTypes; }
@@ -495,11 +505,11 @@ public JavaDecl getSuper()
     
     // Handle Method
     if(isMethod())
-        return _sdecl = schpr!=null? schpr.getMethodDecl(getName(), getArgTypes()) : null;
+        return _sdecl = schpr!=null? schpr.getMethodDeclDeep(getName(), getArgTypes()) : null;
     
     // Handle Constructor
     if(isConstructor())
-        return _sdecl = schpr!=null? schpr.getConstructorDecl(getArgTypes()) : null;
+        return _sdecl = schpr!=null? schpr.getConstructorDeclDeep(getArgTypes()) : null;
         
     // Handle ParamType
     if(isParamType())
@@ -529,7 +539,9 @@ public JavaDecl getCommonAncestor(JavaDecl aDecl)
     for(JavaDecl d0=this;d0!=null;d0=d0.getSuper())
         for(JavaDecl d1=aDecl;d1!=null;d1=d1.getSuper())
             if(d0==d1) return d0;
-    return null;
+
+    // Return Object (case where at least one was interface or ParamType of interface)
+    return getJavaDecl(Object.class);
 }
 
 /**
