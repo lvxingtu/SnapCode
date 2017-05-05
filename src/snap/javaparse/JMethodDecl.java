@@ -2,7 +2,6 @@
  * Copyright (c) 2010, ReportMill Software. All rights reserved.
  */
 package snap.javaparse;
-import java.lang.reflect.*;
 import java.util.*;
 import snap.util.*;
 
@@ -145,13 +144,13 @@ protected JavaDecl getDeclImpl()
     String name = getName(); if(name==null) return null;
     JavaDecl ptypes[] = getParamTypes();
     
-    // Get ClassDecl and helper
+    // Get parent JClassDecl and JavaDecl
     JClassDecl cd = getEnclosingClassDecl(); if(cd==null) return null;
     JavaDecl cdecl = cd.getDecl();
-    JavaDeclHpr clsHpr = cdecl.getHpr();
     
-    // Return method
-    return clsHpr.getMethodDecl(-1, name, null, ptypes);
+    // Return method for name and param types
+    JavaDeclHpr clsHpr = cdecl.getHpr();
+    return clsHpr.getMethodDecl(name, ptypes);
 }
 
 /**

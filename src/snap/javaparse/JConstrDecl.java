@@ -2,7 +2,6 @@
  * Copyright (c) 2010, ReportMill Software. All rights reserved.
  */
 package snap.javaparse;
-import java.lang.reflect.Constructor;
 
 /**
  * A Java member for ConstrDecl.
@@ -14,8 +13,16 @@ public class JConstrDecl extends JMethodDecl {
  */
 protected JavaDecl getDeclImpl()
 {
-    Constructor c = getConstructor();
-    return c!=null? getJavaDecl(c) : null;
+    // Get param types
+    JavaDecl ptypes[] = getParamTypes();
+    
+    // Get parent JClassDecl and JavaDecl
+    JClassDecl cd = getEnclosingClassDecl(); if(cd==null) return null;
+    JavaDecl cdecl = cd.getDecl();
+    
+    // Return Constructor for param types
+    JavaDeclHpr clsHpr = cdecl.getHpr();
+    return clsHpr.getConstructorDecl(ptypes);
 }
 
 /**
@@ -25,17 +32,6 @@ protected JavaDecl getDeclImpl(JNode aNode)
 {
     if(aNode==_id) return getDecl();
     return super.getDeclImpl(aNode);
-}
-
-/**
- * Returns the java.lang.reflect Constructor for this method decl from the compiled class.
- */
-public Constructor getConstructor()
-{
-    JClassDecl cd = getEnclosingClassDecl();
-    Class cls = cd!=null? cd.getEvalClass() : null; if(cls==null) return null;
-    try { return cls.getDeclaredConstructor(getParamClasses()); }
-    catch(NoSuchMethodException e) { return null; }
 }
 
 /**

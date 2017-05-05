@@ -113,7 +113,7 @@ private JavaDecl getRef(ClassFileData.Constant aConst)
         
         // Get class decls and constructor from parameters
         JavaDecl decl = _proj.getJavaDecl(cname);
-        return decl.getHpr().getConstructorDeclDeep(-1, ptypes);
+        return decl.getHpr().getConstructorDeclDeep(ptypes);
     }
     
     // Handle method reference
@@ -130,7 +130,7 @@ private JavaDecl getRef(ClassFileData.Constant aConst)
         
         // Get class decls and method from name and parameters
         JavaDecl decl = _proj.getJavaDecl(cname);
-        return decl.getHpr().getMethodDeclDeep(-1, name, null, ptypes);
+        return decl.getHpr().getMethodDeclDeep(name, ptypes);
     }
     
     // Return null since unknown Constant reference

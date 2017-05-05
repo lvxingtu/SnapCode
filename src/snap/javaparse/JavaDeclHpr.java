@@ -179,10 +179,7 @@ public JavaDecl getMethodDecl(Method aMeth)
     String id = JavaDeclOwner.getId(aMeth);
     JavaDecl decl = getMethodDecl(id); if(decl==null) return null;
     int mods = aMeth.getModifiers(); if(mods!=decl.getModifiers()) return null;
-    //java.lang.reflect.Type ptypes[] = aMeth.getGenericParameterTypes();
-    //if(ptypes.length!=aMeth.getParameterCount()) ptypes = aMeth.getParameterTypes();
-    //JavaDecl types[] = new JavaDecl[ptypes.length];
-    //for(int i=0;i<types.length;i++) types[i] = getTypeDecl(ptypes[i]);
+    // Check return type?
     return decl;
 }
 
@@ -197,26 +194,25 @@ public JavaDecl getMethodDecl(String anId)
 }
 
 /**
- * Returns a method decl for method mods, name and return/parameter type names.
+ * Returns a method decl for method name and parameter types.
  */
-public JavaDecl getMethodDecl(int theMods, String aName, JavaDecl aType, JavaDecl theTypes[])
+public JavaDecl getMethodDecl(String aName, JavaDecl theTypes[])
 {
     if(_fdecls==null) updateDecls();
     
     for(JavaDecl jd : _mdecls)
-        if(jd.getName().equals(aName) && (aType==null || jd.getEvalType().equals(aType)) &&
-            Arrays.equals(jd.getArgTypes(), theTypes) && (theMods<0 || jd.getModifiers()==theMods))
-                return jd;
+        if(jd.getName().equals(aName) && Arrays.equals(jd.getArgTypes(), theTypes))
+            return jd;
     return null;
 }
 
 /**
- * Returns a method decl for method mods, name and return/parameter type names.
+ * Returns a method decl for method name and parameter types.
  */
-public JavaDecl getMethodDeclDeep(int theMods, String aName, JavaDecl aType, JavaDecl theTypes[])
+public JavaDecl getMethodDeclDeep(String aName, JavaDecl theTypes[])
 {
-    JavaDecl decl = getMethodDecl(theMods, aName, aType, theTypes);
-    if(decl==null && _sdeclHpr!=null) decl = _sdeclHpr.getMethodDeclDeep(theMods, aName, aType, theTypes);
+    JavaDecl decl = getMethodDecl(aName, theTypes);
+    if(decl==null && _sdeclHpr!=null) decl = _sdeclHpr.getMethodDeclDeep(aName, theTypes);
     return decl;
 }
 
@@ -230,10 +226,6 @@ public JavaDecl getConstructorDecl(Constructor aConstr)
     String id = JavaDeclOwner.getId(aConstr);
     JavaDecl decl = getConstructorDecl(id); if(decl==null) return null;
     int mods = aConstr.getModifiers(); if(mods!=decl.getModifiers()) return null;
-    //java.lang.reflect.Type ptypes[] = aConstr.getGenericParameterTypes();
-    //if(ptypes.length!=aConstr.getParameterCount()) ptypes = aConstr.getParameterTypes();
-    //JavaDecl types[] = new JavaDecl[ptypes.length];
-    //for(int i=0;i<types.length;i++) types[i] = getJavaDecl(ptypes[i]);
     return decl;
 }
 
@@ -248,23 +240,23 @@ public JavaDecl getConstructorDecl(String anId)
 }
 
 /**
- * Returns a decl for constructor types.
+ * Returns a constructor decl for parameter types.
  */
-public JavaDecl getConstructorDecl(int theMods, JavaDecl theTypes[])
+public JavaDecl getConstructorDecl(JavaDecl theTypes[])
 {
     for(JavaDecl jd : _cdecls)
-        if(Arrays.equals(jd.getArgTypes(), theTypes) && (theMods<0 || jd.getModifiers()==theMods))
+        if(Arrays.equals(jd.getArgTypes(), theTypes))
             return jd;
     return null;
 }
 
 /**
- * Returns a decl for constructor types.
+ * Returns a constructor decl for parameter types.
  */
-public JavaDecl getConstructorDeclDeep(int theMods, JavaDecl theTypes[])
+public JavaDecl getConstructorDeclDeep(JavaDecl theTypes[])
 {
-    JavaDecl decl = getConstructorDecl(theMods, theTypes);
-    if(decl==null && _sdeclHpr!=null) decl = _sdeclHpr.getConstructorDeclDeep(theMods, theTypes);
+    JavaDecl decl = getConstructorDecl(theTypes);
+    if(decl==null && _sdeclHpr!=null) decl = _sdeclHpr.getConstructorDeclDeep(theTypes);
     return decl;
 }
 
