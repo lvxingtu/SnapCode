@@ -363,7 +363,7 @@ public static String getId(Object anObj)
     
     // Handle ParameterizedType: RawType<TypeArg,...>
     else if(anObj instanceof ParameterizedType) { ParameterizedType pt = (ParameterizedType)anObj;
-        sb.append(pt.getRawType()).append('<');
+        sb.append(getId(pt.getRawType())).append('<');
         Type types[] = pt.getActualTypeArguments(), last = types.length>0? types[types.length-1] : null;
         for(Type type : types) { sb.append(getId(type)); if(type!=last) sb.append(','); }
         sb.append('>');

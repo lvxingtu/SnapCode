@@ -34,7 +34,7 @@ public Constructor getConstructor()
 {
     JClassDecl cd = getEnclosingClassDecl();
     Class cls = cd!=null? cd.getEvalClass() : null; if(cls==null) return null;
-    try { return cls.getDeclaredConstructor(getParametersTypes()); }
+    try { return cls.getDeclaredConstructor(getParamClasses()); }
     catch(NoSuchMethodException e) { return null; }
 }
 
@@ -46,7 +46,7 @@ protected JavaDecl getSuperDeclImpl()
     // Get enclosing class and super class and method parameter types
     JClassDecl ecd = getEnclosingClassDecl(); if(ecd==null) return null;
     Class sclass = ecd.getSuperClass(); if(sclass==null) return null;
-    Class ptypes[] = getParametersTypes();
+    Class ptypes[] = getParamClasses();
     
     // Iterate over superclasses and return if any have method
     for(Class cls=sclass; cls!=null; cls=cls.getSuperclass()) {

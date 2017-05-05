@@ -329,9 +329,12 @@ protected JavaDecl getDeclImpl(JNode aNode)
     // If class id, return class declaration
     if(aNode==_id) return getDecl();
     
-    // If Extends or Implements node, forward on
-    if(aNode.getParent()==this)
-        return super.getDeclImpl(aNode);
+    // If declarared type, Extends or Implements node, forward on
+    if(aNode instanceof JType) { JType typ = (JType)aNode;
+        JType ptyp = typ; while(ptyp.getParent() instanceof JType) ptyp = (JType)ptyp.getParent();
+        if(ptyp.getParent()==this)
+            return super.getDeclImpl(aNode);
+    }
     
     // If it's "this", set class and return ClassField
     String name = aNode.getName(); boolean isId = aNode instanceof JExprId, isType = !isId;

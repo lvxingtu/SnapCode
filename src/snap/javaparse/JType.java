@@ -23,6 +23,9 @@ public class JType extends JNode {
     // The base type
     JavaDecl              _baseDecl;
     
+    // The full name
+    String                _fullName;
+    
 /**
  * Returns the simple name.
  */
@@ -30,6 +33,35 @@ public String getSimpleName()
 {
     int index = _name.lastIndexOf('.');
     return index>0?  _name.substring(index+1, _name.length()) : _name;
+}
+
+/**
+ * Returns the full name.
+ */
+public String getFullName()
+{
+    // If already set, just return
+    if(_fullName!=null) return _fullName;
+    
+    // Get BaseDecl id
+    JavaDecl bdecl = getBaseDecl();
+    if(bdecl==null)
+        return getName();
+    String fname = bdecl.getId();
+
+    // If type args, add them
+    if(_typeArgs!=null) {
+        fname += '<'; JType last = _typeArgs.get(_typeArgs.size()-1);
+        for(JType type : _typeArgs) { fname += type.getFullName(); if(type!=last) fname += ','; }
+        fname += '>';
+    }
+    
+    // Add array indices
+    for(int i=0;i<_arrayCount;i++)
+        fname += "[]";
+        
+    // Return full name
+    return _fullName = fname;
 }
 
 /**
@@ -69,14 +101,21 @@ protected JavaDecl getDeclImpl()
 {
     // Get base decl
     JavaDecl decl = getBaseDecl();
-
-    // Handle array
-    if(_arrayCount>0 && decl!=null) {
-        String cname = decl.getClassName();
-        String pfix = "["; for(int i=1; i<_arrayCount; i++) pfix += "[";
-        if(_primitive) cname = pfix + ClassUtils.getClassCoded(cname);
-        else cname = pfix + "L" + cname + ";";
-        decl = getJavaDecl(cname);
+    
+    // Handle TypeArgs or array indexes
+    if(decl!=null && _typeArgs!=null || _arrayCount>0) {
+        
+        // If any child args not resolved just bail (bogus!)
+        if(_typeArgs!=null)
+            for(JType typ : _typeArgs)
+                if(typ.getBaseDecl()==null)
+                    return null;
+                    
+        // Get full name and eval
+        String fname = getFullName();
+        decl = getJavaDecl(fname);
+        if(decl==null)
+            System.err.println("JType.getDeclImpl: Can't find full name: " + fname);
     }
     
     // Return declaration
@@ -102,7 +141,6 @@ protected JavaDecl getBaseDecl()
         decl = getDeclImpl(this);
 
     // Return declaration
-    //if(decl==null) System.err.println("Unresolved Type: " + this);
     return _baseDecl = decl;
 }
 

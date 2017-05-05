@@ -76,9 +76,29 @@ public void addParameter(JVarDecl aVD)
 }
 
 /**
- * Returns the list of formal parameters.
+ * Returns the parameter with given name.
  */
-public Class[] getParametersTypes()
+public JVarDecl getParam(String aName)
+{
+    for(JVarDecl vd : _params) if(SnapUtils.equals(vd.getName(), aName)) return vd;
+    return null;
+}
+
+/**
+ * Returns array of parameter types.
+ */
+public JavaDecl[] getParamTypes()
+{
+    JavaDecl ptypes[] = new JavaDecl[_params.size()];
+    for(int i=0, iMax=_params.size(); i<iMax; i++) { JVarDecl vd = _params.get(i);
+        ptypes[i] = vd.getEvalType(); }
+    return ptypes;
+}
+
+/**
+ * Returns array of parameter classes.
+ */
+public Class[] getParamClasses()
 {
     Class ptypes[] = new Class[_params.size()];
     for(int i=0, iMax=_params.size(); i<iMax; i++) { JVarDecl vd = _params.get(i);
@@ -121,8 +141,17 @@ public void setBlock(JStmtBlock aBlock)  { replaceChild(_block, _block = aBlock)
  */
 protected JavaDecl getDeclImpl()
 {
-    Method meth = getMethod();
-    return meth!=null? getJavaDecl(meth) : null;
+    // Get method name and param types
+    String name = getName(); if(name==null) return null;
+    JavaDecl ptypes[] = getParamTypes();
+    
+    // Get ClassDecl and helper
+    JClassDecl cd = getEnclosingClassDecl(); if(cd==null) return null;
+    JavaDecl cdecl = cd.getDecl();
+    JavaDeclHpr clsHpr = cdecl.getHpr();
+    
+    // Return method
+    return clsHpr.getMethodDecl(-1, name, null, ptypes);
 }
 
 /**
@@ -133,11 +162,11 @@ protected JavaDecl getDeclImpl(JNode aNode)
     // If node is method name, return method decl
     if(aNode==_id) return getDecl();
     
-    // Iterate over formalParams
+    // If node is paramter name, return param decl
     String name = aNode.getName();
-    if(aNode instanceof JExprId) for(JVarDecl vd : _params)
-        if(SnapUtils.equals(vd.getName(), name))
-            return vd.getDecl();
+    if(aNode instanceof JExprId) { JVarDecl param = getParam(name);
+        if(param!=null)
+            return param.getDecl(); }
     
     // Look for JTypeParam for given name
     JTypeParam tp = getTypeParam(name);
@@ -181,7 +210,7 @@ protected JavaDecl getSuperDeclImpl()
     // Get enclosing class and super class and method parameter types
     JClassDecl ecd = getEnclosingClassDecl(); if(ecd==null) return null;
     Class sclass = ecd.getSuperClass(); if(sclass==null) return null;
-    Class ptypes[] = getParametersTypes();
+    Class ptypes[] = getParamClasses();
     
     // Iterate over superclasses and return if any have method
     for(Class cls=sclass; cls!=null; cls=cls.getSuperclass()) {
@@ -196,18 +225,6 @@ protected JavaDecl getSuperDeclImpl()
     
     // Return null since not found
     return null;
-}
-
-/**
- * Returns the java.lang.reflect Method for this method decl from the compiled class.
- */
-public Method getMethod()
-{
-    JClassDecl cd = getEnclosingClassDecl();
-    Class cls = cd!=null? cd.getEvalClass() : null; if(cls==null) return null;
-    String name = getName(); if(name==null) return null;
-    try { return cls.getDeclaredMethod(getName(), getParametersTypes()); }
-    catch(Throwable e) { return null; }
 }
 
 /** Returns the part name. */
