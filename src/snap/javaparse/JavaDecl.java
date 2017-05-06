@@ -35,6 +35,9 @@ public class JavaDecl implements Comparable<JavaDecl> {
     // Whether class decl is enum or interface
     boolean        _enum, _interface, _primitive;
     
+    // Whether method is VarArgs
+    boolean        _varArgs;
+    
     // The type this decl evaluates to when referenced
     JavaDecl       _evalType;
     
@@ -46,6 +49,9 @@ public class JavaDecl implements Comparable<JavaDecl> {
     
     // The VariableDecl
     JVarDecl       _vdecl;
+    
+    // The Array item type (if Array)
+    JavaDecl       _arrayItemType;
     
     // The super implementation of this type (Class, Method, Constructor)
     JavaDecl       _sdecl = NULL_DECL; String _scn;
@@ -123,6 +129,8 @@ private void initType(Type aType)
         _evalType = this;
         Class scls = cls.getSuperclass();
         _scn = scls!=null? scls.getName() : null;
+        if(cls.isArray())
+            _arrayItemType = getJavaDecl(cls.getComponentType());
     }
 }
 
@@ -146,6 +154,7 @@ private void initMember(Member aMmbr)
         TypeVariable tvars[] = exec.getTypeParameters();
         _typeVars = new JavaDecl[tvars.length];
         for(int i=0,iMax=tvars.length;i<iMax;i++) _typeVars[i] = new JavaDecl(_owner,this,tvars[i]);
+        _varArgs = exec.isVarArgs();
         
         // Get Return Type
         Type rtype = exec.getAnnotatedReturnType().getType();
@@ -217,7 +226,12 @@ public boolean isInterface()  { return _type==DeclType.Class && _interface; }
 /**
  * Returns whether is an array.
  */
-public boolean isArrayClass()  { return _type==DeclType.Class && _name.endsWith("[]"); }
+public boolean isArray()  { return _arrayItemType!=null; }
+
+/**
+ * Returns the Array item type (if Array).
+ */
+public JavaDecl getArrayItemType()  { return _arrayItemType; }
 
 /**
  * Returns whether is primitive.
@@ -310,7 +324,7 @@ public JavaDecl getClassType()
 {
     if(isClass()) return this;
     if(isTypeVar()) return _evalType.getClassType();
-    return getParent(DeclType.Class);
+    return _par!=null? _par.getClassType() : null;
 }
 
 /**
@@ -434,6 +448,11 @@ public String[] getArgTypeSimpleNames()
     for(int i=0;i<names.length;i++) names[i] = _argTypes[i].getSimpleName();
     return names;
 }
+
+/**
+ * Returns whether Method/Constructor is VarArgs type.
+ */
+public boolean isVarArgs()  { return _varArgs; }
 
 /**
  * Returns the TypeVars.
@@ -564,6 +583,7 @@ private JavaDecl getCommonAncestorPrimitive(JavaDecl aDecl)
  */
 public JavaDecl getPrimitive()
 {
+    if(isPrimitive()) return this;
     switch(_name) {
         case "java.lang.Boolean": return getJavaDecl(boolean.class);
         case "java.lang.Byte": return getJavaDecl(byte.class);
@@ -582,6 +602,7 @@ public JavaDecl getPrimitive()
  */
 public JavaDecl getPrimitiveAlt()
 {
+    if(!isPrimitive()) return this;
     switch(_name) {
         case "boolean": return getJavaDecl(Boolean.class);
         case "byte": return getJavaDecl(Byte.class);
@@ -593,6 +614,43 @@ public JavaDecl getPrimitiveAlt()
         case "double": return getJavaDecl(Double.class);
         default: return null;
     }
+}
+
+/**
+ * Returns whether given type is assignable to this JavaDecl.
+ */
+public boolean isAssignable(JavaDecl aDecl)
+{
+    // If this decl is primitive, forward to primitive version
+    if(isPrimitive()) return isAssignablePrimitive(aDecl);
+    
+    // If given val is null or this decl is Object return true
+    if(aDecl==null) return true;
+    JavaDecl ctype0 = getClassType(); if(ctype0.getName().equals("java.lang.Object")) return true;
+    JavaDecl ctype1 = aDecl.getClassType(); if(ctype1.isPrimitive()) ctype1 = ctype1.getPrimitiveAlt();
+    
+    // Iterate up given class superclasses and check class and interfaces
+    for(JavaDecl ct1=ctype1; ct1!=null; ct1=ct1.getSuper()) {
+        if(ct1==ctype0)
+            return true;
+        if(ctype0.isInterface())
+            for(JavaDecl infc : ct1.getHpr().getInterfaces())
+                if(isAssignable(infc))
+                    return true;
+    }
+    return false;
+}
+
+/**
+ * Returns whether given type is assignable to this JavaDecl.
+ */
+private boolean isAssignablePrimitive(JavaDecl aDecl)
+{
+    if(aDecl==null) return false;
+    JavaDecl ctype0 = getClassType();
+    JavaDecl ctype1 = aDecl.getClassType().getPrimitive(); if(ctype1==null) return false;
+    JavaDecl common = getCommonAncestorPrimitive(ctype1);
+    return common==this;
 }
 
 /**

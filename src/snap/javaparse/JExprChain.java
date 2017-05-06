@@ -104,7 +104,7 @@ protected JavaDecl getDeclImpl(JNode aNode)
     
     // Handle any parent with class: Look for field
     else if(parExpr.getEvalType()!=null) { JavaDecl pdecl = parExpr.getEvalType();
-        if(pdecl.isArrayClass() && name.equals("length"))
+        if(pdecl.isArray() && name.equals("length"))
             return getJavaDecl(int.class); // was FieldName;
         if(pdecl.isParamType())
             pdecl = pdecl.getParent();

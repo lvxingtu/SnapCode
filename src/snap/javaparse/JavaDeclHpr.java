@@ -13,6 +13,9 @@ public class JavaDeclHpr {
     // The super class decl helper
     JavaDeclHpr      _sdeclHpr;
     
+    // The array of interfaces
+    JavaDecl         _interfaces[];
+    
     // The field decls
     List <JavaDecl>  _fdecls;
 
@@ -58,6 +61,12 @@ public HashSet <JavaDecl> updateDecls()
     Class cls = _cdecl.getEvalClass();
     String cname = _cdecl.getClassName();
     JavaDeclOwner owner = _cdecl._owner;
+    
+    // Get interfaces
+    Class interfaces[] = cls.getInterfaces();
+    _interfaces = new JavaDecl[interfaces.length];
+    for(int i=0,iMax=interfaces.length;i<iMax;i++) { Class infc = interfaces[i];
+        _interfaces[i] = getJavaDecl(infc); }
     
     // Create set for added/removed decls
     HashSet <JavaDecl> addedDecls = new HashSet();
@@ -122,6 +131,16 @@ public HashSet <JavaDecl> updateDecls()
     HashSet <JavaDecl> allDecls = new HashSet(); allDecls.add(_cdecl);
     allDecls.addAll(_fdecls); allDecls.addAll(_mdecls); allDecls.addAll(_cdecls); allDecls.addAll(_icdecls);
     return allDecls;
+}
+
+/**
+ * Returns the interfaces this class implments.
+ */
+public JavaDecl[] getInterfaces()
+{
+    if(_fdecls==null) updateDecls();
+    
+    return _interfaces;
 }
 
 /**
@@ -201,6 +220,111 @@ public JavaDecl getMethodDeclDeep(String aName, JavaDecl theTypes[])
     JavaDecl decl = getMethodDecl(aName, theTypes);
     if(decl==null && _sdeclHpr!=null) decl = _sdeclHpr.getMethodDeclDeep(aName, theTypes);
     return decl;
+}
+
+/**
+ * Returns a compatibile method for given name and param types.
+ */
+public JavaDecl getCompatibleMethod(String aName, JavaDecl theTypes[])
+{
+    if(_fdecls==null) updateDecls();
+    
+    for(JavaDecl md : _mdecls)
+        if(md.getName().equals(aName) && isMethodCompatible(md, theTypes))
+            return md;
+    return null;
+}
+
+/**
+ * Returns a compatibile method for given name and param types.
+ */
+public JavaDecl getCompatibleMethodDeep(String aName, JavaDecl theTypes[])
+{
+    // Search this class and superclasses for compatible method
+    for(JavaDecl cls=_cdecl;cls!=null;cls=cls.getSuper()) {
+        JavaDecl decl = cls.getHpr().getCompatibleMethod(aName, theTypes);
+        if(decl!=null)
+            return decl;
+    }
+    return null;
+}
+
+/**
+ * Returns a compatibile method for given name and param types.
+ */
+public JavaDecl getCompatibleMethodAll(String aName, JavaDecl theTypes[])
+{
+    // Search this class and superclasses for compatible method
+    JavaDecl decl = getCompatibleMethodDeep(aName, theTypes);
+    if(decl!=null)
+        return decl;
+    
+    // Search this class and superclasses for compatible interface
+    for(JavaDecl cls=_cdecl;cls!=null;cls=cls.getSuper()) {
+        for(JavaDecl infc : cls.getHpr().getInterfaces()) {
+            decl = infc.getHpr().getCompatibleMethodDeep(aName, theTypes);
+            if(decl!=null)
+                return decl;
+        }
+    }
+    
+    // If this class is Interface, check Object
+    if(_cdecl.isInterface()) {
+        JavaDecl objDecl = getJavaDecl(Object.class);
+        return objDecl.getHpr().getCompatibleMethodDeep(aName, theTypes);
+    }
+    
+    // Return null since compatible method not found
+    return null;
+}
+
+/**
+ * Returns whether given method is compatible with given types.
+ */
+public boolean isMethodCompatible(JavaDecl aMeth, JavaDecl theTypes[])
+{
+    // If method has VarArgs, forward to special VarArgs version
+    if(aMeth.isVarArgs()) return isMethodCompatibleVarArgs(aMeth, theTypes);
+    
+    // Get method types and check for compatible length
+    JavaDecl ptypes[] = aMeth.getArgTypes();
+    if(theTypes.length!=ptypes.length) return false;
+    
+    // Iterate over args and return false if any not compatible
+    for(int i=0,iMax=ptypes.length;i<iMax;i++) { JavaDecl ptype = ptypes[i];
+        if(!ptype.isAssignable(theTypes[i]))
+            return false; }
+    return true;
+}
+
+/**
+ * Returns whether given method is compatible with given types.
+ */
+private boolean isMethodCompatibleVarArgs(JavaDecl aMeth, JavaDecl theTypes[])
+{
+    // Get method types and check for compatible length
+    JavaDecl ptypes[] = aMeth.getArgTypes(); int plen = ptypes.length, vind = plen-1;
+    if(theTypes.length<vind) return false;
+    
+    // Iterate over non var-args and return false if any not compatible
+    for(int i=0;i<vind;i++) { JavaDecl ptype = ptypes[i];
+        if(!ptype.isAssignable(theTypes[i]))
+            return false; }
+    
+    // If one more arg, return true if same type as VarArg array
+    int argc = theTypes.length;
+    if(argc==plen)
+        if(ptypes[vind].isAssignable(theTypes[vind]))
+            return true;
+            
+    // If any remaining args don't match array item type, return false
+    JavaDecl itype = ptypes[vind].getArrayItemType();
+    for(int i=vind;i<argc;i++)
+        if(!itype.isAssignable(theTypes[i]))
+            return false;
+    
+    // Return true since args match
+    return true;
 }
 
 /**

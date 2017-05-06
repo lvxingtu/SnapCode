@@ -1,7 +1,6 @@
 package snap.javaparse;
 import java.lang.reflect.*;
 import java.util.List;
-import snap.util.ClassUtils;
 
 /**
  * This class represents a method call in code.
@@ -89,51 +88,29 @@ public JavaDecl[] getArgEvalTypes()
 }
 
 /**
- * Returns the method from parent class and arg types.
- */
-public Method getMethod()
-{
-    // Get method name, args and scope class for expression
-    String name = getName();
-    Class argClasses[] = getArgClasses();
-    Class sclass = getScopeNodeEvalClass();
-    
-    // Iterate up enclosing classes until we find method
-    for(Class c=sclass; c!=null; c=c.getEnclosingClass()) {
-        Method meth = null; try { meth = ClassUtils.getMethod(c, name, argClasses); }
-        catch(Throwable t) { }  // Since the compiled app can be in any weird state
-        if(meth!=null)
-            return meth;
-    }
-    
-    // If scope class is interface, try evaluating on Object
-    if(sclass!=null && sclass.isInterface()) {
-        try { return ClassUtils.getMethod(Object.class, name, argClasses); }
-        catch(Throwable t) { }  // Since the compiled app can be in any weird state
-    }
-    
-    // See if method is from static import
-    Member mem = getFile().getImportClassMember(name, argClasses);
-    if(mem instanceof Method)
-        return (Method)mem;
-        
-    // Return null since not found
-    return null;
-}
-
-/**
  * Tries to resolve the method declaration for this node.
  */
 protected JavaDecl getDeclImpl()
 {
-    // Get method using node parent class and args (just return if not found)
-    Method meth = getMethod();
-    if(meth==null)
-        return null;
+    // Get method name and arg types
+    String name = getName();
+    JavaDecl argTypes[] = getArgEvalTypes();
     
-    // Get decl for method
-    JavaDecl decl = getJavaDecl(meth);
-    return decl;
+    // Get scope node class type and search for compatible method for name and arg types
+    JavaDecl sndecl = getScopeNodeEvalType(); if(sndecl==null) return null;
+    JavaDecl snct = sndecl.getClassType();
+    JavaDecl decl = snct.getHpr().getCompatibleMethodAll(name, argTypes);
+    if(decl!=null)
+        return decl;
+        
+    // See if method is from static import
+    Class argClasses[] = getArgClasses();
+    Member mem = getFile().getImportClassMember(name, argClasses);
+    if(mem instanceof Method)
+        return getJavaDecl(mem);
+        
+    // Return null since not found
+    return null;
 }
 
 /**
