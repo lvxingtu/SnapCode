@@ -128,25 +128,26 @@ private JavaDecl getClassDecl(Class aClass)
  */
 private JavaDecl createClassDecl(Class aClass)
 {
+    JavaDecl parDecl = getParentDecl(aClass);
+    return new JavaDecl(this, parDecl, aClass);
+}
+
+/**
+ * Returns the parent decl for a class.
+ */
+private JavaDecl getParentDecl(Class aClass)
+{
     // If declaring class, get decl from parent decl
     Class dcls = aClass.getDeclaringClass();
-    if(dcls!=null) {
-        JavaDecl parDecl = getJavaDecl(dcls);
-        JavaDeclHpr declHpr = parDecl.getHpr();
-        JavaDecl decl = declHpr.getClassDecl(aClass);
-        if(decl==null) System.err.println("JavaDeclOwner.createClassDecl: Inner class not found " + aClass);
-        return decl;
-    }
+    if(dcls!=null)
+        return getJavaDecl(dcls);
     
     // Get parent decl
-    JavaDecl parDecl = null;
     Package pkg = aClass.getPackage();
     String pname = pkg!=null? pkg.getName() : null;
     if(pname!=null && pname.length()>0)
-        parDecl = getPackageDecl(pname);
-    
-    // Create and add JavaDecl for class
-    return new JavaDecl(this, parDecl, aClass);
+        return getPackageDecl(pname);
+    return null;
 }
 
 /**

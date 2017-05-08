@@ -83,7 +83,7 @@ public HashSet <JavaDecl> updateDecls()
     catch(Throwable e) { System.err.println(e + " in " + cname); return null; }
     for(Class icls : iclss) {   //if(icls.isSynthetic()) continue;
         JavaDecl decl = getClassDecl(icls);
-        if(decl==null) { decl = new JavaDecl(owner,_cdecl,icls); addedDecls.add(decl); addDecl(decl); }
+        if(decl==null) { decl = getJavaDecl(icls); addedDecls.add(decl); addDecl(decl); }
         else removedDecls.remove(decl);
     }
     
