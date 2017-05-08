@@ -91,23 +91,21 @@ public JavaDecl getTypeDecl(Type aType, JavaDecl aPar)
     JavaDecl decl = _decls.get(id); if(decl!=null) return decl;
 
     // Handle ParameterizedType
-    if(aType instanceof ParameterizedType)
+    if(aType instanceof ParameterizedType) {
         decl = new JavaDecl(this, null, aType);
+        _decls.put(id, decl);
+        return decl;
+    }
         
     // Handle TypeVariable
-    else if(aType instanceof TypeVariable) { TypeVariable tv = (TypeVariable)aType;
+    if(aType instanceof TypeVariable) { TypeVariable tv = (TypeVariable)aType;
         decl = aPar.getTypeVar(tv.getName());
         return decl;
     }
         
     // Handle Class
-    else {
-        Class cls = getClass(aType);
-        return getClassDecl(cls);
-    }
-    
-    _decls.put(id, decl);
-    return decl;
+    Class cls = getClass(aType);
+    return getClassDecl(cls);
 }
 
 /**
@@ -173,10 +171,8 @@ private JavaDecl createPackageDecl(String aName)
     if(ind>=0) { String pname = aName.substring(0,ind);
         parDecl = getPackageDecl(pname); }
         
-    // Create new decl
-    JavaDecl pdecl = new JavaDecl(this, parDecl, aName);
-    _decls.put(aName, pdecl);
-    return pdecl;
+    // Create new decl and return
+    return new JavaDecl(this, parDecl, aName);
 }
 
 /**
@@ -342,31 +338,27 @@ public static String getId(Object anObj)
     
     // Handle Field: DeclClassName.<Name>
     if(anObj instanceof Field) { Field field = (Field)anObj;
-        sb.append(field.getDeclaringClass()).append('.').append(field.getName());
-    }
+        sb.append(field.getDeclaringClass()).append('.').append(field.getName()); }
     
     // Handle Method: DeclClassName.Name(<ParamType>,...)
     else if(anObj instanceof Method) { Method meth = (Method)anObj;
+        Class ptypes[] = meth.getParameterTypes();
         sb.append(getId(meth.getDeclaringClass())).append('.').append(meth.getName()).append('(');
-        Class ptypes[] = meth.getParameterTypes(), last = ptypes.length>0? ptypes[ptypes.length-1] : null;
-        for(Class ptype : ptypes) { sb.append(getId(ptype)); if(ptype!=last) sb.append(','); }
-        sb.append(')');
+        if(ptypes.length>0) sb.append(getId(ptypes)); sb.append(')');
     }
     
     // Handle Constructor: DeclClassName(<ParamType>,...)
     else if(anObj instanceof Constructor) { Constructor constr = (Constructor)anObj;
+        Class ptypes[] = constr.getParameterTypes();
         sb.append(getId(constr.getDeclaringClass())).append('(');
-        Class ptypes[] = constr.getParameterTypes(), last = ptypes.length>0? ptypes[ptypes.length-1] : null;
-        for(Class ptype : ptypes) { sb.append(getId(ptype)); if(ptype!=last) sb.append(','); }
-        sb.append(')');
+        if(ptypes.length>0) sb.append(getId(ptypes)); sb.append(')');
     }
     
     // Handle ParameterizedType: RawType<TypeArg,...>
     else if(anObj instanceof ParameterizedType) { ParameterizedType pt = (ParameterizedType)anObj;
+        Type ptypes[] = pt.getActualTypeArguments();
         sb.append(getId(pt.getRawType())).append('<');
-        Type types[] = pt.getActualTypeArguments(), last = types.length>0? types[types.length-1] : null;
-        for(Type type : types) { sb.append(getId(type)); if(type!=last) sb.append(','); }
-        sb.append('>');
+        if(ptypes.length>0) sb.append(getId(ptypes)); sb.append('>');
     }
     
     // Handle TypeVariable: DeclType.Name
@@ -391,6 +383,12 @@ public static String getId(Object anObj)
     // Handle String (package name)
     else if(anObj instanceof String)
         sb.append(anObj);
+        
+    // Handle array of types
+    else if(anObj instanceof Object[]) { Object types[] = (Object[])anObj;
+        for(int i=0,iMax=types.length,last=iMax-1;i<iMax;i++) { Object type = types[i];
+            sb.append(getId(type)); if(i!=last) sb.append(','); }
+    }
     
     // Complain about anything else
     else throw new RuntimeException("Unsupported type");
