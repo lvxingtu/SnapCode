@@ -103,7 +103,7 @@ protected JavaDecl getDeclImpl()
     JavaDecl decl = getBaseDecl();
     
     // Handle TypeArgs or array indexes
-    if(decl!=null && _typeArgs!=null || _arrayCount>0) {
+    if(decl!=null && (_typeArgs!=null || _arrayCount>0)) {
         
         // If any child args not resolved just bail (bogus!)
         if(_typeArgs!=null)

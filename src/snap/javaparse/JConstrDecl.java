@@ -2,6 +2,7 @@
  * Copyright (c) 2010, ReportMill Software. All rights reserved.
  */
 package snap.javaparse;
+import snap.util.ArrayUtils;
 
 /**
  * A Java member for ConstrDecl.
@@ -19,6 +20,10 @@ protected JavaDecl getDeclImpl()
     // Get parent JClassDecl and JavaDecl
     JClassDecl cd = getEnclosingClassDecl(); if(cd==null) return null;
     JavaDecl cdecl = cd.getDecl();
+    
+    // If inner class and not static, add implied class type to arg types array
+    if(cdecl.isMemberClass() && !cdecl.isStatic())
+        ptypes = ArrayUtils.add(ptypes, cdecl.getParent(), 0);
     
     // Return Constructor for param types
     JavaDeclHpr clsHpr = cdecl.getHpr();

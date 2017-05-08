@@ -1,6 +1,6 @@
 package snap.javaparse;
-import java.lang.reflect.Constructor;
 import java.util.*;
+import snap.util.ListUtils;
 
 /**
  * A JStmt subclass to represent an explicit constructor invocation, like: this(x) or super(y).
@@ -9,10 +9,10 @@ import java.util.*;
 public class JStmtConstrCall extends JStmt {
 
     // The identifier
-    List <JExprId>        _idList = new ArrayList();
+    List <JExprId>      _idList = new ArrayList();
     
     // The args
-    List <JExpr>   _args;
+    List <JExpr>        _args;
 
 /**
  * Returns the list of ids.
@@ -40,36 +40,49 @@ public void setArgs(List <JExpr> theArgs)
 }
 
 /**
- * Returns the arg classes.
+ * Returns the arg eval types.
  */
-public Class[] getArgClasses()
+public JavaDecl[] getArgEvalTypes()
 {
     List <JExpr> args = getArgs();
-    Class classes[] = new Class[args.size()];
+    JavaDecl etypes[] = new JavaDecl[args.size()];
     for(int i=0, iMax=args.size(); i<iMax; i++) { JExpr arg = args.get(i);
-        classes[i] = arg!=null? arg.getEvalClass() : null; }
-    return classes;
+        etypes[i] = arg!=null? arg.getEvalType() : null; }
+    return etypes;
 }
 
 /**
- * Override to get declaration from actual Constructor.
+ * Tries to resolve the method declaration for this node.
  */
-@Override
 protected JavaDecl getDeclImpl()
 {
-    Constructor c = getConstructor();
-    return c!=null? getJavaDecl(c) : null;
+    // Get class decl and constructor call arg types
+    JClassDecl cd = getEnclosingClassDecl();
+    JavaDecl cdecl = cd.getDecl(); if(cdecl==null) return null;
+    JavaDecl argTypes[] = getArgEvalTypes();
+    
+    // If Super, switch to super class
+    String name = getIds().get(0).getName();
+    if(name.equals("super"))
+        cdecl = cdecl.getSuper();
+    
+    // Get scope node class type and search for compatible method for name and arg types
+    JavaDecl decl = cdecl.getHpr().getCompatibleConstructor(argTypes);
+    if(decl!=null)
+        return decl;
+        
+    // Return null since not found
+    return null;
 }
 
 /**
- * Returns the java.lang.reflect Constructor for this method decl from the compiled class.
+ * Tries to resolve the method declaration for this node.
  */
-public Constructor getConstructor()
+protected JavaDecl getDeclImpl(JNode aNode)
 {
-    JClassDecl cd = getEnclosingClassDecl();
-    Class cls = cd!=null? cd.getEvalClass() : null; if(cls==null) return null;
-    try { return cls.getSuperclass().getDeclaredConstructor(getArgClasses()); }
-    catch(Throwable e) { return null; }
+    if(aNode.getParent()==this && aNode instanceof JExprId && ListUtils.containsId(_idList, aNode))
+        return getDecl();
+    return super.getDeclImpl(aNode);
 }
 
 }

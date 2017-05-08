@@ -225,6 +225,19 @@ public JavaDecl getMethodDeclDeep(String aName, JavaDecl theTypes[])
 /**
  * Returns a compatibile method for given name and param types.
  */
+public JavaDecl getCompatibleConstructor(JavaDecl theTypes[])
+{
+    if(_fdecls==null) updateDecls();
+    
+    for(JavaDecl cd : _cdecls)
+        if(isMethodCompatible(cd, theTypes))
+            return cd;
+    return null;
+}
+
+/**
+ * Returns a compatibile method for given name and param types.
+ */
 public JavaDecl getCompatibleMethod(String aName, JavaDecl theTypes[])
 {
     if(_fdecls==null) updateDecls();

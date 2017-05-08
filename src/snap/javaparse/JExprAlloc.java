@@ -2,9 +2,8 @@
  * Copyright (c) 2010, ReportMill Software. All rights reserved.
  */
 package snap.javaparse;
-import java.lang.reflect.Constructor;
 import java.util.*;
-import snap.util.ClassUtils;
+import snap.util.ArrayUtils;
 
 /**
  * A JExpr subclass for Allocation expressions.
@@ -52,15 +51,15 @@ public void setArgs(List <JExpr> theArgs)
 }
 
 /**
- * Returns the arg classes.
+ * Returns the arg eval types.
  */
-public Class[] getArgClasses()
+public JavaDecl[] getArgEvalTypes()
 {
     List <JExpr> args = getArgs();
-    Class classes[] = new Class[args.size()];
+    JavaDecl etypes[] = new JavaDecl[args.size()];
     for(int i=0, iMax=args.size(); i<iMax; i++) { JExpr arg = args.get(i);
-        classes[i] = arg!=null? arg.getEvalClass() : null; }
-    return classes;
+        etypes[i] = arg!=null? arg.getEvalType() : null; }
+    return etypes;
 }
 
 /**
@@ -102,32 +101,36 @@ public JClassDecl getClassDecl()  { return _classDecl; }
 public void setClassDecl(JClassDecl aCD)  { replaceChild(_classDecl, _classDecl = aCD); }
 
 /**
- * Returns the part name.
- */
-public String getNodeString()  { return "Allocation"; }
-
-/**
- * Tries to resolve the declaration for this node.
+ * Tries to resolve the method declaration for this node.
  */
 protected JavaDecl getDeclImpl()
 {
     // If array alloc, just return Type decl
-    if(_arrayDims!=null)
-        return getType().getDecl();
+    JType type = getType();
+    if(_arrayDims!=null || _arrayInits.size()>0)
+        return type.getDecl();
         
-    // Otherwise, get constructor decl
-    Constructor cstr = getConstructor();
-    return cstr!=null? getJavaDecl(cstr) : null;
+    // Get class decl and constructor call arg types
+    JavaDecl cdecl = type.getDecl(); if(cdecl==null) return null;
+    cdecl = cdecl.getClassType();
+    JavaDecl argTypes[] = getArgEvalTypes();
+    
+    // If inner class and not static, add implied class type to arg types array
+    if(cdecl.isMemberClass() && !cdecl.isStatic())
+        argTypes = ArrayUtils.add(argTypes, cdecl.getParent(), 0);
+    
+    // Get scope node class type and search for compatible method for name and arg types
+    JavaDecl decl = cdecl.getHpr().getCompatibleConstructor(argTypes);
+    if(decl!=null)
+        return decl;
+        
+    // Return null since not found
+    return null;
 }
 
 /**
- * Returns the contructor by querying parent class ref.
+ * Returns the part name.
  */
-public Constructor getConstructor()
-{
-    Class cls = _type!=null? _type.getEvalClass() : null;
-    try { return cls!=null? ClassUtils.getConstructor(cls, getArgClasses()) : null; }
-    catch(Throwable t) { return null; }
-}
+public String getNodeString()  { return "Allocation"; }
 
 }

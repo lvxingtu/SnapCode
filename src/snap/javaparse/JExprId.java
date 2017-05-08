@@ -130,6 +130,7 @@ public String getNodeString()
     JavaDecl decl = getDecl(); if(decl==null) return "UnknownId";
     switch(decl.getType()) {
         case Class: return "ClassId";
+        case Constructor: return "ConstrId";
         case Field: {
             JavaDecl pdecl = decl.getParent(); if(pdecl!=null && pdecl.isEnum()) return "EnumId";
             return "FieldId";

@@ -577,6 +577,7 @@ public void showSymbolCheck()
 
 TextView _symText;
 JFile _symFile;
+int _undefCount;
 
 /**
  * Loads the undefined symbols in file.
@@ -598,12 +599,12 @@ private void findUndefines(WebFile aFile)
  */
 private void findUndefines(JNode aNode)
 {
-    if(_symText.length()>2000) return;
+    if(_undefCount>49) return;
     if(aNode.getDecl()==null && JavaParseUtils.isDeclExpected(aNode)) {
-        aNode.getDecl();
+        aNode.getDecl(); _undefCount++;
         if(aNode.getFile()!=_symFile) {
             _symFile = aNode.getFile(); showSymText("\n" + aNode.getFile().getSourceFile().getName() + ":\n\n"); }
-        try { showSymText("    " + aNode + '\n'); }
+        try { showSymText("    " + _undefCount + ". " + aNode + '\n'); }
         catch(Exception e) { showSymText(e.toString()); }
     }
     else if(aNode.getChildCount()>0)

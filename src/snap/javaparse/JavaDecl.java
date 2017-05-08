@@ -383,7 +383,7 @@ public String getRootClassName()
 /**
  * Returns whether class is member.
  */
-public boolean isMemberClass()  { return isClass() && _par!=null; }
+public boolean isMemberClass()  { return isClass() && _par!=null && _par.isClass(); }
 
 /**
  * Returns the JavaDeclHpr for class child decls.
@@ -629,15 +629,25 @@ public boolean isAssignable(JavaDecl aDecl)
     JavaDecl ctype0 = getClassType(); if(ctype0.getName().equals("java.lang.Object")) return true;
     JavaDecl ctype1 = aDecl.getClassType(); if(ctype1.isPrimitive()) ctype1 = ctype1.getPrimitiveAlt();
     
+    // If both are array type, check ArrayItemTypes instead
+    if(ctype0.isArray() && ctype1.isArray())
+        return ctype0.getArrayItemType().isAssignable(ctype1.getArrayItemType());
+    
     // Iterate up given class superclasses and check class and interfaces
     for(JavaDecl ct1=ctype1; ct1!=null; ct1=ct1.getSuper()) {
+        
+        // If classes match, return true
         if(ct1==ctype0)
             return true;
+            
+        // If any interface of this decl match, return true
         if(ctype0.isInterface())
             for(JavaDecl infc : ct1.getHpr().getInterfaces())
                 if(isAssignable(infc))
                     return true;
     }
+    
+    // Return false since no match found
     return false;
 }
 
