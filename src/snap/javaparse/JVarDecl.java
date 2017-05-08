@@ -131,7 +131,8 @@ public Class getDeclaringClass()
 protected JavaDecl getDeclImpl()
 {
     // If part of a JFieldDecl, get JavaDecl for field
-    if(getParent() instanceof JFieldDecl) {
+    JNode par = getParent();
+    if(par instanceof JFieldDecl) {
         JClassDecl cd = getEnclosingClassDecl(); if(cd==null) return null;
         JavaDecl decl = cd.getDecl(); if(decl==null) {System.err.println("JVarDecl.getDeclImp: No class");return null;}
         JavaDeclHpr declHpr = decl.getHpr();

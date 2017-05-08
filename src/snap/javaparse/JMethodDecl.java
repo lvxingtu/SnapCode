@@ -95,17 +95,6 @@ public JavaDecl[] getParamTypes()
 }
 
 /**
- * Returns array of parameter classes.
- */
-public Class[] getParamClasses()
-{
-    Class ptypes[] = new Class[_params.size()];
-    for(int i=0, iMax=_params.size(); i<iMax; i++) { JVarDecl vd = _params.get(i);
-        ptypes[i] = vd.getEvalClass(); }
-    return ptypes;
-}
-
-/**
  * Returns the throws list.
  */
 public List <JExpr> getThrowsList()  { return _throwsNameList; }

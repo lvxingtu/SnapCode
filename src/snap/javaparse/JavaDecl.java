@@ -35,8 +35,8 @@ public class JavaDecl implements Comparable<JavaDecl> {
     // Whether class decl is enum or interface
     boolean        _enum, _interface, _primitive;
     
-    // Whether method is VarArgs
-    boolean        _varArgs;
+    // Whether method is VarArgs, Default
+    boolean        _varArgs, _default;
     
     // The type this decl evaluates to when referenced
     JavaDecl       _evalType;
@@ -166,6 +166,10 @@ private void initMember(Member aMmbr)
         _argTypes = new JavaDecl[ptypes.length];
         for(int i=0,iMax=ptypes.length; i<iMax; i++)
             _argTypes[i] = _owner.getTypeDecl(ptypes[i], this);
+            
+        // Set default
+        if(exec instanceof Method)
+            _default = ((Method)exec).isDefault();
     }
 }
 
@@ -453,6 +457,11 @@ public String[] getArgTypeSimpleNames()
  * Returns whether Method/Constructor is VarArgs type.
  */
 public boolean isVarArgs()  { return _varArgs; }
+
+/**
+ * Returns whether Method is default type.
+ */
+public boolean isDefault()  { return _default; }
 
 /**
  * Returns the TypeVars.

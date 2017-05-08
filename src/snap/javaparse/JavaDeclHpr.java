@@ -341,6 +341,19 @@ private boolean isMethodCompatibleVarArgs(JavaDecl aMeth, JavaDecl theTypes[])
 }
 
 /**
+ * Returns the lambda method.
+ */
+public JavaDecl getLambdaMethod(int argCount)
+{
+    if(_fdecls==null) updateDecls();
+    
+    for(JavaDecl jd : _mdecls)
+        if(jd.getParamCount()==argCount)
+            return jd;
+    return null;
+}
+
+/**
  * Returns the decl for constructor.
  */
 public JavaDecl getConstructorDecl(Constructor aConstr)

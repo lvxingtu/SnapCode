@@ -107,6 +107,23 @@ public String getValueString()
 }
 
 /**
+ * Returns the value class.
+ */
+public Class getValueClass()
+{
+    switch(getLiteralType()) {
+        case Boolean: return boolean.class;
+        case Integer: return int.class;
+        case Long: return long.class;
+        case Float: return float.class;
+        case Double: return double.class;
+        case Character: return char.class;
+        case String: return String.class;
+        default: return null;
+    }
+}
+
+/**
  * Sets the value string.
  */
 public void setValueString(String aString)  { _valueStr = aString; }
@@ -116,8 +133,7 @@ public void setValueString(String aString)  { _valueStr = aString; }
  */
 protected JavaDecl getDeclImpl()
 {
-    Object val = getValue(); if(val==null) return null;
-    Class cls = val.getClass();
+    Class cls = getValueClass(); if(cls==null) return null;
     JavaDecl decl = getJavaDecl(cls);
     JavaDecl declPrim = decl.getPrimitive(); if(declPrim!=null) decl = declPrim;
     return decl;
