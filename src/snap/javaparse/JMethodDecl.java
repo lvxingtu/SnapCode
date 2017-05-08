@@ -90,7 +90,7 @@ public JavaDecl[] getParamTypes()
 {
     JavaDecl ptypes[] = new JavaDecl[_params.size()];
     for(int i=0, iMax=_params.size(); i<iMax; i++) { JVarDecl vd = _params.get(i);
-        ptypes[i] = vd.getEvalType(); }
+        ptypes[i] = vd.getDecl(); }
     return ptypes;
 }
 

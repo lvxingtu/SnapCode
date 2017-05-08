@@ -378,7 +378,10 @@ public static String getId(Object anObj)
     
     // Handle JVarDecl
     else if(anObj instanceof JVarDecl) { JVarDecl vd = (JVarDecl)anObj;
-        sb.append("JVarDecl").append(vd.getName()); }
+        JType type = vd.getType(); JavaDecl tdecl = type!=null? type.getDecl() : null;
+        if(tdecl!=null) sb.append(tdecl.getId()).append(' ');
+        sb.append(vd.getName());
+    }
         
     // Handle String (package name)
     else if(anObj instanceof String)
