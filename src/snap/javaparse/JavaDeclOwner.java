@@ -217,10 +217,10 @@ public static String getTypeName(Type aType)
         
     // Handle ParameterizedType (e.g., Class <T>, List <T>, Map <K,V>)
     if(aType instanceof ParameterizedType) { ParameterizedType pt = (ParameterizedType)aType;
-        Type base = pt.getRawType();
+        Type base = pt.getRawType(), types[] = pt.getActualTypeArguments();
         StringBuffer sb = new StringBuffer(getTypeName(base)).append('<');
-        Type types[] = pt.getActualTypeArguments(), last = types[types.length-1];
-        for(Type ta : types) { sb.append(getTypeName(ta)); if(ta!=last) sb.append(','); }
+        for(int i=0,iMax=types.length,last=iMax-1;i<iMax;i++) { Type type = types[i];
+            sb.append(getTypeName(type)); if(i!=last) sb.append(','); }
         return sb.append('>').toString();
     }
         
@@ -256,10 +256,10 @@ public static String getTypeSimpleName(Type aType)
         
     // Handle ParameterizedType (e.g., Class <T>, List <T>, Map <K,V>)
     if(aType instanceof ParameterizedType) { ParameterizedType pt = (ParameterizedType)aType;
-        Type base = pt.getRawType();
+        Type base = pt.getRawType(), types[] = pt.getActualTypeArguments();
         StringBuffer sb = new StringBuffer(getTypeSimpleName(base)).append('<');
-        Type types[] = pt.getActualTypeArguments(), last = types[types.length-1];
-        for(Type ta : types) { sb.append(getTypeSimpleName(ta)); if(ta!=last) sb.append(','); }
+        for(int i=0,iMax=types.length,last=iMax-1;i<iMax;i++) { Type type = types[i];
+            sb.append(getTypeSimpleName(type)); if(i!=last) sb.append(','); }
         return sb.append('>').toString();
     }
         
