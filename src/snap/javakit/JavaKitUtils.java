@@ -78,7 +78,7 @@ public static String getId(Object anObj)
     }
     
     // Complain about anything else
-    else throw new RuntimeException("Unsupported type");
+    else throw new RuntimeException("JavaKitUtils.getId: Unsupported type: " + anObj);
     
     // Return string
     return sb.toString();
@@ -120,7 +120,7 @@ public static String getTypeName(Type aType)
     }
     
     // Complain about anything else
-    throw new RuntimeException("JavaDecl: Can't get Type name from type: " + aType);
+    throw new RuntimeException("JavaKitUtils.getTypeName: Can't get name from type: " + aType);
 }
 
 /**
@@ -157,7 +157,7 @@ public static String getTypeSimpleName(Type aType)
     }
     
     // Complain about anything else
-    throw new RuntimeException("JavaDecl: Can't get Type name from type: " + aType);
+    throw new RuntimeException("JavaKitUtils.getTypeSimpleName: Can't get name from type: " + aType);
 }
 
 /**
@@ -191,7 +191,7 @@ public static Class getClass(Type aType)
     }
     
     // Complain about anything else
-    throw new RuntimeException("JavaDecl: Can't get Type name from type: " + aType);
+    throw new RuntimeException("JavaKitUtils.getClass: Can't get class from type: " + aType);
 }
 
 /**
