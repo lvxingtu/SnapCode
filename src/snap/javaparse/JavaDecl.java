@@ -365,14 +365,14 @@ public JavaDecl getParent(DeclType aType)
 }
 
 /**
+ * Returns the parent name.
+ */
+public String getParentName()  { return _par!=null? _par.getName() : ""; }
+
+/**
  * Returns the parent class.
  */
 public Class getParentClass()  { return _par!=null? _par.getEvalClass() : null; }
-
-/**
- * Returns the parent class name.
- */
-public String getParentClassName()  { return _par!=null? _par.getClassName() : null; }
 
 /**
  * Returns the top level class name.
@@ -723,7 +723,7 @@ public String getSuggestionString()
             if(getEvalType()!=null) sb.append(" : ").append(getEvalType().getSimpleName());
             if(getClassName()!=null) sb.append(" - ").append(getClassSimpleName());
             break;
-        case Class: sb.append(" - ").append(getParentClassName()); break;
+        case Class: sb.append(" - ").append(getParentName()); break;
         case Package: break;
         default:  throw new RuntimeException("Unsupported Type " + getType());
     }
@@ -739,7 +739,7 @@ public String getReplaceString()
 {
     switch(getType()) {
         case Class: return getSimpleName();
-        case Constructor: return getPrettyName().replace(getParentClassName() + '.', "");
+        case Constructor: return getPrettyName().replace(getParentName() + '.', "");
         case Method: return getPrettyName().replace(getClassName() + '.', "");
         case Package: {
             String name = getPackageName(); int index = name.lastIndexOf('.');

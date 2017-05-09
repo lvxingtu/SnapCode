@@ -109,7 +109,7 @@ protected JavaDecl getDeclImpl()
         if(_typeArgs!=null)
             for(JType typ : _typeArgs)
                 if(typ.getBaseDecl()==null)
-                    return null;
+                    return decl;
                     
         // Get full name and eval
         String fname = getFullName();

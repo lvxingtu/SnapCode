@@ -157,7 +157,7 @@ private JavaDecl getPackageDecl(String aName)
 {
     if(aName==null || aName.length()==0) return null;  // If bogus package name, just return
     JavaDecl pdecl = _decls.get(aName);
-    if(pdecl==null) _decls.put(aName, createPackageDecl(aName));
+    if(pdecl==null) _decls.put(aName, pdecl = createPackageDecl(aName));
     return pdecl;
 }
 
