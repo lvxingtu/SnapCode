@@ -1,7 +1,7 @@
 package snap.typescript;
 import java.lang.reflect.TypeVariable;
 import java.util.*;
-import snap.javaparse.*;
+import snap.javakit.*;
 
 /**
  * A custom class.

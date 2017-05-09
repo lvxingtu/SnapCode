@@ -3,7 +3,7 @@ import java.io.File;
 import java.text.DecimalFormat;
 import java.util.*;
 import snap.debug.RunApp;
-import snap.javaparse.*;
+import snap.javakit.*;
 import snap.javatext.JavaPage;
 import snap.project.*;
 import snap.util.*;
@@ -600,7 +600,7 @@ private void findUndefines(WebFile aFile)
 private void findUndefines(JNode aNode)
 {
     if(_undefCount>49) return;
-    if(aNode.getDecl()==null && JavaParseUtils.isDeclExpected(aNode)) {
+    if(aNode.getDecl()==null && JavaKitUtils.isDeclExpected(aNode)) {
         aNode.getDecl(); _undefCount++;
         if(aNode.getFile()!=_symFile) {
             _symFile = aNode.getFile(); showSymText("\n" + aNode.getFile().getSourceFile().getName() + ":\n\n"); }
@@ -616,14 +616,6 @@ private void showSymText(String aStr)
 {
     runLater(() -> _symText.replaceChars(aStr, null, _symText.length(), _symText.length(), false));
     try { Thread.sleep(80); } catch(Exception e) { }
-}
-
-private boolean includeNode(JNode aNode)
-{
-    if(aNode instanceof JStmtBlock) return false;
-    if(aNode instanceof JModifiers) return false;
-    if(aNode instanceof JPackageDecl) return false;
-    return true;
 }
 
 /**

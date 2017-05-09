@@ -1,5 +1,5 @@
 package snap.javatext;
-import snap.javaparse.*;
+import snap.javakit.*;
 import snap.parse.*;
 
 /**

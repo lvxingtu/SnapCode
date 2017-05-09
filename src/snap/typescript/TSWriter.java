@@ -1,6 +1,6 @@
 package snap.typescript;
 import java.util.*;
-import snap.javaparse.*;
+import snap.javakit.*;
 
 /**
  * A class to convert Java to TypeScript.

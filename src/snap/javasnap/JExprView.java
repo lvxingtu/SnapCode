@@ -1,5 +1,5 @@
 package snap.javasnap;
-import snap.javaparse.*;
+import snap.javakit.*;
 
 /**
  * A JNodeView subclass for JExpr.

@@ -3,7 +3,7 @@
  */
 package snap.typescript;
 import java.util.*;
-import snap.javaparse.JavaData;
+import snap.javakit.JavaData;
 import snap.project.*;
 import snap.util.*;
 import snap.web.WebFile;

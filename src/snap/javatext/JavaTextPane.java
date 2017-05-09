@@ -3,7 +3,7 @@
  */
 package snap.javatext;
 import snap.gfx.*;
-import snap.javaparse.*;
+import snap.javakit.*;
 import snap.util.*;
 import snap.view.*;
 import snap.viewx.TextPane;

@@ -1,7 +1,7 @@
 package snap.app;
 import java.util.*;
 import snap.gfx.*;
-import snap.javaparse.*;
+import snap.javakit.*;
 import snap.project.Project;
 import snap.view.*;
 import snap.web.*;

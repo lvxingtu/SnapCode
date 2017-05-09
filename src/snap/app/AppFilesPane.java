@@ -2,7 +2,7 @@ package snap.app;
 import java.io.File;
 import java.util.*;
 import snap.gfx.*;
-import snap.javaparse.JavaData;
+import snap.javakit.JavaData;
 import snap.project.Project;
 import snap.typescript.TSWriter;
 import snap.util.*;

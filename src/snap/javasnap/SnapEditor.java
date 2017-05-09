@@ -1,7 +1,7 @@
 package snap.javasnap;
 import java.util.List;
 import snap.gfx.TextBoxLine;
-import snap.javaparse.*;
+import snap.javakit.*;
 import snap.javatext.JavaTextView;
 import snap.view.*;
 

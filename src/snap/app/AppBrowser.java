@@ -1,5 +1,4 @@
 package snap.app;
-import snap.javasnap.SnapEditorPage;
 import snap.javatext.JavaPage;
 import snap.util.SnapUtils;
 import snap.viewx.*;

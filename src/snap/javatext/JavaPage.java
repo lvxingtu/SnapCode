@@ -3,7 +3,7 @@ import snap.app.AppBrowser;
 import snap.app.AppPane;
 import snap.app.SupportTray;
 import snap.gfx.TextBoxLine;
-import snap.javaparse.*;
+import snap.javakit.*;
 import snap.project.*;
 import snap.util.*;
 import snap.view.View;

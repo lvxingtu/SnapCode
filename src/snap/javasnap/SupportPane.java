@@ -1,6 +1,6 @@
 package snap.javasnap;
 import snap.gfx.*;
-import snap.javaparse.*;
+import snap.javakit.*;
 import snap.parse.*;
 import snap.view.*;
 

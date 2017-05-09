@@ -5,7 +5,7 @@ package snap.project;
 import java.io.Closeable;
 import java.net.*;
 import java.util.*;
-import snap.javaparse.*;
+import snap.javakit.*;
 import snap.typescript.TSFileBuilder;
 import snap.util.*;
 import snap.web.*;

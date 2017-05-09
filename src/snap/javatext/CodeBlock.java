@@ -3,7 +3,7 @@
  */
 package snap.javatext;
 import java.lang.reflect.Method;
-import snap.javaparse.*;
+import snap.javakit.*;
 
 /**
  * A class to represent a block of code in the CodeBuilder.

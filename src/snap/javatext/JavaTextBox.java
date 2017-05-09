@@ -3,10 +3,10 @@
  */
 package snap.javatext;
 import java.util.*;
-import snap.javaparse.*;
-import snap.javaparse.JavaParser.JavaTokenizer;
 import snap.parse.*;
 import snap.gfx.*;
+import snap.javakit.*;
+import snap.javakit.JavaParser.JavaTokenizer;
 
 /**
  * A text implementation specifically for Java.

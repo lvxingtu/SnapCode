@@ -1,6 +1,6 @@
 package snap.javasnap;
 import snap.gfx.Font;
-import snap.javaparse.*;
+import snap.javakit.*;
 import snap.parse.Parser;
 import snap.util.SnapUtils;
 import snap.view.*;

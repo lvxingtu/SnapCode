@@ -1,5 +1,5 @@
 package snap.javasnap;
-import snap.javaparse.*;
+import snap.javakit.*;
 import snap.view.*;
 
 /**
