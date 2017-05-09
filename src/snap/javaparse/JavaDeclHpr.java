@@ -319,8 +319,8 @@ public boolean isClassTypesEqual(JavaDecl theTypes0[], JavaDecl theTypes1[])
 {
     int len = theTypes0.length; if(theTypes1.length!=len) return false;
     for(int i=0;i<len;i++) {
-        JavaDecl ct0 = theTypes0[i].getClassType();
-        JavaDecl ct1 = theTypes1[i].getClassType();
+        JavaDecl ct0 = theTypes0[i]; if(ct0!=null) ct0 = ct0.getClassType();
+        JavaDecl ct1 = theTypes1[i]; if(ct1!=null) ct1 = ct1.getClassType();
         if(ct0!=ct1)
             return false;
     }
