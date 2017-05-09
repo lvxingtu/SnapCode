@@ -207,7 +207,7 @@ public JavaDecl getMethodDecl(String aName, JavaDecl theTypes[])
     if(_fdecls==null) updateDecls();
     
     for(JavaDecl jd : _mdecls)
-        if(jd.getName().equals(aName) && Arrays.equals(jd.getArgTypes(), theTypes))
+        if(jd.getName().equals(aName) && isClassTypesEqual(jd.getArgTypes(), theTypes))
             return jd;
     return null;
 }
@@ -297,51 +297,17 @@ public JavaDecl getCompatibleMethodAll(String aName, JavaDecl theTypes[])
 }
 
 /**
- * Returns whether given method is compatible with given types.
+ * Returns whether decl class types are equal.
  */
-public boolean isMethodCompatible(JavaDecl aMeth, JavaDecl theTypes[])
+public boolean isClassTypesEqual(JavaDecl theTypes0[], JavaDecl theTypes1[])
 {
-    // If method has VarArgs, forward to special VarArgs version
-    if(aMeth.isVarArgs()) return isMethodCompatibleVarArgs(aMeth, theTypes);
-    
-    // Get method types and check for compatible length
-    JavaDecl ptypes[] = aMeth.getArgTypes();
-    if(theTypes.length!=ptypes.length) return false;
-    
-    // Iterate over args and return false if any not compatible
-    for(int i=0,iMax=ptypes.length;i<iMax;i++) { JavaDecl ptype = ptypes[i];
-        if(!ptype.isAssignable(theTypes[i]))
-            return false; }
-    return true;
-}
-
-/**
- * Returns whether given method is compatible with given types.
- */
-private boolean isMethodCompatibleVarArgs(JavaDecl aMeth, JavaDecl theTypes[])
-{
-    // Get method types and check for compatible length
-    JavaDecl ptypes[] = aMeth.getArgTypes(); int plen = ptypes.length, vind = plen-1;
-    if(theTypes.length<vind) return false;
-    
-    // Iterate over non var-args and return false if any not compatible
-    for(int i=0;i<vind;i++) { JavaDecl ptype = ptypes[i];
-        if(!ptype.isAssignable(theTypes[i]))
-            return false; }
-    
-    // If one more arg, return true if same type as VarArg array
-    int argc = theTypes.length;
-    if(argc==plen)
-        if(ptypes[vind].isAssignable(theTypes[vind]))
-            return true;
-            
-    // If any remaining args don't match array item type, return false
-    JavaDecl itype = ptypes[vind].getArrayItemType();
-    for(int i=vind;i<argc;i++)
-        if(!itype.isAssignable(theTypes[i]))
+    int len = theTypes0.length; if(theTypes1.length!=len) return false;
+    for(int i=0;i<len;i++) {
+        JavaDecl ct0 = theTypes0[i].getClassType();
+        JavaDecl ct1 = theTypes1[i].getClassType();
+        if(ct0!=ct1)
             return false;
-    
-    // Return true since args match
+    }
     return true;
 }
 
@@ -454,7 +420,7 @@ public JavaDecl getConstructorDecl(String anId)
 public JavaDecl getConstructorDecl(JavaDecl theTypes[])
 {
     for(JavaDecl jd : _cdecls)
-        if(Arrays.equals(jd.getArgTypes(), theTypes))
+        if(isClassTypesEqual(jd.getArgTypes(), theTypes))
             return jd;
     return null;
 }

@@ -445,7 +445,7 @@ public static class MethodDeclHandler extends JNodeParseHandler <JMethodDecl>
         
         // Handle MethodDeclarator FormalParam
         else if(anId=="FormalParam")
-            getPart().addParameter(aNode.getCustomNode(JVarDecl.class));
+            getPart().addParam(aNode.getCustomNode(JVarDecl.class));
         
         // Handle ThrowsList
         else if(anId=="ThrowsList")
@@ -475,7 +475,7 @@ public static class ConstrDeclHandler extends JNodeParseHandler <JConstrDecl>
         
         // Handle FormalParam
         else if(anId=="FormalParam")
-            getPart().addParameter(aNode.getCustomNode(JVarDecl.class));
+            getPart().addParam(aNode.getCustomNode(JVarDecl.class));
         
         // Handle ThrowsList
         else if(anId=="ThrowsList")

@@ -137,6 +137,7 @@ public String getNodeString()
         }
         case Method: return "MethodId";
         case Package: return "PackageId";
+        case TypeVar: return "TypeVarId";
         case VarDecl: return "VariableId";
         default: return "UnknownId";
     }

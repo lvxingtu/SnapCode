@@ -40,8 +40,19 @@ public List <JType> getTypes()  { return _types; }
 public void addType(JType aType)  { _types.add(aType); addChild(aType, -1); }
 
 /**
- * Returns a class name of first type (not sure I need to do this).
+ * Returns the bounds type.
  */
-protected JavaDecl getDeclImpl()  { return _types.size()>0? _types.get(0).getDecl() : getJavaDecl(Object.class); }
+public JavaDecl getBoundsType()  { return _types.size()>0? _types.get(0).getDecl() : getJavaDecl(Object.class); }
+
+/**
+ * Override to get JavaDecl from parent decl (Class, Method).
+ */
+protected JavaDecl getDeclImpl()
+{
+    JavaDecl pdecl = getParent().getDecl(); if(pdecl==null) return null;
+    String name = getName();
+    JavaDecl tvar = pdecl.getTypeVar(name);
+    return tvar;
+}
 
 }

@@ -68,7 +68,7 @@ public List <JVarDecl> getParameters()  { return _params; }
 /**
  * Returns the list of formal parameters.
  */
-public void addParameter(JVarDecl aVD)
+public void addParam(JVarDecl aVD)
 {
     if(aVD==null) { System.err.println("JMethodDecl.addParam: Add null param!"); return; }
     _params.add(aVD); addChild(aVD, -1);
@@ -81,17 +81,6 @@ public JVarDecl getParam(String aName)
 {
     for(JVarDecl vd : _params) if(SnapUtils.equals(vd.getName(), aName)) return vd;
     return null;
-}
-
-/**
- * Returns array of parameter types.
- */
-public JavaDecl[] getParamTypes()
-{
-    JavaDecl ptypes[] = new JavaDecl[_params.size()];
-    for(int i=0, iMax=_params.size(); i<iMax; i++) { JVarDecl vd = _params.get(i); JType type = vd.getType();
-        ptypes[i] = type!=null? type.getDecl() : vd.getEvalType(); }
-    return ptypes;
 }
 
 /**
@@ -131,7 +120,7 @@ protected JavaDecl getDeclImpl()
 {
     // Get method name and param types
     String name = getName(); if(name==null) return null;
-    JavaDecl ptypes[] = getParamTypes();
+    JavaDecl ptypes[] = getParamClassTypesSafe();
     
     // Get parent JClassDecl and JavaDecl
     JClassDecl cd = getEnclosingClassDecl(); if(cd==null) return null;
@@ -150,19 +139,37 @@ protected JavaDecl getDeclImpl(JNode aNode)
     // If node is method name, return method decl
     if(aNode==_id) return getDecl();
     
-    // If node is paramter name, return param decl
+    // Handle parameter name id: return param decl
     String name = aNode.getName();
     if(aNode instanceof JExprId) { JVarDecl param = getParam(name);
         if(param!=null)
             return param.getDecl(); }
     
-    // Look for JTypeParam for given name
+    // Handle TypeVar name: return typevar decl
     JTypeParam tp = getTypeParam(name);
     if(tp!=null)
         return tp.getDecl();
     
     // Do normal version
     return super.getDeclImpl(aNode);
+}
+
+/**
+ * Returns array of parameter class types suitable to resolve method.
+ */
+protected JavaDecl[] getParamClassTypesSafe()
+{
+    JavaDecl ptypes[] = new JavaDecl[_params.size()];
+    for(int i=0, iMax=_params.size(); i<iMax; i++) { JVarDecl vd = _params.get(i);
+        JType type = vd.getType();
+        JTypeParam tvar = getTypeParam(type.getName());
+        ptypes[i] = tvar!=null? tvar.getBoundsType() : type.getBaseDecl();
+        if(type.getArrayCount()>0) {
+            String name = ptypes[i].getName(); for(int j=0,jMax=type.getArrayCount();j<jMax;j++) name += "[]";
+            ptypes[i] = getJavaDecl(name);
+        }
+    }
+    return ptypes;
 }
 
 /**

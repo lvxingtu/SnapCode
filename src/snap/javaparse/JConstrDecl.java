@@ -15,7 +15,7 @@ public class JConstrDecl extends JMethodDecl {
 protected JavaDecl getDeclImpl()
 {
     // Get param types
-    JavaDecl ptypes[] = getParamTypes();
+    JavaDecl ptypes[] = getParamClassTypesSafe();
     
     // Get parent JClassDecl and JavaDecl
     JClassDecl cd = getEnclosingClassDecl(); if(cd==null) return null;
