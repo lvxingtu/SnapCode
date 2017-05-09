@@ -136,12 +136,32 @@ public HashSet <JavaDecl> updateDecls()
 /**
  * Returns the interfaces this class implments.
  */
-public JavaDecl[] getInterfaces()
-{
-    if(_fdecls==null) updateDecls();
-    
-    return _interfaces;
-}
+public JavaDecl[] getInterfaces()  { getFields(); return _interfaces; }
+
+/**
+ * Returns the fields.
+ */
+public List <JavaDecl> getFields()  { if(_fdecls==null) updateDecls(); return _fdecls; }
+
+/**
+ * Returns the methods.
+ */
+public List <JavaDecl> getMethods()  { getFields(); return _mdecls; }
+
+/**
+ * Returns the Constructors.
+ */
+public List <JavaDecl> getConstructors()  { getFields(); return _cdecls; }
+
+/**
+ * Returns the inner classes.
+ */
+public List <JavaDecl> getClasses()  { getFields(); return _icdecls; }
+
+/**
+ * Returns the inner classes.
+ */
+public List <JavaDecl> getTypeVars()  { getFields(); return _tvdecls; }
 
 /**
  * Returns the field decl for field.
@@ -161,9 +181,8 @@ public JavaDecl getField(Field aField)
  */
 public JavaDecl getField(String aName)
 {
-    if(_fdecls==null) updateDecls();
-    
-    for(JavaDecl jd : _fdecls) if(jd.getName().equals(aName)) return jd;
+    List <JavaDecl> fdecls = getFields();
+    for(JavaDecl jd : fdecls) if(jd.getName().equals(aName)) return jd;
     return null;
 }
 
@@ -194,8 +213,8 @@ public JavaDecl getMethodDecl(Method aMeth)
  */
 public JavaDecl getMethodDecl(String anId)
 {
-    if(_fdecls==null) updateDecls();
-    for(JavaDecl jd : _mdecls) if(jd.getId().equals(anId)) return jd;
+    List <JavaDecl> mdecls = getMethods();
+    for(JavaDecl jd : mdecls) if(jd.getId().equals(anId)) return jd;
     return null;
 }
 
@@ -204,9 +223,8 @@ public JavaDecl getMethodDecl(String anId)
  */
 public JavaDecl getMethodDecl(String aName, JavaDecl theTypes[])
 {
-    if(_fdecls==null) updateDecls();
-    
-    for(JavaDecl jd : _mdecls)
+    List <JavaDecl> mdecls = getMethods();
+    for(JavaDecl jd : mdecls)
         if(jd.getName().equals(aName) && isClassTypesEqual(jd.getArgTypes(), theTypes))
             return jd;
     return null;
@@ -227,10 +245,9 @@ public JavaDecl getMethodDeclDeep(String aName, JavaDecl theTypes[])
  */
 public JavaDecl getCompatibleConstructor(JavaDecl theTypes[])
 {
-    if(_fdecls==null) updateDecls();
-    
+    List <JavaDecl> cdecls = getConstructors();
     JavaDecl constr = null; int rating = 0;
-    for(JavaDecl cd : _cdecls) {
+    for(JavaDecl cd : cdecls) {
         int rtg = getMethodRating(cd, theTypes);
         if(rtg>rating) { constr = cd; rating = rtg; }
     }
@@ -242,10 +259,9 @@ public JavaDecl getCompatibleConstructor(JavaDecl theTypes[])
  */
 public JavaDecl getCompatibleMethod(String aName, JavaDecl theTypes[])
 {
-    if(_fdecls==null) updateDecls();
-    
+    List <JavaDecl> mdecls = getMethods();
     JavaDecl meth = null; int rating = 0;
-    for(JavaDecl md : _mdecls)
+    for(JavaDecl md : mdecls)
         if(md.getName().equals(aName)) {
             int rtg = getMethodRating(md, theTypes);
             if(rtg>rating) { meth = md; rating = rtg; }
@@ -383,9 +399,8 @@ private int getMethodRatingVarArgs(JavaDecl aMeth, JavaDecl theTypes[])
  */
 public JavaDecl getLambdaMethod(int argCount)
 {
-    if(_fdecls==null) updateDecls();
-    
-    for(JavaDecl jd : _mdecls)
+    List <JavaDecl> mdecls = getMethods();
+    for(JavaDecl jd : mdecls)
         if(jd.getParamCount()==argCount)
             return jd;
     return null;
@@ -396,8 +411,6 @@ public JavaDecl getLambdaMethod(int argCount)
  */
 public JavaDecl getConstructorDecl(Constructor aConstr)
 {
-    if(_fdecls==null) updateDecls();
-    
     String id = JavaDeclOwner.getId(aConstr);
     JavaDecl decl = getConstructorDecl(id); if(decl==null) return null;
     int mods = aConstr.getModifiers(); if(mods!=decl.getModifiers()) return null;
@@ -409,8 +422,8 @@ public JavaDecl getConstructorDecl(Constructor aConstr)
  */
 public JavaDecl getConstructorDecl(String anId)
 {
-    if(_fdecls==null) updateDecls();
-    for(JavaDecl jd : _cdecls) if(jd.getId().equals(anId)) return jd;
+    List <JavaDecl> cdecls = getConstructors();
+    for(JavaDecl jd : cdecls) if(jd.getId().equals(anId)) return jd;
     return null;
 }
 
@@ -445,8 +458,7 @@ public JavaDecl getClassDecl(Class aClass)  { return getClassDecl(aClass.getSimp
  */
 public JavaDecl getClassDecl(String aName)
 {
-    if(_fdecls==null) updateDecls();
-    
+    List <JavaDecl> icdecls = getClasses();
     for(JavaDecl jd : _icdecls)
         if(jd.getSimpleName().equals(aName))
                 return jd;
@@ -468,9 +480,8 @@ public JavaDecl getClassDeclDeep(String aName)
  */
 public JavaDecl getTypeVarDecl(String aName)
 {
-    if(_fdecls==null) updateDecls();
-    
-    for(JavaDecl jd : _tvdecls)
+    List <JavaDecl> tvdecls = getTypeVars();
+    for(JavaDecl jd : tvdecls)
         if(jd.getName().equals(aName))
                 return jd;
     return null;
@@ -481,9 +492,8 @@ public JavaDecl getTypeVarDecl(String aName)
  */
 public int getTypeVarDeclIndex(String aName)
 {
-    if(_fdecls==null) updateDecls();
-    
-    for(int i=0,iMax=_tvdecls.size();i<iMax;i++) { JavaDecl jd = _tvdecls.get(i);
+    List <JavaDecl> tvdecls = getTypeVars();
+    for(int i=0,iMax=tvdecls.size();i<iMax;i++) { JavaDecl jd = tvdecls.get(i);
         if(jd.getName().equals(aName))
                 return i; }
     return -1;

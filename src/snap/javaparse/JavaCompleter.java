@@ -79,7 +79,7 @@ private void getSuggestions(JType aJType)
             if(cls==null || !Modifier.isPublic(cls.getModifiers())) continue;
             Constructor cstrs[] = null; try { cstrs = cls.getConstructors(); } catch(Throwable t) { }
             if(cstrs!=null) for(Constructor cstr : cstrs)
-                addDecl(cstr);
+                if(!cstr.isSynthetic()) addDecl(cstr);
         }
         else addDecl(cname);
     }
@@ -114,9 +114,11 @@ private void getSuggestions(JExprId anId)
             for(Field field : pclass.getFields()) // Add class fields
                 if(StringUtils.startsWithIC(field.getName(), prefix))
                     addDecl(field);
-            for(Method method : pclass.getMethods()) // Add class methods
-                if(StringUtils.startsWithIC(method.getName(), prefix))
-                    addDecl(method);
+            for(Method meth : pclass.getMethods()) { // Add class methods
+                if(meth.isSynthetic()) continue;
+                if(StringUtils.startsWithIC(meth.getName(), prefix))
+                    addDecl(meth);
+            }
         }
     }
     

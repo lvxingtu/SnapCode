@@ -148,7 +148,12 @@ private void initMember(Member aMmbr)
         _evalType = _owner.getTypeDecl(field.getGenericType(), _par); }
         
     // Handle Executable (Method, Constructor)
-    else { Executable exec = (Executable)aMmbr; _type = exec instanceof Method? DeclType.Method : DeclType.Constructor;
+    else { Executable exec = (Executable)aMmbr;
+    
+        // Set type and reset name for constructor
+        _type = exec instanceof Method? DeclType.Method : DeclType.Constructor;
+        if(exec instanceof Constructor)
+            _name = _sname = exec.getDeclaringClass().getSimpleName();
         
         // Get TypeVars
         TypeVariable tvars[] = exec.getTypeParameters();
@@ -739,8 +744,8 @@ public String getReplaceString()
 {
     switch(getType()) {
         case Class: return getSimpleName();
-        case Constructor: return getPrettyName().replace(getParentName() + '.', "");
-        case Method: return getPrettyName().replace(getClassName() + '.', "");
+        case Constructor:
+        case Method: return getName() + '(' + StringUtils.join(getArgTypeSimpleNames(), ",") + ')';
         case Package: {
             String name = getPackageName(); int index = name.lastIndexOf('.');
             return index>0? name.substring(index+1) : name;
