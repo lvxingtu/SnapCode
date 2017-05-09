@@ -229,10 +229,12 @@ public JavaDecl getCompatibleConstructor(JavaDecl theTypes[])
 {
     if(_fdecls==null) updateDecls();
     
-    for(JavaDecl cd : _cdecls)
-        if(isMethodCompatible(cd, theTypes))
-            return cd;
-    return null;
+    JavaDecl constr = null; int rating = 0;
+    for(JavaDecl cd : _cdecls) {
+        int rtg = getMethodRating(cd, theTypes);
+        if(rtg>rating) { constr = cd; rating = rtg; }
+    }
+    return constr;
 }
 
 /**
@@ -242,10 +244,13 @@ public JavaDecl getCompatibleMethod(String aName, JavaDecl theTypes[])
 {
     if(_fdecls==null) updateDecls();
     
+    JavaDecl meth = null; int rating = 0;
     for(JavaDecl md : _mdecls)
-        if(md.getName().equals(aName) && isMethodCompatible(md, theTypes))
-            return md;
-    return null;
+        if(md.getName().equals(aName)) {
+            int rtg = getMethodRating(md, theTypes);
+            if(rtg>rating) { meth = md; rating = rtg; }
+        }
+    return meth;
 }
 
 /**
@@ -338,6 +343,73 @@ private boolean isMethodCompatibleVarArgs(JavaDecl aMeth, JavaDecl theTypes[])
     
     // Return true since args match
     return true;
+}
+
+/**
+ * Returns a rating of a method for given possible arg classes.
+ */
+private int getMethodRating(JavaDecl aMeth, JavaDecl theTypes[])
+{
+    // Handle VarArg methods special
+    if(aMeth.isVarArgs()) return getMethodRatingVarArgs(aMeth, theTypes);
+    
+    // Get method param types and length (just return if given arg count doesn't match)
+    JavaDecl paramTypes[] = aMeth.getArgTypes(); int plen = paramTypes.length, rating = 0;
+    if(theTypes.length!=plen)
+        return 0;
+    if(plen==0)
+        return 1000;
+
+    // Iterate over classes and add score based on matching classes
+    // This is a punt - need to groc the docs on this: https://docs.oracle.com/javase/specs/jls/se7/html/jls-15.html
+    for(int i=0, iMax=plen; i<iMax; i++) {
+        JavaDecl cls1 = paramTypes[i].getClassType(), cls2 = theTypes[i]; if(cls2!=null) cls2 = cls2.getClassType();
+        if(!cls1.isAssignable(cls2))
+            return 0;
+        rating += cls1==cls2? 1000 : cls2!=null? 100 : 10;
+    }
+    
+    // Return rating
+    return rating;
+}
+
+/**
+ * Returns a rating of a method for given possible arg classes.
+ */
+private int getMethodRatingVarArgs(JavaDecl aMeth, JavaDecl theTypes[])
+{
+    // Get method param types and length (just return if given arg count is insufficient)
+    JavaDecl paramTypes[] = aMeth.getArgTypes(); int plen = paramTypes.length, vind = plen -1, rating = 0;
+    if(theTypes.length<vind)
+        return 0;
+    if(plen==1 && theTypes.length==0)
+        return 10;
+
+    // Iterate over classes and add score based on matching classes
+    // This is a punt - need to groc the docs on this: https://docs.oracle.com/javase/specs/jls/se7/html/jls-15.html
+    for(int i=0, iMax=vind; i<iMax; i++) {
+        JavaDecl cls1 = paramTypes[i].getClassType(), cls2 = theTypes[i]; if(cls2!=null) cls2 = cls2.getClassType();
+        if(!cls1.isAssignable(cls2))
+            return 0;
+        rating += cls1==cls2? 1000 : cls2!=null? 100 : 10;
+    }
+    
+    // Get VarArg type
+    JavaDecl varArgArrayType = paramTypes[vind];
+    JavaDecl varArgType = varArgArrayType.getArrayItemType();
+    
+    // If only one arg and it is of array type, add 1000
+    JavaDecl argType = theTypes.length==plen? theTypes[vind] : null;
+    if(argType!=null && argType.isArray() && varArgArrayType.isAssignable(argType))
+        rating += 1000;
+
+    // If any var args match, add 1000
+    else for(int i=vind; i<theTypes.length; i++) { JavaDecl type = theTypes[i];
+        if(varArgType.isAssignable(type))
+            rating += 1000; }
+    
+    // Return rating
+    return rating;
 }
 
 /**

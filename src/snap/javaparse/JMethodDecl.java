@@ -89,8 +89,8 @@ public JVarDecl getParam(String aName)
 public JavaDecl[] getParamTypes()
 {
     JavaDecl ptypes[] = new JavaDecl[_params.size()];
-    for(int i=0, iMax=_params.size(); i<iMax; i++) { JVarDecl vd = _params.get(i);
-        ptypes[i] = vd.getEvalType(); }
+    for(int i=0, iMax=_params.size(); i<iMax; i++) { JVarDecl vd = _params.get(i); JType type = vd.getType();
+        ptypes[i] = type!=null? type.getDecl() : vd.getEvalType(); }
     return ptypes;
 }
 

@@ -103,6 +103,14 @@ protected JavaDecl getDeclImpl()
     if(decl!=null)
         return decl;
         
+    // If code node class type is member class and not static, go up parent classes
+    while(snct.isMemberClass() && !snct.isStatic()) {
+        snct = snct.getParent();
+        decl = snct.getHpr().getCompatibleMethodAll(name, argTypes);
+        if(decl!=null)
+            return decl;
+    }
+        
     // See if method is from static import
     Class argClasses[] = getArgClasses();
     Member mem = getFile().getImportClassMember(name, argClasses);
