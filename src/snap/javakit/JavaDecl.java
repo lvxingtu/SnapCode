@@ -73,7 +73,7 @@ public JavaDecl(JavaDeclOwner anOwner, JavaDecl aPar, Object anObj)
 {
     // Set JavaDecls
     _owner = anOwner; _par = aPar; assert(_owner!=null || anObj instanceof String);
-    _id = JavaDeclOwner.getId(anObj);
+    _id = JavaKitUtils.getId(anObj);
     
     // Handle Type
     if(anObj instanceof Type)
@@ -106,7 +106,7 @@ private void initType(Type aType)
     // Handle ParameterizedType
     if(aType instanceof ParameterizedType) { ParameterizedType pt = (ParameterizedType)aType;
         _type = DeclType.ParamType;
-        _name = JavaDeclOwner.getTypeName(pt); _sname = JavaDeclOwner.getTypeSimpleName(pt);
+        _name = JavaKitUtils.getTypeName(pt); _sname = JavaKitUtils.getTypeSimpleName(pt);
         _par = _owner.getTypeDecl(pt.getRawType(), _par);
         Type typArgs[] = pt.getActualTypeArguments();
         _paramTypes = new JavaDecl[typArgs.length];
@@ -124,7 +124,7 @@ private void initType(Type aType)
     // Handle Class
     else if(aType instanceof Class) { Class cls = (Class)aType; _type = DeclType.Class;
         _mods = cls.getModifiers();
-        _name = JavaDeclOwner.getClassName(cls); _sname = cls.getSimpleName();
+        _name = JavaKitUtils.getId(cls); _sname = cls.getSimpleName();
         _enum = cls.isEnum(); _interface = cls.isInterface(); _primitive = cls.isPrimitive();
         _evalType = this;
         Class scls = cls.getSuperclass();

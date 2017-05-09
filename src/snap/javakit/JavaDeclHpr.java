@@ -201,7 +201,7 @@ public JavaDecl getFieldDeep(String aName)
  */
 public JavaDecl getMethodDecl(Method aMeth)
 {
-    String id = JavaDeclOwner.getId(aMeth);
+    String id = JavaKitUtils.getId(aMeth);
     JavaDecl decl = getMethodDecl(id); if(decl==null) return null;
     int mods = aMeth.getModifiers(); if(mods!=decl.getModifiers()) return null;
     // Check return type?
@@ -411,7 +411,7 @@ public JavaDecl getLambdaMethod(int argCount)
  */
 public JavaDecl getConstructorDecl(Constructor aConstr)
 {
-    String id = JavaDeclOwner.getId(aConstr);
+    String id = JavaKitUtils.getId(aConstr);
     JavaDecl decl = getConstructorDecl(id); if(decl==null) return null;
     int mods = aConstr.getModifiers(); if(mods!=decl.getModifiers()) return null;
     return decl;
