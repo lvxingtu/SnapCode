@@ -91,7 +91,7 @@ public static String getTypeName(Type aType)
 {
     // Handle Class
     if(aType instanceof Class)
-        getId(aType);
+        return getId(aType);
 
     // Handle GenericArrayType
     if(aType instanceof GenericArrayType) { GenericArrayType gat = (GenericArrayType)aType;
