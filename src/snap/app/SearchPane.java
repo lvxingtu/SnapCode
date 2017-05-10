@@ -176,7 +176,7 @@ public void searchReference(WebFile aFile, List <Result> theResults, JavaDecl aD
         JavaData jdata = JavaData.get(aFile);
         Set <JavaDecl> refs = jdata.getRefs();
         for(JavaDecl decl : refs) {
-            if(decl.matches(aDecl)) {
+            if(aDecl.matches(decl)) {
                 List <JNode> nodes = new ArrayList(); JavaDeclOwner.getRefMatches(jdata.getJFile(), aDecl, nodes);
                 for(JNode node : nodes)
                     theResults.add(new Result(node));
@@ -217,7 +217,7 @@ public void searchDeclaration(WebFile aFile, List <Result> theResults, JavaDecl 
     else if(aFile.getType().equals("java")) {
         JavaData jdata = JavaData.get(aFile);
         for(JavaDecl decl : jdata.getDecls())
-            if(decl.matches(aDecl)) {
+            if(aDecl.matches(decl)) {
                 List <JNode> nodes = new ArrayList(); JavaDeclOwner.getDeclMatches(jdata.getJFile(), aDecl, nodes);
                 for(JNode node : nodes)
                     theResults.add(new Result(node));

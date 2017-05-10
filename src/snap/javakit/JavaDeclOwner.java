@@ -209,7 +209,7 @@ public static void getMatches(JNode aNode, JavaDecl aDecl, List <JNode> theMatch
     // If JType check name
     if(aNode instanceof JType || aNode instanceof JExprId) {
         JavaDecl decl = isPossibleMatch(aNode, aDecl)? aNode.getDecl() : null;
-        if(decl!=null && decl.matches(aDecl))
+        if(decl!=null && aDecl.matches(decl))
             theMatches.add(aNode);
     }
  
@@ -227,7 +227,7 @@ public static void getRefMatches(JNode aNode, JavaDecl aDecl, List <JNode> theMa
     if(aNode instanceof JType || aNode instanceof JExprId) {
         if(isPossibleMatch(aNode, aDecl) && !aNode.isDecl()) {
             JavaDecl decl = aNode.getDecl();
-            if(decl!=null && decl.matches(aDecl) && aNode.getParent(JImportDecl.class)==null)
+            if(decl!=null && aDecl.matches(decl) && aNode.getParent(JImportDecl.class)==null)
                 theMatches.add(aNode);
         }
     }
@@ -254,7 +254,7 @@ public static void getDeclMatches(JNode aNode, JavaDecl aDecl, List <JNode> theM
     // If JType check name
     if(aNode instanceof JType || aNode instanceof JExprId) {
         JavaDecl decl = aNode.isDecl() && isPossibleMatch(aNode, aDecl)? aNode.getDecl() : null;
-        if(decl!=null && decl.matches(aDecl))
+        if(decl!=null && aDecl.matches(decl))
             theMatches.add(aNode);
     }
  

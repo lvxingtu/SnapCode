@@ -3,7 +3,6 @@
  */
 package snap.javakit;
 import java.lang.reflect.*;
-import java.util.*;
 import snap.util.*;
 
 /**
@@ -811,18 +810,16 @@ public JavaDecl getJavaDecl(Object anObj)  { return _owner.getJavaDecl(anObj); }
  */
 public boolean matches(JavaDecl aDecl)
 {
+    // Check identity, type
     if(aDecl==this) return true;
     if(aDecl._type!=_type) return false;
-    if(!aDecl._name.equals(_name)) return false;
-    if(!Arrays.equals(aDecl._paramTypes, _paramTypes)) return false;
-    
-    // If field or method, see if declaring class matches
-    if(isField() || isConstructor() || isMethod()) {
-        Class c1 = getParentClass(), c2 = aDecl.getParentClass();
-        return c1==c2 || c1.isAssignableFrom(c2) || c2.isAssignableFrom(c1);
-    }
-    
-    return true;
+
+    // For Method, Constructor: Check supers
+    if(isMethod() || isConstructor())
+        for(JavaDecl sup=aDecl.getSuper();sup!=null;sup=sup.getSuper())
+            if(sup==this)
+                return true;
+    return false;
 }
 
 /**
