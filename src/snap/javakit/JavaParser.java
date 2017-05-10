@@ -367,7 +367,7 @@ public static class EnumConstantHandler extends JNodeParseHandler <JEnumConst>
         
         // Handle Arguments
         else if(anId=="Arguments")
-            getPart().setArgs(aNode.getString());
+            getPart().setArgs(aNode.getCustomNode(List.class));
         
         // Handle ClassBody
         else if(anId=="ClassBody")

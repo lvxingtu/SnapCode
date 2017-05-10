@@ -1,25 +1,32 @@
 package snap.javakit;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * A JNode for Enum constants.
  */
 public class JEnumConst extends JMemberDecl
 {
-    // The arguments
-    String          _args;
-    
+    // The args
+    List <JExpr>   _args = Collections.EMPTY_LIST;
+
     // The class or interface body
     String          _classBody;
     
 /**
  * Returns the arguments.
  */
-public String getArgs()  { return _args; }
+public List <JExpr> getArgs()  { return _args; }
 
 /**
  * Sets the arguments.
  */
-public void setArgs(String aString)  { _args = aString; }
+public void setArgs(List <JExpr> theArgs)
+{
+    if(_args!=null) for(JExpr arg : _args) removeChild(arg);
+    _args = theArgs;
+    if(_args!=null) for(JExpr arg : _args) addChild(arg, -1);
+}
 
 /**
  * Returns the class decl.
