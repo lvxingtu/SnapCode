@@ -24,6 +24,12 @@ protected JavaDecl getDeclImpl()
     // If inner class and not static, add implied class type to arg types array
     if(cdecl.isMemberClass() && !cdecl.isStatic())
         ptypes = ArrayUtils.add(ptypes, cdecl.getParent(), 0);
+        
+    // If enum, add implied args types for name (String) and ordinal (int)
+    else if(cdecl.isEnum()) {
+        ptypes = ArrayUtils.add(ptypes, getJavaDecl(String.class), 0);
+        ptypes = ArrayUtils.add(ptypes, getJavaDecl(int.class), 1);
+    }
     
     // Return Constructor for param types
     JavaDeclHpr clsHpr = cdecl.getHpr();

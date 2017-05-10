@@ -352,6 +352,11 @@ protected JavaDecl getDeclImpl(JNode aNode)
         for(JVarDecl vd : fd.getVarDecls())
             if(SnapUtils.equals(vd.getName(), name))
                 return vd.getDecl(); }
+                
+    // Iterate over enum constants
+    if(isId && isEnum()) for(JEnumConst ec : getEnumConstants()) {
+        if(name.equals(ec.getName()))
+            return ec.getDecl(); }
     
     // See if it's a field reference from superclass
     Class sclass = getSuperClass();

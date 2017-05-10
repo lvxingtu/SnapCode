@@ -432,7 +432,8 @@ public JavaDecl getConstructorDecl(String anId)
  */
 public JavaDecl getConstructorDecl(JavaDecl theTypes[])
 {
-    for(JavaDecl jd : _cdecls)
+    List <JavaDecl> cdecls = getConstructors();
+    for(JavaDecl jd : cdecls)
         if(isClassTypesEqual(jd.getParamTypes(), theTypes))
             return jd;
     return null;
@@ -459,7 +460,7 @@ public JavaDecl getClassDecl(Class aClass)  { return getClassDecl(aClass.getSimp
 public JavaDecl getClassDecl(String aName)
 {
     List <JavaDecl> icdecls = getClasses();
-    for(JavaDecl jd : _icdecls)
+    for(JavaDecl jd : icdecls)
         if(jd.getSimpleName().equals(aName))
                 return jd;
     return null;

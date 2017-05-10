@@ -338,6 +338,10 @@ public static class EnumDeclHandler extends JNodeParseHandler <JClassDecl>
         // Handle EnumConstant
         else if(anId=="EnumConstant")
             getPart().addEnumConstant(aNode.getCustomNode(JEnumConst.class));
+
+        // Handle ClassBodyDecl (JMemberDecl): ClassDecl, EnumDecl, ConstrDecl, FieldDecl, MethodDecl, AnnotationDecl
+        else if(aNode.getCustomNode() instanceof JMemberDecl)
+            getPart().addMemberDecl(aNode.getCustomNode(JMemberDecl.class));
     }
     
     /** Override to set ClassType Enum. */

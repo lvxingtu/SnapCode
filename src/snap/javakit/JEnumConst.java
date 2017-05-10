@@ -1,6 +1,4 @@
 package snap.javakit;
-import java.lang.reflect.Field;
-import snap.util.ClassUtils;
 
 /**
  * A JNode for Enum constants.
@@ -38,9 +36,11 @@ public void setClassBody(String aBody)  { _classBody = aBody; }
  */
 protected JavaDecl getDeclImpl()
 {
-    Class cls = getParent().getEvalClass();
-    Field field = cls!=null? ClassUtils.getField(cls, getName()) : null;
-    return field!=null? getJavaDecl(field) : null;
+    String name = getName();
+    JClassDecl cls = (JClassDecl)getParent();
+    JavaDecl cdecl = cls.getDecl();
+    JavaDecl edecl = cdecl.getHpr().getField(name);
+    return edecl;
 }
 
 /**
