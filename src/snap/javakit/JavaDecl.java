@@ -171,7 +171,7 @@ private void initMember(Member aMmbr)
         _paramTypes = new JavaDecl[ptypes.length];
         for(int i=0,iMax=ptypes.length; i<iMax; i++)
             _paramTypes[i] = _owner.getTypeDecl(ptypes[i], this);
-            
+
         // Set default
         if(exec instanceof Method)
             _default = ((Method)exec).isDefault();
@@ -281,21 +281,6 @@ public boolean isParamType()  { return _type==DeclType.ParamType; }
  * Returns whether is a TypeVar.
  */
 public boolean isTypeVar()  { return _type==DeclType.TypeVar; }
-
-/**
- * Returns whether is Type is explicit (doesn't contain any type variables).
- */
-public boolean isResolvedType()
-{
-    if(isTypeVar()) return false;
-    if(isParamType()) {
-        if(getParent().isTypeVar()) return false;
-        for(JavaDecl tv : getTypeVars())
-            if(tv.isTypeVar())
-                return false;
-    }
-    return true;
-}
 
 /**
  * Returns whether is a Type (Class, ParamType, TypeVar).
@@ -478,25 +463,26 @@ public JavaDecl[] getTypeVars()  { return _typeVars; }
  */
 public JavaDecl getTypeVar(String aName)
 {
+    // Handle Class: Get type var for name from helper
     if(isClass())
         return getHpr().getTypeVarDecl(aName);
-        
-    else if(isParamType()) {
-        int ind = _par.getHpr().getTypeVarDeclIndex(aName);
-        if(ind>=0 && ind<_paramTypes.length)
-            return _paramTypes[ind];
-    }
     
-    else if(isMethod()) {
+    // Handle Method, Constructor: Get type for name from TypeVars
+    else if(isMethod() || isConstructor()) {
+        
+        // Check Method, Constructor TypeVars
         for(JavaDecl tvar : _typeVars)
             if(tvar.getName().equals(aName))
                 return tvar;
+                
+        // Forward to class
         return _par.getTypeVar(aName);
     }
     
-    else if(isConstructor())
-        return _par.getTypeVar(aName);
+    // Handle any other type: Complain
+    else System.err.println("JavaDecl.getTypeVar: request for typevar from wrong type " + this);
 
+    // Return null since named type var not found
     return null;
 }
 
@@ -675,6 +661,67 @@ private boolean isAssignablePrimitive(JavaDecl aDecl)
     JavaDecl ctype1 = aDecl.getClassType().getPrimitive(); if(ctype1==null) return false;
     JavaDecl common = getCommonAncestorPrimitive(ctype1);
     return common==this;
+}
+
+/**
+ * Returns whether is Type is explicit (doesn't contain any type variables).
+ */
+public boolean isResolvedType()
+{
+    if(isTypeVar()) return false;
+    if(isParamType()) {
+        if(getParent().isTypeVar()) return false;
+        for(JavaDecl tv : getTypeVars())
+            if(tv.isTypeVar())
+                return false;
+    }
+    return true;
+}
+
+/**
+ * Returns a resolved type for given unresolved type (TypeVar or ParamType<TypeVar>), if this decl can resolve it.
+ */
+public JavaDecl getResolvedType(JavaDecl aDecl)
+{
+    // Handle ParamType
+    if(aDecl.isParamType()) {
+        System.err.println("JavaDecl.getResolvedType: ParamType not yet supported");
+        return aDecl;
+    }
+
+    // Handle anything not a type var
+    if(!aDecl.isTypeVar())
+        return aDecl;
+
+    // Get TypeVar name
+    String name = aDecl.getName();
+    
+    // Handle class: If has type
+    if(isClass()) {
+        
+        // If has type var, return bounds type
+        JavaDecl tvar = getTypeVar(name);
+        if(tvar!=null)
+            return tvar.getEvalType();
+        
+        // If super has type var, return mapped type
+        JavaDecl sdecl = getSuper();
+        if(sdecl!=null && sdecl.getTypeVar(name)!=null) {
+            int ind = sdecl.getHpr().getTypeVarDeclIndex(name);
+            if(ind>=0 && ind<_paramTypes.length)
+                return _paramTypes[ind];
+        }
+    }
+    
+    // Handle ParamType:
+    else if(isParamType()) {
+        int ind = _par.getHpr().getTypeVarDeclIndex(name);
+        if(ind>=0 && ind<_paramTypes.length)
+            return _paramTypes[ind];
+    }
+    
+    // If not resolve, just return bounds type
+    return aDecl.getEvalType();
 }
 
 /**

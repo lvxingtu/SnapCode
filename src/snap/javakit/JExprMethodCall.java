@@ -153,12 +153,10 @@ protected JavaDecl getEvalTypeImpl(JNode aNode)
                 return resolvedDecl;
             
             // See if TypeVar can be resolved by ScopeNode.Type
-            if(scopeType.isParamType()) {
-                resolvedDecl = scopeType.getTypeVar(name);
-                if(resolvedDecl!=null)
-                    return resolvedDecl;
-            }
-            
+            resolvedDecl = scopeType.getResolvedType(etype);
+            if(resolvedDecl!=null)
+                return resolvedDecl;
+
             // Otherwise, just return TypeVar default
             return etype.getEvalType();
         }
