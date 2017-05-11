@@ -116,9 +116,19 @@ private JavaDecl getClassDecl(Class aClass)
     String cname = aClass.getName();
     JavaDecl decl = _decls.get(cname);
     if(decl==null) {
+        
+        // Create class decl and add to Decls map
         _decls.put(cname, decl = createClassDecl(aClass));
         if(aClass.isArray())
             _decls.put(JavaKitUtils.getId(aClass), decl);
+            
+        // Get type super type and set in decl
+        AnnotatedType superAType = aClass.getAnnotatedSuperclass();
+        Type superType = superAType!=null? superAType.getType() : null;
+        if(superType!=null) {
+            decl._stype = getJavaDecl(superType);
+            decl._sdecl = decl._stype.getClassType();
+        }
     }
     return decl;
 }

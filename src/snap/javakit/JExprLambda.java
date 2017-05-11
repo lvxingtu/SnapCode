@@ -88,7 +88,7 @@ public void setBlock(JStmtBlock aBlock)  { replaceChild(_block, _block = aBlock)
 protected JavaDecl getDeclImpl()
 {
     JNode par = getParent();
-    if(par==null || par._decl==null)
+    if(par==null) // || par._decl==null)
         return null;
     
     // Handle parent is method call: Get lambda interface from method call decl param
@@ -104,6 +104,8 @@ protected JavaDecl getDeclImpl()
         idecl = par.getEvalType();
         
     // If type is interface, get lambda type
+    if(idecl!=null)
+        idecl = idecl.getClassType();
     if(idecl!=null && idecl.isInterface()) {
         JavaDecl mdecl = idecl.getHpr().getLambdaMethod(getParamCount());
         return mdecl;

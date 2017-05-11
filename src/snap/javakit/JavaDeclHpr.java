@@ -296,7 +296,7 @@ public JavaDecl getCompatibleMethodAll(String aName, JavaDecl theTypes[])
     // Search this class and superclasses for compatible interface
     for(JavaDecl cls=_cdecl;cls!=null;cls=cls.getSuper()) {
         for(JavaDecl infc : cls.getHpr().getInterfaces()) {
-            decl = infc.getHpr().getCompatibleMethodDeep(aName, theTypes);
+            decl = infc.getHpr().getCompatibleMethodAll(aName, theTypes);
             if(decl!=null)
                 return decl;
         }

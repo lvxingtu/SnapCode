@@ -53,7 +53,7 @@ public class JavaDecl implements Comparable<JavaDecl> {
     JavaDecl       _arrayItemType;
     
     // The super implementation of this type (Class, Method, Constructor)
-    JavaDecl       _sdecl = NULL_DECL; String _scn;
+    JavaDecl       _sdecl = NULL_DECL, _stype;
     
     // The JavaDeclHpr to access children of this class JavaDecl (fields, methods, constructors, inner classes)
     JavaDeclHpr    _hpr;
@@ -125,9 +125,7 @@ private void initType(Type aType)
         _mods = cls.getModifiers();
         _name = JavaKitUtils.getId(cls); _sname = cls.getSimpleName();
         _enum = cls.isEnum(); _interface = cls.isInterface(); _primitive = cls.isPrimitive();
-        _evalType = this;
-        Class scls = cls.getSuperclass();
-        _scn = scls!=null? scls.getName() : null;
+        _evalType = this; _sdecl = null; // Set by owner
         if(cls.isArray())
             _arrayItemType = getJavaDecl(cls.getComponentType());
     }
@@ -513,10 +511,6 @@ public JavaDecl getSuper()
     // If already set, just return
     if(_sdecl!=NULL_DECL) return _sdecl;
     
-    // Handle Class
-    if(isClass())
-        return _sdecl = _scn!=null? getJavaDecl(_scn) : null;
-    
     // Get superclass and helper
     JavaDecl cdecl = getParent(), scdecl = cdecl!=null? cdecl.getSuper() : null;
     JavaDeclHpr schpr = scdecl!=null && scdecl.isClass()? scdecl.getHpr() : null;
@@ -704,12 +698,13 @@ public JavaDecl getResolvedType(JavaDecl aDecl)
             return tvar.getEvalType();
         
         // If super has type var, return mapped type
-        JavaDecl sdecl = getSuper();
-        if(sdecl!=null && sdecl.getTypeVar(name)!=null) {
+        //JavaDecl sdecl = getSuper();
+        /*if(sdecl!=null && sdecl.getTypeVar(name)!=null) {
             int ind = sdecl.getHpr().getTypeVarDeclIndex(name);
             if(ind>=0 && ind<_paramTypes.length)
-                return _paramTypes[ind];
-        }
+                return _paramTypes[ind]; }*/
+        if(_stype!=null && _stype.isParamType())
+            return _stype.getResolvedType(aDecl);
     }
     
     // Handle ParamType:
