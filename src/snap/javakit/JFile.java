@@ -2,10 +2,8 @@
  * Copyright (c) 2010, ReportMill Software. All rights reserved.
  */
 package snap.javakit;
-import java.lang.reflect.*;
 import java.util.*;
 import snap.project.*;
-import snap.util.ClassUtils;
 import snap.web.WebFile;
 
 /**
@@ -123,9 +121,9 @@ protected JavaDecl getDeclImpl(JNode aNode)
         return cd;
         
     // See if it's a known static import class member
-    Field field = (Field)getImportClassMember(name, null);
+    JavaDecl field = getImportClassMember(name, null);
     if(field!=null)
-        return getJavaDecl(field);
+        return field;
 
     // Do normal version
     return super.getDeclImpl(aNode);
@@ -178,28 +176,6 @@ public JImportDecl getImport(String aName)
 }
 
 /**
- * Returns an import that can be used to resolve the given name.
- */
-public JImportDecl getStaticImport(String aName, Class theParams[])
-{
-    // Iterate over imports to see if any can resolve name
-    for(int i=_importDecls.size()-1; i>=0; i--) { JImportDecl imp = _importDecls.get(i);
-    
-        // If import is static ("import static xxx.*") and name/params is known field/method, return member
-        if(imp.isStatic()) {
-            Member mbr = imp.getImportMember(aName, theParams);
-            if(mbr!=null) {
-                if(imp.isInclusive()) imp.addFoundClassName(aName); imp._used = true;
-                return imp;
-            }
-        }
-    }
-    
-    // Return null since import not found
-    return null;
-}
-
-/**
  * Returns a Class name for given name referenced in file.
  */
 public String getImportClassName(String aName)
@@ -213,10 +189,9 @@ public String getImportClassName(String aName)
         String names[] = aName.split("\\.");
         String cname = getImportClassName(names[0]); if(cname==null) return null;
         JavaDecl cdecl = getJavaDecl(cname);
-        Class cls = cdecl!=null && cdecl.isClass()? cdecl.getEvalClass() : null;
-        for(int i=1;cls!=null && i<names.length;i++)
-            cls = ClassUtils.getClass(cls, names[i]);
-        return cls!=null? cls.getName() : null;
+        for(int i=1;cdecl!=null && i<names.length;i++)
+            cdecl = cdecl.getHpr().getClassDecl(names[i]);
+        return cdecl!=null? cdecl.getName() : null;
     }
     
     // Get import for name
@@ -242,11 +217,33 @@ public String getImportClassName(String aName)
 /**
  * Returns a Class name for given name referenced in file.
  */
-public Member getImportClassMember(String aName, Class theParams[])
+public JavaDecl getImportClassMember(String aName, JavaDecl theParams[])
 {
     JImportDecl imp = getStaticImport(aName, theParams);
     if(imp!=null)
         return imp.getImportMember(aName, theParams);
+    return null;
+}
+
+/**
+ * Returns an import that can be used to resolve the given name.
+ */
+private JImportDecl getStaticImport(String aName, JavaDecl theParams[])
+{
+    // Iterate over imports to see if any can resolve name
+    for(int i=_importDecls.size()-1; i>=0; i--) { JImportDecl imp = _importDecls.get(i);
+    
+        // If import is static ("import static xxx.*") and name/params is known field/method, return member
+        if(imp.isStatic()) {
+            JavaDecl mbr = imp.getImportMember(aName, theParams);
+            if(mbr!=null) {
+                if(imp.isInclusive()) imp.addFoundClassName(aName); imp._used = true;
+                return imp;
+            }
+        }
+    }
+    
+    // Return null since import not found
     return null;
 }
 

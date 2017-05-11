@@ -1,5 +1,4 @@
 package snap.javakit;
-import java.lang.reflect.*;
 import java.util.List;
 
 /**
@@ -113,10 +112,9 @@ protected JavaDecl getDeclImpl()
     }
         
     // See if method is from static import
-    Class argClasses[] = getArgClasses();
-    Member mem = getFile().getImportClassMember(name, argClasses);
-    if(mem instanceof Method)
-        return getJavaDecl(mem);
+    decl = getFile().getImportClassMember(name, argTypes);
+    if(decl!=null && decl.isMethod())
+        return decl;
         
     // Return null since not found
     return null;

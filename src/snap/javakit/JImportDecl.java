@@ -2,9 +2,7 @@
  * Copyright (c) 2010, ReportMill Software. All rights reserved.
  */
 package snap.javakit;
-import java.lang.reflect.Member;
 import java.util.*;
-import snap.util.ClassUtils;
 
 /**
  * A Java part for import declaration.
@@ -106,12 +104,12 @@ public String getImportClassName(String aName)
 /**
  * Returns the member for given name and parameter types (if method) for static import.
  */
-public Member getImportMember(String aName, Class theParams[])
+public JavaDecl getImportMember(String aName, JavaDecl theParams[])
 {
-    Class cls = getEvalClass(); if(cls==null) return null;
+    JavaDecl cls = getEvalType(); if(cls==null) return null;
     if(theParams==null)
-        return ClassUtils.getField(cls, aName);
-    return ClassUtils.getMethod(cls, aName, theParams);
+        return cls.getHpr().getField(aName);
+    return cls.getHpr().getCompatibleMethodAll(aName, theParams);
 }
 
 /**
