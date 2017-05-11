@@ -120,7 +120,7 @@ protected JavaDecl getDeclImpl()
 {
     // Get method name and param types
     String name = getName(); if(name==null) return null;
-    JavaDecl ptypes[] = getParamClassTypesSafe();
+    JavaDecl ptypes[] = getParamClassTypesSafe(); if(ptypes==null) return null; // Can happen if params are bogus
     
     // Get parent JClassDecl and JavaDecl
     JClassDecl cd = getEnclosingClassDecl(); if(cd==null) return null;
@@ -164,6 +164,7 @@ protected JavaDecl[] getParamClassTypesSafe()
         JType type = vd.getType();
         JTypeParam tvar = getTypeParam(type.getName());
         ptypes[i] = tvar!=null? tvar.getBoundsType() : type.getBaseDecl();
+        if(ptypes[i]==null) return null; // Can happen if params are bogus (being edited)
         if(type.getArrayCount()>0) {
             String name = ptypes[i].getName(); for(int j=0,jMax=type.getArrayCount();j<jMax;j++) name += "[]";
             ptypes[i] = getJavaDecl(name);
