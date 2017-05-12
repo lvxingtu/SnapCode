@@ -96,15 +96,18 @@ protected JavaDecl getDeclImpl()
     JavaDecl argTypes[] = getArgEvalTypes();
     
     // Get scope node class type and search for compatible method for name and arg types
-    JavaDecl sndecl = getScopeNodeEvalType(); if(sndecl==null) return null;
+    JNode scopeNode = getScopeNode(); if(scopeNode==null) return null;
+    JavaDecl sndecl = scopeNode.getEvalType(); if(sndecl==null) return null;
     JavaDecl snct = sndecl.getClassType();
     JavaDecl decl = snct.getHpr().getCompatibleMethodAll(name, argTypes);
     if(decl!=null)
         return decl;
         
-    // If code node class type is member class and not static, go up parent classes
-    while(snct.isMemberClass() && !snct.isStatic()) {
-        snct = snct.getParent();
+    // If scope node is class and not static, go up parent classes
+    while(scopeNode instanceof JClassDecl && !snct.isStatic()) {
+        scopeNode = scopeNode.getEnclosingClassDecl(); if(scopeNode==null) break;
+        sndecl = scopeNode.getDecl(); if(sndecl==null) break;
+        snct = sndecl.getClassType(); if(snct==null) break;
         decl = snct.getHpr().getCompatibleMethodAll(name, argTypes);
         if(decl!=null)
             return decl;

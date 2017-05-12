@@ -329,11 +329,22 @@ protected JavaDecl getDeclImpl(JNode aNode)
     // If class id, return class declaration
     if(aNode==_id) return getDecl();
     
-    // If declarared type, Extends or Implements node, forward on
+    // Handle JType in Extends or Implements lists: forward on
     if(aNode instanceof JType) { JType typ = (JType)aNode;
+    
+        // If parent of nested type is this JClassDecl, either check for TypeVar or forward to file
         JType ptyp = typ; while(ptyp.getParent() instanceof JType) ptyp = (JType)ptyp.getParent();
-        if(ptyp.getParent()==this)
+        if(ptyp.getParent()==this) {
+            
+            // Check for TypeVar
+            //if(typ.getParent() instanceof JType) { JType par = (JType)typ.getParent();
+            //    JavaDecl btype = par.getBaseDecl();
+            //    JavaDecl tvtype = btype!=null? btype.getTypeVar(typ.getName()) : null;
+            //    if(tvtype!=null) return tvtype; }
+            
+            // Forward to file
             return super.getDeclImpl(aNode);
+        }
     }
     
     // If it's "this", set class and return ClassField
