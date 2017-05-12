@@ -313,6 +313,75 @@ public JavaDecl getCompatibleMethodAll(String aName, JavaDecl theTypes[])
 }
 
 /**
+ * Returns a compatibile method for given name and param types.
+ */
+public List <JavaDecl> getCompatibleMethods(String aName, JavaDecl theTypes[])
+{
+    List <JavaDecl> matches = Collections.EMPTY_LIST;
+    List <JavaDecl> mdecls = getMethods();
+    for(JavaDecl md : mdecls)
+        if(md.getName().equals(aName)) {
+            int rtg = getMethodRating(md, theTypes);
+            if(rtg>0) {
+                if(matches==Collections.EMPTY_LIST) matches = new ArrayList(); matches.add(md); }
+        }
+    return matches;
+}
+
+/**
+ * Returns a compatibile method for given name and param types.
+ */
+public List <JavaDecl> getCompatibleMethodsDeep(String aName, JavaDecl theTypes[])
+{
+    // Search this class and superclasses for compatible method
+    List <JavaDecl> matches = Collections.EMPTY_LIST;
+    for(JavaDecl cls=_cdecl;cls!=null;cls=cls.getSuper()) {
+        List <JavaDecl> decls = cls.getHpr().getCompatibleMethods(aName, theTypes);
+        if(decls.size()>0) {
+            if(matches==Collections.EMPTY_LIST) matches = decls; else matches.addAll(decls); }
+    }
+    return matches;
+}
+
+/**
+ * Returns a compatibile method for given name and param types.
+ */
+public List <JavaDecl> getCompatibleMethodsAll(String aName, JavaDecl theTypes[])
+{
+    // Search this class and superclasses for compatible method
+    List <JavaDecl> matches = Collections.EMPTY_LIST;
+    List <JavaDecl> decls = getCompatibleMethodsDeep(aName, theTypes);
+    if(decls.size()>0) {
+        if(matches==Collections.EMPTY_LIST) matches = decls; else matches.addAll(decls); }
+    
+    // Search this class and superclasses for compatible interface
+    for(JavaDecl cls=_cdecl;cls!=null;cls=cls.getSuper()) {
+        for(JavaDecl infc : cls.getHpr().getInterfaces()) {
+            decls = infc.getHpr().getCompatibleMethodsAll(aName, theTypes);
+            if(decls.size()>0) {
+                if(matches==Collections.EMPTY_LIST) matches = decls; else matches.addAll(decls); }
+        }
+    }
+    
+    // If this class is Interface, check Object
+    if(_cdecl.isInterface()) {
+        JavaDecl objDecl = getJavaDecl(Object.class);
+        decls = objDecl.getHpr().getCompatibleMethodsDeep(aName, theTypes);
+        if(decls.size()>0) {
+            if(matches==Collections.EMPTY_LIST) matches = decls; else matches.addAll(decls); }
+    }
+    
+    // Remove supers and duplicates
+    for(int i=0;i<matches.size();i++) { JavaDecl decl = matches.get(i);
+        for(JavaDecl sd=decl.getSuper();sd!=null;sd=sd.getSuper()) matches.remove(sd);
+        for(int j=i+1;j<matches.size();j++) if(matches.get(j)==decl) matches.remove(j);
+    }
+    
+    // Return null since compatible method not found
+    return matches;
+}
+
+/**
  * Returns whether decl class types are equal.
  */
 public boolean isClassTypesEqual(JavaDecl theTypes0[], JavaDecl theTypes1[])

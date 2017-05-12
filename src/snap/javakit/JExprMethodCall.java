@@ -82,7 +82,6 @@ public JavaDecl[] getArgEvalTypes()
     List <JExpr> args = getArgs();
     JavaDecl etypes[] = new JavaDecl[args.size()];
     for(int i=0, iMax=args.size(); i<iMax; i++) { JExpr arg = args.get(i);
-        if(arg instanceof JExprLambda) arg = null;
         etypes[i] = arg!=null? arg.getEvalType() : null; }
     return etypes;
 }

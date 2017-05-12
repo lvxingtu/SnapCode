@@ -16,6 +16,9 @@ public class JExprLambda extends JExpr {
     
     // The statement Block, if lambda has block
     JStmtBlock        _block;
+    
+    // The declaration for the actual method for the interface this lambda represents
+    JavaDecl          _meth;
 
 /**
  * Returns the list of formal parameters.
@@ -83,20 +86,29 @@ public JStmtBlock getBlock()  { return _block; }
 public void setBlock(JStmtBlock aBlock)  { replaceChild(_block, _block = aBlock); }
 
 /**
+ * Returns the specific method in the lambda class interface that is to be called.
+ */
+public JavaDecl getMethod()  { getDecl(); return _meth; }
+
+/**
  * Override to try to resolve decl from parent.
  */
 protected JavaDecl getDeclImpl()
 {
-    JNode par = getParent();
-    if(par==null) // || par._decl==null)
-        return null;
+    JNode par = getParent(); if(par==null) return null;
     
     // Handle parent is method call: Get lambda interface from method call decl param
     JavaDecl idecl = null;
     if(par instanceof JExprMethodCall) { JExprMethodCall mcall = (JExprMethodCall)par;
-        JavaDecl mdecl = par.getDecl(); if(mdecl==null) return null;
-        int ind = ListUtils.indexOfId(mcall.getArgs(), this); if(ind<0) return null;
-        idecl = mdecl.getParamType(ind);
+        List <JavaDecl> meths = getCompatibleMethods(); if(meths.size()==0) return null;
+        int ind = ListUtils.indexOfId(mcall.getArgs(), this), argc = getParamCount(); if(ind<0) return null;
+        for(JavaDecl mdecl : meths) {
+            JavaDecl pdecl = mdecl.getParamType(ind); pdecl = pdecl.getClassType();
+            _meth = pdecl.getHpr().getLambdaMethod(argc);
+            if(_meth!=null)
+                return pdecl;
+        }
+        return null;
     }
     
     // Handle parent anything else (JVarDecl, ?): Get lambda interface from eval type
@@ -107,8 +119,8 @@ protected JavaDecl getDeclImpl()
     if(idecl!=null)
         idecl = idecl.getClassType();
     if(idecl!=null && idecl.isInterface()) {
-        JavaDecl mdecl = idecl.getHpr().getLambdaMethod(getParamCount());
-        return mdecl;
+        _meth = idecl.getHpr().getLambdaMethod(getParamCount());
+        return _meth;
     }
         
     // Return null since not found
@@ -121,14 +133,69 @@ protected JavaDecl getDeclImpl()
 protected JavaDecl getDeclImpl(JNode aNode)
 {
     // If node is paramter name, return param decl
-    String name = aNode.getName();
-    if(aNode instanceof JExprId) { JVarDecl param = getParam(name);
+    if(aNode instanceof JExprId) {
+        String name = aNode.getName();
+        JVarDecl param = getParam(name);
         if(param!=null)
-            return param.getDecl(); }
+            return param.getDecl();
+    }
+    
+    // If node is parameter, get from lambda method params
+    if(aNode instanceof JVarDecl && getParent()==this) {
+        int ind = ListUtils.indexOfId(_params, aNode);
+        if(ind>=0) {
+            JavaDecl meth = getMethod(); if(meth==null) return null;
+            if(ind<meth.getParamCount())
+                return meth.getParamType(ind);
+        }
+    }
     
     // Do normal version
     return super.getDeclImpl(aNode);
 }
+
+/**
+ * Returns the method decl for the parent method call (assumes this lambda is an arg).
+ */
+protected List <JavaDecl> getCompatibleMethods()
+{
+    // Get method call, method name and args
+    JExprMethodCall mc = (JExprMethodCall)getParent();
+    String name = mc.getName();
+    List <JExpr> args = mc.getArgs();
+    int argc = args.size();
+    
+    // Get arg types
+    JavaDecl argTypes[] = new JavaDecl[argc];
+    for(int i=0;i<argc;i++) { JExpr arg = args.get(i);
+        argTypes[i] = arg instanceof JExprLambda? null : arg.getEvalType(); }
+        
+    // Get scope node class type and search for compatible method for name and arg types
+    JavaDecl sndecl = mc.getScopeNodeEvalType(); if(sndecl==null) return null;
+    JavaDecl snct = sndecl.getClassType();
+    List <JavaDecl> decls = snct.getHpr().getCompatibleMethodsAll(name, argTypes);
+    if(decls.size()>0)
+        return decls;
+        
+    // If code node class type is member class and not static, go up parent classes
+    while(snct.isMemberClass() && !snct.isStatic()) {
+        snct = snct.getParent();
+        decls = snct.getHpr().getCompatibleMethodsAll(name, argTypes);
+        if(decls.size()>0)
+            return decls;
+    }
+        
+    // See if method is from static import
+    //decl = getFile().getImportClassMember(name, argTypes);
+    //if(decl!=null && decl.isMethod()) return decl;
+        
+    // Return null since not found
+    return decls;
+}
+
+/**
+ * Returns the compatible methods.
+ */
 
 /**
  * Returns the node name.
