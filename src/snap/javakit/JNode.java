@@ -86,8 +86,10 @@ protected JavaDecl getEvalTypeImpl()
 {
     JavaDecl decl = getDecl(); if(decl==null) return null;
     JavaDecl etype = decl.getEvalType();
-    if(etype!=null && !etype.isResolvedType())
-        etype = getEvalTypeImpl(this);
+    if(etype!=null && !etype.isResolvedType()) {
+        JavaDecl etype2 = getEvalTypeImpl(this);
+        etype = etype2!=null? etype2 : etype.getEvalType();
+    }
     return etype;
 }
 

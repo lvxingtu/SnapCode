@@ -399,6 +399,28 @@ protected JavaDecl getDeclImpl(JNode aNode)
 }
 
 /**
+ * Override to resolve Decl.EvalType from ParentExpr.EvalType.
+ */
+protected JavaDecl getEvalTypeImpl(JNode aNode)
+{
+    // Handle JType: See if class decl can resolve
+    if(aNode instanceof JType) {
+        
+        // If eval type is TypeVar, see if it corresponds to this class
+        JavaDecl etype = aNode.getDecl().getEvalType();
+        if(etype.isTypeVar()) {
+            JavaDecl cdecl = getDecl();
+            JavaDecl etype2 = cdecl.getResolvedType(etype);
+            if(etype2!=etype.getEvalType())
+                return etype2;
+        }
+    }
+    
+    // Do normal version
+    return super.getEvalTypeImpl(aNode);
+}
+
+/**
  * Returns a variable with given name.
  */
 public List <JVarDecl> getVarDecls(String aPrefix, List <JVarDecl> theVDs)
