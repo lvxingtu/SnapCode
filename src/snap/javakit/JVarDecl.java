@@ -2,8 +2,8 @@
  * Copyright (c) 2010, ReportMill Software. All rights reserved.
  */
 package snap.javakit;
-import java.lang.reflect.Field;
 import java.util.*;
+import snap.util.ListUtils;
 
 /**
  * A JNode to represent a defined variable.
@@ -62,9 +62,30 @@ public void setType(JType aType)  { replaceChild(_type, _type=aType); }
  */
 private JType getParentType()
 {
+    // Handle parent is Field or VarDecl statement: return type from parent
     JNode par = getParent();
     if(par instanceof JFieldDecl) return ((JFieldDecl)par).getType();
     if(par instanceof JStmtVarDecl) return ((JStmtVarDecl)par).getType();
+    
+    // Handle parent is JExprLambda: Get decl for this param and create new type
+    if(par instanceof JExprLambda) { JExprLambda lmda = (JExprLambda)par;
+    
+        // Get decl for this param (resolve if needed)
+        JavaDecl meth = lmda.getMethod(); if(meth==null) return null;
+        int ind = ListUtils.indexOfId(lmda.getParams(), this); if(ind<0 || ind>=meth.getParamCount()) return null;
+        JavaDecl tdecl = meth.getParamType(ind);
+        if(!tdecl.isResolvedType()) {
+            JavaDecl ltype = lmda.getDecl();
+            tdecl = ltype.getResolvedType(tdecl);
+        }
+        
+        // Create type for type decl and return
+        JType type = new JType(); type._name = tdecl.getSimpleName();
+        type._startToken = type._endToken = _startToken;
+        type._decl = tdecl; type._primitive = tdecl.isPrimitive(); type._parent = this;
+        return type;
+    }
+    
     return null;
 }
 
@@ -134,9 +155,9 @@ protected JavaDecl getDeclImpl()
     JNode par = getParent();
     if(par instanceof JFieldDecl) {
         JClassDecl cd = getEnclosingClassDecl(); if(cd==null) return null;
-        JavaDecl decl = cd.getDecl(); if(decl==null) {System.err.println("JVarDecl.getDeclImp: No class");return null;}
+        JavaDecl decl = cd.getDecl(); if(decl==null) return null;
         JavaDeclHpr declHpr = decl.getHpr();
-        JavaDecl fdecl = declHpr.getFieldDeep(getName());
+        JavaDecl fdecl = declHpr.getField(getName());
         return fdecl;
     }
     
@@ -151,18 +172,6 @@ protected JavaDecl getDeclImpl(JNode aNode)
 {
     if(aNode==_id) return getDecl();
     return super.getDeclImpl(aNode);
-}
-
-/**
- * Returns the java.lang.reflect Field for this field decl from the compiled class.
- */
-public Field getField()
-{
-    if(!(getParent() instanceof JFieldDecl)) return null;
-    JClassDecl cd = getEnclosingClassDecl();
-    Class cls = cd!=null? cd.getEvalClass() : null; if(cls==null) return null;
-    try { return cls.getDeclaredField(getName()); }
-    catch(Throwable e) { return null; }
 }
 
 }

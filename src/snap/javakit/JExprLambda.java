@@ -116,11 +116,11 @@ protected JavaDecl getDeclImpl()
         idecl = par.getEvalType();
         
     // If type is interface, get lambda type
-    if(idecl!=null)
-        idecl = idecl.getClassType();
-    if(idecl!=null && idecl.isInterface()) {
-        _meth = idecl.getHpr().getLambdaMethod(getParamCount());
-        return _meth;
+    if(idecl!=null) {
+        JavaDecl cdecl = idecl.getClassType();
+        _meth = cdecl.getHpr().getLambdaMethod(getParamCount());
+        if(_meth!=null)
+            return idecl;
     }
         
     // Return null since not found
@@ -138,16 +138,6 @@ protected JavaDecl getDeclImpl(JNode aNode)
         JVarDecl param = getParam(name);
         if(param!=null)
             return param.getDecl();
-    }
-    
-    // If node is parameter, get from lambda method params
-    if(aNode instanceof JVarDecl && getParent()==this) {
-        int ind = ListUtils.indexOfId(_params, aNode);
-        if(ind>=0) {
-            JavaDecl meth = getMethod(); if(meth==null) return null;
-            if(ind<meth.getParamCount())
-                return meth.getParamType(ind);
-        }
     }
     
     // Do normal version
