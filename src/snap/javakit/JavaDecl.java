@@ -31,9 +31,6 @@ public class JavaDecl implements Comparable<JavaDecl> {
     // The simple name of the declaration member
     String         _sname;
     
-    // Whether class decl is enum or interface
-    boolean        _enum, _interface, _primitive;
-    
     // Whether method is VarArgs, Default
     boolean        _varArgs, _default;
     
@@ -49,14 +46,8 @@ public class JavaDecl implements Comparable<JavaDecl> {
     // The VariableDecl
     JVarDecl       _vdecl;
     
-    // The Array item type (if Array)
-    JavaDecl       _arrayItemType;
-    
     // The super implementation of this type (Class, Method, Constructor)
     JavaDecl       _sdecl = NULL_DECL, _stype;
-    
-    // The JavaDeclHpr to access children of this class JavaDecl (fields, methods, constructors, inner classes)
-    JavaDeclHpr    _hpr;
     
     // Constants for type
     public enum DeclType { Class, Field, Constructor, Method, Package, VarDecl, ParamType, TypeVar }
@@ -118,16 +109,6 @@ private void initType(Type aType)
         _name = _sname = tv.getName();
         Type etypes[] = tv.getBounds();
         _evalType = _owner.getTypeDecl(etypes[0], _par);
-    }
-    
-    // Handle Class
-    else if(aType instanceof Class) { Class cls = (Class)aType; _type = DeclType.Class;
-        _mods = cls.getModifiers();
-        _name = JavaKitUtils.getId(cls); _sname = cls.getSimpleName();
-        _enum = cls.isEnum(); _interface = cls.isInterface(); _primitive = cls.isPrimitive();
-        _evalType = this; _sdecl = null; // Set by owner
-        if(cls.isArray())
-            _arrayItemType = getJavaDecl(cls.getComponentType());
     }
 }
 
@@ -217,32 +198,42 @@ public DeclType getType()  { return _type; }
 /**
  * Returns whether is a class reference.
  */
-public boolean isClass()  { return _type==DeclType.Class; }
+public boolean isClass()  { return false; }
 
 /**
  * Returns whether is a enum reference.
  */
-public boolean isEnum()  { return _type==DeclType.Class && _enum; }
+public boolean isEnum()  { return false; }
 
 /**
  * Returns whether is a interface reference.
  */
-public boolean isInterface()  { return _type==DeclType.Class && _interface; }
+public boolean isInterface()  { return false; }
 
 /**
  * Returns whether is an array.
  */
-public boolean isArray()  { return _arrayItemType!=null; }
+public boolean isArray()  { return false; }
 
 /**
  * Returns the Array item type (if Array).
  */
-public JavaDecl getArrayItemType()  { return _arrayItemType; }
+public JavaDecl getArrayItemType()  { return null; }
 
 /**
  * Returns whether is primitive.
  */
-public boolean isPrimitive()  { return _type==DeclType.Class && _primitive; }
+public boolean isPrimitive()  { return false; }
+
+/**
+ * Returns the primitive counter part, if available.
+ */
+public JavaDeclClass getPrimitive()  { return null; }
+
+/**
+ * Returns the primitive counter part, if available.
+ */
+public JavaDeclClass getPrimitiveAlt()  { return null; }
 
 /**
  * Returns whether is a field reference.
@@ -311,9 +302,9 @@ public String getSimpleName()  { return _sname; }
  *     TypeVar: EvalType.ClassType
  *     VarDecl, Package: null?
  */
-public JavaDecl getClassType()
+public JavaDeclClass getClassType()
 {
-    if(isClass()) return this;
+    if(isClass()) return (JavaDeclClass)this;
     if(isTypeVar()) return _evalType.getClassType();
     return _par!=null? _par.getClassType() : null;
 }
@@ -379,7 +370,7 @@ public boolean isMemberClass()  { return isClass() && _par!=null && _par.isClass
 /**
  * Returns the JavaDeclHpr for class child decls.
  */
-public JavaDeclHpr getHpr()  { return _hpr!=null? _hpr : (_hpr = new JavaDeclHpr(this)); }
+public JavaDeclClass getHpr()  { return (JavaDeclClass)this; }
 
 /**
  * Returns the JavaDecl for class this decl evaluates to when referenced.
@@ -513,7 +504,7 @@ public JavaDecl getSuper()
     
     // Get superclass and helper
     JavaDecl cdecl = getParent(), scdecl = cdecl!=null? cdecl.getSuper() : null;
-    JavaDeclHpr schpr = scdecl!=null && scdecl.isClass()? scdecl.getHpr() : null;
+    JavaDeclClass schpr = scdecl!=null && scdecl.isClass()? scdecl.getHpr() : null;
     
     // Handle Method
     if(isMethod())
@@ -572,44 +563,6 @@ private JavaDecl getCommonAncestorPrimitive(JavaDecl aDecl)
 }
     
 /**
- * Returns the primitive counter part, if available.
- */
-public JavaDecl getPrimitive()
-{
-    if(isPrimitive()) return this;
-    switch(_name) {
-        case "java.lang.Boolean": return getJavaDecl(boolean.class);
-        case "java.lang.Byte": return getJavaDecl(byte.class);
-        case "java.lang.Character": return getJavaDecl(char.class);
-        case "java.lang.Short": return getJavaDecl(short.class);
-        case "java.lang.Integer": return getJavaDecl(int.class);
-        case "java.lang.Long": return getJavaDecl(long.class);
-        case "java.lang.Float": return getJavaDecl(float.class);
-        case "java.lang.Double": return getJavaDecl(double.class);
-        default: return null;
-    }
-}
-
-/**
- * Returns the primitive counter part, if available.
- */
-public JavaDecl getPrimitiveAlt()
-{
-    if(!isPrimitive()) return this;
-    switch(_name) {
-        case "boolean": return getJavaDecl(Boolean.class);
-        case "byte": return getJavaDecl(Byte.class);
-        case "char": return getJavaDecl(Character.class);
-        case "short": return getJavaDecl(Short.class);
-        case "int": return getJavaDecl(Integer.class);
-        case "long": return getJavaDecl(Long.class);
-        case "float": return getJavaDecl(Float.class);
-        case "double": return getJavaDecl(Double.class);
-        default: return null;
-    }
-}
-
-/**
  * Returns whether given type is assignable to this JavaDecl.
  */
 public boolean isAssignable(JavaDecl aDecl)
@@ -619,8 +572,8 @@ public boolean isAssignable(JavaDecl aDecl)
     
     // If given val is null or this decl is Object return true
     if(aDecl==null) return true;
-    JavaDecl ctype0 = getClassType(); if(ctype0.getName().equals("java.lang.Object")) return true;
-    JavaDecl ctype1 = aDecl.getClassType(); if(ctype1.isPrimitive()) ctype1 = ctype1.getPrimitiveAlt();
+    JavaDeclClass ctype0 = getClassType(); if(ctype0.getName().equals("java.lang.Object")) return true;
+    JavaDeclClass ctype1 = aDecl.getClassType(); if(ctype1.isPrimitive()) ctype1 = ctype1.getPrimitiveAlt();
     
     // If both are array type, check ArrayItemTypes instead
     if(ctype0.isArray() && ctype1.isArray())
@@ -799,6 +752,11 @@ public String getReplaceString()
  * Returns a JavaDecl for given object.
  */
 public JavaDecl getJavaDecl(Object anObj)  { return _owner.getJavaDecl(anObj); }
+
+/**
+ * Returns a JavaDecl for given object.
+ */
+public JavaDeclClass getClassDecl(Object anObj)  { return _owner.getJavaDeclClass(anObj); }
 
 /**
  * Returns whether given declaration collides with this declaration.

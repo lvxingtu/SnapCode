@@ -156,7 +156,7 @@ protected JavaDecl getDeclImpl()
     if(par instanceof JFieldDecl) {
         JClassDecl cd = getEnclosingClassDecl(); if(cd==null) return null;
         JavaDecl decl = cd.getDecl(); if(decl==null) return null;
-        JavaDeclHpr declHpr = decl.getHpr();
+        JavaDeclClass declHpr = decl.getHpr();
         JavaDecl fdecl = declHpr.getField(getName());
         return fdecl;
     }

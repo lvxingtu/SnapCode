@@ -127,7 +127,7 @@ protected JavaDecl getDeclImpl()
     JavaDecl cdecl = cd.getDecl(); if(cdecl==null) return null;
     
     // Return method for name and param types
-    JavaDeclHpr clsHpr = cdecl.getHpr();
+    JavaDeclClass clsHpr = cdecl.getHpr();
     return clsHpr.getMethodDecl(name, ptypes);
 }
 

@@ -40,23 +40,20 @@ public JavaDecl getJavaDecl(Object anObj)
     
     // Handle Field
     else if(anObj instanceof Field) { Field field = (Field)anObj; Class cls = field.getDeclaringClass();
-        JavaDecl decl = getClassDecl(cls);
-        JavaDeclHpr declHpr = decl.getHpr();
-        jd = declHpr.getField(field);
+        JavaDeclClass decl = getClassDecl(cls);
+        jd = decl.getField(field);
     }
     
     // Handle Method
     else if(anObj instanceof Method) { Method meth = (Method)anObj; Class cls = meth.getDeclaringClass();
-        JavaDecl decl = getClassDecl(cls);
-        JavaDeclHpr declHpr = decl.getHpr();
-        jd = declHpr.getMethodDecl(meth);
+        JavaDeclClass decl = getClassDecl(cls);
+        jd = decl.getMethodDecl(meth);
     }
 
     // Handle Constructor
     else if(anObj instanceof Constructor) { Constructor constr = (Constructor)anObj; Class cls = constr.getDeclaringClass();
-        JavaDecl decl = getClassDecl(cls);
-        JavaDeclHpr declHpr = decl.getHpr();
-        jd = declHpr.getConstructorDecl(constr);
+        JavaDeclClass decl = getClassDecl(cls);
+        jd = decl.getConstructorDecl(constr);
     }
     
     // Handle JVarDecl
@@ -80,6 +77,15 @@ public JavaDecl getJavaDecl(Object anObj)
     if(jd==null)
         System.out.println("JavaDecl.getJavaDecl: Decl not found for " + anObj);
     return jd;
+}
+
+/**
+ * Returns a JavaDeclClass for object.
+ */
+public JavaDeclClass getJavaDeclClass(Object anObj)
+{
+    JavaDecl cd = getJavaDecl(anObj);
+    return cd instanceof JavaDeclClass? (JavaDeclClass)cd : null;
 }
 
 /**
@@ -111,10 +117,10 @@ public JavaDecl getTypeDecl(Type aType, JavaDecl aPar)
 /**
  * Returns a class decl.
  */
-private JavaDecl getClassDecl(Class aClass)
+private JavaDeclClass getClassDecl(Class aClass)
 {
     String cname = aClass.getName();
-    JavaDecl decl = _decls.get(cname);
+    JavaDeclClass decl = (JavaDeclClass)_decls.get(cname);
     if(decl==null) {
         
         // Create class decl and add to Decls map
@@ -127,7 +133,7 @@ private JavaDecl getClassDecl(Class aClass)
         Type superType = superAType!=null? superAType.getType() : null;
         if(superType!=null) {
             decl._stype = getJavaDecl(superType);
-            decl._sdecl = decl._stype.getClassType();
+            decl._sdecl = decl._scdecl = decl._stype.getClassType();
         }
     }
     return decl;
@@ -136,10 +142,10 @@ private JavaDecl getClassDecl(Class aClass)
 /**
  * Creates a class decl.
  */
-private JavaDecl createClassDecl(Class aClass)
+private JavaDeclClass createClassDecl(Class aClass)
 {
     JavaDecl parDecl = getParentDecl(aClass);
-    return new JavaDecl(this, parDecl, aClass);
+    return new JavaDeclClass(this, parDecl, aClass);
 }
 
 /**

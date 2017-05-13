@@ -3,15 +3,15 @@ import java.lang.reflect.*;
 import java.util.*;
 
 /**
- * This class manages JavaDecls for a class.
+ * A subclass of JavaDecl especially for Class declarations.
  */
-public class JavaDeclHpr {
+public class JavaDeclClass extends JavaDecl {
 
-    // The class decl this JavaDecls belongs to
-    JavaDecl         _cdecl;
+    // The super class decl
+    JavaDeclClass    _scdecl;
     
-    // The super class decl helper
-    JavaDeclHpr      _sdeclHpr;
+    // Whether class decl is enum, interface, primitive
+    boolean          _enum, _interface, _primitive;
     
     // The array of interfaces
     JavaDecl         _interfaces[];
@@ -31,23 +31,93 @@ public class JavaDeclHpr {
     // The type var decls
     List <JavaDecl>  _tvdecls = new ArrayList();
     
+    // The Array item type (if Array)
+    JavaDecl         _arrayItemType;
+    
 /**
- * Creates a new JavaDeclClass.
+ * Creates a new JavaDeclClass for given owner, parent and Class.
  */
-public JavaDeclHpr(JavaDecl aCDecl)
+public JavaDeclClass(JavaDeclOwner anOwner, JavaDecl aPar, Class aClass)
 {
-    // Set project, class name and super decl
-    _cdecl = aCDecl;
-    Class cls = aCDecl.getEvalClass();
-    Class scls = cls.getSuperclass();
-    if(scls!=null)
-        _sdeclHpr = aCDecl.getJavaDecl(scls.getName()).getHpr();
+    // Do normal version
+    super(anOwner, aPar, aClass);
+    
+    // Set class attributes
+    _mods = aClass.getModifiers(); _type = DeclType.Class;
+    _name = JavaKitUtils.getId(aClass); _sname = aClass.getSimpleName();
+    _enum = aClass.isEnum(); _interface = aClass.isInterface(); _primitive = aClass.isPrimitive();
+    _evalType = this; _sdecl = null; // Set by owner
+    if(aClass.isArray())
+        _arrayItemType = getJavaDecl(aClass.getComponentType());
 }
 
 /**
- * Returns the class decl.
+ * Returns whether is a class reference.
  */
-public JavaDecl getClassDecl()  { return _cdecl; }
+public boolean isClass()  { return true; }
+
+/**
+ * Returns whether is a enum reference.
+ */
+public boolean isEnum()  { return _enum; }
+
+/**
+ * Returns whether is a interface reference.
+ */
+public boolean isInterface()  { return _interface; }
+
+/**
+ * Returns whether is an array.
+ */
+public boolean isArray()  { return _arrayItemType!=null; }
+
+/**
+ * Returns the Array item type (if Array).
+ */
+public JavaDecl getArrayItemType()  { return _arrayItemType; }
+
+/**
+ * Returns whether is primitive.
+ */
+public boolean isPrimitive()  { return _primitive; }
+
+/**
+ * Returns the primitive counter part, if available.
+ */
+public JavaDeclClass getPrimitive()
+{
+    if(isPrimitive()) return this;
+    switch(_name) {
+        case "java.lang.Boolean": return getClassDecl(boolean.class);
+        case "java.lang.Byte": return getClassDecl(byte.class);
+        case "java.lang.Character": return getClassDecl(char.class);
+        case "java.lang.Short": return getClassDecl(short.class);
+        case "java.lang.Integer": return getClassDecl(int.class);
+        case "java.lang.Long": return getClassDecl(long.class);
+        case "java.lang.Float": return getClassDecl(float.class);
+        case "java.lang.Double": return getClassDecl(double.class);
+        default: return null;
+    }
+}
+
+/**
+ * Returns the primitive counter part, if available.
+ */
+public JavaDeclClass getPrimitiveAlt()
+{
+    if(!isPrimitive()) return this;
+    switch(_name) {
+        case "boolean": return getClassDecl(Boolean.class);
+        case "byte": return getClassDecl(Byte.class);
+        case "char": return getClassDecl(Character.class);
+        case "short": return getClassDecl(Short.class);
+        case "int": return getClassDecl(Integer.class);
+        case "long": return getClassDecl(Long.class);
+        case "float": return getClassDecl(Float.class);
+        case "double": return getClassDecl(Double.class);
+        default: return null;
+    }
+}
 
 /**
  * Updates JavaDecls.
@@ -58,9 +128,8 @@ public HashSet <JavaDecl> updateDecls()
     if(_fdecls==null) _fdecls = new ArrayList();
     
     // Get class
-    Class cls = _cdecl.getEvalClass();
-    String cname = _cdecl.getClassName();
-    JavaDeclOwner owner = _cdecl._owner;
+    Class cls = getEvalClass();
+    String cname = getClassName();
     
     // Get interfaces
     Class interfaces[] = cls.getInterfaces();
@@ -70,28 +139,28 @@ public HashSet <JavaDecl> updateDecls()
     
     // Create set for added/removed decls
     HashSet <JavaDecl> addedDecls = new HashSet();
-    HashSet <JavaDecl> removedDecls = new HashSet(); if(_cdecl!=null) removedDecls.add(_cdecl);
+    HashSet <JavaDecl> removedDecls = new HashSet(); removedDecls.add(this);
     removedDecls.addAll(_fdecls); removedDecls.addAll(_mdecls);
     removedDecls.addAll(_cdecls); removedDecls.addAll(_icdecls);
 
     // Make sure class decl is up to date
-    if(_cdecl.getModifiers()!=cls.getModifiers())
-        _cdecl._mods = cls.getModifiers();
+    if(getModifiers()!=cls.getModifiers())
+        _mods = cls.getModifiers();
         
     // Inner Classes: Add JavaDecl for each inner class
     Class iclss[]; try { iclss = cls.getDeclaredClasses(); }
     catch(Throwable e) { System.err.println(e + " in " + cname); return null; }
     for(Class icls : iclss) {   //if(icls.isSynthetic()) continue;
-        JavaDecl decl = getClassDecl(icls);
+        JavaDecl decl = getClassDecl(icls.getSimpleName());
         if(decl==null) { decl = getJavaDecl(icls); addedDecls.add(decl); addDecl(decl); }
         else removedDecls.remove(decl);
     }
     
     // TypeVariables: Add JavaDecl for each Type parameter
-    Collections.addAll(removedDecls, _cdecl._typeVars);
+    Collections.addAll(removedDecls, this._typeVars);
     for(TypeVariable tv : cls.getTypeParameters()) { String name = tv.getName();
         JavaDecl decl = getTypeVarDecl(name);
-        if(decl==null) { decl = new JavaDecl(owner,_cdecl,tv); addedDecls.add(decl); addDecl(decl); }
+        if(decl==null) { decl = new JavaDecl(_owner,this,tv); addedDecls.add(decl); addDecl(decl); }
         else removedDecls.remove(decl);
     }
     
@@ -100,7 +169,7 @@ public HashSet <JavaDecl> updateDecls()
     catch(Throwable e) { System.err.println(e + " in " + cname); return null; }
     for(Field field : fields) {
         JavaDecl decl = getField(field);
-        if(decl==null) { decl = new JavaDecl(owner,_cdecl,field); addedDecls.add(decl); addDecl(decl); }
+        if(decl==null) { decl = new JavaDecl(_owner,this,field); addedDecls.add(decl); addDecl(decl); }
         else removedDecls.remove(decl);
     }
     
@@ -110,7 +179,7 @@ public HashSet <JavaDecl> updateDecls()
     for(Method meth : methods) {
         if(meth.isSynthetic()) continue;
         JavaDecl decl = getMethodDecl(meth);
-        if(decl==null) { decl = new JavaDecl(owner,_cdecl,meth); addedDecls.add(decl); addDecl(decl); }
+        if(decl==null) { decl = new JavaDecl(_owner,this,meth); addedDecls.add(decl); addDecl(decl); }
         else removedDecls.remove(decl);
     }
     
@@ -120,7 +189,7 @@ public HashSet <JavaDecl> updateDecls()
     for(Constructor constr : constrs) {
         if(constr.isSynthetic()) continue;
         JavaDecl decl = getConstructorDecl(constr);
-        if(decl==null) { decl = new JavaDecl(owner,_cdecl,constr); addedDecls.add(decl); addDecl(decl); }
+        if(decl==null) { decl = new JavaDecl(_owner,this,constr); addedDecls.add(decl); addDecl(decl); }
         else removedDecls.remove(decl);
     }
     
@@ -128,7 +197,7 @@ public HashSet <JavaDecl> updateDecls()
     for(JavaDecl jd : removedDecls) removeDecl(jd);
     
     // Return all decls
-    HashSet <JavaDecl> allDecls = new HashSet(); allDecls.add(_cdecl);
+    HashSet <JavaDecl> allDecls = new HashSet(); allDecls.add(this);
     allDecls.addAll(_fdecls); allDecls.addAll(_mdecls); allDecls.addAll(_cdecls); allDecls.addAll(_icdecls);
     return allDecls;
 }
@@ -161,7 +230,7 @@ public List <JavaDecl> getClasses()  { getFields(); return _icdecls; }
 /**
  * Returns the inner classes.
  */
-public List <JavaDecl> getTypeVars()  { getFields(); return _tvdecls; }
+public List <JavaDecl> getTypeVars2()  { getFields(); return _tvdecls; }
 
 /**
  * Returns the field decl for field.
@@ -192,7 +261,7 @@ public JavaDecl getField(String aName)
 public JavaDecl getFieldDeep(String aName)
 {
     JavaDecl decl = getField(aName);
-    if(decl==null && _sdeclHpr!=null) decl = _sdeclHpr.getFieldDeep(aName);
+    if(decl==null && _scdecl!=null) decl = _scdecl.getFieldDeep(aName);
     return decl;
 }
 
@@ -236,7 +305,7 @@ public JavaDecl getMethodDecl(String aName, JavaDecl theTypes[])
 public JavaDecl getMethodDeclDeep(String aName, JavaDecl theTypes[])
 {
     JavaDecl decl = getMethodDecl(aName, theTypes);
-    if(decl==null && _sdeclHpr!=null) decl = _sdeclHpr.getMethodDeclDeep(aName, theTypes);
+    if(decl==null && _scdecl!=null) decl = _scdecl.getMethodDeclDeep(aName, theTypes);
     return decl;
 }
 
@@ -275,7 +344,7 @@ public JavaDecl getCompatibleMethod(String aName, JavaDecl theTypes[])
 public JavaDecl getCompatibleMethodDeep(String aName, JavaDecl theTypes[])
 {
     // Search this class and superclasses for compatible method
-    for(JavaDecl cls=_cdecl;cls!=null;cls=cls.getSuper()) {
+    for(JavaDecl cls=this;cls!=null;cls=cls.getSuper()) {
         JavaDecl decl = cls.getHpr().getCompatibleMethod(aName, theTypes);
         if(decl!=null)
             return decl;
@@ -294,7 +363,7 @@ public JavaDecl getCompatibleMethodAll(String aName, JavaDecl theTypes[])
         return decl;
     
     // Search this class and superclasses for compatible interface
-    for(JavaDecl cls=_cdecl;cls!=null;cls=cls.getSuper()) {
+    for(JavaDecl cls=this;cls!=null;cls=cls.getSuper()) {
         for(JavaDecl infc : cls.getHpr().getInterfaces()) {
             decl = infc.getHpr().getCompatibleMethodAll(aName, theTypes);
             if(decl!=null)
@@ -303,7 +372,7 @@ public JavaDecl getCompatibleMethodAll(String aName, JavaDecl theTypes[])
     }
     
     // If this class is Interface, check Object
-    if(_cdecl.isInterface()) {
+    if(isInterface()) {
         JavaDecl objDecl = getJavaDecl(Object.class);
         return objDecl.getHpr().getCompatibleMethodDeep(aName, theTypes);
     }
@@ -335,7 +404,7 @@ public List <JavaDecl> getCompatibleMethodsDeep(String aName, JavaDecl theTypes[
 {
     // Search this class and superclasses for compatible method
     List <JavaDecl> matches = Collections.EMPTY_LIST;
-    for(JavaDecl cls=_cdecl;cls!=null;cls=cls.getSuper()) {
+    for(JavaDecl cls=this;cls!=null;cls=cls.getSuper()) {
         List <JavaDecl> decls = cls.getHpr().getCompatibleMethods(aName, theTypes);
         if(decls.size()>0) {
             if(matches==Collections.EMPTY_LIST) matches = decls; else matches.addAll(decls); }
@@ -355,7 +424,7 @@ public List <JavaDecl> getCompatibleMethodsAll(String aName, JavaDecl theTypes[]
         if(matches==Collections.EMPTY_LIST) matches = decls; else matches.addAll(decls); }
     
     // Search this class and superclasses for compatible interface
-    for(JavaDecl cls=_cdecl;cls!=null;cls=cls.getSuper()) {
+    for(JavaDecl cls=this;cls!=null;cls=cls.getSuper()) {
         for(JavaDecl infc : cls.getHpr().getInterfaces()) {
             decls = infc.getHpr().getCompatibleMethodsAll(aName, theTypes);
             if(decls.size()>0) {
@@ -364,7 +433,7 @@ public List <JavaDecl> getCompatibleMethodsAll(String aName, JavaDecl theTypes[]
     }
     
     // If this class is Interface, check Object
-    if(_cdecl.isInterface()) {
+    if(isInterface()) {
         JavaDecl objDecl = getJavaDecl(Object.class);
         decls = objDecl.getHpr().getCompatibleMethodsDeep(aName, theTypes);
         if(decls.size()>0) {
@@ -514,14 +583,9 @@ public JavaDecl getConstructorDecl(JavaDecl theTypes[])
 public JavaDecl getConstructorDeclDeep(JavaDecl theTypes[])
 {
     JavaDecl decl = getConstructorDecl(theTypes);
-    if(decl==null && _sdeclHpr!=null) decl = _sdeclHpr.getConstructorDeclDeep(theTypes);
+    if(decl==null && _scdecl!=null) decl = _scdecl.getConstructorDeclDeep(theTypes);
     return decl;
 }
-
-/**
- * Returns a Class decl for inner class.
- */
-public JavaDecl getClassDecl(Class aClass)  { return getClassDecl(aClass.getSimpleName()); }
 
 /**
  * Returns a Class decl for inner class simple name.
@@ -541,7 +605,7 @@ public JavaDecl getClassDecl(String aName)
 public JavaDecl getClassDeclDeep(String aName)
 {
     JavaDecl decl = getClassDecl(aName);
-    if(decl==null && _sdeclHpr!=null) decl = _sdeclHpr.getClassDeclDeep(aName);
+    if(decl==null && _scdecl!=null) decl = _scdecl.getClassDeclDeep(aName);
     return decl;
 }
 
@@ -550,7 +614,7 @@ public JavaDecl getClassDeclDeep(String aName)
  */
 public JavaDecl getTypeVarDecl(String aName)
 {
-    List <JavaDecl> tvdecls = getTypeVars();
+    List <JavaDecl> tvdecls = getTypeVars2();
     for(JavaDecl jd : tvdecls)
         if(jd.getName().equals(aName))
                 return jd;
@@ -562,7 +626,7 @@ public JavaDecl getTypeVarDecl(String aName)
  */
 public int getTypeVarDeclIndex(String aName)
 {
-    List <JavaDecl> tvdecls = getTypeVars();
+    List <JavaDecl> tvdecls = getTypeVars2();
     for(int i=0,iMax=tvdecls.size();i<iMax;i++) { JavaDecl jd = tvdecls.get(i);
         if(jd.getName().equals(aName))
                 return i; }
@@ -604,11 +668,6 @@ public void removeDecl(JavaDecl aDecl)
 /**
  * Standard toString implementation.
  */
-public String toString()  { return "ClassDecl { ClassName=" + _cdecl.getClassName() + " }"; }
-
-/**
- * Returns a JavaDecl for object.
- */
-public JavaDecl getJavaDecl(Object anObj)  { return _cdecl.getJavaDecl(anObj); }
+public String toString()  { return "ClassDecl { ClassName=" + getClassName() + " }"; }
 
 }
