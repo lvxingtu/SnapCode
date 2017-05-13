@@ -19,7 +19,7 @@ protected JavaDecl getDeclImpl()
     
     // Get parent JClassDecl and JavaDecl
     JClassDecl cd = getEnclosingClassDecl(); if(cd==null) return null;
-    JavaDecl cdecl = cd.getDecl();
+    JavaDeclClass cdecl = cd.getDecl();
     
     // If inner class and not static, add implied class type to arg types array
     if(cdecl.isMemberClass() && !cdecl.isStatic())
@@ -32,8 +32,7 @@ protected JavaDecl getDeclImpl()
     }
     
     // Return Constructor for param types
-    JavaDeclClass clsHpr = cdecl.getHpr();
-    return clsHpr.getConstructorDecl(ptypes);
+    return cdecl.getConstructorDecl(ptypes);
 }
 
 /**

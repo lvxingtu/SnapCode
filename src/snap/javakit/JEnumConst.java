@@ -45,8 +45,8 @@ protected JavaDecl getDeclImpl()
 {
     String name = getName();
     JClassDecl cls = (JClassDecl)getParent();
-    JavaDecl cdecl = cls.getDecl();
-    JavaDecl edecl = cdecl.getHpr().getField(name);
+    JavaDeclClass cdecl = cls.getDecl();
+    JavaDecl edecl = cdecl.getField(name);
     return edecl;
 }
 

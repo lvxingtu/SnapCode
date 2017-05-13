@@ -103,8 +103,9 @@ protected JavaDecl getDeclImpl()
         List <JavaDecl> meths = getCompatibleMethods(); if(meths.size()==0) return null;
         int ind = ListUtils.indexOfId(mcall.getArgs(), this), argc = getParamCount(); if(ind<0) return null;
         for(JavaDecl mdecl : meths) {
-            JavaDecl pdecl = mdecl.getParamType(ind); pdecl = pdecl.getClassType();
-            _meth = pdecl.getHpr().getLambdaMethod(argc);
+            JavaDecl pdecl = mdecl.getParamType(ind);
+            JavaDeclClass pcdecl = pdecl.getClassType();
+            _meth = pcdecl.getLambdaMethod(argc);
             if(_meth!=null)
                 return pdecl;
         }
@@ -117,8 +118,8 @@ protected JavaDecl getDeclImpl()
         
     // If type is interface, get lambda type
     if(idecl!=null) {
-        JavaDecl cdecl = idecl.getClassType();
-        _meth = cdecl.getHpr().getLambdaMethod(getParamCount());
+        JavaDeclClass cdecl = idecl.getClassType();
+        _meth = cdecl.getLambdaMethod(getParamCount());
         if(_meth!=null)
             return idecl;
     }
@@ -162,15 +163,15 @@ protected List <JavaDecl> getCompatibleMethods()
         
     // Get scope node class type and search for compatible method for name and arg types
     JavaDecl sndecl = mc.getScopeNodeEvalType(); if(sndecl==null) return null;
-    JavaDecl snct = sndecl.getClassType();
-    List <JavaDecl> decls = snct.getHpr().getCompatibleMethodsAll(name, argTypes);
+    JavaDeclClass snct = sndecl.getClassType();
+    List <JavaDecl> decls = snct.getCompatibleMethodsAll(name, argTypes);
     if(decls.size()>0)
         return decls;
         
-    // If code node class type is member class and not static, go up parent classes
+    // If scope node class type is member class and not static, go up parent classes
     while(snct.isMemberClass() && !snct.isStatic()) {
-        snct = snct.getParent();
-        decls = snct.getHpr().getCompatibleMethodsAll(name, argTypes);
+        snct = (JavaDeclClass)snct.getParent();
+        decls = snct.getCompatibleMethodsAll(name, argTypes);
         if(decls.size()>0)
             return decls;
     }

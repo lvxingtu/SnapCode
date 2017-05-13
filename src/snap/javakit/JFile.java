@@ -188,9 +188,9 @@ public String getImportClassName(String aName)
     if(aName.indexOf('.')>0) {
         String names[] = aName.split("\\.");
         String cname = getImportClassName(names[0]); if(cname==null) return null;
-        JavaDecl cdecl = getJavaDecl(cname);
+        JavaDeclClass cdecl = (JavaDeclClass)getJavaDecl(cname);
         for(int i=1;cdecl!=null && i<names.length;i++)
-            cdecl = cdecl.getHpr().getClassDecl(names[i]);
+            cdecl = cdecl.getClassDecl(names[i]);
         return cdecl!=null? cdecl.getName() : null;
     }
     

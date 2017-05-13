@@ -75,9 +75,8 @@ public static class SwitchLabel extends JNode
             JStmtSwitch swStmt = getParent(JStmtSwitch.class);
             JExpr swExpr = swStmt.getExpr();
             JavaDecl sdecl = swExpr!=null? swExpr.getEvalType() : null;
-            if(sdecl!=null && sdecl.isEnum()) {
-                JavaDeclClass hpr = sdecl.getHpr();
-                JavaDecl enumConst = hpr.getField(name);
+            if(sdecl!=null && sdecl.isEnum()) { JavaDeclClass edecl = sdecl.getClassType();
+                JavaDecl enumConst = edecl.getField(name);
                 if(enumConst!=null)
                     return enumConst;
             }

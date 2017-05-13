@@ -352,11 +352,6 @@ public String getRootClassName()
 public boolean isMemberClass()  { return isClass() && _par!=null && _par.isClass(); }
 
 /**
- * Returns the JavaDeclHpr for class child decls.
- */
-public JavaDeclClass getHpr()  { return (JavaDeclClass)this; }
-
-/**
  * Returns the JavaDecl for class this decl evaluates to when referenced.
  */
 public JavaDecl getEvalType()  { return _evalType; }

@@ -8,31 +8,31 @@ import java.util.*;
 public class JavaDeclClass extends JavaDecl {
 
     // The super class decl
-    JavaDeclClass    _scdecl;
+    JavaDeclClass         _scdecl;
     
     // Whether class decl is enum, interface, primitive
-    boolean          _enum, _interface, _primitive;
+    boolean               _enum, _interface, _primitive;
     
     // The array of interfaces
-    JavaDeclClass    _interfaces[];
+    JavaDeclClass         _interfaces[];
     
     // The field decls
-    List <JavaDecl>  _fdecls;
+    List <JavaDecl>       _fdecls;
 
     // The method decls
-    List <JavaDecl>  _mdecls = new ArrayList();
+    List <JavaDecl>       _mdecls = new ArrayList();
 
     // The constructor decls
-    List <JavaDecl>  _cdecls = new ArrayList();
+    List <JavaDecl>       _cdecls = new ArrayList();
 
     // The inner class decls
-    List <JavaDecl>  _icdecls = new ArrayList();
+    List <JavaDeclClass>  _icdecls = new ArrayList();
     
     // The type var decls
-    List <JavaDecl>  _tvdecls = new ArrayList();
+    List <JavaDecl>       _tvdecls = new ArrayList();
     
     // The Array item type (if Array)
-    JavaDecl         _arrayItemType;
+    JavaDecl              _arrayItemType;
     
 /**
  * Creates a new JavaDeclClass for given owner, parent and Class.
@@ -277,7 +277,7 @@ public List <JavaDecl> getConstructors()  { getFields(); return _cdecls; }
 /**
  * Returns the inner classes.
  */
-public List <JavaDecl> getClasses()  { getFields(); return _icdecls; }
+public List <JavaDeclClass> getClasses()  { getFields(); return _icdecls; }
 
 /**
  * Returns the inner classes.
@@ -642,10 +642,10 @@ public JavaDecl getConstructorDeclDeep(JavaDecl theTypes[])
 /**
  * Returns a Class decl for inner class simple name.
  */
-public JavaDecl getClassDecl(String aName)
+public JavaDeclClass getClassDecl(String aName)
 {
-    List <JavaDecl> icdecls = getClasses();
-    for(JavaDecl jd : icdecls)
+    List <JavaDeclClass> icdecls = getClasses();
+    for(JavaDeclClass jd : icdecls)
         if(jd.getSimpleName().equals(aName))
                 return jd;
     return null;
@@ -654,9 +654,9 @@ public JavaDecl getClassDecl(String aName)
 /**
  * Returns a Class decl for inner class name.
  */
-public JavaDecl getClassDeclDeep(String aName)
+public JavaDeclClass getClassDeclDeep(String aName)
 {
-    JavaDecl decl = getClassDecl(aName);
+    JavaDeclClass decl = getClassDecl(aName);
     if(decl==null && _scdecl!=null) decl = _scdecl.getClassDeclDeep(aName);
     return decl;
 }
@@ -695,7 +695,7 @@ public void addDecl(JavaDecl aDecl)
         case Field: _fdecls.add(aDecl); break;
         case Method: _mdecls.add(aDecl); break;
         case Constructor: _cdecls.add(aDecl); break;
-        case Class: _icdecls.add(aDecl); break;
+        case Class: _icdecls.add((JavaDeclClass)aDecl); break;
         case TypeVar: _tvdecls.add(aDecl); break;
         default: throw new RuntimeException("JavaDeclHpr.addDecl: Invalid type " + type);
     }

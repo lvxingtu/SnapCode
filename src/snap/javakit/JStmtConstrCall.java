@@ -58,7 +58,7 @@ protected JavaDecl getDeclImpl()
 {
     // Get class decl and constructor call arg types
     JClassDecl cd = getEnclosingClassDecl();
-    JavaDecl cdecl = cd.getDecl(); if(cdecl==null) return null;
+    JavaDeclClass cdecl = cd.getDecl(); if(cdecl==null) return null;
     JavaDecl argTypes[] = getArgEvalTypes();
     
     // If Super, switch to super class
@@ -67,7 +67,7 @@ protected JavaDecl getDeclImpl()
         cdecl = cdecl.getSuper();
     
     // Get scope node class type and search for compatible method for name and arg types
-    JavaDecl decl = cdecl.getHpr().getCompatibleConstructor(argTypes);
+    JavaDecl decl = cdecl.getCompatibleConstructor(argTypes);
     if(decl!=null)
         return decl;
         

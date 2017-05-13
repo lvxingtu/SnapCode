@@ -108,8 +108,8 @@ protected JavaDecl getDeclImpl(JNode aNode)
             return getJavaDecl(int.class); // was FieldName;
         if(pdecl.isParamType())
             pdecl = pdecl.getParent();
-        if(pdecl.isClass()) {
-            JavaDecl fd = pdecl.getHpr().getFieldDeep(name);
+        if(pdecl.isClass()) { JavaDeclClass cdecl = (JavaDeclClass)pdecl;
+            JavaDecl fd = cdecl.getFieldDeep(name);
             if(fd!=null)
                 return fd;
         }

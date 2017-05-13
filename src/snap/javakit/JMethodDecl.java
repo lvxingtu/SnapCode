@@ -124,11 +124,10 @@ protected JavaDecl getDeclImpl()
     
     // Get parent JClassDecl and JavaDecl
     JClassDecl cd = getEnclosingClassDecl(); if(cd==null) return null;
-    JavaDecl cdecl = cd.getDecl(); if(cdecl==null) return null;
+    JavaDeclClass cdecl = cd.getDecl(); if(cdecl==null) return null;
     
     // Return method for name and param types
-    JavaDeclClass clsHpr = cdecl.getHpr();
-    return clsHpr.getMethodDecl(name, ptypes);
+    return cdecl.getMethodDecl(name, ptypes);
 }
 
 /**

@@ -98,8 +98,8 @@ protected JavaDecl getDeclImpl()
     // Get scope node class type and search for compatible method for name and arg types
     JNode scopeNode = getScopeNode(); if(scopeNode==null) return null;
     JavaDecl sndecl = scopeNode.getEvalType(); if(sndecl==null) return null;
-    JavaDecl snct = sndecl.getClassType();
-    JavaDecl decl = snct.getHpr().getCompatibleMethodAll(name, argTypes);
+    JavaDeclClass snct = sndecl.getClassType();
+    JavaDecl decl = snct.getCompatibleMethodAll(name, argTypes);
     if(decl!=null)
         return decl;
         
@@ -108,7 +108,7 @@ protected JavaDecl getDeclImpl()
         scopeNode = scopeNode.getEnclosingClassDecl(); if(scopeNode==null) break;
         sndecl = scopeNode.getDecl(); if(sndecl==null) break;
         snct = sndecl.getClassType(); if(snct==null) break;
-        decl = snct.getHpr().getCompatibleMethodAll(name, argTypes);
+        decl = snct.getCompatibleMethodAll(name, argTypes);
         if(decl!=null)
             return decl;
     }

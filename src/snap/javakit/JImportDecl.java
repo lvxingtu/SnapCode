@@ -106,10 +106,10 @@ public String getImportClassName(String aName)
  */
 public JavaDecl getImportMember(String aName, JavaDecl theParams[])
 {
-    JavaDecl cls = getEvalType(); if(cls==null) return null;
+    JavaDeclClass cls = (JavaDeclClass)getEvalType(); if(cls==null) return null;
     if(theParams==null)
-        return cls.getHpr().getField(aName);
-    return cls.getHpr().getCompatibleMethodAll(aName, theParams);
+        return cls.getField(aName);
+    return cls.getCompatibleMethodAll(aName, theParams);
 }
 
 /**

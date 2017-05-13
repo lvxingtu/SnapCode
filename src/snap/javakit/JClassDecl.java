@@ -299,6 +299,11 @@ protected String getNameImpl()
 /**
  * Returns the class declaration.
  */
+public JavaDeclClass getDecl()  { return (JavaDeclClass)super.getDecl(); }
+
+/**
+ * Returns the class declaration.
+ */
 protected JavaDecl getDeclImpl()
 {
     // If enclosing class declaration, return ThatClassName$ThisName, otherwise return JFile.Name

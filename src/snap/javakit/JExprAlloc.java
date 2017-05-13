@@ -111,8 +111,8 @@ protected JavaDecl getDeclImpl()
         return type.getDecl();
         
     // Get class decl and constructor call arg types
-    JavaDecl cdecl = type.getDecl(); if(cdecl==null) return null;
-    cdecl = cdecl.getClassType();
+    JavaDecl tdecl = type.getDecl(); if(tdecl==null) return null;
+    JavaDeclClass cdecl = tdecl.getClassType();
     JavaDecl argTypes[] = getArgEvalTypes();
     
     // If inner class and not static, add implied class type to arg types array
@@ -120,7 +120,7 @@ protected JavaDecl getDeclImpl()
         argTypes = ArrayUtils.add(argTypes, cdecl.getParent(), 0);
     
     // Get scope node class type and search for compatible method for name and arg types
-    JavaDecl decl = cdecl.getHpr().getCompatibleConstructor(argTypes);
+    JavaDecl decl = cdecl.getCompatibleConstructor(argTypes);
     if(decl!=null)
         return decl;
         
