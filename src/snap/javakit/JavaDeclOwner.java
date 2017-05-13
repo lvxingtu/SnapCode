@@ -65,11 +65,7 @@ public JavaDecl getJavaDecl(Object anObj)
     
     // Handle Java.lang.refelect.Type
     else if(anObj instanceof Type) { Type type = (Type)anObj; //Class cls = getClass(type);
-        try { jd = getTypeDecl(type, null); }
-        catch(Exception e) {
-            e.printStackTrace();
-        }
-    }
+        return getTypeDecl(type); }
 
     // Complain
     else throw new RuntimeException("JavaDeclOwner.getJavaDecl: Unsupported type " + anObj);
@@ -91,7 +87,7 @@ public JavaDeclClass getJavaDeclClass(Object anObj)
 /**
  * Returns a JavaDecl for type.
  */
-public JavaDecl getTypeDecl(Type aType, JavaDecl aPar)
+public JavaDecl getTypeDecl(Type aType)
 {
     String id = JavaKitUtils.getId(aType);
     JavaDecl decl = _decls.get(id); if(decl!=null) return decl;
@@ -99,13 +95,14 @@ public JavaDecl getTypeDecl(Type aType, JavaDecl aPar)
     // Handle ParameterizedType
     if(aType instanceof ParameterizedType) {
         decl = new JavaDecl(this, null, aType);
-        _decls.put(id, decl);
         return decl;
     }
         
     // Handle TypeVariable
-    if(aType instanceof TypeVariable) { TypeVariable tv = (TypeVariable)aType;
-        decl = aPar.getTypeVar(tv.getName());
+    if(aType instanceof TypeVariable) { TypeVariable tv = (TypeVariable)aType; String name = tv.getName();
+        GenericDeclaration gdecl = tv.getGenericDeclaration();
+        JavaDecl pdecl = getJavaDecl(gdecl);
+        decl = pdecl.getTypeVar(name);
         return decl;
     }
         
@@ -119,33 +116,14 @@ public JavaDecl getTypeDecl(Type aType, JavaDecl aPar)
  */
 private JavaDeclClass getClassDecl(Class aClass)
 {
+    // Lookup class decl by name and return if already set
     String cname = aClass.getName();
-    JavaDeclClass decl = (JavaDeclClass)_decls.get(cname);
-    if(decl==null) {
-        
-        // Create class decl and add to Decls map
-        _decls.put(cname, decl = createClassDecl(aClass));
-        if(aClass.isArray())
-            _decls.put(JavaKitUtils.getId(aClass), decl);
-            
-        // Get type super type and set in decl
-        AnnotatedType superAType = aClass.getAnnotatedSuperclass();
-        Type superType = superAType!=null? superAType.getType() : null;
-        if(superType!=null) {
-            decl._stype = getJavaDecl(superType);
-            decl._sdecl = decl._scdecl = decl._stype.getClassType();
-        }
-    }
-    return decl;
-}
-
-/**
- * Creates a class decl.
- */
-private JavaDeclClass createClassDecl(Class aClass)
-{
+    JavaDeclClass decl = (JavaDeclClass)_decls.get(cname); if(decl!=null) return decl;
+    
+    // Create decl and return
     JavaDecl parDecl = getParentDecl(aClass);
-    return new JavaDeclClass(this, parDecl, aClass);
+    decl = new JavaDeclClass(this, parDecl, aClass);
+    return decl;
 }
 
 /**

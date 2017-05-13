@@ -47,7 +47,7 @@ public class JavaDecl implements Comparable<JavaDecl> {
     JVarDecl       _vdecl;
     
     // The super implementation of this type (Class, Method, Constructor)
-    JavaDecl       _sdecl = NULL_DECL, _stype;
+    JavaDecl       _sdecl = NULL_DECL;
     
     // Constants for type
     public enum DeclType { Class, Field, Constructor, Method, Package, VarDecl, ParamType, TypeVar }
@@ -97,18 +97,21 @@ private void initType(Type aType)
     if(aType instanceof ParameterizedType) { ParameterizedType pt = (ParameterizedType)aType;
         _type = DeclType.ParamType;
         _name = JavaKitUtils.getTypeName(pt); _sname = JavaKitUtils.getTypeSimpleName(pt);
-        _par = _owner.getTypeDecl(pt.getRawType(), _par);
+        _par = _owner.getTypeDecl(pt.getRawType());
         Type typArgs[] = pt.getActualTypeArguments();
         _paramTypes = new JavaDecl[typArgs.length];
-        for(int i=0,iMax=typArgs.length;i<iMax;i++) _paramTypes[i] = _owner.getTypeDecl(typArgs[i], _par);
+        for(int i=0,iMax=typArgs.length;i<iMax;i++) _paramTypes[i] = _owner.getTypeDecl(typArgs[i]);
         _evalType = this;
+        _owner._decls.put(_id, this);
     }
     
     // Handle TypeVariable
     else if(aType instanceof TypeVariable) { TypeVariable tv = (TypeVariable)aType; _type = DeclType.TypeVar;
         _name = _sname = tv.getName();
         Type etypes[] = tv.getBounds();
-        _evalType = _owner.getTypeDecl(etypes[0], _par);
+        Class ecls = JavaKitUtils.getClass(etypes[0]);
+        _evalType = getClassDecl(ecls);
+        _owner._decls.put(_id, this);
     }
 }
 
@@ -123,7 +126,7 @@ private void initMember(Member aMmbr)
     
     // Handle Field
     if(aMmbr instanceof Field) { Field field = (Field)aMmbr; _type = DeclType.Field;
-        _evalType = _owner.getTypeDecl(field.getGenericType(), _par); }
+        _evalType = _owner.getTypeDecl(field.getGenericType()); }
         
     // Handle Executable (Method, Constructor)
     else { Executable exec = (Executable)aMmbr;
@@ -141,14 +144,14 @@ private void initMember(Member aMmbr)
         
         // Get Return Type
         Type rtype = exec.getAnnotatedReturnType().getType();
-        _evalType = _owner.getTypeDecl(rtype, this);
+        _evalType = _owner.getTypeDecl(rtype);
         
         // Get GenericParameterTypes (this can fail https://bugs.openjdk.java.net/browse/JDK-8075483))
         Type ptypes[] = exec.getGenericParameterTypes();
         if(ptypes.length<exec.getParameterCount()) ptypes = exec.getParameterTypes();
         _paramTypes = new JavaDecl[ptypes.length];
         for(int i=0,iMax=ptypes.length; i<iMax; i++)
-            _paramTypes[i] = _owner.getTypeDecl(ptypes[i], this);
+            _paramTypes[i] = _owner.getTypeDecl(ptypes[i]);
 
         // Set default
         if(exec instanceof Method)
@@ -562,39 +565,15 @@ public boolean isResolvedType()
  */
 public JavaDecl getResolvedType(JavaDecl aDecl)
 {
-    // Handle ParamType
+    // Handle ParamType and anything not a TypeVar
     if(aDecl.isParamType()) {
-        System.err.println("JavaDecl.getResolvedType: ParamType not yet supported");
-        return aDecl;
-    }
-
-    // Handle anything not a type var
+        System.err.println("JavaDecl.getResolvedType: ParamType not yet supported"); return aDecl; }
     if(!aDecl.isTypeVar())
         return aDecl;
 
-    // Get TypeVar name
-    String name = aDecl.getName();
-    
-    // Handle class: If has type
-    if(isClass()) {
-        
-        // If has type var, return bounds type
-        JavaDecl tvar = getTypeVar(name);
-        if(tvar!=null)
-            return tvar.getEvalType();
-        
-        // If super has type var, return mapped type
-        //JavaDecl sdecl = getSuper();
-        /*if(sdecl!=null && sdecl.getTypeVar(name)!=null) {
-            int ind = sdecl.getHpr().getTypeVarDeclIndex(name);
-            if(ind>=0 && ind<_paramTypes.length)
-                return _paramTypes[ind]; }*/
-        if(_stype!=null && _stype.isParamType())
-            return _stype.getResolvedType(aDecl);
-    }
-    
     // Handle ParamType:
-    else if(isParamType()) {
+    if(isParamType()) {
+        String name = aDecl.getName();
         JavaDeclClass cls = getClassType();
         int ind = cls.getTypeVarIndex(name);
         if(ind>=0 && ind<_paramTypes.length)

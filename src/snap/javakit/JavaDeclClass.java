@@ -7,6 +7,9 @@ import java.util.*;
  */
 public class JavaDeclClass extends JavaDecl {
 
+    // The SuperClass type
+    JavaDecl              _stype;
+    
     // The super class decl
     JavaDeclClass         _scdecl;
     
@@ -49,6 +52,19 @@ public JavaDeclClass(JavaDeclOwner anOwner, JavaDecl aPar, Class aClass)
     _evalType = this; _sdecl = null; // Set by owner
     if(aClass.isArray())
         _arrayItemType = getJavaDecl(aClass.getComponentType());
+        
+    // Create class decl and add to Decls map
+    _owner._decls.put(_id, this);
+    if(aClass.isArray())
+        _owner._decls.put(aClass.getName(), this);
+        
+    // Get type super type and set in decl
+    AnnotatedType superAType = aClass.getAnnotatedSuperclass();
+    Type superType = superAType!=null? superAType.getType() : null;
+    if(superType!=null) {
+        _stype = getJavaDecl(superType);
+        _sdecl = _scdecl = _stype.getClassType();
+    }
 }
 
 /**
@@ -172,6 +188,34 @@ private boolean isAssignablePrimitive(JavaDecl aDecl)
 public JavaDeclClass getSuper()  { return _scdecl; }
 
 /**
+ * Returns a resolved type for given unresolved type (TypeVar or ParamType<TypeVar>), if this decl can resolve it.
+ */
+public JavaDecl getResolvedType(JavaDecl aDecl)
+{
+    // Handle ParamType and anything not a TypeVar
+    if(aDecl.isParamType()) {
+        System.err.println("JavaDecl.getResolvedType: ParamType not yet supported"); return aDecl; }
+    if(!aDecl.isTypeVar())
+        return aDecl;
+
+    // If has type var, return bounds type
+    String name = aDecl.getName();
+    JavaDecl tvar = getTypeVar(name);
+    if(tvar!=null)
+        return tvar.getEvalType();
+    
+    // If super has type var, return mapped type //JavaDecl sdecl = getSuper();
+    /*if(sdecl!=null && sdecl.getTypeVar(name)!=null) {
+        int ind = sdecl.getHpr().getTypeVarDeclIndex(name);
+        if(ind>=0 && ind<_paramTypes.length) return _paramTypes[ind]; }*/
+
+    if(_stype!=null && _stype.isParamType())
+        return _stype.getResolvedType(aDecl);
+        
+    return aDecl.getEvalType();
+}
+
+/**
  * Updates JavaDecls.
  */
 public HashSet <JavaDecl> updateDecls()
@@ -193,26 +237,27 @@ public HashSet <JavaDecl> updateDecls()
     HashSet <JavaDecl> addedDecls = new HashSet();
     HashSet <JavaDecl> removedDecls = new HashSet(); removedDecls.add(this);
     removedDecls.addAll(_fdecls); removedDecls.addAll(_mdecls);
-    removedDecls.addAll(_cdecls); removedDecls.addAll(_icdecls);
+    removedDecls.addAll(_cdecls); removedDecls.addAll(_icdecls); removedDecls.addAll(_tvdecls);
 
     // Make sure class decl is up to date
     if(getModifiers()!=cls.getModifiers())
         _mods = cls.getModifiers();
         
+    // TypeVariables: Add JavaDecl for each Type parameter
+    TypeVariable tvars[]; try { tvars = cls.getTypeParameters(); }
+    catch(Throwable e) { System.err.println(e + " in " + cname); return null; }
+    for(TypeVariable tv : tvars) { String name = tv.getName();
+        JavaDecl decl = getTypeVar(name);
+        if(decl==null) { decl = new JavaDecl(_owner,this,tv); addedDecls.add(decl); addDecl(decl); }
+        else removedDecls.remove(decl);
+    }
+    
     // Inner Classes: Add JavaDecl for each inner class
     Class iclss[]; try { iclss = cls.getDeclaredClasses(); }
     catch(Throwable e) { System.err.println(e + " in " + cname); return null; }
     for(Class icls : iclss) {   //if(icls.isSynthetic()) continue;
         JavaDecl decl = getClassDecl(icls.getSimpleName());
         if(decl==null) { decl = getJavaDecl(icls); addedDecls.add(decl); addDecl(decl); }
-        else removedDecls.remove(decl);
-    }
-    
-    // TypeVariables: Add JavaDecl for each Type parameter
-    Collections.addAll(removedDecls, this._typeVars);
-    for(TypeVariable tv : cls.getTypeParameters()) { String name = tv.getName();
-        JavaDecl decl = getTypeVar(name);
-        if(decl==null) { decl = new JavaDecl(_owner,this,tv); addedDecls.add(decl); addDecl(decl); }
         else removedDecls.remove(decl);
     }
     
