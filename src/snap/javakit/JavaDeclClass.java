@@ -14,7 +14,7 @@ public class JavaDeclClass extends JavaDecl {
     boolean          _enum, _interface, _primitive;
     
     // The array of interfaces
-    JavaDecl         _interfaces[];
+    JavaDeclClass    _interfaces[];
     
     // The field decls
     List <JavaDecl>  _fdecls;
@@ -129,23 +129,23 @@ public boolean isAssignable(JavaDecl aDecl)
     
     // If given val is null or this decl is Object return true
     if(aDecl==null) return true;
-    JavaDeclClass ctype0 = getClassType(); if(ctype0.getName().equals("java.lang.Object")) return true;
+    if(getName().equals("java.lang.Object")) return true;
     JavaDeclClass ctype1 = aDecl.getClassType(); if(ctype1.isPrimitive()) ctype1 = ctype1.getPrimitiveAlt();
     
     // If both are array type, check ArrayItemTypes instead
-    if(ctype0.isArray() && ctype1.isArray())
-        return ctype0.getArrayItemType().isAssignable(ctype1.getArrayItemType());
+    if(isArray() && ctype1.isArray())
+        return getArrayItemType().isAssignable(ctype1.getArrayItemType());
     
     // Iterate up given class superclasses and check class and interfaces
-    for(JavaDecl ct1=ctype1; ct1!=null; ct1=ct1.getSuper()) {
+    for(JavaDeclClass ct1=ctype1; ct1!=null; ct1=ct1.getSuper()) {
         
         // If classes match, return true
-        if(ct1==ctype0)
+        if(ct1==this)
             return true;
             
         // If any interface of this decl match, return true
-        if(ctype0.isInterface())
-            for(JavaDecl infc : ct1.getHpr().getInterfaces())
+        if(isInterface())
+            for(JavaDeclClass infc : ct1.getInterfaces())
                 if(isAssignable(infc))
                     return true;
     }
@@ -167,6 +167,11 @@ private boolean isAssignablePrimitive(JavaDecl aDecl)
 }
 
 /**
+ * Override to return as Class type.
+ */
+public JavaDeclClass getSuper()  { return _scdecl; }
+
+/**
  * Updates JavaDecls.
  */
 public HashSet <JavaDecl> updateDecls()
@@ -180,9 +185,9 @@ public HashSet <JavaDecl> updateDecls()
     
     // Get interfaces
     Class interfaces[] = cls.getInterfaces();
-    _interfaces = new JavaDecl[interfaces.length];
+    _interfaces = new JavaDeclClass[interfaces.length];
     for(int i=0,iMax=interfaces.length;i<iMax;i++) { Class infc = interfaces[i];
-        _interfaces[i] = getJavaDecl(infc); }
+        _interfaces[i] = getClassDecl(infc); }
     
     // Create set for added/removed decls
     HashSet <JavaDecl> addedDecls = new HashSet();
@@ -252,7 +257,7 @@ public HashSet <JavaDecl> updateDecls()
 /**
  * Returns the interfaces this class implments.
  */
-public JavaDecl[] getInterfaces()  { getFields(); return _interfaces; }
+public JavaDeclClass[] getInterfaces()  { getFields(); return _interfaces; }
 
 /**
  * Returns the fields.
@@ -391,8 +396,8 @@ public JavaDecl getCompatibleMethod(String aName, JavaDecl theTypes[])
 public JavaDecl getCompatibleMethodDeep(String aName, JavaDecl theTypes[])
 {
     // Search this class and superclasses for compatible method
-    for(JavaDecl cls=this;cls!=null;cls=cls.getSuper()) {
-        JavaDecl decl = cls.getHpr().getCompatibleMethod(aName, theTypes);
+    for(JavaDeclClass cls=this;cls!=null;cls=cls.getSuper()) {
+        JavaDecl decl = cls.getCompatibleMethod(aName, theTypes);
         if(decl!=null)
             return decl;
     }
@@ -410,9 +415,9 @@ public JavaDecl getCompatibleMethodAll(String aName, JavaDecl theTypes[])
         return decl;
     
     // Search this class and superclasses for compatible interface
-    for(JavaDecl cls=this;cls!=null;cls=cls.getSuper()) {
-        for(JavaDecl infc : cls.getHpr().getInterfaces()) {
-            decl = infc.getHpr().getCompatibleMethodAll(aName, theTypes);
+    for(JavaDeclClass cls=this;cls!=null;cls=cls.getSuper()) {
+        for(JavaDeclClass infc : cls.getInterfaces()) {
+            decl = infc.getCompatibleMethodAll(aName, theTypes);
             if(decl!=null)
                 return decl;
         }
@@ -420,8 +425,8 @@ public JavaDecl getCompatibleMethodAll(String aName, JavaDecl theTypes[])
     
     // If this class is Interface, check Object
     if(isInterface()) {
-        JavaDecl objDecl = getJavaDecl(Object.class);
-        return objDecl.getHpr().getCompatibleMethodDeep(aName, theTypes);
+        JavaDeclClass objDecl = getClassDecl(Object.class);
+        return objDecl.getCompatibleMethodDeep(aName, theTypes);
     }
     
     // Return null since compatible method not found
@@ -451,8 +456,8 @@ public List <JavaDecl> getCompatibleMethodsDeep(String aName, JavaDecl theTypes[
 {
     // Search this class and superclasses for compatible method
     List <JavaDecl> matches = Collections.EMPTY_LIST;
-    for(JavaDecl cls=this;cls!=null;cls=cls.getSuper()) {
-        List <JavaDecl> decls = cls.getHpr().getCompatibleMethods(aName, theTypes);
+    for(JavaDeclClass cls=this;cls!=null;cls=cls.getSuper()) {
+        List <JavaDecl> decls = cls.getCompatibleMethods(aName, theTypes);
         if(decls.size()>0) {
             if(matches==Collections.EMPTY_LIST) matches = decls; else matches.addAll(decls); }
     }
@@ -471,9 +476,9 @@ public List <JavaDecl> getCompatibleMethodsAll(String aName, JavaDecl theTypes[]
         if(matches==Collections.EMPTY_LIST) matches = decls; else matches.addAll(decls); }
     
     // Search this class and superclasses for compatible interface
-    for(JavaDecl cls=this;cls!=null;cls=cls.getSuper()) {
-        for(JavaDecl infc : cls.getHpr().getInterfaces()) {
-            decls = infc.getHpr().getCompatibleMethodsAll(aName, theTypes);
+    for(JavaDeclClass cls=this;cls!=null;cls=cls.getSuper()) {
+        for(JavaDeclClass infc : cls.getInterfaces()) {
+            decls = infc.getCompatibleMethodsAll(aName, theTypes);
             if(decls.size()>0) {
                 if(matches==Collections.EMPTY_LIST) matches = decls; else matches.addAll(decls); }
         }
@@ -481,8 +486,8 @@ public List <JavaDecl> getCompatibleMethodsAll(String aName, JavaDecl theTypes[]
     
     // If this class is Interface, check Object
     if(isInterface()) {
-        JavaDecl objDecl = getJavaDecl(Object.class);
-        decls = objDecl.getHpr().getCompatibleMethodsDeep(aName, theTypes);
+        JavaDeclClass objDecl = getClassDecl(Object.class);
+        decls = objDecl.getCompatibleMethodsDeep(aName, theTypes);
         if(decls.size()>0) {
             if(matches==Collections.EMPTY_LIST) matches = decls; else matches.addAll(decls); }
     }

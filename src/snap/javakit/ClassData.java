@@ -95,9 +95,9 @@ private JavaDecl getRef(ClassFileData.Constant aConst)
     // Handle Field reference
     if(aConst.isField()) {
         String cname = aConst.getDeclClassName(); if(cname.startsWith("[")) return null;
-        JavaDecl decl = _proj.getJavaDecl(cname);
+        JavaDeclClass cdecl = _proj.getClassDecl(cname);
         String name = aConst.getMemberName();
-        return decl.getHpr().getFieldDeep(name);
+        return cdecl.getFieldDeep(name);
     }
     
     // Handle method reference
@@ -112,8 +112,8 @@ private JavaDecl getRef(ClassFileData.Constant aConst)
         for(int i=0;i<pnames.length;i++) ptypes[i] = _proj.getJavaDecl(pnames[i]);
         
         // Get class decls and constructor from parameters
-        JavaDecl decl = _proj.getJavaDecl(cname);
-        return decl.getHpr().getConstructorDeclDeep(ptypes);
+        JavaDeclClass cdecl = _proj.getClassDecl(cname);
+        return cdecl.getConstructorDeclDeep(ptypes);
     }
     
     // Handle method reference
@@ -129,8 +129,8 @@ private JavaDecl getRef(ClassFileData.Constant aConst)
         for(int i=0;i<pnames.length;i++) ptypes[i] = _proj.getJavaDecl(pnames[i]);
         
         // Get class decls and method from name and parameters
-        JavaDecl decl = _proj.getJavaDecl(cname);
-        return decl.getHpr().getMethodDeclDeep(name, ptypes);
+        JavaDeclClass cdecl = _proj.getClassDecl(cname);
+        return cdecl.getMethodDeclDeep(name, ptypes);
     }
     
     // Return null since unknown Constant reference

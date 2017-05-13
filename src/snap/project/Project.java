@@ -150,6 +150,15 @@ public JavaDecl getJavaDecl(Object anObj)
 }
 
 /**
+ * Returns a JavaDecl for object.
+ */
+public JavaDeclClass getClassDecl(Object anObj)
+{
+    JavaDecl jd = getJavaDecl(anObj);
+    return jd instanceof JavaDeclClass? (JavaDeclClass)jd : null;
+}
+
+/**
  * An JavaDeclOwner subclass.
  */
 private class ProjJavaDeclOwner extends JavaDeclOwner {

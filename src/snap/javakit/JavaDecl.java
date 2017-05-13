@@ -483,16 +483,16 @@ public JavaDecl getSuper()
     if(_sdecl!=NULL_DECL) return _sdecl;
     
     // Get superclass and helper
-    JavaDecl cdecl = getParent(), scdecl = cdecl!=null? cdecl.getSuper() : null;
-    JavaDeclClass schpr = scdecl!=null && scdecl.isClass()? scdecl.getHpr() : null;
+    JavaDeclClass cdecl = getClassType();
+    JavaDeclClass scdecl = cdecl!=null? cdecl.getSuper() : null;
     
     // Handle Method
     if(isMethod())
-        return _sdecl = schpr!=null? schpr.getMethodDeclDeep(getName(), getParamTypes()) : null;
+        return _sdecl = scdecl!=null? scdecl.getMethodDeclDeep(getName(), getParamTypes()) : null;
     
     // Handle Constructor
     if(isConstructor())
-        return _sdecl = schpr!=null? schpr.getConstructorDeclDeep(getParamTypes()) : null;
+        return _sdecl = scdecl!=null? scdecl.getConstructorDeclDeep(getParamTypes()) : null;
         
     // Handle ParamType
     if(isParamType())
