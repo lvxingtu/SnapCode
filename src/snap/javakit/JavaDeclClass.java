@@ -120,6 +120,53 @@ public JavaDeclClass getPrimitiveAlt()
 }
 
 /**
+ * Returns whether given type is assignable to this JavaDecl.
+ */
+public boolean isAssignable(JavaDecl aDecl)
+{
+    // If this decl is primitive, forward to primitive version
+    if(isPrimitive()) return isAssignablePrimitive(aDecl);
+    
+    // If given val is null or this decl is Object return true
+    if(aDecl==null) return true;
+    JavaDeclClass ctype0 = getClassType(); if(ctype0.getName().equals("java.lang.Object")) return true;
+    JavaDeclClass ctype1 = aDecl.getClassType(); if(ctype1.isPrimitive()) ctype1 = ctype1.getPrimitiveAlt();
+    
+    // If both are array type, check ArrayItemTypes instead
+    if(ctype0.isArray() && ctype1.isArray())
+        return ctype0.getArrayItemType().isAssignable(ctype1.getArrayItemType());
+    
+    // Iterate up given class superclasses and check class and interfaces
+    for(JavaDecl ct1=ctype1; ct1!=null; ct1=ct1.getSuper()) {
+        
+        // If classes match, return true
+        if(ct1==ctype0)
+            return true;
+            
+        // If any interface of this decl match, return true
+        if(ctype0.isInterface())
+            for(JavaDecl infc : ct1.getHpr().getInterfaces())
+                if(isAssignable(infc))
+                    return true;
+    }
+    
+    // Return false since no match found
+    return false;
+}
+
+/**
+ * Returns whether given type is assignable to this JavaDecl.
+ */
+private boolean isAssignablePrimitive(JavaDecl aDecl)
+{
+    if(aDecl==null) return false;
+    JavaDecl ctype0 = getClassType();
+    JavaDecl ctype1 = aDecl.getClassType().getPrimitive(); if(ctype1==null) return false;
+    JavaDecl common = getCommonAncestorPrimitive(ctype1);
+    return common==this;
+}
+
+/**
  * Updates JavaDecls.
  */
 public HashSet <JavaDecl> updateDecls()
@@ -159,7 +206,7 @@ public HashSet <JavaDecl> updateDecls()
     // TypeVariables: Add JavaDecl for each Type parameter
     Collections.addAll(removedDecls, this._typeVars);
     for(TypeVariable tv : cls.getTypeParameters()) { String name = tv.getName();
-        JavaDecl decl = getTypeVarDecl(name);
+        JavaDecl decl = getTypeVar(name);
         if(decl==null) { decl = new JavaDecl(_owner,this,tv); addedDecls.add(decl); addDecl(decl); }
         else removedDecls.remove(decl);
     }
@@ -612,7 +659,7 @@ public JavaDecl getClassDeclDeep(String aName)
 /**
  * Returns a TypeVar decl for inner class name.
  */
-public JavaDecl getTypeVarDecl(String aName)
+public JavaDecl getTypeVar(String aName)
 {
     List <JavaDecl> tvdecls = getTypeVars2();
     for(JavaDecl jd : tvdecls)
@@ -624,7 +671,7 @@ public JavaDecl getTypeVarDecl(String aName)
 /**
  * Returns a TypeVar decl for inner class name.
  */
-public int getTypeVarDeclIndex(String aName)
+public int getTypeVarIndex(String aName)
 {
     List <JavaDecl> tvdecls = getTypeVars2();
     for(int i=0,iMax=tvdecls.size();i<iMax;i++) { JavaDecl jd = tvdecls.get(i);

@@ -333,24 +333,9 @@ public String getClassSimpleName()
 public JavaDecl getParent()  { return _par; }
 
 /**
- * Returns the enclosing class this decl.
- */
-public JavaDecl getParent(DeclType aType)
-{
-    if(_par==null) return null;
-    if(_par.getType()==aType) return _par;
-    return _par.getParent(aType);
-}
-
-/**
  * Returns the parent name.
  */
 public String getParentName()  { return _par!=null? _par.getName() : ""; }
-
-/**
- * Returns the parent class.
- */
-public Class getParentClass()  { return _par!=null? _par.getEvalClass() : null; }
 
 /**
  * Returns the top level class name.
@@ -358,8 +343,7 @@ public Class getParentClass()  { return _par!=null? _par.getEvalClass() : null; 
 public String getRootClassName()
 {
     if(_par!=null && _par.isClass()) return _par.getRootClassName();
-    if(isClass()) return getClassName();
-    return null;
+    return getClassName();
 }
 
 /**
@@ -451,12 +435,8 @@ public JavaDecl[] getTypeVars()  { return _typeVars; }
  */
 public JavaDecl getTypeVar(String aName)
 {
-    // Handle Class: Get type var for name from helper
-    if(isClass())
-        return getHpr().getTypeVarDecl(aName);
-    
     // Handle Method, Constructor: Get type for name from TypeVars
-    else if(isMethod() || isConstructor()) {
+    if(isMethod() || isConstructor()) {
         
         // Check Method, Constructor TypeVars
         for(JavaDecl tvar : _typeVars)
@@ -550,7 +530,7 @@ public JavaDecl getCommonAncestor(JavaDecl aDecl)
 /**
  * Returns common ancestor of this decl and given decls.
  */
-private JavaDecl getCommonAncestorPrimitive(JavaDecl aDecl)
+protected JavaDecl getCommonAncestorPrimitive(JavaDecl aDecl)
 {
     String n0 = getName(), n1 = aDecl.getName();
     if(n0.equals("double")) return this; if(n1.equals("double")) return aDecl;
@@ -565,49 +545,7 @@ private JavaDecl getCommonAncestorPrimitive(JavaDecl aDecl)
 /**
  * Returns whether given type is assignable to this JavaDecl.
  */
-public boolean isAssignable(JavaDecl aDecl)
-{
-    // If this decl is primitive, forward to primitive version
-    if(isPrimitive()) return isAssignablePrimitive(aDecl);
-    
-    // If given val is null or this decl is Object return true
-    if(aDecl==null) return true;
-    JavaDeclClass ctype0 = getClassType(); if(ctype0.getName().equals("java.lang.Object")) return true;
-    JavaDeclClass ctype1 = aDecl.getClassType(); if(ctype1.isPrimitive()) ctype1 = ctype1.getPrimitiveAlt();
-    
-    // If both are array type, check ArrayItemTypes instead
-    if(ctype0.isArray() && ctype1.isArray())
-        return ctype0.getArrayItemType().isAssignable(ctype1.getArrayItemType());
-    
-    // Iterate up given class superclasses and check class and interfaces
-    for(JavaDecl ct1=ctype1; ct1!=null; ct1=ct1.getSuper()) {
-        
-        // If classes match, return true
-        if(ct1==ctype0)
-            return true;
-            
-        // If any interface of this decl match, return true
-        if(ctype0.isInterface())
-            for(JavaDecl infc : ct1.getHpr().getInterfaces())
-                if(isAssignable(infc))
-                    return true;
-    }
-    
-    // Return false since no match found
-    return false;
-}
-
-/**
- * Returns whether given type is assignable to this JavaDecl.
- */
-private boolean isAssignablePrimitive(JavaDecl aDecl)
-{
-    if(aDecl==null) return false;
-    JavaDecl ctype0 = getClassType();
-    JavaDecl ctype1 = aDecl.getClassType().getPrimitive(); if(ctype1==null) return false;
-    JavaDecl common = getCommonAncestorPrimitive(ctype1);
-    return common==this;
-}
+public boolean isAssignable(JavaDecl aDecl)  { return false; }
 
 /**
  * Returns whether is Type is explicit (doesn't contain any type variables).
@@ -662,7 +600,8 @@ public JavaDecl getResolvedType(JavaDecl aDecl)
     
     // Handle ParamType:
     else if(isParamType()) {
-        int ind = _par.getHpr().getTypeVarDeclIndex(name);
+        JavaDeclClass cls = getClassType();
+        int ind = cls.getTypeVarIndex(name);
         if(ind>=0 && ind<_paramTypes.length)
             return _paramTypes[ind];
     }
