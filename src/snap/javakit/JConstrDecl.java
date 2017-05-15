@@ -19,7 +19,7 @@ protected JavaDecl getDeclImpl()
     
     // Get parent JClassDecl and JavaDecl
     JClassDecl cd = getEnclosingClassDecl(); if(cd==null) return null;
-    JavaDeclClass cdecl = cd.getDecl();
+    JavaDeclClass cdecl = cd.getDecl(); if(cdecl==null) return null;
     
     // If inner class and not static, add implied class type to arg types array
     if(cdecl.isMemberClass() && !cdecl.isStatic())

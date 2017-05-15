@@ -100,7 +100,7 @@ protected JavaDecl getDeclImpl()
     // Handle parent is method call: Get lambda interface from method call decl param
     JavaDecl idecl = null;
     if(par instanceof JExprMethodCall) { JExprMethodCall mcall = (JExprMethodCall)par;
-        List <JavaDecl> meths = getCompatibleMethods(); if(meths.size()==0) return null;
+        List <JavaDecl> meths = getCompatibleMethods(); if(meths==null || meths.size()==0) return null;
         int ind = ListUtils.indexOfId(mcall.getArgs(), this), argc = getParamCount(); if(ind<0) return null;
         for(JavaDecl mdecl : meths) {
             JavaDecl pdecl = mdecl.getParamType(ind);

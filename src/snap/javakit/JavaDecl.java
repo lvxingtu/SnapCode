@@ -362,12 +362,12 @@ public JavaDecl getEvalType()  { return _evalType; }
 /**
  * Returns the type name for class this decl evaluates to when referenced.
  */
-public String getEvalTypeName()  { return _evalType.getName(); }
+public String getEvalTypeName()  { return _evalType!=null? _evalType.getName() : null; }
 
 /**
  * Returns the type name for class this decl evaluates to when referenced.
  */
-public String getEvalClassName()  { return _evalType.getClassName(); }
+public String getEvalClassName()  { return _evalType!=null? _evalType.getClassName() : null; }
 
 /**
  * Returns the class this decl evaluates to when referenced.

@@ -131,7 +131,7 @@ public JavaDeclClass getPrimitiveAlt()
         case "long": return getClassDecl(Long.class);
         case "float": return getClassDecl(Float.class);
         case "double": return getClassDecl(Double.class);
-        default: return null;
+        default: return this;
     }
 }
 
@@ -226,6 +226,8 @@ public HashSet <JavaDecl> updateDecls()
     // Get class
     Class cls = getEvalClass();
     String cname = getClassName();
+    if(cls==null) {
+        System.err.println("JavaDeclClass: Failed to load class: " + cname); return null; }
     
     // Get interfaces
     Class interfaces[] = cls.getInterfaces();

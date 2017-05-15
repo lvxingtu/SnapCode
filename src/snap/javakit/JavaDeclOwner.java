@@ -19,7 +19,7 @@ public JavaDecl getJavaDecl(Object anObj)
     // Handle String (Class, ParamType or package name)
     if(anObj instanceof String) { String id = (String)anObj;
     
-        // If decl exists for name, just return
+        // If decl exists forf name, just return
         JavaDecl jd = _decls.get(id); if(jd!=null) return jd;
         
         // If name is Parameterized class, create

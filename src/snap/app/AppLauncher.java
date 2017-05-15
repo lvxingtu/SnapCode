@@ -251,6 +251,15 @@ private void updateTeaFiles()
         }
         else updateTeaFiles(file);
     }
+    
+    // Write tea file
+    WebURL teaIndexURL = WebURL.getURL(_proj.getClassPath().getBuildPathAbsolute() + "/tea/index.txt");
+    WebFile teaIndex = teaIndexURL.createFile(false);
+    String text = ListUtils.joinStrings(_teaPaths, "\n");
+    if(!text.equals(teaIndex.getText())) {
+        teaIndex.setText(text);
+        teaIndex.save();
+    }
 }
 
 /**
@@ -275,8 +284,11 @@ private void updateTeaFiles(WebFile aFile)
             tfile.setBytes(aFile.getBytes());
             tfile.save();
         }
+        _teaPaths.add(path);
     }
 }
+
+List <String> _teaPaths = new ArrayList();
 
 /**
  * Returns whether given file is a resource file.
