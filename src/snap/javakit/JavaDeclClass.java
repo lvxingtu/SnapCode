@@ -112,6 +112,7 @@ public JavaDeclClass getPrimitive()
         case "java.lang.Long": return getClassDecl(long.class);
         case "java.lang.Float": return getClassDecl(float.class);
         case "java.lang.Double": return getClassDecl(double.class);
+        case "java.lang.Void": return getClassDecl(void.class);
         default: return null;
     }
 }
@@ -131,7 +132,8 @@ public JavaDeclClass getPrimitiveAlt()
         case "long": return getClassDecl(Long.class);
         case "float": return getClassDecl(Float.class);
         case "double": return getClassDecl(Double.class);
-        default: return this;
+        case "void": return getClassDecl(Void.class);
+        default: return null;
     }
 }
 
