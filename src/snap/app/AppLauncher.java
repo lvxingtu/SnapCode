@@ -247,7 +247,21 @@ private void updateTeaFiles()
         WebFile file = proj.getSourceDir();
         if(proj.getName().equals("SnapKit")) {
             updateTeaFiles(proj.getFile("/src/snap/util/XMLParser.txt"));
+            updateTeaFiles(proj.getFile("/src/snap/view"));
             updateTeaFiles(proj.getFile("/src/snap/viewx/JTokens.txt"));
+            updateTeaFiles(proj.getFile("/src/snap/viewx/TextPane.snp"));
+            updateTeaFiles(proj.getFile("/src/snap/viewx/pkg.images/Edit_Copy.png"));
+            updateTeaFiles(proj.getFile("/src/snap/viewx/pkg.images/Edit_Cut.png"));
+            updateTeaFiles(proj.getFile("/src/snap/viewx/pkg.images/Edit_Delete.png"));
+            updateTeaFiles(proj.getFile("/src/snap/viewx/pkg.images/Edit_Paste.png"));
+            updateTeaFiles(proj.getFile("/src/snap/viewx/pkg.images/Edit_Redo.png"));
+            updateTeaFiles(proj.getFile("/src/snap/viewx/pkg.images/Edit_Undo.png"));
+            updateTeaFiles(proj.getFile("/src/snap/viewx/pkg.images/File_New.png"));
+            updateTeaFiles(proj.getFile("/src/snap/viewx/pkg.images/File_Open.png"));
+            updateTeaFiles(proj.getFile("/src/snap/viewx/pkg.images/File_Print.png"));
+            updateTeaFiles(proj.getFile("/src/snap/viewx/pkg.images/File_Save.png"));
+            updateTeaFiles(proj.getFile("/src/snap/viewx/pkg.images/Font_Increase.png"));
+            updateTeaFiles(proj.getFile("/src/snap/viewx/pkg.images/Font_Decrease.png"));
         }
         else updateTeaFiles(file);
     }
@@ -279,7 +293,7 @@ private void updateTeaFiles(WebFile aFile)
         WebURL url = WebURL.getURL(_proj.getClassPath().getBuildPathAbsolute() + "/tea" + path);
         WebFile tfile = url.getFile();
         if(tfile==null || aFile.getLastModifiedTime()>tfile.getLastModifiedTime()) {
-            System.out.println("Updating Tea Resource File: " + url.getPath());
+            //System.out.println("Updating Tea Resource File: " + url.getPath());
             if(tfile==null) tfile = url.createFile(false);
             tfile.setBytes(aFile.getBytes());
             tfile.save();
