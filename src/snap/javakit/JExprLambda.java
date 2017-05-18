@@ -112,8 +112,8 @@ protected JavaDecl getDeclImpl()
         return null;
     }
     
-    // Handle parent anything else (JVarDecl, ?): Get lambda interface from eval type
-    else if(par!=null)
+    // Handle parent anything else (JVarDecl, JStmtExpr): Get lambda interface from eval type
+    else if(par!=null && par._decl!=null)
         idecl = par.getEvalType();
         
     // If type is interface, get lambda type
