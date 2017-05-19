@@ -202,7 +202,7 @@ protected List <String> getTeaCommand()
     // Get Class path and add to list
     String cpaths[] = _proj.getProjectSet().getClassPaths(); //cpaths = ArrayUtils.add(cpaths, "/Temp/teavm/*");
     String cpathsNtv[] = FilePathUtils.getNativePaths(cpaths);
-    String cpath = FilePathUtils.getJoinedPath(cpathsNtv); cpath = cpath.replace("teavm-jso-0.4.3.jar", "*");
+    String cpath = FilePathUtils.getJoinedPath(cpathsNtv); cpath = cpath.replace("teavm-jso.jar", "*");
     commands.add("-cp"); commands.add(cpath);
     
     // Add runner and class name
