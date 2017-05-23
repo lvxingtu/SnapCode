@@ -45,6 +45,7 @@ public void writeJNode(JNode aNode)
     else if(aNode instanceof JVarDecl) writeJVarDecl((JVarDecl)aNode);
     else if(aNode instanceof JEnumConst) writeJEnumConst((JEnumConst)aNode);
     else if(aNode instanceof JTypeParam) writeJTypeParam((JTypeParam)aNode);
+    else if(aNode instanceof JModifiers) writeJModifiers((JModifiers)aNode);
     else append("JavaWriter: write" + aNode.getClass().getSimpleName() + " not implemented");
 }
 

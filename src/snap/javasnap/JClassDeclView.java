@@ -1,5 +1,5 @@
 package snap.javasnap;
-import java.util.List;
+import java.util.*;
 import snap.gfx.*;
 import snap.javakit.*;
 import snap.view.*;
@@ -20,6 +20,10 @@ public JClassDeclView(JNODE aCD)  { super(aCD); }
 protected void updateUI()
 {
     super.updateUI(); setType(Type.None);
+
+    // Configure VBox special for file
+    VBox vbox = getVBox(); vbox.setSpacing(25); vbox.setPadding(25,10,10,0);
+    vbox.setFillWidth(false);
 }
 
 /**
@@ -54,6 +58,25 @@ protected void updateHBox(HBox spane)
         spane.addChild(typView);
     }
 }
+
+/**
+ * Override to return JFile child node owners.
+ */
+protected List <JNodeView> createJNodeViews()
+{
+    JClassDecl cdecl = getJNode();
+    List <JNodeView> children = new ArrayList();
+    for(JMemberDecl md : cdecl.getMemberDecls()) {
+        JNodeView mdp = JMemberDeclView.createView(md); if(mdp==null) continue;
+        children.add(mdp);
+    }
+    return children;
+}
+
+/**
+ * Override to return false.
+ */
+public boolean isBlock()  { return true; }
 
 /**
  * Returns a string describing the part.

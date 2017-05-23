@@ -241,7 +241,11 @@ protected void addChild(JNode aNode, int anIndex)
     if(aNode==null) return; if(anIndex<0) anIndex = _children.size();
     if(_children==Collections.EMPTY_LIST) _children = new ArrayList();
     _children.add(anIndex, aNode); aNode.setParent(this);
-    if(getStartToken()==null || getStart()>aNode.getStart()) setStartToken(aNode.getStartToken());
+    if(getStartToken()==null || getStart()>aNode.getStart()) {
+        if(aNode.getStartToken()==null) System.err.println("JNode.addChild: Bogus start token for " + aNode);
+        else setStartToken(aNode.getStartToken());
+    }
+    
     if(getEndToken()==null || getEnd()<aNode.getEnd()) setEndToken(aNode.getEndToken());
     //for(JNode n=this; n!=null; n=n.getParent()) n._string = null;
 }

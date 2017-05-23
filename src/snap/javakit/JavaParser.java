@@ -622,8 +622,9 @@ public static class BlockHandler extends JNodeParseHandler <JStmtBlock>
     protected void parsedOne(ParseNode aNode, String anId)
     {
         // Handle Statements
+        JStmtBlock block = getPart();
         if(aNode.getCustomNode() instanceof JStmt)
-            getPart().addStatement(aNode.getCustomNode(JStmt.class));
+            block.addStatement(aNode.getCustomNode(JStmt.class));
     }
 }
 

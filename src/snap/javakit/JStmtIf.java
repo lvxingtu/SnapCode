@@ -55,12 +55,12 @@ public boolean isBlock()  { return true; }
 /**
  * Returns the statement block.
  */
-public JStmtBlock getBlock()
-{
-    if(_stmt instanceof JStmtBlock) return (JStmtBlock)_stmt;
-    JStmtBlock sb = new JStmtBlock(); if(_stmt!=null) sb.addStatement(_stmt); setStatement(sb);
-    return sb;
-}
+public JStmtBlock getBlock()  { return _stmt instanceof JStmtBlock? (JStmtBlock)_stmt : null; }
+
+//public JStmtBlock getBlock(boolean doCreate) {
+//    JStmtBlock sb = _stmt instanceof JStmtBlock? (JStmtBlock)_stmt : null;
+//    if(sb==null && doCreate) { sb = new JStmtBlock(); if(_stmt!=null) sb.addStatement(_stmt); setStatement(sb); }
+//    return sb; }
 
 /**
  * Sets a block.

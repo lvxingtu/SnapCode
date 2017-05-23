@@ -30,7 +30,7 @@ public JModifiers getMods()
  */
 public void setMods(JModifiers aValue)
 {
-    if(_mods==null) addChild(_mods=aValue);
+    if(_mods==null) addChild(_mods=aValue,0);
     else replaceChild(_mods, _mods=aValue);
 }
 
