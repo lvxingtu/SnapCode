@@ -19,44 +19,36 @@ public JClassDeclView(JNODE aCD)  { super(aCD); }
  */
 protected void updateUI()
 {
-    super.updateUI(); setType(Type.None);
-
-    // Configure VBox special for file
-    VBox vbox = getVBox(); vbox.setSpacing(25); vbox.setPadding(25,10,10,0);
-    vbox.setFillWidth(false);
-}
-
-/**
- * Updates UI for HBox.
- */
-protected void updateHBox(HBox spane)
-{
-    //JClassDecl cd = getJNode();
-    //Label label = createLabel(cd.getName()); label.setFont(label.getFont().deriveFont(18));
-    //spane.addChild(label);
-    spane.setSpacing(12);
+    // Do normal version and set Type to None
+    super.updateUI(); setType(Type.None); BlockLeft = 0;
     
+    // Configure HBox
+    HBox hbox = getHBox(); hbox.setSpacing(12);
+    
+    // Create/add node for id
     JClassDecl cd = getJNode();
     JExprId id = cd.getId();
-    List <JType> exts = cd.getExtendsTypes();
-    JType ext = exts.size()>0? exts.get(0) : null;
-    
-    // Add JNodeView for id
     JNodeView idView = new ClassDeclIdView(id);
-    spane.addChild(idView);
+    hbox.addChild(idView);
     
     // Add JNodeView for extnds type
+    List <JType> exts = cd.getExtendsTypes();
+    JType ext = exts.size()>0? exts.get(0) : null;
     if(ext!=null) {
         
         // Add separator label
         Label label = new Label(" extends "); label.setFont(Font.Arial14.deriveFont(16));
         label.setTextFill(Color.WHITE);
-        spane.addChild(label);
+        hbox.addChild(label);
         
         // Add TypeView
         JNodeView typView = new ClassDeclTypeView(ext);
-        spane.addChild(typView);
+        hbox.addChild(typView);
     }
+    
+    // Configure VBox special for file
+    VBox vbox = getVBox(); vbox.setPadding(25,10,10,0); vbox.setSpacing(25);
+    vbox.setFillWidth(false);
 }
 
 /**
@@ -94,17 +86,17 @@ public static class ClassDeclIdView <JNODE extends JExprId> extends JNodeView <J
     /** Override. */
     protected void updateUI()
     {
+        // Do normal version
         super.updateUI(); setType(Type.Plain); setSeg(Seg.Middle); setColor(ClassDeclColor);
-        getHBox().setMinSize(240,35);
         _bg.setBorder(ClassDeclColor.darker(),2);
-    }
-    
-    /** Updates UI for HBox. */
-    protected void updateHBox(HBox spane)
-    {
+        
+        // Get configure HBox
+        HBox hbox = getHBox(); hbox.setPadding(2,2,2,8); hbox.setMinSize(240,35);
+        
+        // Create/add view for Class id
         JExprId id = getJNode();
         Label label = createLabel(id.getName()); label.setFont(label.getFont().deriveFont(20));
-        spane.addChild(label);
+        hbox.addChild(label);
     }
     
     /** Returns a string describing the part. */
@@ -122,16 +114,16 @@ public static class ClassDeclTypeView <JNODE extends JType> extends JNodeView <J
     /** Override. */
     protected void updateUI()
     {
+        // Do normal version and basic config
         super.updateUI(); setType(Type.Plain); setSeg(Seg.Middle); setColor(ClassDeclColor);
-        getHBox().setMinSize(120,25);
-    }
-    
-    /** Updates UI for HBox. */
-    protected void updateHBox(HBox spane)
-    {
+        
+        // Get/configure HBox
+        HBox hbox = getHBox(); hbox.setPadding(2,2,2,8); hbox.setMinSize(120,25);
+
+        // Create/add label for type
         JType typ = getJNode();
         Label label = createLabel(typ.getName()); label.setFont(label.getFont().deriveFont(14));
-        spane.addChild(label);
+        hbox.addChild(label);
     }
     
     /** Returns a string describing the part. */

@@ -1,5 +1,4 @@
 package snap.javasnap;
-import java.util.*;
 import snap.javakit.*;
 import snap.view.*;
 
@@ -11,21 +10,18 @@ public class JStmtExprView <JNODE extends JStmtExpr> extends JStmtView <JNODE> {
 /**
  * Updates UI for HBox.
  */
-protected void updateHBox(HBox aHBox)
+protected void updateUI()
 {
-    for(JNodeView spart : getJNodeViews()) aHBox.addChild(spart);
-    for(View child : aHBox.getChildren()) child.setGrowWidth(true);
-}
-
-/**
- * Override to return JFile child node owners.
- */
-protected List <JNodeView> createJNodeViews()
-{
+    // Do normal version
+    super.updateUI();
+    
+    // Configure HBox
+    HBox hbox = getHBox(); hbox.setPadding(0,0,0,0);
+    
+    // Create/Add expr view
     JStmtExpr stmt = getJNode(); JExpr expr = stmt.getExpr();
-    JExprView sexpr = JExprView.createView(expr);
-    List <JNodeView> children = new ArrayList(); children.add(sexpr);
-    return children;
+    JExprView eview = JExprView.createView(expr); eview.setGrowWidth(true);
+    hbox.addChild(eview);
 }
 
 }

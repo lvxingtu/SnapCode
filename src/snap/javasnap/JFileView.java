@@ -10,7 +10,7 @@ import snap.view.*;
 public class JFileView extends JNodeView <JFile> {
 
     // The SnapCodeArea
-    SnapEditor       _codeArea;
+    SnapEditor       _editor;
 
     // Background fill
     static final Color    BACK_FILL = new Color("#B0B0B0");
@@ -18,7 +18,7 @@ public class JFileView extends JNodeView <JFile> {
 /**
  * Returns the SnapCodeArea.
  */
-public SnapEditor getCodeArea()  { return _codeArea; }
+public SnapEditor getEditor()  { return _editor; }
 
 /**
  * Sets the JNode.
@@ -39,12 +39,15 @@ public void setJNode(JFile aJNode)
  */
 public void updateUI()
 {
-    // Get pane and set Type=None
-    super.updateUI(); setType(JNodeViewBase.Type.None);
+    // Do normal version
+    super.updateUI(); setType(JNodeViewBase.Type.None); BlockTop = 0;
     setFill(BACK_FILL); setBorder(Color.LIGHTGRAY, 1); //Bevel
     
-    // Configure VBox special for file
-    VBox vbox = getVBox(); vbox.setPadding(0,10,10,10); vbox.setSpacing(25);
+    // Get/configure HBox
+    HBox hbox = getHBox(); hbox.setMinHeight(-1);
+    
+    // Get/configure VBox
+    VBox vbox = getVBox(); vbox.setPadding(25,10,10,10); vbox.setSpacing(25);
     vbox.setFillWidth(false);
 }
 

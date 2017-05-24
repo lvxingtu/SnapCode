@@ -28,16 +28,16 @@ public static class MethodDecl <JNODE extends JMethodDecl> extends JMemberDeclVi
     /** Override. */
     protected void updateUI()
     {
-        super.updateUI(); setType(JNodeViewBase.Type.MemberDecl);
-        setColor(MemberDeclColor); getHBox().setMinWidth(120);
-    }
-    
-    /** Updates UI for HBox. */
-    protected void updateHBox(HBox spane)
-    {
+        // Do normal version and set type to MemberDecl
+        super.updateUI(); setType(JNodeViewBase.Type.MemberDecl); setColor(MemberDeclColor);
+        
+        // Configure HBox
+        HBox hbox = getHBox(); hbox.setPadding(0,0,0,8); hbox.setMinSize(120, PieceHeight);
+         
+        // Add label for method name
         JMethodDecl md = getJNode();
         Label label = createLabel(md.getName()); label.setFont(label.getFont().deriveFont(14));
-        spane.addChild(label);
+        hbox.addChild(label);
     }
     
     /** Returns a string describing the part. */

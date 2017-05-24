@@ -10,24 +10,31 @@ public class JStmtForView <JNODE extends JStmtFor> extends JStmtView <JNODE> {
 /**
  * Updates UI for top line.
  */
-protected void updateHBox(HBox theHBox)
+protected void updateUI()
 {
+    // Do normal version
+    super.updateUI();
+    
+    // Configure HBox
+    HBox hbox = getHBox();
+    
+    // Create label and add to HBox
     JStmtFor fs = getJNode();
     Label label = createLabel("for");
-    theHBox.addChild(label);
+    hbox.addChild(label);
     
     // Add init declaration text
     if(fs.getInitDecl()!=null) { JStmtVarDecl ivd = fs.getInitDecl(); String str = ivd.getString();
         TextField tfield = createTextField(str); tfield.setName("ExprText"); tfield.setProp("Expr", ivd);
         tfield.addEventHandler(e -> handleTextEvent(e));
-        theHBox.addChild(tfield);
+        hbox.addChild(tfield);
     }
     
     // Add conditional text
     if(fs.getConditional()!=null) { JExpr cond = fs.getConditional(); String str = cond.getString();
         TextField tfield = createTextField(str); tfield.setName("ExprText"); tfield.setProp("Expr", cond);
         tfield.addEventHandler(e -> handleTextEvent(e));
-        theHBox.addChild(tfield);
+        hbox.addChild(tfield);
     }
     
     // Add update statement text
@@ -35,7 +42,7 @@ protected void updateHBox(HBox theHBox)
         JStmtExpr se = fs.getUpdateStmts().get(0); String str = se.getString();
         TextField tfield = createTextField(str); tfield.setName("ExprText"); tfield.setProp("Expr", se);
         tfield.addEventHandler(e -> handleTextEvent(e));
-        theHBox.addChild(tfield);
+        hbox.addChild(tfield);
     }
 }
 

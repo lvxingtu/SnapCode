@@ -18,15 +18,12 @@ public class JExprEditor <JNODE extends JExpr> extends JExprView <JNODE> {
  */
 public void updateUI()
 {
-    super.updateUI();
-    setSeg(Seg.Middle); setColor(null);
-}
+    // Do normal version
+    super.updateUI(); setSeg(Seg.Middle); setColor(null);
+    
+    // Get/configure HBox
+    HBox hbox = getHBox();
 
-/**
- * Updates UI for HBox.
- */
-protected void updateHBox(HBox aHBox)
-{
     // Get expression
     JExpr expr = getJNode(); String str = expr.getString();
     
@@ -34,7 +31,7 @@ protected void updateHBox(HBox aHBox)
     _tfield = createTextField(str); _tfield.setName(TextFieldName);
     _tfield.addEventHandler(e -> handleTextEvent(e), KeyRelease); //enableEvents(_tfield, DragEvents);
     _tfield.addEventHandler(e -> handleTextEvent(e), Action);
-    aHBox.addChild(_tfield);
+    hbox.addChild(_tfield);
 }
 
 /** Fires TextFieldAction. */

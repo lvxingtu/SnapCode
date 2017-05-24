@@ -22,18 +22,16 @@ public JTypeView(JNODE aCD)  { super(aCD); }
  */
 protected void updateUI()
 {
-    super.updateUI(); setType(Type.Piece); setSeg(Seg.Middle);
-    setColor(PieceColor);
-}
-
-/**
- * Updates UI for HBox.
- */
-protected void updateHBox(HBox spane)
-{
+    // Do normal version and set type, color
+    super.updateUI(); setType(Type.Piece); setSeg(Seg.Middle); setColor(PieceColor);
+    
+    // Configure HBox
+    HBox hbox = getHBox(); hbox.setPadding(0,0,0,8);
+    
+    // Create label for type and add
     JType typ = getJNode();
     Label label = createLabel(typ.getName()); label.setFont(label.getFont().deriveFont(14));
-    spane.addChild(label);
+    hbox.addChild(label);
 }
 
 /**

@@ -5,7 +5,7 @@ import snap.view.*;
 /**
  * A pane that draws background for puzzle pieces.
  */
-public class JNodeViewBase extends VBox {
+public class JNodeViewBase extends ChildView {
 
     // The type
     Type          _type = Type.Piece;
@@ -41,7 +41,7 @@ public class JNodeViewBase extends VBox {
     public enum Seg { Only, First, Middle, Last }
     
     // Constant for piece height
-    static double PieceHeight = 26, BlockTailHeight = 14;
+    double PieceHeight = 26, BlockTop = 3, BlockLeft = 12, BlockBottom = 0, BlockTailHeight = 14;
 
 
 /**
@@ -50,17 +50,18 @@ public class JNodeViewBase extends VBox {
 protected JNodeViewBase()
 {
     // Configure
-    setAlign(Pos.TOP_LEFT); setFillWidth(true);
+    setAlign(Pos.TOP_LEFT); //setFillWidth(true);
     
     // Set background
     _bg = new PathView(); _bg.setManaged(false); //_bg.setEffect(new EmbossEffect(68,112,4));
     
     // Create HBox
-    _hbox = new HBox(); _hbox.setMinHeight(PieceHeight); _hbox.setSpacing(2);
+    _hbox = new HBox(); _hbox.setAlign(Pos.CENTER_LEFT); _hbox.setSpacing(2); _hbox.setMinHeight(PieceHeight);
+    //_hbox.setBorder(Color.PINK,1);
     
     // Create/set foreground
     _fg = new PathView(); _fg.setManaged(false); //_fg.setStroke(null); _fg.setMouseTransparent(true);
-    setChildren(_bg, _fg, _hbox);//, _fg);
+    setChildren(_bg, _fg, _hbox);
 }
 
 /**
@@ -113,10 +114,14 @@ public VBox getVBox()  { return _vbox!=null? _vbox : (_vbox=createVBox()); }
 protected VBox createVBox()
 {
     VBox vbox = new VBox(); vbox.setMinHeight(35); vbox.setFillWidth(true); //vbox.setSpacing(2);
-    vbox.setPadding(3,1,BlockTailHeight,12);
-    addChild(vbox);//,getChildren().size()-1);
+    addChild(vbox);//,getChildren().size()-1); //vbox.setPadding(3,1,BlockTailHeight,12);
     return vbox;
 }
+
+/**
+ * Returns whether NodePane is a block.
+ */
+public boolean isBlock()  { return false; }
 
 /**
  * Returns whether part is selected.
@@ -139,12 +144,47 @@ public void setSelected(boolean aValue)
 public void setUnderDrag(boolean aValue)  { _fg.setFill(aValue? Color.get("#FFFFFF88") : null); }
 
 /**
+ * Override.
+ */
+protected double getPrefWidthImpl(double aH)
+{
+    double pw = getHBox().getBestWidth(aH);
+    if(_vbox!=null || isBlock())
+        pw = Math.max(pw, BlockLeft + getVBox().getBestWidth(aH));
+    return pw;
+}
+
+/**
+ * Override.
+ */
+protected double getPrefHeightImpl(double aW)
+{
+    double ph = getHBox().getBestHeight(aW);
+    if(_vbox!=null || isBlock())
+        ph += BlockTop + getVBox().getBestHeight(aW) + BlockBottom + BlockTailHeight;
+    return ph;
+}
+
+/**
  * Override to resize rects.
  */
 protected void layoutImpl()
 {
-    super.layoutImpl();
-    double w = getWidth(), h = getHeight(); resizeBG(_bg, w, h); resizeBG(_fg, w, h);
+    // Get size
+    double w = getWidth(), h = getHeight();
+    
+    // Layout HBox
+    HBox hbox = getHBox(); double hh = hbox.getBestHeight(w);
+    hbox.setBounds(0, 0, w, hh);
+    
+    // Layout VBox
+    if(_vbox!=null) {
+        VBox vbox = getVBox();
+        vbox.setBounds(BlockLeft, hh + BlockTop, w - BlockLeft, h - hh - BlockBottom - BlockTailHeight);
+    }
+    
+    // Layout Background, Foreground pathviews
+    resizeBG(_bg, w, h); resizeBG(_fg, w, h);
 }
 
 /**
@@ -209,11 +249,9 @@ protected void resizeBGPieceFirst(PathView aPath, double aW, double aH)
  */
 protected void resizeBGPieceMiddle(PathView aPath, double aW, double aH)
 {
-    Path p = aPath.getPath(); p.clear(); double r = 0; //8
-    p.moveTo(r,0); p.hlineTo(aW-r); p.arcTo(aW,0,aW,r);
-    p.vlineTo(aH-r); p.arcTo(aW,aH,aW-r,aH);
-    p.hlineTo(r); p.arcTo(0,aH,0,aH-r);
-    p.vlineTo(r); p.arcTo(0,0,r,0); p.close();
+    Path p = aPath.getPath(); p.clear(); p.append(new Rect(0,0,aW,aH-3)); aPath.setSize(aW,aH-3);
+    //p.moveTo(r,0); p.hlineTo(aW-r); p.arcTo(aW,0,aW,r); p.vlineTo(aH-r); p.arcTo(aW,aH,aW-r,aH);
+    //p.hlineTo(r); p.arcTo(0,aH,0,aH-r); p.vlineTo(r); p.arcTo(0,0,r,0); p.close();
 }
 
 /**
@@ -221,11 +259,9 @@ protected void resizeBGPieceMiddle(PathView aPath, double aW, double aH)
  */
 protected void resizeBGPieceLast(PathView aPath, double aW, double aH)
 {
-    Path p = aPath.getPath(); p.clear(); double r = 0; //e.add(new MoveTo(r,0));
+    Path p = aPath.getPath(); p.clear(); double r = 5; aPath.setSize(aW, aH-3);
     p.moveTo(0,0); p.hlineTo(aW-r); p.arcTo(aW,0,aW,r);
-    p.vlineTo(aH-r); p.arcTo(aW,aH,aW-r,aH);
-    p.hlineTo(0); //e.add(new HLineTo(r)); e.add(new ArcTo(r,r,0,0,aH-r,false,true));
-    p.vlineTo(0); //e.add(new VLineTo(r)); e.add(new ArcTo(r,r,0,r,0,false,true)); e.add(new ClosePath());
+    p.vlineTo(aH-r); p.arcTo(aW,aH,aW-r,aH); p.hlineTo(0); p.vlineTo(0);
 }
 
 /**

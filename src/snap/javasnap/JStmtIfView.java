@@ -10,12 +10,19 @@ public class JStmtIfView <JNODE extends JStmtIf> extends JStmtView <JNODE> {
 /**
  * Updates UI for top line.
  */
-protected void updateHBox(HBox theHBox)
+protected void updateUI()
 {
-    JStmtIf istmt = getJNode(); JExpr cond = istmt.getConditional();
-    JExprView spart = new JExprEditor(); spart.setJNode(cond);
+    // Do normal version
+    super.updateUI();
+    
+    // Configure HBox
+    HBox hbox = getHBox();
+    
+    // Create label and condition views and add to box
     Label label = createLabel("if");
-    theHBox.setChildren(label, spart);
+    JStmtIf istmt = getJNode(); JExpr cond = istmt.getConditional();
+    JExprView eview = new JExprEditor(); eview.setJNode(cond);
+    hbox.setChildren(label, eview);
 }
 
 }

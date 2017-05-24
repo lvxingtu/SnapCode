@@ -1,5 +1,6 @@
 package snap.javasnap;
 import snap.javakit.*;
+import snap.view.HBox;
 
 /**
  * A JNodeView subclass for JExpr.
@@ -9,7 +10,15 @@ public abstract class JExprView <JNODE extends JExpr> extends JNodeView <JNODE> 
 /**
  * Updates UI.
  */
-public void updateUI()  { super.updateUI(); getHBox().setPadding(0,2,2,2); }
+protected void updateUI()
+{
+    // Do normal version
+    super.updateUI();
+    
+    // Configure HBox
+    HBox hbox = getHBox(); hbox.setPadding(0,2,2,8);
+    setMinHeight(PieceHeight);
+}
 
 /**
  * Override to forward to parent.

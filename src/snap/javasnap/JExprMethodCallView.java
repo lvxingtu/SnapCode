@@ -13,22 +13,20 @@ public class JExprMethodCallView <JNODE extends JExprMethodCall> extends JExprVi
  */
 public void updateUI()
 {
+    // Do normal version
     super.updateUI(); setColor(PieceColor);
-}
+    
+    // Configure HBox
+    HBox hbox = getHBox();
 
-/**
- * Updates HBox.
- */
-protected void updateHBox(HBox aHBox)
-{
     // Add label for method name
     JExprMethodCall mc = getJNode();
     Label label = createLabel(mc.getName());
-    aHBox.addChild(label);
+    hbox.addChild(label);
     
     // Add child UIs
     for(JNodeView child : getJNodeViews())
-        aHBox.addChild(child);
+        hbox.addChild(child);
 }
 
 /**

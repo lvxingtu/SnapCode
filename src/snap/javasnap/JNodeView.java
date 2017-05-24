@@ -53,26 +53,17 @@ public void setJNode(JNODE aJNode)
  */
 protected void updateUI()
 {
-    // Add horizontal UI
-    updateHBox(getHBox());
-    if(getHBox().getChildCount()>0 && getHBox().getChild(0) instanceof TextField)
-        getHBox().setPadding(0,2,0,0);
-    
     // Add child UI
     if(isBlock()) {
-        getVBox();
+        VBox vbox = getVBox();
         for(JNodeView child : getJNodeViews())
-            getVBox().addChild(child);
+            vbox.addChild(child);
+        vbox.setMinHeight(vbox.getChildCount()==0? 30 : -1);
     }
 
     if(_jnode.getFile()==null) return;
     enableEvents(DragEvents);
 }
-
-/**
- * Updates the UI for the top line.
- */
-protected void updateHBox(HBox spane)  { }
 
 /**
  * Returns the SnapEditor.
@@ -135,7 +126,7 @@ public String getPartString()  { return getJNode().getNodeString(); }
  */
 protected Label createLabel(String aString)
 {
-    Label label = new Label(aString); label.setPadding(3,4,4,8);
+    Label label = new Label(aString); label.setPadding(2,4,2,0);
     label.setFont(new Font("Arial Bold", 12)); label.setTextFill(Color.WHITE);
     return label;
 }

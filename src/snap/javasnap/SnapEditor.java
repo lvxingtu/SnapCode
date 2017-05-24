@@ -31,7 +31,7 @@ public SnapEditor(JavaTextView aJTV)
     _jtextView = aJTV;
     
     // Create FilePart and add
-    _filePart = new JFileView(); _filePart._codeArea = this;
+    _filePart = new JFileView(); _filePart._editor = this;
     _filePart.setGrowWidth(true); _filePart.setGrowHeight(true);
     addChild(_filePart);
 

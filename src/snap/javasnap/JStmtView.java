@@ -12,21 +12,14 @@ public class JStmtView <JNODE extends JStmt> extends JNodeView <JNODE> {
  */
 protected void updateUI()
 {
-    super.updateUI();
+    // Do normal version and set type, color
+    super.updateUI(); BlockTop = BlockBottom = 2;
     setType(isBlock()? JNodeViewBase.Type.BlockStmt : JNodeViewBase.Type.Piece);
     setColor(isBlock()? BlockStmtColor : PieceColor);
-    getHBox().setMinWidth(120);
-}
-
-/**
- * Updates UI for top line.
- */
-protected void updateHBox(HBox theHBox)
-{
-    // Create label for statement and add to HBox
-    JStmt stmt = getJNode();
-    Label label = createLabel(stmt.getString());
-    theHBox.addChild(label);
+    
+    // Configure HBox
+    HBox hbox = getHBox();
+    hbox.setPadding(0,2,0,8); hbox.setMinSize(120, PieceHeight);
 }
 
 /**
@@ -70,7 +63,25 @@ public static JNodeView createView(JNode aNode)
     if(aNode instanceof JStmtWhile) return new JStmtWhileView();
     if(aNode instanceof JStmtIf) return new JStmtIfView();
     if(aNode instanceof JStmtFor) return new JStmtForView();
-    return new JStmtView();
+    return new JStmtOtherView();
+}
+
+/**
+ * A subclass of JStmtView for statements not yet implemented.
+ */
+protected static class JStmtOtherView extends JStmtView <JStmt> {
+    
+    /** Override to configure. */
+    protected void updateUI()
+    {
+        // Do normal version and set type, color
+        super.updateUI();
+        
+        // Create label for statement and add to HBox
+        JStmt stmt = getJNode();
+        Label label = createLabel(stmt.getString());
+        getHBox().addChild(label);
+    }
 }
 
 }
