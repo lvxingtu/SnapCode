@@ -27,7 +27,7 @@ public static JExprView createView(JNode aNode)
     JExprView sp;
     if(aNode instanceof JExprMethodCall) sp = new JExprMethodCallView();
     else if(aNode instanceof JExprChain) sp = new JExprChainView();
-    else sp = new JExprEditorView();
+    else sp = new JExprEditor();
     sp.setJNode(aNode);
     return sp;
 }

@@ -13,7 +13,7 @@ public class JStmtWhileView <JNODE extends JStmtWhile> extends JStmtView <JNODE>
 protected void updateHBox(HBox theHBox)
 {
     JStmtWhile wstmt = getJNode(); JExpr cond = wstmt.getConditional();
-    JExprView spart = new JExprEditorView(); spart.setJNode(cond);
+    JExprView spart = new JExprEditor(); spart.setJNode(cond);
     Label label = createLabel("while");
     theHBox.setChildren(label, spart);
 }    

@@ -5,7 +5,7 @@ import snap.view.*;
 /**
  * A SnapPartExpr subclass to do text editing on expression.
  */
-public class JExprEditorView <JNODE extends JExpr> extends JExprView <JNODE> {
+public class JExprEditor <JNODE extends JExpr> extends JExprView <JNODE> {
 
     // The text field
     TextField    _tfield;
@@ -33,6 +33,7 @@ protected void updateHBox(HBox aHBox)
     // Create text field, configure and return
     _tfield = createTextField(str); _tfield.setName(TextFieldName);
     _tfield.addEventHandler(e -> handleTextEvent(e), KeyRelease); //enableEvents(_tfield, DragEvents);
+    _tfield.addEventHandler(e -> handleTextEvent(e), Action);
     aHBox.addChild(_tfield);
 }
 
@@ -53,7 +54,8 @@ protected void handleTextEvent(ViewEvent anEvent)
     else {
         SnapEditorPopup hpop = SnapEditorPopup.getShared();
         String str = _tfield.getText(); if(hpop.isShowing()) str = hpop.getFixedText();
-        getCodeArea().replaceJNode(getJNode(), str);
+        SnapEditor sed = getEditor();
+        sed.replaceJNode(getJNode(), str);
         hpop.hide();
     }
 }
@@ -70,7 +72,7 @@ protected void dropNode(JNode aJNode, double anX, double aY)
     
     // Replace expression with DropNode
     String str = aJNode.getString();
-    getCodeArea().replaceJNode(getJNode(), str);
+    getEditor().replaceJNode(getJNode(), str);
 }
     
 }

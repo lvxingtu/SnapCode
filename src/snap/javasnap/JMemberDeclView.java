@@ -46,7 +46,7 @@ public static class MethodDecl <JNODE extends JMethodDecl> extends JMemberDeclVi
     /** Drops a node. */
     protected void dropNode(JNode aNode, double anX, double aY)
     {
-        if(getJNodeViewCount()==0) getCodeArea().insertNode(getJNode(), aNode, 0);
+        if(getJNodeViewCount()==0) getEditor().insertNode(getJNode(), aNode, 0);
         else if(aY<getHeight()/2) getJNodeView(0).dropNode(aNode, anX, 0);
         else getJNodeViewLast().dropNode(aNode, anX, getJNodeViewLast().getHeight());
     }

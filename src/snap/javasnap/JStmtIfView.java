@@ -13,7 +13,7 @@ public class JStmtIfView <JNODE extends JStmtIf> extends JStmtView <JNODE> {
 protected void updateHBox(HBox theHBox)
 {
     JStmtIf istmt = getJNode(); JExpr cond = istmt.getConditional();
-    JExprView spart = new JExprEditorView(); spart.setJNode(cond);
+    JExprView spart = new JExprEditor(); spart.setJNode(cond);
     Label label = createLabel("if");
     theHBox.setChildren(label, spart);
 }

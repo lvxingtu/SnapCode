@@ -75,9 +75,9 @@ protected void updateUI()
 protected void updateHBox(HBox spane)  { }
 
 /**
- * Returns the SnapCodeArea.
+ * Returns the SnapEditor.
  */
-public SnapEditor getCodeArea()  { return getJNodeViewParent()!=null? getJNodeViewParent().getCodeArea() : null; }
+public SnapEditor getEditor()  { return getJNodeViewParent()!=null? getJNodeViewParent().getEditor() : null; }
 
 /**
  * Returns whether NodePane is a block.

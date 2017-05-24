@@ -118,7 +118,7 @@ protected void respondUI(ViewEvent anEvent)
     if(anEvent.isKeyEvent()) {
         if(anEvent.isEscapeKey()) { if(anEvent.isKeyRelease()) getPopup().hide(); anEvent.consume(); }
         if(anEvent.isEnterKey()) {
-            if(anEvent.isKeyRelease()) ((JExprEditorView)_spart).fireTextFieldAction(); anEvent.consume(); }
+            if(anEvent.isKeyRelease()) ((JExprEditor)_spart).fireTextFieldAction(); anEvent.consume(); }
     }
 }
 

@@ -38,7 +38,7 @@ protected List <JNodeView> createJNodeViews()
 {
     JExprMethodCall mc = getJNode(); List <JExpr> args = mc.getArgs();
     List children = new ArrayList();
-    if(args!=null) for(JExpr arg : args) { JExprView spe = new JExprEditorView(); spe.setJNode(arg);
+    if(args!=null) for(JExpr arg : args) { JExprView spe = new JExprEditor(); spe.setJNode(arg);
         children.add(spe); }
     return children;
 }

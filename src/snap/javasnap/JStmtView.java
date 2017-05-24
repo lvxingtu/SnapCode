@@ -3,7 +3,7 @@ import snap.javakit.*;
 import snap.view.*;
 
 /**
- * A JNodeView for JStatement.
+ * A JNodeView for JStmt.
  */
 public class JStmtView <JNODE extends JStmt> extends JNodeView <JNODE> {
 
@@ -45,15 +45,15 @@ protected void dropNode(JNode aNode, double anX, double aY)
 
     // If less than 11, insert node before statement
     if(aY<11)
-        getCodeArea().insertNode(getJNode(), aNode, -1);
+        getEditor().insertNode(getJNode(), aNode, -1);
     
     // If greater than Height-6 or simple statement, insert node after statement
     else if(aY>getHeight()-6 || !isBlock())
-        getCodeArea().insertNode(getJNode(), aNode, 1);
+        getEditor().insertNode(getJNode(), aNode, 1);
     
     // If block but no children, insert inside statement
     else if(getJNodeViewCount()==0)
-        getCodeArea().insertNode(getJNode(), aNode, 0);
+        getEditor().insertNode(getJNode(), aNode, 0);
     
     // If before first child statement, have first child dropNode, otherwise have last child dropNode 
     else if(aY<getHeight()/2)

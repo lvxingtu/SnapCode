@@ -46,7 +46,7 @@ protected void handleTextEvent(ViewEvent anEvent)
 {
     TextField tfield = anEvent.getView(TextField.class);
     JNode jnode = (JNode)tfield.getProp("Expr");
-    getCodeArea().replaceJNode(jnode, anEvent.getStringValue());
+    getEditor().replaceJNode(jnode, anEvent.getStringValue());
 }
 
 }
