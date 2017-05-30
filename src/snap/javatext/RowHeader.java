@@ -79,7 +79,8 @@ protected List <Marker> createMarkers()
     // Add markers for BuildIssues
     BuildIssue buildIssues[] = _textView.getBuildIssues();
     for(BuildIssue issue : buildIssues)
-        markers.add(new BuildIssueMarker(issue));
+        if(issue.getEnd()<_textView.length())
+            markers.add(new BuildIssueMarker(issue));
         
     // Add markers for breakpoints
     for(Breakpoint bp : _textView.getBreakpoints()) {
