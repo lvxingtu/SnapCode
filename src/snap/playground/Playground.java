@@ -22,7 +22,7 @@ public Playground()  { }
  */
 protected View createUI()
 {
-    SplitView split = new SplitView(); split.setPrefSize(800,1000); split.setVertical(true);
+    SplitView split = new SplitView(); split.setPrefSize(1000,900); split.setVertical(true);
     split.setItems(_textPane.getUI(), _tabPane.getUI());
     return split;
 }
