@@ -52,7 +52,6 @@ protected View createUI()
     //_tpane.addTab("Problems", _appPane.getProblemsPane().getUI());
     _tview.addTab("Console", console.getUI());
     _tview.addTab("Variables", new Label("DebugVarsPane"));
-    _tview.addTab("Expressions", new Label("DebugExprsPane"));
     return _tview;
 }
 

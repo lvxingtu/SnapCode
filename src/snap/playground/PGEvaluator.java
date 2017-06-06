@@ -49,9 +49,7 @@ public void eval(String aStr)
     
     // Iterate over lines and eval each
     for(int i=0, iMax=_lines.length;i<iMax;i++) { String line = _lines[i];
-        if(line.trim().length()==0) continue;
-        _lineVals[i] = evalLine(line);
-    }
+        _lineVals[i] = evalLine(line); }
     
     // Set sys out/err to catch console
     System.setOut(_sout);
@@ -63,15 +61,18 @@ public void eval(String aStr)
  */
 protected Object evalLine(String aLine)
 {
+    // Get trimmed line (just return if empty or comment)
+    String line = aLine.trim(); if(line.length()==0 || line.startsWith("//")) return null;
+    
     // Get textview and mark current length, in case we need to check for console output
     TextView tview = _pg.getConsole().getConsoleView();
     int start = tview.length();
     
     // Eval as statement (or expression, if that fails)
     Object val = null;
-    try { val = _stmtEval.eval(_pg, aLine); }
+    try { val = _stmtEval.eval(_pg, line); }
     catch(Exception e) {
-        try { val = _exprEval.eval(aLine); }
+        try { val = _exprEval.eval(line); }
         catch(Exception e2) { }
     }
     

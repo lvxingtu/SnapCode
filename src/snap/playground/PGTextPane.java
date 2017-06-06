@@ -118,7 +118,6 @@ protected class EvalView extends TextView {
         setTextFill(Color.GRAY);
         setPrefWidth(200);
         setEditable(false); setFont(PGTextPane.this.getDefaultFont());
-        setWrapText(true);
     }
     
     /** Called to update when textView changes. */

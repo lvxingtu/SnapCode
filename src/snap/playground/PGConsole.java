@@ -132,7 +132,7 @@ protected void initUI()
 
     // Get output text
     _tview = getView("OutputText", PGConsoleView.class); _tview._pgc = this;
-    _tview.setFont(defaultFont); _tview.setRich(true);
+    _tview.setFont(defaultFont); _tview.setRich(true); _tview.setPadding(4,4,4,4);
 }
 
 /**
