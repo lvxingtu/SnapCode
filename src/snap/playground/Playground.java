@@ -11,6 +11,9 @@ public class Playground extends ViewOwner {
     
     // The TabPane
     PGTabPane         _tabPane = new PGTabPane(this);
+    
+    // The evaluator
+    PGEvaluator       _evaluator = new PGEvaluator();
 
 /**
  * Creates a new Playground.
@@ -22,8 +25,11 @@ public Playground()  { }
  */
 protected View createUI()
 {
+    Button rbtn = new Button("Run"); rbtn.setName("RunButton"); rbtn.setPrefSize(60,20);
+    HBox hbox = new HBox(); hbox.setChildren(rbtn);
+    VBox vbox = new VBox(); vbox.setFillWidth(true); vbox.setChildren(_textPane.getUI(), hbox);
     SplitView split = new SplitView(); split.setPrefSize(1000,900); split.setVertical(true);
-    split.setItems(_textPane.getUI(), _tabPane.getUI());
+    split.setItems(vbox, _tabPane.getUI());
     return split;
 }
 
@@ -33,6 +39,17 @@ protected View createUI()
 protected void initUI()
 {
     super.initUI();
+}
+
+/**
+ * Respond to UI.
+ */
+protected void respondUI(ViewEvent anEvent)
+{
+    if(anEvent.equals("RunButton")) {
+        _evaluator.eval(_textPane.getTextView().getText());
+        _textPane._evalView.updateLines();
+    }
 }
 
 /**

@@ -9,6 +9,9 @@ import snap.viewx.TextPane;
  */
 public class PGTextPane extends TextPane {
     
+    // The Playground
+    Playground       _pg;
+    
     // The TextView
     TextView         _textView;
     
@@ -24,7 +27,7 @@ public class PGTextPane extends TextPane {
 /**
  * Creates a new PGTextPane.
  */
-public PGTextPane(Playground aPG)  { }
+public PGTextPane(Playground aPG)  { _pg = aPG; }
 
 /**
  * Creates the TextView.
@@ -53,10 +56,15 @@ public Font getDefaultFont()
 protected void initUI()
 {
     super.initUI();
-    View ui = getUI(); ui.setPrefSize(800,800); ui.setGrowHeight(true);
+    View ui = getUI(); ui.setPrefSize(800,700); ui.setGrowHeight(true);
     
+    StringBuilder sb = new StringBuilder("// Playground: Play with Java\n\n");
+    sb.append("1+1").append("\n\n");
+    sb.append("\"Hello\" + \"World\"").append("\n\n");
+    sb.append("getClass().getName()").append("\n\n");
+
     _textView = getTextView(); _textView.setGrowWidth(true); _textView.setFont(getDefaultFont());
-    _textView.setText("// Playground: Play with Java\n\n\nSystem.out.println(\"HelloWorld\")\n");
+    _textView.setText(sb.toString());
     ScrollView scroll = _textView.getParent(ScrollView.class);
     
     _textView.getRichText().addPropChangeListener(pce -> _lineNumView.updateLines());
@@ -113,8 +121,13 @@ protected class EvalView extends TextView {
     void updateLines()
     {
         StringBuilder sb = new StringBuilder();
-        for(int i=1,iMax=_textView.getLineCount();i<=iMax;i++)
-            sb.append(i).append('\n');
+        Object lineVals[] = _pg._evaluator._lineVals;
+        for(int i=0,iMax=lineVals.length;i<iMax;i++) {
+            Object val = lineVals[i];
+            if(val!=null)
+                sb.append(val);
+            sb.append('\n');
+        }
         setText(sb.toString());
     }
 }

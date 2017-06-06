@@ -1,6 +1,7 @@
 package snap.javakit;
-import java.util.*;
+import java.lang.reflect.Method;
 import snap.parse.Parser;
+import snap.util.ClassUtils;
 import snap.util.SnapUtils;
 
 /**
@@ -96,11 +97,16 @@ Object evalName(Object anOR, String aName) throws Exception
  */
 Object evalMethod(Object anOR, JExprMethodCall anExpr) throws Exception
 {
+    if(anOR==null)
+        return null;
+
     Object thisObj = thisObject();
-    List <Object> args = new ArrayList();
-    for(JExpr arg : anExpr.getArgs())
-        args.add(evalExpr(thisObj, arg));
-    return invokeMethod(anOR, anExpr.getName(), args);
+    String name = anExpr.getName(); int argc = anExpr.getArgCount();
+    Object args[] = new Object[argc];
+    for(int i=0;i<argc;i++) { JExpr arg = anExpr.getArg(i);
+        args[i] = evalExpr(thisObj, arg); }
+    Object val = invokeMethod(anOR, name, args);
+    return val;
 }
 
 /**
@@ -405,9 +411,15 @@ public Object arrayValue(Object anObj, int anIndex)
 /**
  * Invoke method.
  */
-public Object invokeMethod(Object anObj, String aName, List <Object> theArgs)
+public Object invokeMethod(Object anObj, String aName, Object theArgs[])
 {
-    return null;
+    Class cls = anObj.getClass();
+    Class classes[] = new Class[theArgs.length];
+    for(int i=0,iMax=theArgs.length;i<iMax;i++) { Object arg = theArgs[i];
+        classes[i] = arg!=null? arg.getClass() : null; }
+    Method meth = ClassUtils.getMethod(cls, aName, classes);
+    try { return meth.invoke(anObj, theArgs); }
+    catch(Exception e) { return null; }
 }
 
 /**
