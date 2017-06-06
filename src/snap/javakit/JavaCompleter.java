@@ -160,7 +160,7 @@ private void getSuggestions(JExprId anId)
 class Array { public int length; }
 static Field getLengthField() { try { return Array.class.getField("length"); } catch(Exception e) { return null; }}
 
-/** Returns the assignable type of given node assuming it's the receiving expression of assignment or a method arg. */
+/** Returns the assignable type of given node assuming it's the receiving expression of assign or a method arg. */
 private static Class getReceivingClass(JNode aNode)
 {
     // If MethocCall arg, return arg class
@@ -168,8 +168,8 @@ private static Class getReceivingClass(JNode aNode)
     if(argType!=null)
         return argType.getEvalClass();
     
-    // If node is Assignment Right-Hand-Side, return assignment Left-Hand-Side class
-    JExprMath assExpr = getExpression(aNode, JExprMath.Op.Assignment);
+    // If node is Assign Right-Hand-Side, return assignment Left-Hand-Side class
+    JExprMath assExpr = getExpression(aNode, JExprMath.Op.Assign);
     JExpr lhs = assExpr!=null? assExpr.getOperand(0) : null;
     if(lhs!=null)
         return lhs.getEvalClass();

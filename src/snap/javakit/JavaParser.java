@@ -756,10 +756,10 @@ public static class ExprStatementHandler extends JNodeParseHandler<JStmtExpr>
         else if(anId=="--")
             getPart().setExpr(new JExprMath(JExprMath.Op.PostDecrement, getPart().getExpr()));
         
-        // Handle AssignmentOp Expression
+        // Handle Assign Expression
         else if(anId=="Expression") {
             JExpr expr = aNode.getCustomNode(JExpr.class);
-            getPart().setExpr(new JExprMath(JExprMath.Op.Assignment, getPart().getExpr(), expr));
+            getPart().setExpr(new JExprMath(JExprMath.Op.Assign, getPart().getExpr(), expr));
         }
     }
 }
@@ -1063,9 +1063,9 @@ public static class ExpressionHandler extends JNodeParseHandler <JExpr>
         if(anId=="ConditionalExpr")
             _part = aNode.getCustomNode(JExpr.class);
         
-        // Handle AssignmentOp
+        // Handle Assign Op
         else if(anId=="AssignmentOp")
-            _part = new JExprMath(JExprMath.Op.Assignment, _part);
+            _part = new JExprMath(JExprMath.Op.Assign, _part);
         
         // Handle Expression
         else if(anId=="Expression")

@@ -59,7 +59,8 @@ protected void initUI()
     View ui = getUI(); ui.setPrefSize(800,700); ui.setGrowHeight(true);
     
     StringBuilder sb = new StringBuilder("// Playground: Play with Java\n\n");
-    sb.append("1+1").append("\n\n");
+    sb.append("x = 1").append("\n\n");
+    sb.append("y = x + 1").append("\n\n");
     sb.append("\"Hello\" + \"World\"").append("\n\n");
     sb.append("getClass().getName()").append("\n\n");
 

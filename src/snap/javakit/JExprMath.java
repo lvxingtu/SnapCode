@@ -12,7 +12,7 @@ public class JExprMath extends JExpr {
     public enum Op {
         Add, Subtract, Multiply, Divide, Mod,
         Equal, NotEqual, LessThan, GreaterThan, LessThanOrEqual, GreaterThanOrEqual,
-        Or, And, Not, BitOr, BitXOr, BitAnd, Conditional, Assignment,
+        Or, And, Not, BitOr, BitXOr, BitAnd, Conditional, Assign,
         ShiftLeft, ShiftRight, ShiftRightUnsigned,
         PreIncrement, PreDecrement, Negate, BitComp, PostIncrement, PostDecrement
     }
@@ -71,7 +71,7 @@ protected JavaDecl getDeclImpl()
         case Equal: case NotEqual: case LessThan: case GreaterThan: case LessThanOrEqual: case GreaterThanOrEqual:
         case Or: case And: case Not: return getJavaDecl(boolean.class);
         case Conditional: return getEvalTypeConditional();
-        case Assignment: return getOperand(0).getEvalType();
+        case Assign: return getOperand(0).getEvalType();
         case BitOr: case BitXOr: case BitAnd: return getOperand(0).getEvalType();
         case ShiftLeft: case ShiftRight: case ShiftRightUnsigned: return getOperand(0).getEvalType();
         case PreIncrement: case PreDecrement: case Negate: case BitComp: return getOperand(0).getEvalType();
@@ -133,7 +133,7 @@ public static String getOpString(Op anOp)
         case LessThanOrEqual: return "<="; case GreaterThanOrEqual: return ">=";
         case Or: return "||"; case And: return "&&"; case Not: return "!";
         case BitOr: return "|"; case BitXOr: return "^"; case BitAnd: return "&";
-        case Conditional: return "?"; case Assignment: return "=";
+        case Conditional: return "?"; case Assign: return "=";
         case ShiftLeft: return "<<"; case ShiftRight: return ">>"; case ShiftRightUnsigned: return ">>>";
         case PreIncrement: return "++"; case PreDecrement: return "--";
         case Negate: return "-"; case BitComp: return "<DUNNO>";

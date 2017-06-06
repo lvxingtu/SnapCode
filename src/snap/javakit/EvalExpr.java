@@ -1,8 +1,8 @@
 package snap.javakit;
-import java.lang.reflect.Method;
+import java.lang.reflect.*;
+import java.util.*;
 import snap.parse.Parser;
-import snap.util.ClassUtils;
-import snap.util.SnapUtils;
+import snap.util.*;
 
 /**
  * A class to evaluate expressions.
@@ -10,10 +10,13 @@ import snap.util.SnapUtils;
 public class EvalExpr {
     
     // The current "this" object
-    protected Object    _thisObj;
+    protected Object     _thisObj;
+    
+    // A map of local variables
+    Map <String,Object>  _locals = new HashMap();
 
     // A parser to parse expressions
-    static Parser       _exprParser = JavaParser.getShared().getExprParser();
+    static Parser        _exprParser = JavaParser.getShared().getExprParser();
     
 /**
  * Evaluate expression.
@@ -33,19 +36,27 @@ public Object eval(String anExpr)
  */
 public Object evalExpr(Object anOR, JExpr anExpr) throws Exception
 {
-    if(anExpr instanceof JExprLiteral) return evalLiteral((JExprLiteral)anExpr);
-    if(anExpr instanceof JExprId) return evalIdentifier(anOR, (JExprId)anExpr);
-    if(anExpr instanceof JExprMethodCall) return evalMethod(anOR, (JExprMethodCall)anExpr);
-    if(anExpr instanceof JExprMath) return evalMathExpr(anOR, (JExprMath)anExpr);
-    if(anExpr instanceof JExprArrayIndex) return evalArrayIndex(anOR, (JExprArrayIndex)anExpr);
-    if(anExpr instanceof JExprChain) return evalExprChain(anOR, (JExprChain)anExpr);
-    return null;
+    if(anExpr instanceof JExprLiteral) return evalJExprLiteral((JExprLiteral)anExpr);
+    if(anExpr instanceof JExprId) return evalJExprId(anOR, (JExprId)anExpr);
+    if(anExpr instanceof JExprMethodCall) return evalJExprMethodCall(anOR, (JExprMethodCall)anExpr);
+    if(anExpr instanceof JExprMath) return evalJExprMath(anOR, (JExprMath)anExpr);
+    if(anExpr instanceof JExprArrayIndex) return evalJExprArrayIndex(anOR, (JExprArrayIndex)anExpr);
+    if(anExpr instanceof JExprChain) return evalJExprChain(anOR, (JExprChain)anExpr);
+    throw new RuntimeException("EvalExpr.evalExpr: Unsupported expression " + anExpr.getClass());
+    
+    /*if(aExpr instanceof JExprAlloc) writeJExprAlloc((JExprAlloc)aExpr);
+    else if(aExpr instanceof JExpr.CastExpr) writeJExprCast((JExpr.CastExpr)aExpr);
+    else if(aExpr instanceof JExprId) writeJExprId((JExprId)aExpr);
+    else if(aExpr instanceof JExpr.InstanceOfExpr) writeJExprInstanceOf((JExpr.InstanceOfExpr)aExpr);
+    else if(aExpr instanceof JExprLambda) writeJExprLambda((JExprLambda)aExpr);
+    else if(aExpr instanceof JExprMethodRef) writeJExprMethodRef((JExprMethodRef)aExpr);
+    else if(aExpr instanceof JExprType) writeJExprType((JExprType)aExpr); */
 }
 
 /**
- * Evaluate JLiteral.
+ * Evaluate JExprLiteral.
  */
-Object evalLiteral(JExprLiteral aLiteral) throws Exception
+Object evalJExprLiteral(JExprLiteral aLiteral) throws Exception
 {
     switch(aLiteral.getLiteralType()) {
         case Boolean: return (Boolean)aLiteral.getValue();
@@ -61,9 +72,9 @@ Object evalLiteral(JExprLiteral aLiteral) throws Exception
 }
 
 /**
- * Evaluate JIdentifier.
+ * Evaluate JExprId.
  */
-Object evalIdentifier(Object anOR, JExprId anId) throws Exception
+Object evalJExprId(Object anOR, JExprId anId) throws Exception
 {
     String name = anId.getName();
     return evalName(anOR, name);
@@ -79,23 +90,21 @@ Object evalName(Object anOR, String aName) throws Exception
     if(aName.equals("this")) return thisObject();
     
     // Check for local variable
-    //StackFrame frame = anApp.getCurrentFrame();
-    //LocalVariable lvar = frame.visibleVariableByName(name);
-    //if(lvar!=null) return frame.getValue(lvar);
+    if(isLocalVar(aName))
+        return getLocalVarValue(aName);
     
     // Check for field
-    //ReferenceType refType = anOR.referenceType();
-    //Field field = refType.fieldByName(name);
-    //if(field!=null) return anOR.getValue(field);
+    if(isField(anOR, aName))
+        getFieldValue(anOR, aName);
     
     // Complain
     throw new RuntimeException("Identifier not found: " + aName);
 }
 
 /**
- * Evaluate JMethodCall.
+ * Evaluate JExprMethodCall.
  */
-Object evalMethod(Object anOR, JExprMethodCall anExpr) throws Exception
+Object evalJExprMethodCall(Object anOR, JExprMethodCall anExpr) throws Exception
 {
     if(anOR==null)
         return null;
@@ -112,7 +121,7 @@ Object evalMethod(Object anOR, JExprMethodCall anExpr) throws Exception
 /**
  * Evaluate JExprArrayIndex.
  */
-Object evalArrayIndex(Object anOR, JExprArrayIndex anExpr) throws Exception
+Object evalJExprArrayIndex(Object anOR, JExprArrayIndex anExpr) throws Exception
 {
     // Get Array
     JExpr arrayExpr = anExpr.getArrayExpr();
@@ -132,7 +141,7 @@ Object evalArrayIndex(Object anOR, JExprArrayIndex anExpr) throws Exception
 /**
  * Evaluate JExprChain.
  */
-Object evalExprChain(Object anOR, JExprChain anExpr) throws Exception
+Object evalJExprChain(Object anOR, JExprChain anExpr) throws Exception
 {
     Object val = anOR; //Object or = anOR; 
     for(int i=0, iMax=anExpr.getExprCount(); i<iMax; i++) { JExpr expr = anExpr.getExpr(i);
@@ -145,10 +154,17 @@ Object evalExprChain(Object anOR, JExprChain anExpr) throws Exception
 /**
  * Evaluate JExprMath.
  */
-Object evalMathExpr(Object anOR, JExprMath anExpr) throws Exception
+Object evalJExprMath(Object anOR, JExprMath anExpr) throws Exception
 {
+    // Get Op and OpCount
+    JExprMath.Op op = anExpr.getOp();
+    int opCount = anExpr.getOperandCount();
+    
+    // Handle Assign special
+    if(op==JExprMath.Op.Assign)
+        return evalJExprMathAssign(anOR, anExpr);
+        
     // Get first value
-    JExprMath.Op op = anExpr.getOp(); int opCount = anExpr.getOperandCount();
     JExpr expr1 = anExpr.getOperand(0);
     Object val1 = evalExpr(anOR, expr1);
     
@@ -199,6 +215,24 @@ Object evalMathExpr(Object anOR, JExprMath anExpr) throws Exception
     
     // Complain
     throw new RuntimeException("Invalid MathExpr " + anExpr.toString());
+}
+
+/**
+ * Handle JExprMath Assign.
+ */
+Object evalJExprMathAssign(Object anOR, JExprMath anExpr) throws Exception
+{
+    // Get name expression/name
+    JExpr nameExpr = anExpr.getOperand(0);
+    String name = nameExpr.getName();
+    
+    // Get value expression/value
+    JExpr valExpr = anExpr.getOperand(1);
+    Object value = evalExpr(anOR, valExpr);
+    
+    // Set local var value and return value
+    setLocalVarValue(name, value);
+    return value;
 }
 
 /**
@@ -305,7 +339,7 @@ Object compareLogical(Object aVal1, Object aVal2, JExprMath.Op anOp)
 /**
  * Compare two values.
  */
-private static boolean compareLogical(boolean aVal1, boolean aVal2, JExprMath.Op anOp)
+boolean compareLogical(boolean aVal1, boolean aVal2, JExprMath.Op anOp)
 {
     if(anOp==JExprMath.Op.And) return aVal1 && aVal2;
     if(anOp==JExprMath.Op.Or) return aVal1 && aVal2;
@@ -406,6 +440,50 @@ public Object arrayValue(Object anObj, int anIndex)
     if(anObj instanceof Object[])
         return ((Object[])anObj)[anIndex];
     return null;
+}
+
+/**
+ * Returns whether there is a local variable for name.
+ */
+public boolean isLocalVar(String aName)  { return _locals.keySet().contains(aName); }
+
+/**
+ * Returns a local variable value by name.
+ */
+public Object getLocalVarValue(String aName)  { return _locals.get(aName); }
+/*{
+    //StackFrame frame = anApp.getCurrentFrame();
+    //LocalVariable lvar = frame.visibleVariableByName(name);
+    //if(lvar!=null) return frame.getValue(lvar);
+}*/
+
+/**
+ * Sets a local variable value by name.
+ */
+public void setLocalVarValue(String aName, Object aValue)  { _locals.put(aName, aValue); }
+
+/**
+ * Returns whether name is a field of given object.
+ */
+public boolean isField(Object anObj, String aName)
+{
+    Class cls = anObj.getClass();
+    Field field = ClassUtils.getField(cls, aName);
+    return field!=null;
+}
+
+/**
+ * Returns the value of the field.
+ */
+public Object getFieldValue(Object anObj, String aName)
+{
+    Class cls = anObj.getClass();
+    Field field = ClassUtils.getField(cls, aName);
+    try { return field.get(anObj); }
+    catch(Exception e) { return null; }
+    //ReferenceType refType = anOR.referenceType();
+    //Field field = refType.fieldByName(name);
+    //if(field!=null) return anOR.getValue(field);    
 }
 
 /**
