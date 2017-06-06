@@ -6,7 +6,7 @@ import snap.util.SnapUtils;
 /**
  * A class to evaluate expressions.
  */
-public class Evaluator {
+public class EvalExpr {
     
     // The current "this" object
     protected Object    _thisObj;
@@ -32,18 +32,12 @@ public Object eval(String anExpr)
  */
 public Object evalExpr(Object anOR, JExpr anExpr) throws Exception
 {
-    if(anExpr instanceof JExprLiteral)
-        return evalLiteral((JExprLiteral)anExpr);
-    if(anExpr instanceof JExprId)
-        return evalIdentifier(anOR, (JExprId)anExpr);
-    if(anExpr instanceof JExprMethodCall)
-        return evalMethod(anOR, (JExprMethodCall)anExpr);
-    if(anExpr instanceof JExprMath)
-        return evalMathExpr(anOR, (JExprMath)anExpr);
-    if(anExpr instanceof JExprArrayIndex)
-        return evalArrayIndex(anOR, (JExprArrayIndex)anExpr);
-    if(anExpr instanceof JExprChain)
-        return evalExprChain(anOR, (JExprChain)anExpr);
+    if(anExpr instanceof JExprLiteral) return evalLiteral((JExprLiteral)anExpr);
+    if(anExpr instanceof JExprId) return evalIdentifier(anOR, (JExprId)anExpr);
+    if(anExpr instanceof JExprMethodCall) return evalMethod(anOR, (JExprMethodCall)anExpr);
+    if(anExpr instanceof JExprMath) return evalMathExpr(anOR, (JExprMath)anExpr);
+    if(anExpr instanceof JExprArrayIndex) return evalArrayIndex(anOR, (JExprArrayIndex)anExpr);
+    if(anExpr instanceof JExprChain) return evalExprChain(anOR, (JExprChain)anExpr);
     return null;
 }
 
@@ -429,9 +423,9 @@ public String toString(Object anObj)  { return anObj!=null? anObj.toString() : n
 /**
  * Returns a new evaluator for given object.
  */
-public Evaluator get(Object anObj)
+public static EvalExpr get(Object anObj)
 {
-    Evaluator eval = new Evaluator(); eval._thisObj = anObj;
+    EvalExpr eval = new EvalExpr(); eval._thisObj = anObj;
     return eval;
 }
 
