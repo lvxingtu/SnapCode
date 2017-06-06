@@ -12,13 +12,21 @@ public class Playground extends ViewOwner {
     // The TabPane
     PGTabPane         _tabPane = new PGTabPane(this);
     
+    // The Console
+    PGConsole         _console = new PGConsole(this);
+    
     // The evaluator
-    PGEvaluator       _evaluator = new PGEvaluator();
+    PGEvaluator       _evaluator = new PGEvaluator(this);
 
 /**
  * Creates a new Playground.
  */
 public Playground()  { }
+
+/**
+ * Returns the console.
+ */
+public PGConsole getConsole()  { return _console; }
 
 /**
  * Creates the UI.

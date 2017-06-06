@@ -59,12 +59,14 @@ protected void initUI()
     View ui = getUI(); ui.setPrefSize(800,700); ui.setGrowHeight(true);
     
     StringBuilder sb = new StringBuilder("// Playground: Play with Java\n\n");
+    sb.append("System.out.println(\"Hi Wo!\");").append("\n\n");
     sb.append("x = 1").append("\n\n");
     sb.append("y = x + 1").append("\n\n");
     sb.append("\"Hello\" + \"World\"").append("\n\n");
     sb.append("getClass().getName()").append("\n\n");
 
-    _textView = getTextView(); _textView.setGrowWidth(true); _textView.setFont(getDefaultFont());
+    _textView = getTextView(); _textView.setGrowWidth(true);
+    _textView.getRichText().setDefaultStyle(new TextStyle(getDefaultFont()));
     _textView.setText(sb.toString());
     ScrollView scroll = _textView.getParent(ScrollView.class);
     
@@ -116,6 +118,7 @@ protected class EvalView extends TextView {
         setTextFill(Color.GRAY);
         setPrefWidth(200);
         setEditable(false); setFont(PGTextPane.this.getDefaultFont());
+        setWrapText(true);
     }
     
     /** Called to update when textView changes. */

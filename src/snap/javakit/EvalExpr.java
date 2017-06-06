@@ -23,12 +23,23 @@ public class EvalExpr {
  */
 public Object eval(String anExpr)
 {
+    // Get JExpr for string
     _exprParser.setInput(anExpr);
-    Object oref = thisObject();
     JExpr expr = _exprParser.parseCustom(JExpr.class);
-    Object value; try { value = evalExpr(oref, expr); }
+    
+    // Eval expression
+    Object value; try { value = evalExpr(expr); }
     catch(Exception e) { return e; }
     return value;
+}
+
+/**
+ * Evaluate JExpr.
+ */
+public Object evalExpr(JExpr anExpr) throws Exception
+{
+    Object oref = thisObject();
+    return evalExpr(oref, anExpr);
 }
 
 /**
@@ -95,7 +106,12 @@ Object evalName(Object anOR, String aName) throws Exception
     
     // Check for field
     if(isField(anOR, aName))
-        getFieldValue(anOR, aName);
+        return getFieldValue(anOR, aName);
+        
+    // Check for class name
+    Class cls = getClassForName(anOR, aName);
+    if(cls!=null)
+        return cls;
     
     // Complain
     throw new RuntimeException("Identifier not found: " + aName);
@@ -467,7 +483,7 @@ public void setLocalVarValue(String aName, Object aValue)  { _locals.put(aName, 
  */
 public boolean isField(Object anObj, String aName)
 {
-    Class cls = anObj.getClass();
+    Class cls = anObj instanceof Class? (Class)anObj : anObj.getClass();
     Field field = ClassUtils.getField(cls, aName);
     return field!=null;
 }
@@ -477,7 +493,7 @@ public boolean isField(Object anObj, String aName)
  */
 public Object getFieldValue(Object anObj, String aName)
 {
-    Class cls = anObj.getClass();
+    Class cls = anObj instanceof Class? (Class)anObj : anObj.getClass();
     Field field = ClassUtils.getField(cls, aName);
     try { return field.get(anObj); }
     catch(Exception e) { return null; }
@@ -491,13 +507,39 @@ public Object getFieldValue(Object anObj, String aName)
  */
 public Object invokeMethod(Object anObj, String aName, Object theArgs[])
 {
-    Class cls = anObj.getClass();
+    Class cls = anObj instanceof Class? (Class)anObj : anObj.getClass();
     Class classes[] = new Class[theArgs.length];
     for(int i=0,iMax=theArgs.length;i<iMax;i++) { Object arg = theArgs[i];
         classes[i] = arg!=null? arg.getClass() : null; }
     Method meth = ClassUtils.getMethod(cls, aName, classes);
     try { return meth.invoke(anObj, theArgs); }
     catch(Exception e) { return null; }
+}
+
+/**
+ * Returns a class for given name.
+ */
+public Class getClassForName(Object anOR, String aName)
+{
+    // Look for inner class
+    String icname = anOR.getClass().getName() + '$' + aName;
+    Class cls = ClassUtils.getClass(icname);
+    if(cls!=null)
+        return cls;
+        
+    // Look for root level class
+    cls = ClassUtils.getClass(aName);
+    if(cls!=null)
+        return cls;
+        
+    // Look for standard class
+    String sname = "java.lang." + aName;
+    cls = ClassUtils.getClass(sname);
+    if(cls!=null)
+        return cls;
+    
+    // Return null since not found
+    return null;
 }
 
 /**

@@ -15,12 +15,15 @@ public class EvalStmt {
 /**
  * Evaluate expression.
  */
-public Object eval(String anExpr)
+public Object eval(Object aOR, String anExpr)
 {
+    // Parse string to statement
     _stmtParser.setInput(anExpr);
-    Object oref = _exprEval.thisObject();
     JStmt stmt = _stmtParser.parseCustom(JStmt.class);
-    Object value; try { value = evalStmt(oref, stmt); }
+    
+    // Set ObjectRef and eval statement
+    _exprEval._thisObj = aOR;
+    Object value; try { value = evalStmt(aOR, stmt); }
     catch(Exception e) { return e; }
     return value;
 }
@@ -57,7 +60,10 @@ public Object evalStmt(Object anOR, JStmt aStmt) throws Exception
  */
 public Object evalJStmtExpr(JStmtExpr aStmt)
 {
-    return null;
+    JExpr expr = aStmt.getExpr();
+    Object val; try { val = _exprEval.evalExpr(expr); }
+    catch(Exception e) { return e; }
+    return val;
 }
 
 /**
