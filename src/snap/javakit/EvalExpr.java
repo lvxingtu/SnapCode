@@ -507,7 +507,7 @@ public Object getFieldValue(Object anObj, String aName)
  */
 public Object invokeMethod(Object anObj, String aName, Object theArgs[])
 {
-    Class cls = anObj instanceof Class? (Class)anObj : anObj.getClass();
+    Class cls = anObj.getClass(); //anObj instanceof Class? (Class)anObj : anObj.getClass();
     Class classes[] = new Class[theArgs.length];
     for(int i=0,iMax=theArgs.length;i<iMax;i++) { Object arg = theArgs[i];
         classes[i] = arg!=null? arg.getClass() : null; }

@@ -30,6 +30,15 @@ public Playground()  { }
 public PGConsole getConsole()  { return _console; }
 
 /**
+ * Runs the playground.
+ */
+public void play()
+{
+    _evaluator.eval(_textPane.getTextView().getText());
+    _textPane._evalView.updateLines();
+}
+
+/**
  * Creates the UI.
  */
 protected View createUI()
@@ -53,7 +62,8 @@ protected void initUI()
     // Add Button to TextPane
     Button rbtn = new Button("Run"); rbtn.setName("RunButton"); rbtn.setPrefSize(100,20); rbtn.setLeanX(HPos.RIGHT);
     rbtn.setOwner(this);
-    _textPane.getToolBarPane().addChild(rbtn); _textPane.getToolBarPane().setPadding(0,20,0,4);
+    _textPane.getToolBarPane().addChild(rbtn); _textPane.getToolBarPane().setPadding(0,30,0,4);
+    runLater(() -> play());
 }
 
 /**
@@ -61,10 +71,8 @@ protected void initUI()
  */
 protected void respondUI(ViewEvent anEvent)
 {
-    if(anEvent.equals("RunButton")) {
-        _evaluator.eval(_textPane.getTextView().getText());
-        _textPane._evalView.updateLines();
-    }
+    if(anEvent.equals("RunButton"))
+        play();
 }
 
 /**

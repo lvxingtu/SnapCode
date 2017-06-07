@@ -70,7 +70,7 @@ protected Class <? extends WebPage> getPageClass(WebResponse aResp)
     if(type.equals("snp") || type.equals("rib") || type.equals("jfx")) return studio.app.EditorPage.class;
     if(type.equals("diff")) return snap.app.DiffPage.class;
     if(type.equals("class") && getAppPane().getSites().contains(file.getSite())) return ClassInfoPage.class;
-    //if(type.equals("table")) return TableEditorPage.class;
+    if(type.equals("pgd")) return snap.playground.PGPage.class;
     
     // Do normal version
     return super.getPageClass(aResp);

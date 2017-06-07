@@ -16,7 +16,7 @@ public class PGEvaluator {
     EvalStmt          _stmtEval = new EvalStmt();
     
     // An expression evaluator
-    EvalExpr          _exprEval = EvalExpr.get(this);
+    EvalExpr          _exprEval;
     
     // The lines
     String            _lines[];
@@ -32,7 +32,11 @@ public class PGEvaluator {
 /**
  * Creates a new PGEvaluator.
  */
-public PGEvaluator(Playground aPG)  { _pg = aPG; }
+public PGEvaluator(Playground aPG)
+{
+    _pg = aPG;
+    _exprEval = EvalExpr.get(_pg);
+}
 
 /**
  * Evaluate string.
