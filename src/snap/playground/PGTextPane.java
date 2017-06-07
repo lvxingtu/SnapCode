@@ -70,6 +70,7 @@ protected void initUI()
 
     _textView = getTextView(); _textView.setGrowWidth(true);
     _textView.getRichText().setDefaultStyle(new TextStyle(getDefaultFont()));
+    enableEvents(_textView, KeyRelease);
     _textView.setText(sb.toString());
     ScrollView scroll = _textView.getParent(ScrollView.class);
     
@@ -84,6 +85,17 @@ protected void initUI()
 }
 
 /**
+ * Respond to UI changes.
+ */
+protected void respondUI(ViewEvent anEvent)
+{
+    if(anEvent.isKeyRelease() && anEvent.isEnterKey())
+        runLater(() -> _pg.play());
+        
+    else super.respondUI(anEvent);
+}
+
+/**
  * A View subclass to show line numbers.
  */
 protected class LineNumView extends TextView {
@@ -94,7 +106,7 @@ protected class LineNumView extends TextView {
         setRich(false);
         getRichText().setDefaultLineStyle(TextLineStyle.DEFAULT.copyFor(HPos.RIGHT));
         setFill(new Color("#f7f7f7"));
-        setTextFill(Color.GRAY);
+        setTextFill(new Color(.6f));
         setPrefWidth(25); setPadding(2,4,2,2);
         setEditable(false); setFont(PGTextPane.this.getDefaultFont());
     }
