@@ -1,5 +1,7 @@
 package snap.javakit;
-import snap.parse.Parser;
+import java.util.*;
+import snap.parse.*;
+import snap.util.ListUtils;
 
 /**
  * A class to evaluate Java statements.
@@ -10,7 +12,7 @@ public class EvalStmt {
     EvalExpr            _exprEval = EvalExpr.get(null);
 
     // A parser to parse expressions
-    static Parser       _stmtParser = JavaParser.getShared().getStmtParser();
+    static Parser       _stmtParser = new StmtParser();
     
 /**
  * Evaluate expression.
@@ -42,7 +44,7 @@ public Object evalStmt(Object anOR, JStmt aStmt) throws Exception
     //else if(aStmt instanceof JStmtDo) return evalJStmtDo((JStmtDo)aStmt);
     //else if(aStmt instanceof JStmtEmpty) return evalJStmtEmpty((JStmtEmpty)aStmt);
     if(aStmt instanceof JStmtExpr) return evalJStmtExpr((JStmtExpr)aStmt);
-    //else if(aStmt instanceof JStmtFor) return evalJStmtFor((JStmtFor)aStmt);
+    else if(aStmt instanceof JStmtFor) return evalJStmtFor((JStmtFor)aStmt);
     //else if(aStmt instanceof JStmtIf) return evalJStmtIf((JStmtIf)aStmt);
     //else if(aStmt instanceof JStmtLabeled) return evalJStmtLabeled((JStmtLabeled)aStmt);
     //else if(aStmt instanceof JStmtReturn) return evalJStmtReturn((JStmtReturn)aStmt);
@@ -61,9 +63,16 @@ public Object evalStmt(Object anOR, JStmt aStmt) throws Exception
 public Object evalJStmtExpr(JStmtExpr aStmt)
 {
     JExpr expr = aStmt.getExpr();
-    Object val; try { val = _exprEval.evalExpr(expr); }
-    catch(Exception e) { return e; }
+    Object val = evalJExpr(expr);
     return val;
+}
+
+/**
+ * Evaluate JStmtFor.
+ */
+public Object evalJStmtFor(JStmtFor aStmt)
+{
+    return null;
 }
 
 /**
@@ -71,9 +80,48 @@ public Object evalJStmtExpr(JStmtExpr aStmt)
  */
 public Object evalJStmtVarDecl(JStmtVarDecl aStmt)
 {
-    return null;
+    List vals = new ArrayList();
+    for(JVarDecl vd : aStmt.getVarDecls()) {
+        JExpr iexpr = vd.getInitializer();
+        if(iexpr!=null) {
+            Object val = evalJExpr(iexpr);
+            _exprEval.setLocalVarValue(vd.getName(), val);
+            vals.add(val);
+        }
+    }
+    
+    if(vals.size()==1)
+        return vals.get(0);
+    return ListUtils.joinStrings(vals, ", ");
 }
 
+/**
+ * Evaluate JStmtExpr.
+ */
+public Object evalJExpr(JExpr anExpr)
+{
+    Object val; try { val = _exprEval.evalExpr(anExpr); }
+    catch(Exception e) { return e; }
+    return val;
+}
 
+/**
+ * A Java Statement parser.
+ */
+protected static class StmtParser extends Parser {
+    
+    /** Creates a new StmtParser. */
+    public StmtParser()
+    {
+        super(JavaParser.getShared().getRule("BlockStatement"));
+    }
+    
+    /** Override to ignore exception. */
+    protected void parseFailed(ParseRule aRule, ParseHandler aHandler)
+    {
+        if(aRule.getPattern()!=";")
+            super.parseFailed(aRule, aHandler);
+    }
+}
 
 }

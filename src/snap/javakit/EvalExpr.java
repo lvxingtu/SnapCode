@@ -252,6 +252,16 @@ Object evalJExprMathAssign(Object anOR, JExprMath anExpr) throws Exception
 }
 
 /**
+ * Handle JExprMath Assign.
+ */
+Object evalJExprMathAssign(Object anOR, String aName, JExprMath anExpr) throws Exception
+{
+    Object value = evalExpr(anOR, anExpr);
+    setLocalVarValue(aName, value);
+    return value;
+}
+
+/**
  * Add two values.
  */
 Object add(Object aVal1, Object aVal2)
