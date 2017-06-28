@@ -81,7 +81,7 @@ protected void initUI()
     enableEvents(_textView, KeyPress, KeyRelease, KeyType, MousePress, MouseRelease, DragOver, DragExit,DragDrop);
     
     // Reset TextView font
-    float fontSize = PrefsUtils.prefs().getFloat("JavaFontSize", 12); if(fontSize<8) fontSize = 12;
+    float fontSize = Prefs.get().getFloat("JavaFontSize", 12); if(fontSize<8) fontSize = 12;
     _textView.setFont(new Font(_textView.getDefaultFont().getName(), fontSize));
     
     // Get TextView.RowHeader and configure
@@ -206,7 +206,7 @@ public void respondUI(ViewEvent anEvent)
 
     // Handle FontSizeText, IncreaseFontButton, DecreaseFontButton
     else if(anEvent.equals("FontSizeText")||anEvent.equals("IncreaseFontButton")||anEvent.equals("DecreaseFontButton"))
-        PrefsUtils.prefsPut("JavaFontSize", getTextView().getFont().getSize()); 
+        Prefs.get().set("JavaFontSize", getTextView().getFont().getSize()); 
     
     // Handle OpenDeclarationMenuItem
     else if(anEvent.equals("OpenDeclarationMenuItem"))

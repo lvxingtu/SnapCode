@@ -427,7 +427,7 @@ public void respondUI(ViewEvent anEvent)
     
     // Handle WinClosing
     if(anEvent.isWinClose()) {
-        hide(); runLater(() -> { PrefsUtils.flush(); WelcomePanel.getShared().showPanel(); }); }
+        hide(); runLater(() -> { Prefs.get().flush(); WelcomePanel.getShared().showPanel(); }); }
 }
 
 /**

@@ -62,11 +62,11 @@ protected void initUI()
     sb.append("// \n");
     sb.append("// Playground: Enter Java statements and expressions\n");
     sb.append("//\n\n");
-    sb.append("System.out.println(\"Hello World!\");").append("\n\n");
-    sb.append("x = 1").append("\n\n");
+    //sb.append("System.out.println(\"Hello World!\");").append("\n\n");
+    sb.append("int x = 1").append("\n\n");
     sb.append("y = x + 1").append("\n\n");
-    sb.append("\"Hello\" + \" Again\"").append("\n\n");
-    sb.append("getClass().getName()").append("\n\n");
+    //sb.append("\"Hello\" + \" Again\"").append("\n\n");
+    //sb.append("getClass().getName()").append("\n\n");
 
     _textView = getTextView(); _textView.setGrowWidth(true);
     _textView.getRichText().setDefaultStyle(new TextStyle(getDefaultFont()));

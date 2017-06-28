@@ -49,7 +49,7 @@ public void hide()
     
     // Write current list of sites, flush prefs
     writeSites();
-    PrefsUtils.flush();
+    Prefs.get().flush();
 }
 
 /**
@@ -400,10 +400,10 @@ void handleRemoveButtonAlt()
 void handleOpenButtonAlt()
 {
     DialogBox dbox = new DialogBox("Open File Viewer"); dbox.setQuestionMessage("Enter path:");
-    String path = PrefsUtils.getPrefs().get("SnapFileViewerPath", System.getProperty("user.home"));
+    String path = Prefs.get().get("SnapFileViewerPath", System.getProperty("user.home"));
     path = dbox.showInputDialog(getUI(), path); if(path==null) return;
     WebURL url = WebURL.getURL(path); if(url==null || url.getFile()==null) return;
-    PrefsUtils.getPrefs().put("SnapFileViewerPath", path);
+    Prefs.get().set("SnapFileViewerPath", path);
     AppPane apane = new AppPane();
     WebSite site = url.getAsSite();
     apane.addSite(site);

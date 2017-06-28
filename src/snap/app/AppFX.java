@@ -40,7 +40,7 @@ public static void main(String args[])
 public void start(Stage aStage)
 {
     // Set App Prefs class
-    PrefsUtils.setPrefsClass(App.class);
+    Prefs.setPrefsClass(App.class);
     
     // Install Exception reporter
     ExceptionReporter er = new ExceptionReporter("SnapCode"); er.setToAddress("support@reportmill.com");
@@ -63,7 +63,7 @@ public static void quitApp()  { Platform.runLater(() -> quitAppImpl()); }
 private static void quitAppImpl()
 {
     if(AppPane.getOpenAppPane()!=null) AppPane.getOpenAppPane().hide();
-    PrefsUtils.flush();
+    Prefs.get().flush();
     System.exit(0);
 }
 
