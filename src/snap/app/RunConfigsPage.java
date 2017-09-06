@@ -75,4 +75,9 @@ public void respondUI(ViewEvent anEvent)
     getAppPane().getToolBar().setRunMenuButtonItems();
 }
 
+/**
+ * Override to suppress.
+ */
+public void reload()  { }
+
 }

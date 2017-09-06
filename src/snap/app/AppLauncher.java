@@ -131,10 +131,6 @@ protected List <String> getCommand()
     String cpath = FilePathUtils.getJoinedPath(cpathsNtv);
     commands.add("-cp"); commands.add(cpath);
 
-    // If using Snap Runtime, add main class, otherwise ...
-    //if(_proj.getUseSnapRuntime() || !getURLString().endsWith(".class")) {
-    //    commands.add("snap.swing.SnapApp"); commands.add("file"); commands.add(getURLString()); } else
-    
     // Add class name
     commands.add(_proj.getClassName(getURL().getFile()));
     

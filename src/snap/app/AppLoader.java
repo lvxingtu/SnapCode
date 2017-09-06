@@ -58,7 +58,7 @@ public static void main1(String args[]) throws Exception
         throw new RuntimeException("Main Jar not found!");
     
     // Check for updates in background thread
-    if(args.length==0 || !args[0].equals("-snap"))
+    if(args.length==0)
         new Thread(() -> checkForUpdatesSilent()).start();
     
     // Create URLClassLoader for main jar file, get App class and invoke main

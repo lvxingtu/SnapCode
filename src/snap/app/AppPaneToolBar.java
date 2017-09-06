@@ -246,7 +246,7 @@ public void respondUI(ViewEvent anEvent)
     
     // Handle RunConfigsMenuItem
     if(anEvent.equals("RunConfigsMenuItem"))
-        appPane.getBrowser().setURL(WebURL.getURL(RunConfigsPage.class));
+        appPane.getBrowser().setURL(getRunConfigsPageURL());
         
     // Show history
     if(anEvent.equals("ShowHistoryMenuItem"))
@@ -269,6 +269,20 @@ public void respondUI(ViewEvent anEvent)
             page.getUI().setProp("HideSideBar", !showSideBar);
     }
 }
+
+/**
+ * Returns the RunConfigsPageURL.
+ */
+public WebURL getRunConfigsPageURL()
+{
+    if(_runConfigsPageURL!=null) return _runConfigsPageURL;
+    _runConfigsPageURL = WebURL.getURL("class:/RunConfigsPageURL");
+    getAppPane().getBrowser().setPage(_runConfigsPageURL, new RunConfigsPage());
+    return _runConfigsPageURL;
+}
+
+// RunConfigsPageURL
+WebURL _runConfigsPageURL;
 
 /**
  * Handle FileTab clicked.

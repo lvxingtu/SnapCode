@@ -198,6 +198,11 @@ protected WebFile addSceneJavaFile(WebSite aSite, String aName)
 }
 
 /**
+ * Override to suppress.
+ */
+public void reload()  { }
+
+/**
  * Return better title.
  */
 public String getTitle()  { return "Home Page"; }

@@ -679,7 +679,16 @@ protected void run(RunConfig aConfig, WebFile aFile, boolean isDebug)
 /**
  * Returns the HomePageURL.
  */
-public WebURL getHomePageURL()  { return WebURL.getURL(HomePage.class); }
+public WebURL getHomePageURL()
+{
+    if(_homePageURL!=null) return _homePageURL;
+    _homePageURL = WebURL.getURL("class:/HomePage");
+    getBrowser().setPage(_homePageURL, new HomePage());
+    return _homePageURL;
+}
+
+// HomePageURL
+WebURL _homePageURL;
 
 /**
  * Handle Copy.
