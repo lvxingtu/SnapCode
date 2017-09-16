@@ -30,9 +30,9 @@ protected void respondUI(ViewEvent anEvent)
     
     // Handle DragEvents
     if(anEvent.isDragEvent()) {
-        if(anEvent.getDragboard().hasFiles()) anEvent.acceptDrag();
+        if(anEvent.getClipboard().hasFiles()) anEvent.acceptDrag();
         if(!anEvent.isDragDrop()) return;
-        List <File> files = anEvent.getDragboard().getFiles();
+        List <File> files = anEvent.getClipboard().getJavaFiles();
         loadClassFile(files.get(0));
     }
 }

@@ -415,11 +415,11 @@ void handleOpenButtonAlt()
 void handleDragDrop(ViewEvent anEvent)
 {
     // Accept drags with files
-    if(!anEvent.getDragboard().hasFiles()) return;
+    if(!anEvent.getClipboard().hasFiles()) return;
     anEvent.acceptDrag();
     if(!anEvent.isDragDrop()) return;
     
-    WebURL url = WebURL.getURL(anEvent.getDragboard().getFiles().get(0));
+    WebURL url = WebURL.getURL(anEvent.getClipboard().getFiles().get(0));
     runLater(() -> handleGreenfootArchiveDrop(url));
 }
 

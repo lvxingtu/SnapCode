@@ -223,8 +223,8 @@ public void respondUI(ViewEvent anEvent)
         // Handle DragEvent
         else if(anEvent.isDragEvent()) { //DragEvent de = anEvent.getEvent(DragEvent.class);
             anEvent.acceptDrag(); //de.acceptTransferModes(TransferMode.COPY); de.consume();
-            if(anEvent.isDragDropEvent() && anEvent.getDragboard().hasFiles()) {
-                List <File> files = anEvent.getDragboard().getFiles(); if(files==null || files.size()==0) return;
+            if(anEvent.isDragDropEvent() && anEvent.getClipboard().hasFiles()) {
+                List <File> files = anEvent.getClipboard().getJavaFiles(); if(files==null || files.size()==0) return;
                 addFiles(files);
                 anEvent.dropComplete(); //anEvent.setDropCompleted(true);
             }
@@ -708,7 +708,7 @@ public void copy()
 public void paste()
 {
     Clipboard cb = Clipboard.get();
-    if(cb.hasFiles()) addFiles(cb.getFiles());
+    if(cb.hasFiles()) addFiles(cb.getJavaFiles());
 }
 
 /**
