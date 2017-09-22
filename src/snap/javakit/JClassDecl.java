@@ -342,10 +342,11 @@ protected JavaDecl getDeclImpl(JNode aNode)
         if(ptyp.getParent()==this) {
             
             // Check for TypeVar
-            //if(typ.getParent() instanceof JType) { JType par = (JType)typ.getParent();
-            //    JavaDecl btype = par.getBaseDecl();
-            //    JavaDecl tvtype = btype!=null? btype.getTypeVar(typ.getName()) : null;
-            //    if(tvtype!=null) return tvtype; }
+            if(typ.getParent() instanceof JType) { JType par = (JType)typ.getParent();
+                JavaDecl btype = par.getBaseDecl();
+                JavaDecl tvtype = btype!=null? btype.getTypeVar(typ.getName()) : null;
+                if(tvtype!=null) return tvtype;
+            }
             
             // Forward to file
             return super.getDeclImpl(aNode);

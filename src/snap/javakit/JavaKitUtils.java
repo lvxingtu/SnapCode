@@ -85,6 +85,17 @@ public static String getId(Object anObj)
 }
 
 /**
+ * Returns an id string for given Java part.
+ */
+public static String getParamTypeId(JavaDecl aDecl, JavaDecl theTypeDecls[])
+{
+    StringBuilder sb = new StringBuilder(aDecl.getId());
+    sb.append('<').append(theTypeDecls[0].getId());
+    for(int i=1;i<theTypeDecls.length;i++) sb.append(',').append(theTypeDecls[i].getId()); sb.append('>');
+    return sb.toString();
+}
+
+/**
  * Returns the class name, converting primitive arrays to 'int[]' instead of '[I'.
  */
 public static String getTypeName(Type aType)

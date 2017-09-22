@@ -3,6 +3,7 @@
  */
 package snap.javakit;
 import java.lang.reflect.*;
+import java.util.Arrays;
 import snap.util.*;
 
 /**
@@ -57,13 +58,21 @@ public class JavaDecl implements Comparable<JavaDecl> {
     private static JavaDecl[] EMPTY_DECLS = new JavaDecl[0];
     
 /**
- * Creates a new JavaDecl for Class, Field, Constructor, Method, VarDecl or class name string.
+ * Creates a new JavaDecl for Class, Field, Constructor, Method, VarDecl or package name string.
  */
 public JavaDecl(JavaDeclOwner anOwner, JavaDecl aPar, Object anObj)
 {
+    this(anOwner, aPar, anObj, JavaKitUtils.getId(anObj));
+}
+
+/**
+ * Creates a new JavaDecl for Class, Field, Constructor, Method, VarDecl or package name string.
+ */
+public JavaDecl(JavaDeclOwner anOwner, JavaDecl aPar, Object anObj, String anId)
+{
     // Set JavaDecls
     _owner = anOwner; _par = aPar; assert(_owner!=null || anObj instanceof String);
-    _id = JavaKitUtils.getId(anObj);
+    _id = anId;
     
     // Handle Type
     if(anObj instanceof Type)
@@ -80,9 +89,15 @@ public JavaDecl(JavaDeclOwner anOwner, JavaDecl aPar, Object anObj)
         _evalType = jt!=null? jt.getDecl() : getJavaDecl(Object.class); // Can happen for Lambdas
     }
     
-    // Handle String
-    else if(anObj instanceof String)
-        initWithString((String)anObj);
+    // Handle ParamType
+    else if(anObj instanceof JavaDecl[])
+        initParamType((JavaDecl[])anObj);
+    
+    // Handle Package
+    else if(anObj instanceof String) { String str = (String)anObj;
+        _type = DeclType.Package;
+        _name = str; _sname = JavaDeclOwner.getSimpleName(str);
+    }
     
     // Throw exception for unknown type
     else throw new RuntimeException("JavaDecl.init: Unsupported type " + anObj);
@@ -160,32 +175,18 @@ private void initMember(Member aMmbr)
 }
 
 /**
- * Initialize from String (Package, ParamType).
+ * Initialize ParamType from array of type decls.
  */
-private void initWithString(String aStr)
+private void initParamType(JavaDecl theTypeDecls[])
 {
-    // Handle ParamType string
-    if(aStr.indexOf('<')>0) { _type = DeclType.ParamType;
-
-        // Get parts from string
-        String cname = aStr.substring(0,aStr.indexOf('<'));
-        String pnamesStr = aStr.substring(aStr.indexOf('<')+1,aStr.length()-1);
-        String pnames[] = pnamesStr.split(",");
-        
-        // Set parts
-        _name = aStr; _par = getJavaDecl(cname);
-        _paramTypes = new JavaDecl[pnames.length];
-        for(int i=0,iMax=pnames.length;i<iMax;i++) _paramTypes[i] = getJavaDecl(pnames[i]);
-        _evalType = this;
-        
-        // Build simple name
-        _sname = _par.getSimpleName() + '<'; JavaDecl last = _paramTypes[_paramTypes.length-1];
-        for(JavaDecl a : _paramTypes) { _sname += a.getSimpleName(); if(a!=last) _sname += ','; }
-        _sname += '>';
-    }
-        
-    // Handle Package string
-    else { _type = DeclType.Package; _name = aStr; _sname = JavaDeclOwner.getSimpleName(aStr); }
+    // Set Type, Name, EvalType, ParamTypes
+    _type = DeclType.ParamType; _name = _id; _evalType = this;
+    _paramTypes = Arrays.copyOf(theTypeDecls, theTypeDecls.length);
+    
+    // Build simple name
+    _sname = _par.getSimpleName() + '<'; JavaDecl last = _paramTypes[_paramTypes.length-1];
+    for(JavaDecl a : _paramTypes) { _sname += a.getSimpleName(); if(a!=last) _sname += ','; }
+    _sname += '>';
 }
 
 /**
@@ -670,6 +671,27 @@ public JavaDecl getJavaDecl(Object anObj)  { return _owner.getJavaDecl(anObj); }
  * Returns a JavaDecl for given object.
  */
 public JavaDeclClass getClassDecl(Object anObj)  { return _owner.getJavaDeclClass(anObj); }
+
+/**
+ * Returns a ParamType decl for this base class and given types ( This<typ,type>).
+ */
+public JavaDecl getParamTypeDecl(JavaDecl ... theTypeDecls)  { return _owner.getParamTypeDecl(this, theTypeDecls); }
+
+/**
+ * Returns the Array decl for this base class.
+ */
+public JavaDecl getArrayTypeDecl()
+{
+    // Handle not class: Return ClassType.getArrayTypeDecl()
+    if(!isClass()) {
+        System.err.println("JavaDecl: Asking for array of non-class: " + this);
+        return getClassType().getArrayTypeDecl();
+    }
+    
+    // Append array chars to class name and get decl
+    String cname = getName() + "[]";
+    return getJavaDecl(cname);
+}
 
 /**
  * Returns whether given declaration collides with this declaration.

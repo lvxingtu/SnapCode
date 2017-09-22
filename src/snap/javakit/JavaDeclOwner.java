@@ -16,15 +16,11 @@ public abstract class JavaDeclOwner {
  */
 public JavaDecl getJavaDecl(Object anObj)
 {
-    // Handle String (Class, ParamType or package name)
+    // Handle String (Class or package name)
     if(anObj instanceof String) { String id = (String)anObj;
     
-        // If decl exists forf name, just return
+        // If decl exists for name, just return
         JavaDecl jd = _decls.get(id); if(jd!=null) return jd;
-        
-        // If name is Parameterized class, create
-        if(id.indexOf('<')>0)
-            return getParamTypeForId(id);
         
         // If class exists, forward to getClassDecl()
         Class cls = getClass(id);
@@ -65,8 +61,8 @@ public JavaDecl getJavaDecl(Object anObj)
     
     // Handle Java.lang.refelect.Type
     else if(anObj instanceof Type) { Type type = (Type)anObj; //Class cls = getClass(type);
-        return getTypeDecl(type); }
-
+        jd = getTypeDecl(type); }
+        
     // Complain
     else throw new RuntimeException("JavaDeclOwner.getJavaDecl: Unsupported type " + anObj);
     
@@ -173,10 +169,14 @@ private JavaDecl createPackageDecl(String aName)
 /**
  * Returns the param type with given name.
  */
-private JavaDecl getParamTypeForId(String aId)
+protected JavaDecl getParamTypeDecl(JavaDecl aDecl, JavaDecl theTypeDecls[])
 {
-    JavaDecl jd = _decls.get(aId); if(jd!=null) return jd;
-    _decls.put(aId, jd = new JavaDecl(this, null, aId));
+    // Get id and decl for id (just return if found)
+    String id = JavaKitUtils.getParamTypeId(aDecl, theTypeDecls);
+    JavaDecl jd = _decls.get(id); if(jd!=null) return jd;
+    
+    // Create new decl, add to map and return
+    _decls.put(id, jd = new JavaDecl(this, aDecl, theTypeDecls, id));
     return jd;
 }
 
@@ -190,6 +190,11 @@ public abstract ClassLoader getClassLoader();
  */
 public Class getClass(String aName)
 {
+    // Check for ParamType (should never happen)
+    if(aName.indexOf('<')>0) { int ind = aName.indexOf('<');
+        System.err.println("JavaDeclOwner.getClass: Shouldn't happen: " + aName); aName = aName.substring(0,ind); }
+    
+    // Get Class loader, find class and return
     ClassLoader cldr = getClassLoader();
     Class cls = ClassUtils.getClass(aName, cldr);
     return cls;

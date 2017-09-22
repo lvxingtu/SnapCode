@@ -87,9 +87,11 @@ protected JavaDecl getDeclImpl(JNode aNode)
         if(name.equals("this"))
             return parDecl; // was FieldName
             
-        // Handle Class.class: Return ParamType
-        if(name.equals("class")) { String cname = "java.lang.Class<" + parDecl.getId() + '>';
-            return getJavaDecl(cname); } // Was: getJavaDecl(Class.class);
+        // Handle Class.class: Return ParamType for Class<T>
+        if(name.equals("class")) {
+            JavaDecl cdecl = getJavaDecl(Class.class);
+            return cdecl.getParamTypeDecl(parDecl);
+        }
             
         // Handle inner class
         Class cls = pclass!=null? ClassUtils.getClass(pclass, name) : null;

@@ -36,35 +36,6 @@ public String getSimpleName()
 }
 
 /**
- * Returns the full name.
- */
-public String getFullName()
-{
-    // If already set, just return
-    if(_fullName!=null) return _fullName;
-    
-    // Get BaseDecl id
-    JavaDecl bdecl = getBaseDecl();
-    if(bdecl==null)
-        return getName();
-    String fname = bdecl.getId();
-
-    // If type args, add them
-    if(_typeArgs!=null) {
-        fname += '<'; JType last = _typeArgs.get(_typeArgs.size()-1);
-        for(JType type : _typeArgs) { fname += type.getFullName(); if(type!=last) fname += ','; }
-        fname += '>';
-    }
-    
-    // Add array indices
-    for(int i=0;i<_arrayCount;i++)
-        fname += "[]";
-        
-    // Return full name
-    return _fullName = fname;
-}
-
-/**
  * Returns whether type is primitive type.
  */
 public boolean isPrimitive()  { return _primitive; }
@@ -95,31 +66,50 @@ public void setArrayCount(int aValue)  { _arrayCount = aValue; }
 public boolean isReferenceType()  { return _primitive && _arrayCount==0; }
 
 /**
- * Override to resolve type class name and create declaration from that.
+ * Returns the number of type args.
  */
-protected JavaDecl getDeclImpl()
+public int getTypeArgCount()  { return _typeArgs.size(); }
+
+/**
+ * Returns the type arg type at given index.
+ */
+public JType getTypeArg(int anIndex)  { return _typeArgs.get(anIndex); }
+
+/**
+ * Returns the type arg decl at given index.
+ */
+public JavaDecl getTypeArgDecl(int anIndex)
 {
-    // Get base decl
+    JType targ = getTypeArg(anIndex);
+    JavaDecl jd = targ.getDecl();
+    return jd;
+}
+
+/**
+ * Returns the generic types.
+ */
+public List <JType> getTypeArgs()  { return _typeArgs; }
+
+/**
+ * Adds a type arg.
+ */
+public void addTypeArg(JType aType)
+{
+    if(_typeArgs==null) _typeArgs = new ArrayList();
+    _typeArgs.add(aType); addChild(aType, -1);
+}
+
+/**
+ * Returns whether type is number type.
+ */
+public boolean isNumberType()
+{
     JavaDecl decl = getBaseDecl();
-    
-    // Handle TypeArgs or array indexes
-    if(decl!=null && (_typeArgs!=null || _arrayCount>0)) {
-        
-        // If any child args not resolved just bail (bogus!)
-        if(_typeArgs!=null)
-            for(JType typ : _typeArgs)
-                if(typ.getBaseDecl()==null)
-                    return decl;
-                    
-        // Get full name and eval
-        String fname = getFullName();
-        decl = getJavaDecl(fname);
-        if(decl==null)
-            System.err.println("JType.getDeclImpl: Can't find full name: " + fname);
-    }
-    
-    // Return declaration
-    return decl;
+    String tp = decl!=null? decl.getClassName() : null; if(tp==null) return false;
+    tp = tp.intern();
+    return tp=="byte" || tp=="short" || tp=="int" || tp=="long" || tp=="float" || tp=="double" ||
+        tp=="java.lang.Byte" || tp=="java.lang.Short" || tp=="java.lang.Integer" || tp=="java.lang.Long" ||
+        tp=="java.lang.Float" || tp=="java.lang.Double" || tp=="java.lang.Number";
 }
 
 /**
@@ -145,39 +135,29 @@ protected JavaDecl getBaseDecl()
 }
 
 /**
- * Returns the generic types.
+ * Override to resolve type class name and create declaration from that.
  */
-public List <JType> getTypeArgs()  { return _typeArgs; }
-
-/**
- * Adds a type arg.
- */
-public void addTypeArg(JType aType)
+protected JavaDecl getDeclImpl()
 {
-    if(_typeArgs==null) _typeArgs = new ArrayList();
-    _typeArgs.add(aType); addChild(aType, -1);
-}
-    
-/**
- * Returns the Java code string for node.
- */
-protected void append(StringBuffer aSB)
-{
-    aSB.append(getName());
-    for(int i=0;i<getArrayCount();i++) aSB.append("[]");
-}
-
-/**
- * Returns whether type is number type.
- */
-public boolean isNumberType()
-{
+    // Get base decl
     JavaDecl decl = getBaseDecl();
-    String tp = decl!=null? decl.getClassName() : null; if(tp==null) return false;
-    tp = tp.intern();
-    return tp=="byte" || tp=="short" || tp=="int" || tp=="long" || tp=="float" || tp=="double" ||
-        tp=="java.lang.Byte" || tp=="java.lang.Short" || tp=="java.lang.Integer" || tp=="java.lang.Long" ||
-        tp=="java.lang.Float" || tp=="java.lang.Double" || tp=="java.lang.Number";
+    if(decl==null) {
+        System.err.println("JType.getDeclImpl: Can't find base decl: " + getName()); return getJavaDecl(Object.class); }
+        
+    // If type args, build array and get decl for ParamType
+    if(_typeArgs!=null) {
+        int len = _typeArgs.size();
+        JavaDecl decls[] = new JavaDecl[len]; for(int i=0;i<len;i++) decls[i] = getTypeArgDecl(i);
+        decl = decl.getParamTypeDecl(decls);
+    }
+    
+    // If ArrayCount, get decl for array
+    for(int i=0;i<_arrayCount;i++)
+        decl = decl.getArrayTypeDecl();
+                
+    // Return declaration
+    if(decl==null) System.err.println("JType.getDeclImpl: Shouldn't happen: decl not found for " + getName());
+    return decl;
 }
 
 /**
