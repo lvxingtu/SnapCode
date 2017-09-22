@@ -312,6 +312,7 @@ public void respondUI(ViewEvent anEvent)
     if(anEvent.equals("DiffFilesMenuItem")) {
         WebFile file = getSelectedFile();
         WebFile cmpFile = file.getSite().createFile(file.getPath() + ".diff", false);
+        getBrowser().setPage(cmpFile.getURL(), null);
         getBrowser().setFile(cmpFile);
     }
     
