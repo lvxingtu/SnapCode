@@ -28,6 +28,9 @@ public class RunApp {
     // Command args
     String             _appArgs;
     
+    // The working directory
+    File               _workDir;
+    
     // The process
     Process            _process;
     
@@ -121,6 +124,19 @@ public boolean setArgs(String argv[])
 }
 
 /**
+ * Sets the working directory.
+ */
+public void setWorkingDirectory(Object aDir)
+{
+    if(aDir instanceof File)
+        _workDir = (File)aDir;
+    else {
+        WebURL url = WebURL.getURL(aDir);
+        _workDir = url!=null? url.getSourceFile() : null;
+    }
+}
+
+/**
  * Returns VM arguments.
  */
 public String getVmArgs()  { return _vmArgs; }
@@ -170,7 +186,7 @@ public void exec()
 
     // Run process
     try {
-        _process = Runtime.getRuntime().exec(_args); _running = true;
+        _process = Runtime.getRuntime().exec(_args, null, _workDir); _running = true;
         startProcessReaders();
     }
     
