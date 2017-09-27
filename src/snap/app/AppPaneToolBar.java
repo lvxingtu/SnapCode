@@ -185,7 +185,7 @@ protected void initUI()
     TextField.setBackLabelAlignAnimatedOnFocused(searchText, true);
     
     // Enable events on buttons
-    String bnames[] = { "HomeButton", "BackButton", "NextButton", "RefreshButton", "RunButton" };
+    String bnames[] = { "HomeButton", "BackButton", "NextButton", "RefreshButton", "RunButton", "RunInBrowserButton" };
     for(String name : bnames) enableEvents(name, MouseRelease, MouseEnter, MouseExit);
 }
 
@@ -226,9 +226,9 @@ public void respondUI(ViewEvent anEvent)
     if(anEvent.equals("RefreshButton") && anEvent.isMouseRelease())
         appPane.getBrowser().reloadPage();
     
-    // Handle RunButton
-    if(anEvent.equals("RunButton") && anEvent.isMouseRelease())
-        appPane._filesPane.run();
+    // Handle RunButton, RunInBrowserButton
+    if(anEvent.equals("RunButton") && anEvent.isMouseRelease()) appPane._filesPane.run();
+    if(anEvent.equals("RunInBrowserButton") && anEvent.isMouseRelease()) appPane._filesPane.runInBrowser();
     
     // Handle RunConfigMenuItems
     if(anEvent.getName().endsWith("RunConfigMenuItem")) {

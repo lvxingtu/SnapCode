@@ -41,7 +41,7 @@ public String getAppArgs()  { return _config!=null? _config.getAppArgs() : null;
 /**
  * Runs the provided file for given run mode.
  */
-public void runFile(AppPane anAppPane, RunConfig aConfig, WebFile aFile, boolean isDebug)
+public void runFile(AppPane anAppPane, RunConfig aConfig, WebFile aFile, boolean isDebug, boolean inBrowser)
 {
     // Have AppPane save files
     anAppPane.saveFiles();
@@ -63,7 +63,7 @@ public void runFile(AppPane anAppPane, RunConfig aConfig, WebFile aFile, boolean
     _lastRunFile = aFile;
     
     // If Cheerp (links against SnapCJ), generate cheerp files and open in browser
-    if(AppLauncherCJ.isCheerp(_proj, aFile)) {
+    if(inBrowser) { //AppLauncherCJ.isCheerp(_proj, aFile)) {
         new AppLauncherCJ(this).runCheerp(anAppPane); return; }
         
     // If TeaVM (links against jar and activates TVViewEnv), generate tea files and open in browser

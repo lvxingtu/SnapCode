@@ -61,7 +61,7 @@
       <cl />
     </path>
   </PathView>
-  <PathView Name="RefreshButton" x="132" y="5" width="36" height="36">
+  <PathView Name="RefreshButton" x="132" y="5" width="36" height="36" ToolTip="Refresh">
     <LineBorder />
     <color value="#9eceff" />
     <effect type="emboss" radius="6" />
@@ -85,7 +85,7 @@
       <cl />
     </path>
   </PathView>
-  <PathView Name="RunButton" x="174" y="5" width="36" height="36">
+  <PathView Name="RunButton" x="174" y="5" width="36" height="36" ToolTip="Run on Desktop">
     <LineBorder />
     <color value="#2aff4b" />
     <effect type="emboss" radius="6" />
@@ -96,6 +96,9 @@
       <cl />
     </path>
   </PathView>
+  <ImageView Name="RunInBrowserButton" x="234" y="8" width="36" height="36" ToolTip="Run in Browser" image="RunInBrowser.png">
+    <effect type="emboss" radius="6" />
+  </ImageView>
   <ComboBox Name="SearchComboBox" x="293" y="16" width="200" height="22" LeanX="RIGHT" ShowTextField="true" ShowButton="false" FilterList="true">
     <font name="Arial" size="12" />
   </ComboBox>

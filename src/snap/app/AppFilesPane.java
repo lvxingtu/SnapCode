@@ -218,7 +218,7 @@ public void respondUI(ViewEvent anEvent)
         // Handle MouseClick (double-click): RunSelectedFile
         if(anEvent.isMouseClick() && anEvent.getClickCount()==2) {
             if(getSelectedFile().isFile())
-                run(null, getSelectedFile(), false); }
+                run(null, getSelectedFile(), false, false); }
         
         // Handle DragEvent
         else if(anEvent.isDragEvent()) { //DragEvent de = anEvent.getEvent(DragEvent.class);
@@ -293,8 +293,8 @@ public void respondUI(ViewEvent anEvent)
     }
     
     // Handle RunFileMenuItem, DebugFileMenuItem
-    if(anEvent.equals("RunFileMenuItem")) run(null, getSelectedFile(), false);
-    if(anEvent.equals("DebugFileMenuItem")) run(null, getSelectedFile(), true);
+    if(anEvent.equals("RunFileMenuItem")) run(null, getSelectedFile(), false, false);
+    if(anEvent.equals("DebugFileMenuItem")) run(null, getSelectedFile(), true, false);
     
     // Handle UpdateFilesMenuItem
     if(anEvent.equals("UpdateFilesMenuItem"))
@@ -648,17 +648,22 @@ public void showRemoveFilePanel()
 /**
  * Run application.
  */
-public void run()  { run(null, null, false); }
+public void run()  { run(null, null, false, false); }
+
+/**
+ * Run application.
+ */
+public void runInBrowser()  { run(null, getSelectedFile(), false, true); }
 
 /**
  * Debug application.
  */
-public void debug()  { run(null, null, true); }
+public void debug()  { run(null, null, true, false); }
 
 /**
  * Runs a given RunConfig or file as a separate process.
  */
-protected void run(RunConfig aConfig, WebFile aFile, boolean isDebug)
+protected void run(RunConfig aConfig, WebFile aFile, boolean isDebug, boolean inBrowser)
 {
     // Automatically save all files
     saveAllFiles();
@@ -674,7 +679,7 @@ protected void run(RunConfig aConfig, WebFile aFile, boolean isDebug)
     if(file==null) file = getSelectedFile();
     
     // Send to AppLauncher
-    new AppLauncher().runFile(_appPane, config, file, isDebug);
+    new AppLauncher().runFile(_appPane, config, file, isDebug, inBrowser);
 }
 
 /**

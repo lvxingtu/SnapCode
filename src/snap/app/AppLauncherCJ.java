@@ -1,7 +1,6 @@
 package snap.app;
 import java.util.*;
 import snap.debug.RunApp;
-import snap.javakit.*;
 import snap.project.Project;
 import snap.util.*;
 import snap.web.*;
@@ -23,12 +22,12 @@ public static boolean isCheerp(Project aProj, WebFile aFile)
 {
     // If class path doesn't include SnapCJ jar, return false
     String cpath = FilePathUtils.getJoinedPath(aProj.getProjectSet().getLibPaths());
-    if(!cpath.contains("SnapCJ")) return false;
+    //if(!cpath.contains("SnapCJ")) return false;
+    if(cpath.contains("SnapCJ")) return true;
     
     // If main class contains snapcj.CJ.set() reference, return true
-    Set <JavaDecl> decls = JavaData.get(aFile).getRefs(); for(JavaDecl decl : decls) {
-        if(decl.getName().startsWith("snapcj.CJ"))
-            return true; }
+    //Set <JavaDecl> decls = JavaData.get(aFile).getRefs(); for(JavaDecl decl : decls) {
+    //    if(decl.getName().startsWith("snapcj.CJ")) return true; }
     return false;
 }
 
@@ -110,6 +109,17 @@ public WebURL getCheerpHTMLURL()
  */
 public WebFile getCheerpHTMLFile()
 {
+    String cpath = FilePathUtils.getJoinedPath(_proj.getProjectSet().getLibPaths());
+    if(cpath.contains("SnapCJ"))
+        return getCheerpHTMLFileSnapKit();
+    return getCheerpHTMLFileSwing();
+}
+
+/**
+ * Creates and returns an HTML file for given name.
+ */
+public WebFile getCheerpHTMLFileSnapKit()
+{
     String classNameSimple = _url.getPathNameSimple();
     String htmlPath = _proj.getClassPath().getBuildPathAbsolute() + '/' + classNameSimple + ".html";
     WebURL html = WebURL.getURL(htmlPath);
@@ -131,6 +141,39 @@ public WebFile getCheerpHTMLFile()
     sb.append("<script src=\"http://reportmill.com/cj/scripts/Loader.js\"></script>\n");
     sb.append("<script>\n");
     sb.append("snapRunJar(\"" + className + "\",\"" + jarPath + "\");\n");
+    sb.append("</script>\n");
+    sb.append("</html>");
+    hfile.setText(sb.toString());
+    hfile.save();
+    return hfile;
+}
+
+/**
+ * Creates and returns an HTML file for given name.
+ */
+public WebFile getCheerpHTMLFileSwing()
+{
+    String classNameSimple = _url.getPathNameSimple();
+    String htmlPath = _proj.getClassPath().getBuildPathAbsolute() + '/' + classNameSimple + ".html";
+    WebURL html = WebURL.getURL(htmlPath);
+    WebFile hfile = html.getFile(); //if(hfile!=null) return hfile;
+    hfile = html.createFile(false);
+    
+    // Get Main class and jar path
+    String className = _proj.getClassName(getURL().getFile());
+    String jarName = _proj.getName() + ".jar";
+    String jarPath = "SnapKit.jar:" + jarName;
+
+    StringBuffer sb = new StringBuffer();
+    sb.append("<!DOCTYPE html>\n<html>\n<head>\n<title>" + classNameSimple + " CheerpJ</title>\n");
+    sb.append("<meta http-equiv=\"Content-Type\" content=\"text/html;charset=utf-8\">\n");
+    sb.append("<script src=\"https://cheerpjdeploy.leaningtech.com/loader.js\" crossorigin=\"anonymous\"></script>\n");
+    sb.append("</head>\n");
+    sb.append("<body>\n");
+    sb.append("</body>\n");
+    sb.append("<script src=\"http://reportmill.com/cj/scripts/Loader.js\"></script>\n");
+    sb.append("<script>\n");
+    sb.append("snapRunJarSwing(\"" + className + "\",\"" + jarPath + "\");\n");
     sb.append("</script>\n");
     sb.append("</html>");
     hfile.setText(sb.toString());
