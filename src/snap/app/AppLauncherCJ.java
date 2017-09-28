@@ -41,6 +41,9 @@ void runCheerp(AppPane anAppPane)
     try { JarBuilder.build(_proj); }
     catch(Exception e) { throw new RuntimeException(e); }
     
+    // Ensure runtime libs are present
+    checkRuntime();
+    
     // Get build path, cheerp path
     String buildPath = _proj.getClassPath().getBuildPathAbsolute();
     String cheerpPath =  buildPath + "/cheerp";
@@ -55,6 +58,48 @@ void runCheerp(AppPane anAppPane)
     anAppPane.getProcPane().execProc(proc);
     proc.addListener(new RunApp.AppAdapter() {
         public void appExited(RunApp ra) { cheerpCompileDone(); }});
+}
+
+/**
+ * Ensure runtime libs are present: SnapKit.jar/js, CJDom.jar/js, SnapCJ.jar.js.
+ */
+void checkRuntime()
+{
+    // Get lib paths
+    String cpath = FilePathUtils.getJoinedPath(_proj.getProjectSet().getLibPaths());
+    
+    // Check for SnapKit
+    if(cpath.contains("SnapKit")) {
+        checkRuntimeFile("SnapKit.jar", "http://reportmill.com/cj/SnapKit/SnapKit.jar");
+        checkRuntimeFile("SnapKit.jar.js", "http://reportmill.com/cj/SnapKit/SnapKit.jar.js");
+    }
+    
+    // Check for CJDom
+    if(cpath.contains("CJDom")) {
+        checkRuntimeFile("CJDom.jar", "http://reportmill.com/cj/CJDom/CJDom.jar");
+        checkRuntimeFile("CJDom.jar.js", "http://reportmill.com/cj/CJDom/CJDom.jar.js");
+    }
+    
+    // Check for SnapCJ
+    if(cpath.contains("SnapCJ")) {
+        checkRuntimeFile("SnapCJ.jar", "http://reportmill.com/cj/SnapCJ/SnapCJ.jar");
+        checkRuntimeFile("SnapCJ.jar.js", "http://reportmill.com/cj/SnapCJ/SnapCJ.jar.js");
+    }
+}
+
+/**
+ * Ensure runtime libs are present: SnapKit.jar/js, CJDom.jar/js, SnapCJ.jar.js.
+ */
+void checkRuntimeFile(String aName, String aURL)
+{
+    String path = "/jars/" + aName;
+    if(_proj.getBuildFile(path, false, false)!=null) return;
+    WebURL url = WebURL.getURL(aURL);
+    byte bytes[] = url.getBytes();
+    WebFile file = _proj.getBuildFile(path, true, false);
+    file.setBytes(bytes);
+    file.save();
+    System.out.println("Downloaded runtime file: " + file.getPath());
 }
 
 /**
@@ -74,7 +119,7 @@ protected List <String> getCheerpCommand()
     commands.add(cheerpCompilerPathNtv);
     
     // Get Class path and add to list
-    String cpath = "SnapKit.jar:CJDom.jar:SnapCJ.jar".replace(':', FilePathUtils.PATH_SEPARATOR_CHAR);
+    String cpath = "jars/SnapKit.jar:jars/CJDom.jar:jars/SnapCJ.jar".replace(':', FilePathUtils.PATH_SEPARATOR_CHAR);
     commands.add("--deps"); commands.add(cpath);
 
     // Get jar name
@@ -138,7 +183,7 @@ public WebFile getCheerpHTMLFileSnapKit()
     // Get Main class and jar path
     String className = _proj.getClassName(getURL().getFile());
     String jarName = _proj.getName() + ".jar";
-    String jarPath = "SnapKit.jar:CJDom.jar:SnapCJ.jar:" + jarName;
+    String jarPath = "jars/SnapKit.jar:jars/CJDom.jar:jars/SnapCJ.jar:" + jarName;
 
     StringBuffer sb = new StringBuffer();
     sb.append("<!DOCTYPE html>\n<html>\n<head>\n<title>" + classNameSimple + " CheerpJ</title>\n");
@@ -171,7 +216,7 @@ public WebFile getCheerpHTMLFileSwing()
     // Get Main class and jar path
     String className = _proj.getClassName(getURL().getFile());
     String jarName = _proj.getName() + ".jar";
-    String jarPath = "SnapKit.jar:" + jarName;
+    String jarPath = "jars/SnapKit.jar:" + jarName;
 
     StringBuffer sb = new StringBuffer();
     sb.append("<!DOCTYPE html>\n<html>\n<head>\n<title>" + classNameSimple + " CheerpJ</title>\n");

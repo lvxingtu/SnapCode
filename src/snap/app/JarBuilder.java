@@ -154,10 +154,9 @@ public static void build(Project aProj) throws IOException
     
     // Iterate over files in build dir. If file is class, dir or exists in src dir, add to jar
     File buildDir = new File(buildPath);
-    for(File file : buildDir.listFiles()) {
-        if(file.isDirectory() || file.getAbsolutePath().endsWith(".class") ||
-            aProj.getSourceFile(file.getName(),false,false)!=null)
-                jb.addFile(file, buildDir);
+    for(File file : buildDir.listFiles()) { String name = file.getName();
+        if(name.endsWith(".class") || aProj.getSourceFile('/' + name,false,false)!=null)
+            jb.addFile(file, buildDir);
     }
         
     // Build jar
