@@ -3,6 +3,7 @@ import java.util.*;
 import snap.debug.RunApp;
 import snap.project.Project;
 import snap.util.*;
+import snap.view.ViewUtils;
 import snap.web.*;
 
 /**
@@ -75,10 +76,18 @@ protected List <String> getCheerpCommand()
     // Get Class path and add to list
     String cpath = "SnapKit.jar:CJDom.jar:SnapCJ.jar".replace(':', FilePathUtils.PATH_SEPARATOR_CHAR);
     commands.add("--deps"); commands.add(cpath);
+
+    // Get jar name
+    String jarName = _proj.getName() + ".jar";
     
-    // Add Jar name
-    String jarPath = _proj.getName() + ".jar";
-    commands.add(jarPath);
+    // If alt is down, pack jar
+    if(ViewUtils.isAltDown()) {
+        commands.add("--pack-jar");
+        commands.add(jarName);
+    }
+    
+    // Add jar name
+    commands.add(jarName);
     
     // Return commands
     return commands;
