@@ -173,7 +173,7 @@ public WebFile getCheerpHTMLFileSwing()
     sb.append("</body>\n");
     sb.append("<script src=\"http://reportmill.com/cj/scripts/Loader.js\"></script>\n");
     sb.append("<script>\n");
-    sb.append("snapRunJarSwing(\"" + className + "\",\"" + jarPath + "\");\n");
+    sb.append("snapRunJarSwing(\"" + className + "\",\"" + jarPath + "\",1000,1000);\n");
     sb.append("</script>\n");
     sb.append("</html>");
     hfile.setText(sb.toString());
