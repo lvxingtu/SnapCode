@@ -60,12 +60,12 @@ protected void initUI()
 {
     // Get TextView and configure
     _textView = getView("LogText", TextView.class);
-    _textView.setRich(true);
+    _textView.setRich(true); _textView.setWrapText(true);
     
     // Make font bigger and increase space between lines
-    _textView.getRichText().setDefaultStyle(_textView.getRichText().getDefaultStyle().copyFor(Font.Arial14));
+    _textView.getRichText().setDefaultStyle(_textView.getRichText().getDefaultStyle().copyFor(Font.Arial12));
     TextLineStyle lstyle = _textView.getRichText().getDefaultLineStyle();
-    TextLineStyle lstyle2 = lstyle.copyFor(TextLineStyle.SPACING_KEY,4);
+    TextLineStyle lstyle2 = lstyle.copyFor(TextLineStyle.SPACING_KEY,2);
     _textView.getRichText().setDefaultLineStyle(lstyle2);
 }
 
@@ -202,7 +202,6 @@ private class SimpleHttpHandler implements HttpHandler {
         // Get method
         String meth = anExch.getRequestMethod();
         String path = anExch.getRequestURI().getPath();
-        System.out.println("SimpleHttpHandler.handle(): " + meth + ' ' + path);
         
         // Add ResponseHeaders: Server, Keep-alive
         Headers hdrs = anExch.getResponseHeaders();
