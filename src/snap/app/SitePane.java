@@ -24,6 +24,9 @@ public class SitePane extends ViewOwner implements DeepChangeListener {
     // The VersionControl pane
     VcsPane            _vcp;
     
+    // The HttpServerPane
+    HttpServerPane     _httpServerPane;
+    
 /**
  * Creates a new SitePane for given site.
  */
@@ -38,6 +41,9 @@ protected SitePane(WebSite aSite)
     // Set VersionControlPane
     String urls = getRemoteURLString();
     _vcp = VersionControl.get(_site) instanceof VersionControlGit? new VcsPaneGit(this) : new VcsPane(this);
+    
+    // Set HttpServerPane
+    _httpServerPane = new HttpServerPane(this);
 }
 
 /**
@@ -74,6 +80,11 @@ public ProjectPane getProjPane()  { return _projPane; }
  * Returns the VersionControlPane.
  */
 public VcsPane getVersionControlPane()  { return _vcp; }
+
+/**
+ * Returns the HttpServerPane.
+ */
+public HttpServerPane getHttpServerPane()  { return _httpServerPane; }
 
 /**
  * Returns the HomePageURL.
@@ -178,6 +189,8 @@ public void closeSite()
     _site.removeDeepChangeListener(this);
     _site.setProp(SitePane.class.getName(), null);
     _appPane = null; _site = null; _consolePane = null; _projPane = null; _vcp = null;
+    
+    _httpServerPane.stopServer(); _httpServerPane = null;
 }
 
 /**

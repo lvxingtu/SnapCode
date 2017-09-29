@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<SpringView width="400" height="400" PrefWidth="400" PrefHeight="400">
+  <Button Name="StartButton" x="7" y="28" width="100" height="20" text="Start" />
+  <ScrollView x="8" y="54" width="386" height="340" asize="-~-,-~-">
+    <TextView Name="LogText" />
+  </ScrollView>
+</SpringView>

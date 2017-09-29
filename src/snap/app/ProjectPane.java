@@ -164,7 +164,7 @@ public void addProject(String aName, String aURLString, View aView)
 {
     // If already set, just return
     if(_proj.getProjectSet().getProject(aName)!=null) {
-        DialogBox.showWarningDialog(aView, "Error Adding Project", "Project already present"); return; }
+        DialogBox.showWarningDialog(aView, "Error Adding Project", "Project already present: " + aName); return; }
 
     // Get site - if not present, create and clone
     WebSite site = WelcomePanel.getShared().getSite(aName);

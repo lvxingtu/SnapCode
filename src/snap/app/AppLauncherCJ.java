@@ -143,6 +143,10 @@ protected List <String> getCheerpCommand()
  */
 public void cheerpCompileDone()
 {
+    // Start HttpServer
+    SitePane.get(_url.getSite()).getHttpServerPane().startServer();
+    
+    // Get HTML file and open
     WebFile htmlFile = getCheerpHTMLFile();
     WebURL htmlURL = getCheerpHTMLURL();
     snap.gfx.GFXEnv.getEnv().openURL(htmlURL);
