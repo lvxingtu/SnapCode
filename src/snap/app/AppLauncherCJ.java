@@ -262,7 +262,7 @@ static String getPythonPath()
 {
     if(_pyPath!=null) return _pyPath;
     _pyPath = findExecutableOnPath("python3");
-    String msg = "Can't find the python3 command - please download and try again";
+    String msg = "Can't find the python3 command - please download and try again. Search path: "+System.getenv("PATH");
     if(_pyPath==null) DialogBox.showConfirmDialog(null,"Can't find Python", msg);
     return _pyPath;
 }
@@ -270,12 +270,16 @@ static String _pyPath;
 
 public static String findExecutableOnPath(String aName)
 {
-    String name = aName; if(SnapUtils.isWindows) name += ".exe";
-    for (String dirname : System.getenv("PATH").split(java.io.File.pathSeparator)) {
+    String paths[] = System.getenv("PATH").split(java.io.File.pathSeparator);
+    List <String> plist = new ArrayList(); Collections.addAll(plist,paths);
+    String name = aName; if(SnapUtils.isWindows) name += ".exe"; else plist.add("/usr/local/bin");
+
+    for (String dirname : plist) {
         File file = new File(dirname, name);
         if(file.isFile() && file.canExecute())
             return file.getAbsolutePath();
     }
+    
     return null;
 }
 
