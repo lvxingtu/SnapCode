@@ -106,7 +106,7 @@ public void respondUI(ViewEvent anEvent)
         if(ppane.getProject().getProjectSet().getProject("SnapKit")==null)
             ppane.addProject("SnapKit", "https://github.com/reportmill/SnapKit.git");
         if(ppane.getProject().getProjectSet().getProject("CJDom")==null)
-            ppane.addProject("SnapKit", "https://github.com/reportmill/CJDom.git");
+            ppane.addProject("CJDom", "https://github.com/reportmill/CJDom.git");
         if(ppane.getProject().getProjectSet().getProject("SnapCJ")==null)
             ppane.addProject("SnapCJ", "https://github.com/reportmill/SnapCJ.git");
     }
