@@ -92,10 +92,21 @@ void checkRuntime()
  */
 void checkRuntimeFile(String aName, String aURL)
 {
+    // Get path for name and return if file exists
     String path = "/jars/" + aName;
     if(_proj.getBuildFile(path, false, false)!=null) return;
+    
+    // Get URL for remote file (check for SnapCode/jar_cache/name for bogus JavaOne optimization)
     WebURL url = WebURL.getURL(aURL);
+    String localCachePath = FilePathUtils.getChild(SnapCodeUtils.getSnapCodeDirPath(), "jar_cache/" + aName);
+    WebURL localCacheURL = WebURL.getURL(localCachePath);
+    if(localCacheURL.isFound())
+        url = localCacheURL;
+    
+    // Get bytes for remote file
     byte bytes[] = url.getBytes();
+    
+    // Create local file, set bytes and save
     WebFile file = _proj.getBuildFile(path, true, false);
     file.setBytes(bytes);
     file.save();

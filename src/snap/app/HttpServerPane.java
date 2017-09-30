@@ -1,6 +1,5 @@
 package snap.app;
-import java.io.IOException;
-import java.io.OutputStream;
+import java.io.*;
 import java.net.InetSocketAddress;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -19,8 +18,8 @@ public class HttpServerPane extends ViewOwner {
     // The SitePane
     SitePane       _sitePane;
     
-    // The WebSite
-    WebSite        _site;
+    // The WebSite path
+    String         _sitePath;
 
     // The HTTPServer
     HttpServer     _server;
@@ -37,6 +36,9 @@ public class HttpServerPane extends ViewOwner {
     // The TextView
     TextView       _textView;
     
+    // The last response code
+    int            _respCode;
+    
     // DateFormat for GMT time
     static DateFormat  _fmt;
     
@@ -50,7 +52,20 @@ public class HttpServerPane extends ViewOwner {
 public HttpServerPane(SitePane aSitePane)
 {
     _sitePane = aSitePane;
-    _site = aSitePane.getSite().getURL("/bin").getAsSite();
+    
+    WebSite site = aSitePane.getSite();
+    File file = site.getRootDir().getStandardFile();
+    _sitePath = FilePathUtils.getStandardized(file.getAbsolutePath());
+    _sitePath = FilePathUtils.getChild(_sitePath,"/bin/");
+}
+
+/**
+ * Returns a URL for given path.
+ */
+public WebURL getURL(String aPath)
+{
+    String path = FilePathUtils.getChild(_sitePath,aPath);
+    return WebURL.getURL(path);
 }
 
 /**
@@ -87,6 +102,10 @@ protected void respondUI(ViewEvent anEvent)
         if(!isRunning()) startServer();
         else stopServer();
     }
+    
+    // Handle ClearButton
+    if(anEvent.equals("ClearButton"))
+        _textView.clear();
 }
 
 /**
@@ -121,7 +140,9 @@ public boolean isRunning()  { return _server!=null && _running; }
 public void startServer()
 {
     if(_running) return;
-    getServer().start(); _running = true;
+    try { getServer().start(); }
+    catch(Exception e) { DialogBox.showConfirmDialog(getUI(),"Server Error", e.toString()); return; }
+    _running = true;
     getUI();
     append("Started Server\n");
 }
@@ -133,7 +154,7 @@ public void stopServer()
 {
     if(!_running) return;
     getServer().stop(0);
-    _running = false;
+    _server = null; _running = false;
 }
 
 /**
@@ -145,15 +166,24 @@ void printExchange(HttpExchange anExch)
     append("["); append(new Date().toString()); append("] ");
     
     // Append method and path
+    Color color = _respCode==WebResponse.OK? OK_COLOR : ERR_COLOR;
     String meth = anExch.getRequestMethod();
     String path = anExch.getRequestURI().getPath();
-    append("\""); append(meth,OK_COLOR); append(" ",OK_COLOR); append(path,OK_COLOR); append("\" ");
+    append("\""); append(meth,color); append(" ",color); append(path,color); append("\" ");
     
-    // Append User-Agent
-    Headers hdrs = anExch.getRequestHeaders();
-    List <String> userAgents = hdrs.get("User-agent");
-    if(userAgents!=null)
-        append(StringUtils.getStringQuoted(ListUtils.joinStrings(userAgents,",")));
+    // If error print error
+    if(_respCode!=WebResponse.OK) {
+        append("Error ("); append(String.valueOf(_respCode),color); append("): \"");
+        append(WebResponse.getCodeString(_respCode),color); append("\"");
+    }
+    
+    // Otherwise append User-Agent
+    else {
+        Headers hdrs = anExch.getRequestHeaders();
+        List <String> userAgents = hdrs.get("User-agent");
+        if(userAgents!=null)
+            append(StringUtils.getStringQuoted(ListUtils.joinStrings(userAgents,",")));
+    }
 
     //for(String hdr : hdrs.keySet()) append(hdr + " = " + ListUtils.joinStrings(hdrs.get(hdr),",") + '\n');
     append("\n");
@@ -218,24 +248,27 @@ private class SimpleHttpHandler implements HttpHandler {
     /** Handle HEAD. */
     public void handleHead(HttpExchange anExch) throws IOException
     {
-        // Get path and File
+        // Get path and URL
         String path = anExch.getRequestURI().getPath();
-        WebFile file = _site.getFile(path);
+        WebURL url = getURL(path);
+        WebResponse resp = url.getHead();
         
-        // If file not found, return NOT_FOUND (404) and return
-        if(file==null) {
-            anExch.sendResponseHeaders(HTTPResponse.NOT_FOUND,-1); return; }
+        // If response not OK, return error code
+        _respCode = resp.getCode();
+        if(resp.getCode()!=WebResponse.OK) {
+            anExch.sendResponseHeaders(resp.getCode(),-1); return; }
             
-        // Get bytes
-        file.reload();
-        byte bytes[] = file.getBytes();
+        // Get length and LastModified
+        long len = resp.getFileHeader().getSize();
+        Date lastMod = new Date(resp.getFileHeader().getLastModifiedTime());
+        String ext = FilePathUtils.getExtension(url.getPath());
         
         // Add ResponseHeaders: last-modified, cache-control, content-length, content-type
         Headers hdrs = anExch.getResponseHeaders();
-        hdrs.add("last-modified", getGMT(file.getModifiedDate()));
+        hdrs.add("last-modified", getGMT(lastMod));
         hdrs.add("cache-control", _cacheControl);
-        hdrs.add("content-length", String.valueOf(bytes.length));
-        String mtype = MIMEType.getType(file.getType());
+        hdrs.add("content-length", String.valueOf(len));
+        String mtype = MIMEType.getType(ext);
         if(mtype!=null) hdrs.add("content-type", mtype);
         
         // Get bytes and append
@@ -245,23 +278,28 @@ private class SimpleHttpHandler implements HttpHandler {
     /** Handle GET. */
     public void handleGet(HttpExchange anExch) throws IOException
     {
-        // Get path and File
+        // Get path and URL
         String path = anExch.getRequestURI().getPath();
-        WebFile file = _site.getFile(path);
+        WebURL url = getURL(path);
+        WebResponse resp = url.getResponse();
         
-        // If file not found, return NOT_FOUND (404) and return
-        if(file==null) {
-            anExch.sendResponseHeaders(HTTPResponse.NOT_FOUND,0); return; }
-        
-        // Get bytes
-        byte bytes[] = file.getBytes();
+        // If response not OK, return error code
+        _respCode = resp.getCode();
+        if(resp.getCode()!=WebResponse.OK) {
+            anExch.sendResponseHeaders(resp.getCode(),-1); return; }
+            
+        // Get length and LastModified
+        long len = resp.getFileHeader().getSize();
+        Date lastMod = new Date(resp.getFileHeader().getLastModifiedTime());
+        String ext = FilePathUtils.getExtension(url.getPath());
+        byte bytes[] = resp.getBytes();
         
         // Add ResponseHeaders: last-modified, content-length, content-type
         Headers hdrs = anExch.getResponseHeaders();
-        hdrs.add("last-modified", getGMT(file.getModifiedDate()));
+        hdrs.add("last-modified", getGMT(lastMod));
         hdrs.add("cache-control", _cacheControl);
-        hdrs.add("content-length", String.valueOf(bytes.length));
-        String mtype = MIMEType.getType(file.getType());
+        hdrs.add("content-length", String.valueOf(len));
+        String mtype = MIMEType.getType(ext);
         if(mtype!=null) hdrs.add("content-type", mtype);
         
         // Append bytes
