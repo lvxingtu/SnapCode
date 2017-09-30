@@ -1,8 +1,10 @@
 package snap.app;
+import java.io.File;
 import java.util.*;
 import snap.debug.RunApp;
 import snap.project.Project;
 import snap.util.*;
+import snap.view.DialogBox;
 import snap.view.ViewUtils;
 import snap.web.*;
 
@@ -37,6 +39,9 @@ public static boolean isCheerp(Project aProj, WebFile aFile)
  */
 void runCheerp(AppPane anAppPane)
 {
+    // If no python, just bail
+    if(getPythonPath()==null) return;
+    
     // Build Jar file
     try { JarBuilder.build(_proj); }
     catch(Exception e) { throw new RuntimeException(e); }
@@ -121,7 +126,7 @@ protected List <String> getCheerpCommand()
 {
     // Get basic python command and add to list
     List <String> commands = new ArrayList();
-    String python = "python3";
+    String python = getPythonPath();
     commands.add(python);
     
     // Get cheerpjfy compiler path and to list
@@ -248,6 +253,30 @@ public WebFile getCheerpHTMLFileSwing()
     hfile.setText(sb.toString());
     hfile.save();
     return hfile;
+}
+
+/**
+ * Returns the path to python.
+ */
+static String getPythonPath()
+{
+    if(_pyPath!=null) return _pyPath;
+    _pyPath = findExecutableOnPath("python3");
+    String msg = "Can't find the python3 command - please download and try again";
+    if(_pyPath==null) DialogBox.showConfirmDialog(null,"Can't find Python", msg);
+    return _pyPath;
+}
+static String _pyPath;
+
+public static String findExecutableOnPath(String aName)
+{
+    String name = aName; if(SnapUtils.isWindows) name += ".exe";
+    for (String dirname : System.getenv("PATH").split(java.io.File.pathSeparator)) {
+        File file = new File(dirname, name);
+        if(file.isFile() && file.canExecute())
+            return file.getAbsolutePath();
+    }
+    return null;
 }
 
 }
