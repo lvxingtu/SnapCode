@@ -108,14 +108,11 @@ private void getSuggestions(JExprId anId)
         }
         
         // Handle anything else with a parent class
-        else if(parExpr.getEvalClass()!=null) { Class pclass = parExpr.getEvalClass();
-            if(pclass.isArray()) // If array, add array field
-                addDecl(getLengthField());
-            for(Field field : pclass.getFields()) // Add class fields
+        else if(parExpr.getEvalType()!=null) { JavaDeclClass parDecl = parExpr.getEvalType().getClassType();
+            for(JavaDecl field : parDecl.getFields()) // Add class fields
                 if(StringUtils.startsWithIC(field.getName(), prefix))
                     addDecl(field);
-            for(Method meth : pclass.getMethods()) { // Add class methods
-                if(meth.isSynthetic()) continue;
+            for(JavaDecl meth : parDecl.getMethods()) { // Add class methods
                 if(StringUtils.startsWithIC(meth.getName(), prefix))
                     addDecl(meth);
             }
@@ -153,12 +150,6 @@ private void getSuggestions(JExprId anId)
             addDecl(name);
     }
 }
-
-/**
- * A bogus "Array" class to provide a bogus field "length" to stand in for non-standard array length field.
- */
-class Array { public int length; }
-static Field getLengthField() { try { return Array.class.getField("length"); } catch(Exception e) { return null; }}
 
 /** Returns the assignable type of given node assuming it's the receiving expression of assign or a method arg. */
 private static Class getReceivingClass(JNode aNode)

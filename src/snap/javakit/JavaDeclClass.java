@@ -294,6 +294,12 @@ public HashSet <JavaDecl> updateDecls()
         else removedDecls.remove(decl);
     }
     
+    // Array.length: Have to handle this special
+    if(isArray() && getField("length")==null) {
+        Field lenField = getLenField();
+        JavaDecl decl = new JavaDecl(_owner,this,lenField); addedDecls.add(decl); addDecl(decl);
+    }
+    
     // Remove unused decls
     for(JavaDecl jd : removedDecls) removeDecl(jd);
     
@@ -303,6 +309,10 @@ public HashSet <JavaDecl> updateDecls()
     return allDecls;
 }
 
+// Bogus class to get length
+private static class Array { public int length; }
+private static Field getLenField() { try { return Array.class.getField("length"); } catch(Exception e) { return null; }}
+    
 /**
  * Returns the interfaces this class implments.
  */
