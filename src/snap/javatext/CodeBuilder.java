@@ -127,11 +127,11 @@ public void respondUI(ViewEvent anEvent)
             String dragString = _dragCodeBlock.getString();
             
             // Get event dboard and start drag
-            Clipboard dboard = anEvent.getClipboard();
-            dboard.setContent(dragString);
-            //dboard.setDragImageFromString(dragString, getTextView().getFont().deriveFont(10f));
-            //dboard.setDragImagePoint(0, dboard.getDragImage().getHeight()/2);
-            dboard.startDrag();
+            Clipboard cboard = anEvent.getClipboard();
+            cboard.addData(dragString);
+            //cboard.setDragImageFromString(dragString, getTextView().getFont().deriveFont(10f));
+            //cboard.setDragImagePoint(0, dboard.getDragImage().getHeight()/2);
+            cboard.startDrag();
         }
         
         // Handle DragSourceEnd

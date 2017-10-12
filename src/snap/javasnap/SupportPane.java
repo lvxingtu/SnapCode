@@ -82,10 +82,10 @@ protected void respondUI(ViewEvent anEvent)
         _dragSP = getSnapPart(getUI(ParentView.class), anEvent.getX(), anEvent.getY()); if(_dragSP==null) return;
         
         // Create Dragboard, set image and start drag
-        Clipboard dboard = anEvent.getClipboard();
-        dboard.setContent("SupportPane:" + _dragSP.getClass().getSimpleName());
-        Image img = ViewUtils.getImage(_dragSP); dboard.setDragImage(img);
-        dboard.startDrag();
+        Clipboard cboard = anEvent.getClipboard();
+        cboard.addData("SupportPane:" + _dragSP.getClass().getSimpleName());
+        Image img = ViewUtils.getImage(_dragSP); cboard.setDragImage(img);
+        cboard.startDrag();
     }
 }
 

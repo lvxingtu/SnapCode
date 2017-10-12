@@ -704,8 +704,8 @@ public void copy()
     List <WebFile> dfiles = getSelectedFiles();
     List <File> files = new ArrayList();
     for(WebFile df : dfiles) if(df.getStandardFile()!=null) files.add(df.getStandardFile());
-    Clipboard cb = Clipboard.get();
-    cb.setContent(files);
+    Clipboard cb = Clipboard.getCleared();
+    cb.addData(files);
 }
 
 /**
