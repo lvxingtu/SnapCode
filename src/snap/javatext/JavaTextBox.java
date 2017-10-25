@@ -2,7 +2,6 @@
  * Copyright (c) 2010, ReportMill Software. All rights reserved.
  */
 package snap.javatext;
-import java.util.*;
 import snap.parse.*;
 import snap.gfx.*;
 import snap.javakit.*;
@@ -92,9 +91,9 @@ public void updateLines(int aStart, int endOld, int endNew)
 }
 
 /**
- * Create and return TextBoxLines for given RichTextLine with line index and start char index.
+ * Create and return TextBoxLine for given RichTextLine, start char index and line index.
  */
-protected List <TextBoxLine> createLines(RichTextLine aTextLine, int aLineIndex, int aStart)
+protected TextBoxLine createLine(RichTextLine aTextLine, int aStart, int aLineIndex)
 {
     // Get iteration variables
     TextStyle style = aTextLine.getRun(0).getStyle(); Exception exception = null;
@@ -103,7 +102,7 @@ protected List <TextBoxLine> createLines(RichTextLine aTextLine, int aLineIndex,
     // Create new line (just return if last line in text)
     JavaTextLine line = new JavaTextLine(this, style, aTextLine, aStart);
     if(aStart>0) {
-        line.resetSizes(); return Arrays.asList(line); }
+        line.resetSizes(); return line; }
     
     // See if this line is InMultilineComment (do this first, since it may require use of Text.Tokenizer)
     line._utermCmnt = aLineIndex>0 && getLine(aLineIndex-1).isUnterminatedComment();
@@ -168,7 +167,7 @@ protected List <TextBoxLine> createLines(RichTextLine aTextLine, int aLineIndex,
     
     // Return line
     line.resetSizes();
-    return Arrays.asList(line);
+    return line;
 }
 
 /**
