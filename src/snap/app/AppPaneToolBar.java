@@ -14,8 +14,8 @@ public class AppPaneToolBar extends ViewOwner {
     // The AppPane
     AppPane                  _appPane;
     
-    // The file tabs pane
-    HBox                     _fileTabsPane;
+    // The file tabs box
+    Box                      _fileTabsBox;
     
     // A list of open files
     List <WebFile>           _openFiles = new ArrayList();
@@ -149,9 +149,9 @@ protected View createUI()
     uin.addChild(mbtn);
     
     // Add FileTabsPane pane
-    _fileTabsPane = new HBox(); _fileTabsPane.setPadding(4,0,0,4);
-    _fileTabsPane.setBounds(0,45,uin.getWidth()-10,24); _fileTabsPane.setAutosizing("-~-,~--");
-    uin.addChild(_fileTabsPane);
+    _fileTabsBox = new ScaleBox(); _fileTabsBox.setPadding(4,0,0,4); _fileTabsBox.setAlign(HPos.LEFT);
+    _fileTabsBox.setBounds(0,45,uin.getWidth()-10,24); _fileTabsBox.setAutosizing("-~-,~--");
+    uin.addChild(_fileTabsBox);
     buildFileTabs();
     
     // Add Expand button
@@ -389,22 +389,8 @@ public void buildFileTabs()
         hbox.addChild(bm);
     }
     
-    // Add box and call scaleFileTabs to scale them if needed
-    _fileTabsPane.setChildren(hbox);
-    scaleFileTabs();
-}
-
-/**
- * Scales file tabs HBox so all tabs show.
- */
-private void scaleFileTabs()
-{
-    HBox hbox = (HBox)_fileTabsPane.getChild(0);
-    double width1 = hbox.getPrefWidth(), width2 = _fileTabsPane.getWidth();
-    if(width1>width2-4) {
-        hbox.setScaleX((width2-4)/width1);
-        hbox.setTransX(-(width1 - width2 + 4)/2);
-    }
+    // Add box
+    _fileTabsBox.setContent(hbox);
 }
 
 /**
