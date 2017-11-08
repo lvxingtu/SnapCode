@@ -172,7 +172,7 @@ protected void initUI()
     // Get/configure SearchComboBox
     ComboBox <WebFile> searchComboBox = getView("SearchComboBox", ComboBox.class);
     searchComboBox.setItemTextFunction(itm -> itm.getName());
-    searchComboBox.setCellConfigure(this :: configureSearchListCell);
+    searchComboBox.getListView().setItemTextFunction(itm -> itm.getName() + " - " + itm.getParent().getPath());
     searchComboBox.setPrefixFunction(s -> getFilesForPrefix(s));
     
     // Get/configure SearchComboBox.PopupList
@@ -391,16 +391,6 @@ public void buildFileTabs()
     
     // Add box
     _fileTabsBox.setContent(hbox);
-}
-
-/**
- * Configures a search list cell.
- */
-public void configureSearchListCell(ListCell<WebFile> aCell)
-{
-    WebFile file = aCell.getItem(); if(file==null) return;
-    Label after = new Label("- " + file.getParent().getPath()); if(aCell.isSelected()) after.setTextFill(Color.WHITE);
-    aCell.setGraphicAfter(after);
 }
 
 /**
