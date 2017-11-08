@@ -71,13 +71,26 @@ void appendString(String aStr, Color aColor)
     // Look for a StackFrame reference: " at java.pkg.Class(Class.java:55)" and add as link if found
     int start = 0;
     for(int i=aStr.indexOf(".java:"); i>0; i=aStr.indexOf(".java:", start)) {
+        
+        // Get start/end of Java file name inside parens (if parens not found, just add chars and continue)
         int s = aStr.lastIndexOf("(", i), e = aStr.indexOf(")", i);
-        if(s<0 || e<0) { _tview.addChars(aStr.substring(start,i+6), style); start = i+6; continue; }
+        if(s<start || e<0) {
+            _tview.addChars(aStr.substring(start, start=i+6), style); continue; }
+        
+        // Get chars before parens and add
         String prefix = aStr.substring(start, s+1);
-        String linkedText = aStr.substring(s+1,e);
-        TextStyle lstyle = style.copyFor(new TextLink(getLink(prefix, linkedText)));
         _tview.addChars(prefix, style);
-        _tview.addChars(linkedText, lstyle);
+        
+        // Get link text, link address, TextLink 
+        String linkText = aStr.substring(s+1,e);
+        String linkAddr = getLink(prefix, linkText);
+        TextLink textLink = new TextLink(linkAddr);
+        
+        // Get TextStyle for link and add link chars
+        TextStyle lstyle = style.copyFor(textLink);
+        _tview.addChars(linkText, lstyle);
+        
+        // Update start to end of link text and continue
         start = e;
     }
     
