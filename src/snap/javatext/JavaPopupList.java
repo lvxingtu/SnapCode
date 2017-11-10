@@ -25,7 +25,10 @@ public class JavaPopupList extends PopupList <JavaDecl> implements PropChangeLis
 public JavaPopupList(JavaTextView aJavaTextView)
 {
     _textView = aJavaTextView;
-    setPrefWidth(500); setVisRowCount(15);
+    setPrefWidth(500); setPrefRowCount(15);
+    
+    // Register to configure PopupList
+    setCellConfigure(lc -> configureJavaPopupListCell(lc));
 }
 
 /**
@@ -88,7 +91,7 @@ protected void addImport(JavaDecl aDecl, JFile aFile)
 public void show(View aView, double aX, double aY)
 {
     super.show(aView, aX, aY);
-    _textView.addPropChangeListener(this);
+    _textView.addPropChangeListener(_textViewLsnr);
     _selStart = _textView.getSelStart();
 }
 
@@ -98,13 +101,16 @@ public void show(View aView, double aX, double aY)
 public void hide()
 {
     super.hide();
-    _textView.removePropChangeListener(this);
+    _textView.removePropChangeListener(_textViewLsnr);
 }
+
+// PropChangeListner for TextView prop changes
+PropChangeListener _textViewLsnr = pce -> textViewPropChange(pce);
 
 /**
  * Catch TextEditor Selection changes that should cause Popup to close.
  */
-public void propertyChange(PropChange anEvent)
+public void textViewPropChange(PropChange anEvent)
 {
     // If not showing, unregister (in case we were PopupList was dismissed without hide)
     if(!isShowing()) { _textView.removePropChangeListener(this); return; }
@@ -129,11 +135,10 @@ public void setItems(List <JavaDecl> theItems)
 }
 
 /**
- * Override to configure cells.
+ * Configure cells for this PopupList.
  */
-protected void configureCell(ListCell <JavaDecl> aCell)
+private void configureJavaPopupListCell(ListCell <JavaDecl> aCell)
 {
-    super.configureCell(aCell);
     JavaDecl item = aCell.getItem(); if(item==null) return;
     aCell.setText(item.getSuggestionString());
     aCell.setImage(getSuggestionImage(item));

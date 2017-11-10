@@ -176,8 +176,9 @@ protected void initUI()
     searchComboBox.setPrefixFunction(s -> getFilesForPrefix(s));
     
     // Get/configure SearchComboBox.PopupList
-    searchComboBox.getPopupList().setRowHeight(22); searchComboBox.getPopupList().setPrefWidth(300);
-    searchComboBox.getPopupList().setAltPaint(Color.get("#F8F8F8"));
+    PopupList searchPopup = searchComboBox.getPopupList();
+    searchPopup.setRowHeight(22); searchPopup.setPrefWidth(300); searchPopup.setMaxRowCount(15);
+    searchPopup.setAltPaint(Color.get("#F8F8F8"));
     
     // Get/configure SearchText: radius, prompt, image, animation
     TextField searchText = searchComboBox.getTextField(); searchText.setRadius(8);
