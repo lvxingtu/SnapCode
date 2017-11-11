@@ -109,13 +109,10 @@ private void getSuggestions(JExprId anId)
         
         // Handle anything else with a parent class
         else if(parExpr.getEvalType()!=null) { JavaDeclClass parDecl = parExpr.getEvalType().getClassType();
-            for(JavaDecl field : parDecl.getFields()) // Add class fields
-                if(StringUtils.startsWithIC(field.getName(), prefix))
-                    addDecl(field);
-            for(JavaDecl meth : parDecl.getMethods()) { // Add class methods
-                if(StringUtils.startsWithIC(meth.getName(), prefix))
-                    addDecl(meth);
-            }
+            List <JavaDecl> fields = parDecl.getPrefixFields(prefix);
+            for(JavaDecl fd : fields) addDecl(fd);
+            List <JavaDecl> meths = parDecl.getPrefixMethods(prefix);
+            for(JavaDecl md : meths) addDecl(md);
         }
     }
     

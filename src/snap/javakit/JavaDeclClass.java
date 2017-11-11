@@ -1,6 +1,7 @@
 package snap.javakit;
 import java.lang.reflect.*;
 import java.util.*;
+import snap.util.StringUtils;
 
 /**
  * A subclass of JavaDecl especially for Class declarations.
@@ -418,6 +419,54 @@ public JavaDecl getMethodDeclDeep(String aName, JavaDecl theTypes[])
     JavaDecl decl = getMethodDecl(aName, theTypes);
     if(decl==null && _scdecl!=null) decl = _scdecl.getMethodDeclDeep(aName, theTypes);
     return decl;
+}
+
+/**
+ * Returns a compatibile method for given name and param types.
+ */
+public List <JavaDecl> getPrefixFields(String aPrefix)
+{
+    // Create return list of prefix fields
+    List <JavaDecl> pfields = new ArrayList();
+    
+    // Iterate over classes
+    for(JavaDeclClass cls=this;cls!=null;cls=cls.getSuper()) {
+        
+        // Get Class fields
+        List <JavaDecl> fdecls = cls.getFields();
+        for(JavaDecl fd : fdecls)
+            if(StringUtils.startsWithIC(fd.getName(), aPrefix))
+                pfields.add(fd);
+                
+        // Should iterate over class interfaces, too
+    }
+    
+    // Return list of prefix fields
+    return pfields;
+}
+
+/**
+ * Returns a compatibile method for given name and param types.
+ */
+public List <JavaDecl> getPrefixMethods(String aPrefix)
+{
+    // Create return list of prefix methods
+    List <JavaDecl> pmeths = new ArrayList();
+    
+    // Iterate over classes
+    for(JavaDeclClass cls=this;cls!=null;cls=cls.getSuper()) {
+        
+        // Get Class methods
+        List <JavaDecl> mdecls = cls.getMethods();
+        for(JavaDecl md : mdecls)
+            if(StringUtils.startsWithIC(md.getName(), aPrefix))
+                pmeths.add(md);
+                
+        // Should iterate over class interfaces, too
+    }
+    
+    // Return list of prefix methods
+    return pmeths;
 }
 
 /**
