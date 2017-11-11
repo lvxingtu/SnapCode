@@ -149,10 +149,22 @@ protected boolean isSearchTextFile(WebFile aFile)
  */
 public void searchReference(JNode aNode)
 {
+    // Get JavaDecl for node
     JavaDecl decl = aNode.getDecl(); if(decl==null) { beep(); return; }
+    
+    // If method, get root method
+    if(decl.isMethod())
+        while(decl.getSuper()!=null)
+            decl = decl.getSuper();
+    
+    // Configure search
     _search = new Search(); _search._string = decl.getMatchName(); _search._kind = Search.Kind.Reference;
+    
+    // Iterate over all project sites
     for(WebSite site : _appPane.getSites())
         searchReference(site.getRootDir(), _search._results, decl);
+        
+    // Update UI
     resetLater();
 }
     
@@ -191,10 +203,22 @@ public void searchReference(WebFile aFile, List <Result> theResults, JavaDecl aD
  */
 public void searchDeclaration(JNode aNode)
 {
+    // Get JavaDecl for node
     JavaDecl decl = aNode.getDecl(); if(decl==null) { beep(); return; }
+    
+    // If method, get root method
+    if(decl.isMethod())
+        while(decl.getSuper()!=null)
+            decl = decl.getSuper();
+    
+    // Configure search
     _search = new Search(); _search._string = decl.getMatchName(); _search._kind = Search.Kind.Declaration;
+    
+    // Iterate over all project sites
     for(WebSite site : _appPane.getSites())
         searchDeclaration(site.getRootDir(), _search._results, decl);
+        
+    // Update UI
     resetLater();
 }
     
