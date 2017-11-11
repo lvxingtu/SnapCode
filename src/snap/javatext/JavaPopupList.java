@@ -26,9 +26,6 @@ public JavaPopupList(JavaTextView aJavaTextView)
 {
     _textView = aJavaTextView;
     setPrefWidth(500); setPrefRowCount(15);
-    
-    // Register to configure PopupList
-    setCellConfigure(lc -> configureJavaPopupListCell(lc));
 }
 
 /**
@@ -137,7 +134,7 @@ public void setItems(List <JavaDecl> theItems)
 /**
  * Configure cells for this PopupList.
  */
-private void configureJavaPopupListCell(ListCell <JavaDecl> aCell)
+protected void configureCell(ListCell <JavaDecl> aCell)
 {
     JavaDecl item = aCell.getItem(); if(item==null) return;
     aCell.setText(item.getSuggestionString());
