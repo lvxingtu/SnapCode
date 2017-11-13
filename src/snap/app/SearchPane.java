@@ -3,6 +3,7 @@ import java.util.*;
 import snap.gfx.*;
 import snap.javakit.*;
 import snap.project.Project;
+import snap.util.ArrayUtils;
 import snap.view.*;
 import snap.web.*;
 
@@ -141,7 +142,8 @@ protected void search(WebFile aFile, List <Result> theResults, String aString)
 protected boolean isSearchTextFile(WebFile aFile)
 {
     String type = aFile.getType();
-    return type.equals("java") || type.equals("snp") || type.equals("rib") || type.equals("txt");
+    String types[] = { "java", "snp", "txt", "js", "rib" };
+    return ArrayUtils.contains(types, type);
 }
 
 /**
