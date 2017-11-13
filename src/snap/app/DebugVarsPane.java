@@ -58,7 +58,7 @@ protected View createUI()
     split.setVertical(true); split.setGrowHeight(true);
     
     // Add to VBox with padding
-    VBox vbox = new VBox(); vbox.setFillWidth(true); vbox.setPadding(2,2,2,2);
+    ColView vbox = new ColView(); vbox.setFillWidth(true); vbox.setPadding(2,2,2,2);
     vbox.addChild(split);
     return vbox;
 }

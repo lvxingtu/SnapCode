@@ -98,7 +98,7 @@ public void rebuildUI()
     Class cls = getEditor().getSelectedPartEnclClass();
     
     ScrollView spane = (ScrollView)getUI(TabView.class).getTabContent(0);
-    VBox pane = (VBox)spane.getContent();
+    ColView pane = (ColView)spane.getContent();
     pane.removeChildren();
     
     // Add pieces for classes
@@ -126,7 +126,7 @@ public void updateTabView(Class aClass, ChildView aPane)
 private View createMethodsPane()
 {
     // Create vertical box
-    VBox pane = new VBox(); pane.setPadding(20,20,20,20); pane.setSpacing(16);
+    ColView pane = new ColView(); pane.setPadding(20,20,20,20); pane.setSpacing(16);
     pane.setGrowWidth(true); pane.setGrowHeight(true); pane.setFill(JFileView.BACK_FILL); //pane.setBorder(bevel);
     
     // Wrap in ScrollView and return
@@ -139,7 +139,7 @@ private View createMethodsPane()
  */
 private View createBlocksPane()
 {
-    VBox pane = new VBox(); pane.setPadding(20,20,20,20); pane.setSpacing(16);
+    ColView pane = new ColView(); pane.setPadding(20,20,20,20); pane.setSpacing(16);
     pane.setGrowWidth(true); pane.setGrowHeight(true); pane.setFill(JFileView.BACK_FILL); //pane.setBorder(bevel);
     
     // Add node for while(true)

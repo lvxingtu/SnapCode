@@ -32,7 +32,7 @@ public static class MethodDecl <JNODE extends JMethodDecl> extends JMemberDeclVi
         super.updateUI(); setType(JNodeViewBase.Type.MemberDecl); setColor(MemberDeclColor);
         
         // Configure HBox
-        HBox hbox = getHBox(); hbox.setPadding(0,0,0,8); hbox.setMinSize(120, PieceHeight);
+        RowView hbox = getHBox(); hbox.setPadding(0,0,0,8); hbox.setMinSize(120, PieceHeight);
          
         // Add label for method name
         JMethodDecl md = getJNode();

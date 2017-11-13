@@ -16,7 +16,7 @@ protected void updateUI()
     super.updateUI();
     
     // Configure HBox
-    HBox hbox = getHBox(); hbox.setPadding(0,0,0,0);
+    RowView hbox = getHBox(); hbox.setPadding(0,0,0,0);
     
     // Create/Add expr view
     JStmtExpr stmt = getJNode(); JExpr expr = stmt.getExpr();

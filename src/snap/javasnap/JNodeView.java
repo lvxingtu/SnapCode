@@ -55,7 +55,7 @@ protected void updateUI()
 {
     // Add child UI
     if(isBlock()) {
-        VBox vbox = getVBox();
+        ColView vbox = getVBox();
         for(JNodeView child : getJNodeViews())
             vbox.addChild(child);
         vbox.setMinHeight(vbox.getChildCount()==0? 30 : -1);

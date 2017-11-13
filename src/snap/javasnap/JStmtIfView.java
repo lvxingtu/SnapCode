@@ -16,7 +16,7 @@ protected void updateUI()
     super.updateUI();
     
     // Configure HBox
-    HBox hbox = getHBox();
+    RowView hbox = getHBox();
     
     // Create label and condition views and add to box
     Label label = createLabel("if");

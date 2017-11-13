@@ -16,7 +16,7 @@ protected void updateUI()
     super.updateUI();
     
     // Configure HBox
-    HBox hbox = getHBox();
+    RowView hbox = getHBox();
     
     // Creeate label and expr parts and add to HBox
     Label label = createLabel("while");

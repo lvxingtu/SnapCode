@@ -1,6 +1,6 @@
 package snap.javasnap;
 import snap.javakit.*;
-import snap.view.HBox;
+import snap.view.RowView;
 
 /**
  * A JNodeView subclass for JExpr.
@@ -16,7 +16,7 @@ protected void updateUI()
     super.updateUI();
     
     // Configure HBox
-    HBox hbox = getHBox(); hbox.setPadding(0,2,2,8);
+    RowView hbox = getHBox(); hbox.setPadding(0,2,2,8);
     setMinHeight(PieceHeight);
 }
 

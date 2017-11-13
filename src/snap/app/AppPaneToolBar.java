@@ -15,7 +15,7 @@ public class AppPaneToolBar extends ViewOwner {
     AppPane                  _appPane;
     
     // The file tabs box
-    Box                      _fileTabsBox;
+    BoxView                      _fileTabsBox;
     
     // A list of open files
     List <WebFile>           _openFiles = new ArrayList();
@@ -381,7 +381,7 @@ public void buildFileTabs()
     _selectedView = null;
     
     // Create HBox for tabs
-    HBox hbox = new HBox(); hbox.setSpacing(2);
+    RowView hbox = new RowView(); hbox.setSpacing(2);
     
     // Iterate over OpenFiles, create FileTabs, init and add
     for(WebFile file : _openFiles) {

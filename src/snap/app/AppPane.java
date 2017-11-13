@@ -326,7 +326,7 @@ public void deepChange(PropChangeListener aSource, PropChange anEvent)
 protected View createUI()
 {
     _mainSplit = (SplitView)super.createUI();
-    VBox vbox = new VBox(); vbox.setFillWidth(true);
+    ColView vbox = new ColView(); vbox.setFillWidth(true);
     vbox.setChildren(_toolBar.getUI(), _mainSplit);
     return vbox;
 }

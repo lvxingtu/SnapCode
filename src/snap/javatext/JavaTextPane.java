@@ -90,7 +90,7 @@ protected void initUI()
     
     // Get ScrollView and add RowHeader
     ScrollView spane = getView("ScrollView", ScrollView.class); spane.setGrowWidth(true);
-    HBox hbox = new HBox(); hbox.setFillHeight(true);
+    RowView hbox = new RowView(); hbox.setFillHeight(true);
     hbox.setChildren(rowHeader, _textView);
     spane.setContent(hbox);
     
@@ -114,7 +114,7 @@ public void resetUI()
     setViewValue("FontSizeText", getTextView().getFont().getSize());
     
     // Clear path box and add Lin/Col postion label
-    HBox nodePathBox = getView("BottomBox", HBox.class);
+    RowView nodePathBox = getView("BottomBox", RowView.class);
     while(nodePathBox.getChildCount()>1) nodePathBox.removeChild(1); Font font = Font.get("Arial",11);
     
     // Iterate up from DeepPart and add parts

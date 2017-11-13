@@ -17,7 +17,7 @@ public void updateUI()
     super.updateUI(); setColor(PieceColor);
     
     // Configure HBox
-    HBox hbox = getHBox();
+    RowView hbox = getHBox();
 
     // Add label for method name
     JExprMethodCall mc = getJNode();

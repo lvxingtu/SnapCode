@@ -17,7 +17,7 @@ public class VcsPaneGit extends VcsPane {
     SplitView          _topSplit;
     
     // The HBox
-    HBox               _hbox;
+    RowView               _hbox;
     
     // The VersionControlGit
     VersionControlGit  _vcg;
@@ -64,7 +64,7 @@ protected View createUI()
     pane.addChild(_topSplit);
     
     // Add Horizontal browser UI
-    _hbox = new HBox(); _hbox.setPrefHeight(300); _hbox.setFillHeight(true);
+    _hbox = new RowView(); _hbox.setPrefHeight(300); _hbox.setFillHeight(true);
     ScrollView spane = new ScrollView(_hbox); spane.setPrefHeight(300); spane.setFillHeight(true);
     
     // Add content view and return UI

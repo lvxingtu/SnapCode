@@ -20,7 +20,7 @@ public class SnapEditorPane extends ViewOwner {
     SupportPane         _supportPane;
     
     // The node path
-    HBox                _nodePathBox;
+    RowView                _nodePathBox;
     
     // The deepest part of current NodePath (which is SelectedPart, unless NodePath changed SelectedPart)
     JNodeView            _deepPart;
@@ -110,7 +110,7 @@ protected View createUI()
     spane.setItems(sview, _supportPane.getUI());
     
     // Create NodePath and add to bottom
-    _nodePathBox = new HBox(); _nodePathBox.setPadding(2,2,2,2);
+    _nodePathBox = new RowView(); _nodePathBox.setPadding(2,2,2,2);
     
     // Create BorderView with toolbar
     BorderView bview = new BorderView(); bview.setCenter(spane); bview.setTop(toolBar); bview.setBottom(_nodePathBox);

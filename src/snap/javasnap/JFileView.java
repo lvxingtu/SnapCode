@@ -44,10 +44,10 @@ public void updateUI()
     setFill(BACK_FILL); setBorder(Color.LIGHTGRAY, 1); //Bevel
     
     // Get/configure HBox
-    HBox hbox = getHBox(); hbox.setMinHeight(-1);
+    RowView hbox = getHBox(); hbox.setMinHeight(-1);
     
     // Get/configure VBox
-    VBox vbox = getVBox(); vbox.setPadding(25,10,10,10); vbox.setSpacing(25);
+    ColView vbox = getVBox(); vbox.setPadding(25,10,10,10); vbox.setSpacing(25);
     vbox.setFillWidth(false);
 }
 

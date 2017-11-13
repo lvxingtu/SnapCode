@@ -79,7 +79,7 @@ protected void initUI()
     
     RectView rview = new RectView(0,0,1,300); rview.setFill(Color.LIGHTGRAY);
     
-    HBox hbox = new HBox(); hbox.setFillHeight(true); hbox.setGrowHeight(true);
+    RowView hbox = new RowView(); hbox.setFillHeight(true); hbox.setGrowHeight(true);
     hbox.setChildren(_lineNumView, _textView, rview, _evalView);
     scroll.setContent(hbox);
 }

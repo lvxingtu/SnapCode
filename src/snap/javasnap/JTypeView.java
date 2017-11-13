@@ -26,7 +26,7 @@ protected void updateUI()
     super.updateUI(); setType(Type.Piece); setSeg(Seg.Middle); setColor(PieceColor);
     
     // Configure HBox
-    HBox hbox = getHBox(); hbox.setPadding(0,0,0,8);
+    RowView hbox = getHBox(); hbox.setPadding(0,0,0,8);
     
     // Create label for type and add
     JType typ = getJNode();

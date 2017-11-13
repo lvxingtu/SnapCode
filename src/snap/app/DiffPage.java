@@ -32,7 +32,7 @@ protected View createUI()
     ScrollView spane = new ScrollView(_splitView); spane.setFillWidth(true); spane.setGrowWidth(true);
     
     // Wrap ScrollView and OverviewPane in HBox and return
-    HBox hbox = new HBox(); hbox.setFillHeight(true); hbox.setChildren(spane, new OverviewPane());
+    RowView hbox = new RowView(); hbox.setFillHeight(true); hbox.setChildren(spane, new OverviewPane());
     return hbox;
 }
 

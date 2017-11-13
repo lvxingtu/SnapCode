@@ -16,7 +16,7 @@ protected void updateUI()
     super.updateUI();
     
     // Configure HBox
-    HBox hbox = getHBox();
+    RowView hbox = getHBox();
     
     // Create label and add to HBox
     JStmtFor fs = getJNode();

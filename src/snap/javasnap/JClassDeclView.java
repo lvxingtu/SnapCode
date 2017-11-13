@@ -23,7 +23,7 @@ protected void updateUI()
     super.updateUI(); setType(Type.None); BlockLeft = 0;
     
     // Configure HBox
-    HBox hbox = getHBox(); hbox.setSpacing(12);
+    RowView hbox = getHBox(); hbox.setSpacing(12);
     
     // Create/add node for id
     JClassDecl cd = getJNode();
@@ -47,7 +47,7 @@ protected void updateUI()
     }
     
     // Configure VBox special for file
-    VBox vbox = getVBox(); vbox.setPadding(25,10,10,0); vbox.setSpacing(25);
+    ColView vbox = getVBox(); vbox.setPadding(25,10,10,0); vbox.setSpacing(25);
     vbox.setFillWidth(false);
 }
 
@@ -91,7 +91,7 @@ public static class ClassDeclIdView <JNODE extends JExprId> extends JNodeView <J
         _bg.setBorder(ClassDeclColor.darker(),2);
         
         // Get configure HBox
-        HBox hbox = getHBox(); hbox.setPadding(2,2,2,8); hbox.setMinSize(240,35);
+        RowView hbox = getHBox(); hbox.setPadding(2,2,2,8); hbox.setMinSize(240,35);
         
         // Create/add view for Class id
         JExprId id = getJNode();
@@ -118,7 +118,7 @@ public static class ClassDeclTypeView <JNODE extends JType> extends JNodeView <J
         super.updateUI(); setType(Type.Plain); setSeg(Seg.Middle); setColor(ClassDeclColor);
         
         // Get/configure HBox
-        HBox hbox = getHBox(); hbox.setPadding(2,2,2,8); hbox.setMinSize(120,25);
+        RowView hbox = getHBox(); hbox.setPadding(2,2,2,8); hbox.setMinSize(120,25);
 
         // Create/add label for type
         JType typ = getJNode();

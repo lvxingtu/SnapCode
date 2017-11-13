@@ -22,7 +22,7 @@ public void updateUI()
     super.updateUI(); setSeg(Seg.Middle); setColor(null);
     
     // Get/configure HBox
-    HBox hbox = getHBox();
+    RowView hbox = getHBox();
 
     // Get expression
     JExpr expr = getJNode(); String str = expr.getString();

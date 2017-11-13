@@ -76,11 +76,11 @@ protected View createUI()
     Button addBtn = new Button(); addBtn.setImage(addImage); addBtn.setName("AddButton");
     Button remBtn = new Button(); remBtn.setImage(remImage); remBtn.setName("RemoveButton");
     addBtn.setPrefSize(32,24); remBtn.setPrefSize(32,24); addBtn.setLeanX(HPos.RIGHT);
-    HBox hbox = new HBox();
+    RowView hbox = new RowView();
     hbox.setChildren(label, tfield, addBtn, remBtn);
     
     // Add to VBox with padding
-    VBox vbox = new VBox(); vbox.setFillWidth(true);
+    ColView vbox = new ColView(); vbox.setFillWidth(true);
     vbox.setChildren(hbox, split); vbox.setPadding(2,2,2,2);
     return vbox;
 }

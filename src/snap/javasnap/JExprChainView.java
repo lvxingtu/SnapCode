@@ -17,7 +17,7 @@ protected void updateUI()
     super.updateUI();
     
     // Get/configure HBox
-    HBox hbox = getHBox(); hbox.setPadding(0,0,0,0);
+    RowView hbox = getHBox(); hbox.setPadding(0,0,0,0);
     
     // Create/add views for child expressions
     for(JNodeView child : getJNodeViews()) hbox.addChild(child);

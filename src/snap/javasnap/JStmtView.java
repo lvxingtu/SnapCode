@@ -18,7 +18,7 @@ protected void updateUI()
     setColor(isBlock()? BlockStmtColor : PieceColor);
     
     // Configure HBox
-    HBox hbox = getHBox();
+    RowView hbox = getHBox();
     hbox.setPadding(0,2,0,8); hbox.setMinSize(120, PieceHeight);
 }
 

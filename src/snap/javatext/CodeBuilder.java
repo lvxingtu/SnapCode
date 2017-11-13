@@ -88,7 +88,7 @@ protected View createUI()
     ListView slist = new ListView(); slist.setName("SuggestionsList");
     slist.setGrowHeight(true); slist.setRowHeight(22);
     ScrollView spane = new ScrollView(slist); spane.setGrowHeight(true);
-    VBox vbox = new VBox(); vbox.setChildren(label, spane); vbox.setFillWidth(true); vbox.setPrefWidth(260);
+    ColView vbox = new ColView(); vbox.setChildren(label, spane); vbox.setFillWidth(true); vbox.setPrefWidth(260);
     return vbox;
 }
 

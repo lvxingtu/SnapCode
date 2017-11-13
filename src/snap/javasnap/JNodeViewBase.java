@@ -20,10 +20,10 @@ public class JNodeViewBase extends ChildView {
     PathView      _bg;
     
     // The HBox
-    HBox          _hbox;
+    RowView          _hbox;
     
     // The VBox
-    VBox          _vbox;
+    ColView          _vbox;
     
     // The foreground shape
     PathView      _fg;
@@ -56,7 +56,7 @@ protected JNodeViewBase()
     _bg = new PathView(); _bg.setManaged(false); //_bg.setEffect(new EmbossEffect(68,112,4));
     
     // Create HBox
-    _hbox = new HBox(); _hbox.setAlign(Pos.CENTER_LEFT); _hbox.setSpacing(2); _hbox.setMinHeight(PieceHeight);
+    _hbox = new RowView(); _hbox.setAlign(Pos.CENTER_LEFT); _hbox.setSpacing(2); _hbox.setMinHeight(PieceHeight);
     //_hbox.setBorder(Color.PINK,1);
     
     // Create/set foreground
@@ -101,19 +101,19 @@ public void setColor(Color aColor)
 /**
  * Returns the horizontal box.
  */
-public HBox getHBox()  { return _hbox; }
+public RowView getHBox()  { return _hbox; }
 
 /**
  * Returns the vertical box.
  */
-public VBox getVBox()  { return _vbox!=null? _vbox : (_vbox=createVBox()); }
+public ColView getVBox()  { return _vbox!=null? _vbox : (_vbox=createVBox()); }
 
 /**
  * Creates the vertical box.
  */
-protected VBox createVBox()
+protected ColView createVBox()
 {
-    VBox vbox = new VBox(); vbox.setMinHeight(35); vbox.setFillWidth(true); //vbox.setSpacing(2);
+    ColView vbox = new ColView(); vbox.setMinHeight(35); vbox.setFillWidth(true); //vbox.setSpacing(2);
     addChild(vbox);//,getChildren().size()-1); //vbox.setPadding(3,1,BlockTailHeight,12);
     return vbox;
 }
@@ -174,12 +174,12 @@ protected void layoutImpl()
     double w = getWidth(), h = getHeight();
     
     // Layout HBox
-    HBox hbox = getHBox(); double hh = hbox.getBestHeight(w);
+    RowView hbox = getHBox(); double hh = hbox.getBestHeight(w);
     hbox.setBounds(0, 0, w, hh);
     
     // Layout VBox
     if(_vbox!=null) {
-        VBox vbox = getVBox();
+        ColView vbox = getVBox();
         vbox.setBounds(BlockLeft, hh + BlockTop, w - BlockLeft, h - hh - BlockBottom - BlockTailHeight);
     }
     
