@@ -43,8 +43,7 @@ public DebugApp getDebugApp()  { return getProcPane().getSelDebugApp(); }
 protected View createUI()
 {
     // Create VarTree and configure
-    _varTree = new TreeView(); //_varTree.setShowRoot(false); _varTree.setRoot(new TreeItem());
-    _varTree.setFont(Font.Arial11); // _varTree.setFontWeight("Normal").setIn(_varTable);
+    _varTree = new TreeView(); _varTree.setGrowHeight(true); _varTree.setFont(Font.Arial11);
     TreeCol c0 = _varTree.getCol(0); c0.setHeaderText("Name"); c0.setPrefWidth(450);
     TreeCol c1 = new TreeCol(); c1.setHeaderText("Value"); c1.setPrefWidth(150); c1.setGrowWidth(true);
     _varTree.addCol(c1); _varTree.setResolver(new VarTreeResolver()); //_varTree.setEditable(true);
@@ -65,9 +64,8 @@ protected View createUI()
     _varText = new TextView(); _varText.setWrapText(true);
     ScrollView textScroll = new ScrollView(_varText); textScroll.setPrefHeight(40);
     
-    // Create SplitView with VarTable and VarText
-    ScrollView varTreeScroll = new ScrollView(_varTree); varTreeScroll.setGrowHeight(true);
-    SplitView split = new SplitView(); split.setItems(varTreeScroll, textScroll);
+    // Create SplitView with VarTree and VarText
+    SplitView split = new SplitView(); split.setItems(_varTree, textScroll);
     split.setVertical(true); split.setGrowHeight(true);
     
     // Create Buttons

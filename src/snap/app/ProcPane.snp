@@ -29,7 +29,5 @@
       <binding aspect="Enabled" key="Paused" />
     </Button>
   </HBox>
-  <ScrollView GrowHeight="true">
-    <TreeView Name="ProcTree" RootVisible="false" ShowRootHandles="false" />
-  </ScrollView>
+  <TreeView Name="ProcTree" GrowHeight="true" RootVisible="false" ShowRootHandles="false" />
 </VBox>

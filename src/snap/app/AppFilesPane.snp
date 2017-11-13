@@ -34,7 +34,5 @@
   <ListView Name="FilesList"  y="30" width="200" height="365" GrowWidth="true" GrowHeight="true" ItemKey="Text">
     <font name="Arial" size="15" />
   </ListView>
-  <ScrollView y="30" width="200" height="365" GrowWidth="true" GrowHeight="true">
-    <TreeView Name="FilesTree" RootVisible="false" ShowRootHandles="false" />
-  </ScrollView>
+  <TreeView Name="FilesTree" y="30" width="200" height="365" GrowWidth="true" GrowHeight="true" RootVisible="false" ShowRootHandles="false" />
 </SpringView>
