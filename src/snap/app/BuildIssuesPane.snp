@@ -4,11 +4,9 @@
   <Label Padding="0,0,0,5" text="Problems:">
     <binding aspect="Text" key="BuildStatusText" />
   </Label>
-  <ScrollView GrowWidth="true" GrowHeight="true">
-    <ListView Name="ErrorsList">
-      <font name="Arial" size="14" />
-      <binding aspect="Items" key="Issues" />
-      <binding aspect="SelectedItem" key="SelectedIssue" />
-    </ListView>
-  </ScrollView>
+  <ListView Name="ErrorsList" GrowWidth="true" GrowHeight="true">
+    <font name="Arial" size="14" />
+    <binding aspect="Items" key="Issues" />
+    <binding aspect="SelectedItem" key="SelectedIssue" />
+  </ListView>
 </VBox>

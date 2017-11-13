@@ -21,12 +21,10 @@
       <binding aspect="Text" key="SelectedRunConfig.MainClassName" />
       <binding aspect="Enabled" key="SelectedRunConfig" />
     </TextField>
-    <ScrollView x="36" y="102" width="217" height="410">
-      <ListView ItemKey="Name">
-        <binding aspect="Items" key="RunConfigs" />
-        <binding aspect="SelectedItem" key="SelectedRunConfig" />
-      </ListView>
-    </ScrollView>
+    <ListView x="36" y="102" width="217" height="410" ItemKey="Name">
+      <binding aspect="Items" key="RunConfigs" />
+      <binding aspect="SelectedItem" key="SelectedRunConfig" />
+    </ListView>
     <Label x="289" y="194" width="67" height="22" Align="CENTER_RIGHT" text="App Args:" />
     <TextView Name="AppArgsText" x="369" y="196" width="283" height="60" GrowWidth="true" GrowHeight="true">
       <binding aspect="Text" key="SelectedRunConfig.AppArgs" />

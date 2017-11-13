@@ -6,10 +6,8 @@
     </Button>
     <Button Name="DeleteAllButton" PrefWidth="80" PrefHeight="22" text="Delete All" />
   </HBox>
-  <ScrollView GrowHeight="true">
+  <ListView Name="BreakpointList" GrowHeight="true" ItemKey="Descriptor">
     <font name="Arial" size="12" />
-    <ListView Name="BreakpointList" ItemKey="Descriptor">
-      <binding aspect="Items" key="Breakpoints" />
-    </ListView>
-  </ScrollView>
+    <binding aspect="Items" key="Breakpoints" />
+  </ListView>
 </VBox>

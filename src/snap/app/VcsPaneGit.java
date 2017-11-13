@@ -9,7 +9,7 @@ import snap.viewx.WebBrowser;
 import snap.web.*;
 
 /**
- * A custom class.
+ * Provides UI for .
  */
 public class VcsPaneGit extends VcsPane {
     
@@ -18,9 +18,6 @@ public class VcsPaneGit extends VcsPane {
     
     // The HBox
     HBox               _hbox;
-    
-    // ListViews
-    List <ListView>    _lists = new ArrayList();
     
     // The VersionControlGit
     VersionControlGit  _vcg;

@@ -5,11 +5,9 @@
     <font name="Arial" size="16" />
   </Label>
   <SplitView Name="SplitView" Vertical="true" GrowHeight="true">
-    <ScrollView GrowHeight="true">
-      <ListView Name="FilesList">
-        <binding aspect="Items" key="Files" />
-      </ListView>
-    </ScrollView>
+    <ListView Name="FilesList" GrowHeight="true">
+      <binding aspect="Items" key="Files" />
+    </ListView>
     <ScrollView PrefHeight="120">
       <TextView Name="CommentText" WrapText="true">
         <font name="Arial" size="11" />

@@ -7,11 +7,9 @@
   <Button Name="ClearButton" x="561" y="4" width="75" height="22" LeanX="RIGHT" text="Clear">
     <binding aspect="Enabled" key="Search" />
   </Button>
-  <ScrollView x="2" y="30" width="636" height="448" GrowWidth="true" GrowHeight="true">
+  <ListView Name="ResultsList" x="2" y="30" width="636" height="448" GrowWidth="true" GrowHeight="true">
     <font name="Arial" size="12" />
-    <ListView Name="ResultsList">
-      <binding aspect="Items" key="Results" />
-      <binding aspect="SelectedItem" key="SelectedResult" />
-    </ListView>
-  </ScrollView>
+    <binding aspect="Items" key="Results" />
+    <binding aspect="SelectedItem" key="SelectedResult" />
+  </ListView>
 </SpringView>

@@ -23,22 +23,18 @@
   <TabView PrefWidth="360" PrefHeight="160">
     <BevelBorder />
     <Box Padding="3" FillWidth="true" FillHeight="true" title="    Jars    ">
-      <ScrollView>
+      <ListView Name="JarPathsList">
         <font name="Arial" size="12" />
-        <ListView Name="JarPathsList">
-          <binding aspect="Items" key="JarPaths" />
-          <binding aspect="SelectedItem" key="SelectedJarPath" />
-        </ListView>
-      </ScrollView>
+        <binding aspect="Items" key="JarPaths" />
+        <binding aspect="SelectedItem" key="SelectedJarPath" />
+      </ListView>
     </Box>
     <Box Padding="3" FillWidth="true" FillHeight="true" title="  Projects  ">
-      <ScrollView>
+      <ListView Name="ProjectPathsList">
         <font name="Arial" size="12" />
-        <ListView Name="ProjectPathsList">
-          <binding aspect="Items" key="ProjectPaths" />
-          <binding aspect="SelectedItem" key="SelectedProjectPath" />
-        </ListView>
-      </ScrollView>
+        <binding aspect="Items" key="ProjectPaths" />
+        <binding aspect="SelectedItem" key="SelectedProjectPath" />
+      </ListView>
     </Box>
   </TabView>
   <CheckBox text="Build Project Automatically">
