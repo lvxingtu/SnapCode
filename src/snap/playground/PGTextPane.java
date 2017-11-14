@@ -12,8 +12,8 @@ public class PGTextPane extends TextPane {
     // The Playground
     Playground       _pg;
     
-    // The TextView
-    TextView         _textView;
+    // The TextArea
+    TextArea         _textArea;
     
     // LineNumView
     LineNumView      _lineNumView = new LineNumView();
@@ -30,9 +30,9 @@ public class PGTextPane extends TextPane {
 public PGTextPane(Playground aPG)  { _pg = aPG; }
 
 /**
- * Creates the TextView.
+ * Creates the TextArea.
  */
-protected TextView createTextView()  { return new CodeView(); }
+protected TextArea createTextArea()  { return new CodeView(); }
 
 /**
  * Returns the default font.
@@ -68,19 +68,19 @@ protected void initUI()
     //sb.append("\"Hello\" + \" Again\"").append("\n\n");
     //sb.append("getClass().getName()").append("\n\n");
 
-    _textView = getTextView(); _textView.setGrowWidth(true);
-    _textView.getRichText().setDefaultStyle(new TextStyle(getDefaultFont()));
-    enableEvents(_textView, KeyRelease);
-    _textView.setText(sb.toString());
-    ScrollView scroll = _textView.getParent(ScrollView.class);
+    _textArea = getTextArea(); _textArea.setGrowWidth(true);
+    _textArea.getRichText().setDefaultStyle(new TextStyle(getDefaultFont()));
+    enableEvents(_textArea, KeyRelease);
+    _textArea.setText(sb.toString());
+    ScrollView scroll = _textArea.getParent(ScrollView.class);
     
-    _textView.getRichText().addPropChangeListener(pce -> _lineNumView.updateLines());
+    _textArea.getRichText().addPropChangeListener(pce -> _lineNumView.updateLines());
     _lineNumView.updateLines();
     
     RectView rview = new RectView(0,0,1,300); rview.setFill(Color.LIGHTGRAY);
     
     RowView hbox = new RowView(); hbox.setFillHeight(true); hbox.setGrowHeight(true);
-    hbox.setChildren(_lineNumView, _textView, rview, _evalView);
+    hbox.setChildren(_lineNumView, _textArea, rview, _evalView);
     scroll.setContent(hbox);
 }
 
@@ -96,35 +96,35 @@ protected void respondUI(ViewEvent anEvent)
 }
 
 /**
- * A View subclass to show line numbers.
+ * A TextArea subclass to show line numbers.
  */
-protected class LineNumView extends TextView {
+protected class LineNumView extends TextArea {
     
     /** Creates new LineNumView. */
     public LineNumView()
     {
-        setRich(false);
-        getRichText().setDefaultLineStyle(TextLineStyle.DEFAULT.copyFor(HPos.RIGHT));
+        setPlainText(true);
+        setDefaultLineStyle(TextLineStyle.DEFAULT.copyFor(HPos.RIGHT));
         setFill(new Color("#f7f7f7"));
         setTextFill(new Color(.6f));
         setPrefWidth(25); setPadding(2,4,2,2);
         setEditable(false); setFont(PGTextPane.this.getDefaultFont());
     }
     
-    /** Called to update when textView changes. */
+    /** Called to update when TextArea changes. */
     void updateLines()
     {
         StringBuilder sb = new StringBuilder();
-        for(int i=1,iMax=_textView.getLineCount();i<=iMax;i++)
+        for(int i=1,iMax=_textArea.getLineCount();i<=iMax;i++)
             sb.append(i).append('\n');
         setText(sb.toString());
     }
 }
 
 /**
- * A View subclass to show code evaluation.
+ * A TextArea subclass to show code evaluation.
  */
-protected class EvalView extends TextView {
+protected class EvalView extends TextArea {
     
     /** Creates new EvalView. */
     public EvalView()

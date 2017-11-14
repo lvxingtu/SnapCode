@@ -51,9 +51,9 @@ public SnapEditor getEditor()  { return _editor; }
 public JavaTextPane getJavaTextPane()  { return _javaPane; }
 
 /**
- * Returns the JavaTextView.
+ * Returns the JavaTextArea.
  */
-public JavaTextView getJavaTextView()  { return _javaPane.getTextView(); }
+public JavaTextArea getJavaTextArea()  { return _javaPane.getTextArea(); }
 
 /**
  * Returns the SupportPane.
@@ -97,7 +97,7 @@ protected View createUI()
     View toolBar = super.createUI(); //toolBar.setMaxHeight(28);
     
     // Create SnapEditor
-    _editor = new SnapEditor(getJavaTextView());
+    _editor = new SnapEditor(getJavaTextArea());
 
     // Add to Editor.UI to ScrollView
     ScrollView sview = new ScrollView(_editor); sview.setGrowWidth(true);
@@ -227,7 +227,7 @@ public void copy()
     }
     
     // Do copy
-    getJavaTextView().copy();
+    getJavaTextArea().copy();
 }
 
 /**
@@ -252,17 +252,17 @@ public void paste()
 /**
  * Delete current selection.
  */
-public void delete()  { getJavaTextView().delete(); rebuildLater(); }
+public void delete()  { getJavaTextArea().delete(); rebuildLater(); }
 
 /**
  * Undo last change.
  */
-public void undo()  { getJavaTextView().undo(); rebuildLater(); }
+public void undo()  { getJavaTextArea().undo(); rebuildLater(); }
 
 /**
  * Redo last undo.
  */
-public void redo()  { getJavaTextView().redo(); rebuildLater(); }
+public void redo()  { getJavaTextArea().redo(); rebuildLater(); }
 
 /**
  * Escape.

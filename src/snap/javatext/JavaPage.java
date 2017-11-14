@@ -29,14 +29,14 @@ public JavaPage()  { _jtextPane._javaPage = this; }
 AppPane getAppPane()  { return getBrowser() instanceof AppBrowser? ((AppBrowser)getBrowser()).getAppPane() : null; }
 
 /**
- * Returns the JavaTextView.
+ * Returns the JavaTextArea.
  */
 public JavaTextPane getTextPane()  { return _jtextPane; }
 
 /**
- * Returns the JavaTextView.
+ * Returns the JavaTextArea.
  */
-public JavaTextView getTextView()  { return getTextPane().getTextView(); }
+public JavaTextArea getTextArea()  { return getTextPane().getTextArea(); }
 
 /**
  * Creates UI panel.
@@ -49,8 +49,8 @@ protected View createUI()  { return _jtextPane.getUI(); }
 protected void initUI()
 {
     super.initUI();
-    getTextView().setSource(getFile());
-    setFirstFocus(getTextView());
+    getTextArea().setSource(getFile());
+    setFirstFocus(getTextArea());
 }
 
 /**
@@ -68,21 +68,21 @@ public void setResponse(WebResponse aResp)
     WebURL aURL = aResp.getRequestURL();
     String lineNumberString = aURL.getRefValue("LineNumber");
     if(lineNumberString!=null) { int lineNumber = SnapUtils.intValue(lineNumberString);
-        getTextView().selectLine(lineNumber-1); }
+        getTextArea().selectLine(lineNumber-1); }
     
     // Look for Sel (selection)
     String sel = aURL.getRefValue("Sel");
     if(sel!=null) {
         int start = SnapUtils.intValue(sel); sel = sel.substring(sel.indexOf('-')+1);
         int end = SnapUtils.intValue(sel); if(end<start) end = start;
-        getTextView().setSel(start, end);
+        getTextArea().setSel(start, end);
     }
         
     // Look for SelLine (select line)
     String selLine = aURL.getRefValue("SelLine");
     if(selLine!=null) { int lineNum = SnapUtils.intValue(selLine)-1;
-        TextBoxLine tline = lineNum>=0 && lineNum<getTextView().getLineCount()? getTextView().getLine(lineNum) : null;
-        if(tline!=null) getTextView().setSel(tline.getStart());
+        TextBoxLine tline = lineNum>=0 && lineNum<getTextArea().getLineCount()? getTextArea().getLine(lineNum) : null;
+        if(tline!=null) getTextArea().setSel(tline.getStart());
     }
     
     // Look for Find
@@ -100,7 +100,7 @@ public void setResponse(WebResponse aResp)
         else for(JMemberDecl md : cd.getMemberDecls())
             if(md.getName()!=null && md.getName().equals(memberName)) { id = md.getId(); break; }
         if(id!=null)
-            getTextView().setSel(id.getStart(), id.getEnd());
+            getTextArea().setSel(id.getStart(), id.getEnd());
     }
 }
 
@@ -217,7 +217,7 @@ private void showDeclarations(JNode aNode)
 private void setTextModified(boolean aFlag)  { getFile().setUpdater(aFlag? this : null); }
 
 /** WebFile.Updater method. */
-public void updateFile(WebFile aFile)  { getFile().setText(getTextView().getText()); }
+public void updateFile(WebFile aFile)  { getFile().setText(getTextArea().getText()); }
 
 /** Override to get ProgramCounter from ProcPane. */
 private int getProgramCounterLine()

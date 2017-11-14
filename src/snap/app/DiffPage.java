@@ -2,7 +2,7 @@ package snap.app;
 import java.util.*;
 import snap.app.DiffUtil.*;
 import snap.gfx.*;
-import snap.javatext.JavaTextView;
+import snap.javatext.JavaTextArea;
 import snap.project.VersionControl;
 import snap.view.*;
 import snap.viewx.WebPage;
@@ -17,7 +17,7 @@ public class DiffPage extends WebPage {
     SplitView         _splitView;
 
     // The two texts
-    TextView          _ltext, _rtext;
+    TextArea          _ltext, _rtext;
     
     // The default font
     static Font       _dfont;
@@ -27,7 +27,7 @@ public class DiffPage extends WebPage {
  */
 protected View createUI()
 {
-    // Create SplitView for left/right TextViews, and ScrollView to hold it
+    // Create SplitView for left/right TextAreas, and ScrollView to hold it
     _splitView = new SplitView();
     ScrollView spane = new ScrollView(_splitView); spane.setFillWidth(true); spane.setGrowWidth(true);
     
@@ -51,8 +51,8 @@ protected void initUI()
     
     // Get ranges lists
     List <TextSel> lranges, rranges;
-    lranges = _ltext instanceof DiffTextView? ((DiffTextView)_ltext).ranges : ((DiffJavaTextView)_ltext).ranges;
-    rranges = _rtext instanceof DiffTextView? ((DiffTextView)_rtext).ranges : ((DiffJavaTextView)_rtext).ranges;
+    lranges = _ltext instanceof DiffTextArea? ((DiffTextArea)_ltext).ranges : ((DiffJavaTextArea)_ltext).ranges;
+    rranges = _rtext instanceof DiffTextArea? ((DiffTextArea)_rtext).ranges : ((DiffJavaTextArea)_rtext).ranges;
     
     // Print diffs
     DiffUtil diffUtil = new DiffUtil();
@@ -92,17 +92,17 @@ public WebFile getRemoteFile()
 /**
  * Returns the text for file.
  */
-TextView getText(WebFile aFile)
+TextArea getText(WebFile aFile)
 {
     // Refresh file to get latest version
     aFile.reload();
     
     // Handle JavaFile
     if(aFile.getType().equals("java")) {
-        DiffJavaTextView tview = new DiffJavaTextView(); tview.setSource(aFile); return tview; }
+        DiffJavaTextArea tarea = new DiffJavaTextArea(); tarea.setSource(aFile); return tarea; }
     
     // Handle normal TextFile
-    TextView ta = new DiffTextView();
+    TextArea ta = new DiffTextArea();
     ta.setFont(getDefaultFont());
     ta.setText(aFile.getText());
     return ta;
@@ -127,10 +127,13 @@ static Color fc = new Color(230,230,230,192), sc = new Color(140,140,140);
 /**
  * A text area that shows diffs.
  */
-static class DiffTextView extends TextView {
+static class DiffTextArea extends TextArea {
 
     // The ranges
     List <TextSel> ranges = new ArrayList();
+    
+    /** Create new DiffTextArea. */
+    public DiffTextArea()  { setFill(Color.WHITE); }
     
     /** Override to add ranges. */
     protected void paintBack(Painter aPntr)
@@ -146,7 +149,7 @@ static class DiffTextView extends TextView {
 /**
  * A text area that shows diffs.
  */
-static class DiffJavaTextView extends JavaTextView {
+static class DiffJavaTextArea extends JavaTextArea {
 
     // The ranges
     List <TextSel> ranges = new ArrayList();
@@ -179,7 +182,7 @@ public class OverviewPane extends View {
     /** Creates a new OverviewPane. */
     public OverviewPane()  { enableEvents(MouseMove, MouseRelease); setToolTipEnabled(true); setPrefWidth(14); }
 
-    /** Sets the JavaTextView selection. */
+    /** Sets the JavaTextArea selection. */
     public void setTextSel(int aStart, int anEnd)  { _ltext.setSel(aStart, anEnd); }
     
     /** Returns the list of markers. */
@@ -191,9 +194,9 @@ public class OverviewPane extends View {
         // Create list
         List <Marker> markers = new ArrayList();
         
-        // Add markers for TextView.JavaSource.BuildIssues
-        List <TextSel> ranges = _ltext instanceof DiffTextView? ((DiffTextView)_ltext).ranges :
-            ((DiffJavaTextView)_ltext).ranges;
+        // Add markers for TextArea.JavaSource.BuildIssues
+        List <TextSel> ranges = _ltext instanceof DiffTextArea? ((DiffTextArea)_ltext).ranges :
+            ((DiffJavaTextArea)_ltext).ranges;
         for(TextSel ts : ranges)
             markers.add(new Marker(ts));
         

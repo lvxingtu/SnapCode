@@ -34,7 +34,7 @@ public PGConsole getConsole()  { return _console; }
  */
 public void play()
 {
-    _evaluator.eval(_textPane.getTextView().getText());
+    _evaluator.eval(_textPane.getTextArea().getText());
     _textPane._evalView.updateLines();
 }
 

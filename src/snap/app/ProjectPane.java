@@ -80,7 +80,7 @@ protected void setAppPane(AppPane anAP)
 {
     _appPane = anAP;
     
-    // Add listener to update ProcPane and JavaPage.TextView(s) when Breakpoint added/removed
+    // Add listener to update ProcPane and JavaPage.TextArea(s) when Breakpoint added/removed
     _proj.getBreakpoints().addPropChangeListener(pc -> {
         System.out.println("Breakpoints.change: " + pc);
         if(pc.getPropertyName()!=Breakpoints.ITEMS_PROP) return;
@@ -89,7 +89,7 @@ protected void setAppPane(AppPane anAP)
         else notifyBreakpointRemoved(oval);
     });
     
-    // Add listener to update SupportTray and JavaPage.TextView(s) when BuildIssue added/removed
+    // Add listener to update SupportTray and JavaPage.TextArea(s) when BuildIssue added/removed
     _proj.getBuildIssues().addPropChangeListener(pc -> {
         if(pc.getPropertyName()!=Breakpoints.ITEMS_PROP) return;
         BuildIssue oval = (BuildIssue)pc.getOldValue(), nval = (BuildIssue)pc.getNewValue();
@@ -408,10 +408,10 @@ protected void notifyBreakpointAdded(Breakpoint aBP)
  */
 protected void notifyBreakpointRemoved(Breakpoint aBP)
 {
-    // Make current JavaPage.TextView resetLater
+    // Make current JavaPage.TextArea resetLater
     WebPage page = getAppPane().getBrowser().getPage(aBP.getFile().getURL());
     if(page instanceof JavaPage)
-        ((JavaPage)page).getTextView().repaintAll();
+        ((JavaPage)page).getTextArea().repaintAll();
     
     // Tell active processes about breakpoint change
     for(RunApp rp : getAppPane().getProcPane().getProcs())
@@ -423,10 +423,10 @@ protected void notifyBreakpointRemoved(Breakpoint aBP)
  */
 protected void notifyBuildIssueAdded(BuildIssue aBI)
 {
-    // Make current JavaPage.TextView resetLater
+    // Make current JavaPage.TextArea resetLater
     WebPage page = getAppPane().getBrowser().getPage(aBI.getFile().getURL());
     if(page instanceof JavaPage)
-        ((JavaPage)page).getTextView().repaintAll();
+        ((JavaPage)page).getTextArea().repaintAll();
     
     // Update FilesPane.FilesTree
     getAppPane().getFilesPane().updateFile(aBI.getFile());
@@ -437,10 +437,10 @@ protected void notifyBuildIssueAdded(BuildIssue aBI)
  */
 protected void notifyBuildIssueRemoved(BuildIssue aBI)
 {
-    // Make current JavaPage.TextView resetLater
+    // Make current JavaPage.TextArea resetLater
     WebPage page = getAppPane().getBrowser().getPage(aBI.getFile().getURL());
     if(page instanceof JavaPage)
-        ((JavaPage)page).getTextView().repaintAll();
+        ((JavaPage)page).getTextArea().repaintAll();
 
     // Update FilesPane.FilesTree
     getAppPane().getFilesPane().updateFile(aBI.getFile());

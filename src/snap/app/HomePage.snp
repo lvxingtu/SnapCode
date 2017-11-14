@@ -5,7 +5,7 @@
     <SpringView Name="Header" x="36" y="36" width="540" height="109" PrefWidth="540" PrefHeight="109">
       <LineBorder />
       <fill type="image" resource="128492831" />
-      <TextView y="7" width="540" height="99" Rich="true" Editable="false" WrapText="true">
+      <TextArea y="7" width="540" height="99" Rich="true" Editable="false" WrapText="true">
         <effect type="shadow" radius="5" dx="2" dy="2" color="#00000086" />
         <RichText>
           <font name="Arial Bold" size="48" />
@@ -19,21 +19,21 @@
           <color value="#ffffff" />
           <string>Home Page</string>
         </RichText>
-      </TextView>
+      </TextArea>
     </SpringView>
     <SpringView Name="JavaPlayground" x="36" y="165" width="255" height="130" PrefWidth="255" PrefHeight="130">
       <RectView width="255" height="130" GrowWidth="true" GrowHeight="true" LeanX="CENTER" LeanY="CENTER">
         <LineBorder />
         <fill type="image" resource="1161328792" />
       </RectView>
-      <TextView x="4" y="6.547" width="242" height="117.842" Align="CENTER_LEFT" Rich="true" Editable="false" WrapText="true">
+      <TextArea x="4" y="6.547" width="242" height="117.842" Align="CENTER_LEFT" Rich="true" Editable="false" WrapText="true">
         <effect type="shadow" radius="5" dx="2" dy="2" color="#00000086" />
         <RichText>
           <font name="Arial Bold" size="24" />
           <pgraph align="center" />
           <string>Java&#10;Playground</string>
         </RichText>
-      </TextView>
+      </TextArea>
       <ImageView x="197" y="37.5" width="48" height="87" ImageName="Duke.png">
         <effect type="shadow" radius="6" dx="2" dy="2" color="#00000086" />
       </ImageView>
@@ -43,98 +43,98 @@
         <LineBorder />
         <fill type="image" resource="1161328792" />
       </RectView>
-      <TextView x="7" y="6.547" width="242" height="117.842" Align="CENTER_LEFT" Rich="true" Editable="false" WrapText="true">
+      <TextArea x="7" y="6.547" width="242" height="117.842" Align="CENTER_LEFT" Rich="true" Editable="false" WrapText="true">
         <effect type="shadow" radius="5" dx="2" dy="2" color="#00000086" />
         <RichText>
           <font name="Arial Bold" size="24" />
           <pgraph align="center" />
           <string>New Snap Scene</string>
         </RichText>
-      </TextView>
+      </TextArea>
     </SpringView>
     <SpringView Name="NewJavaFile" x="36" y="318" width="255" height="130" PrefWidth="255" PrefHeight="130">
       <RectView width="255" height="130" GrowWidth="true" GrowHeight="true" LeanX="CENTER" LeanY="CENTER">
         <LineBorder />
         <fill type="image" resource="1161328792" />
       </RectView>
-      <TextView x="13" y="12.547" width="201" height="100.453" Align="CENTER_LEFT" Rich="true" Editable="false" WrapText="true">
+      <TextArea x="13" y="12.547" width="201" height="100.453" Align="CENTER_LEFT" Rich="true" Editable="false" WrapText="true">
         <effect type="shadow" radius="5" dx="2" dy="2" color="#00000086" />
         <RichText>
           <font name="Arial Bold" size="24" />
           <pgraph align="center" />
           <string>New Java File</string>
         </RichText>
-      </TextView>
+      </TextArea>
     </SpringView>
     <SpringView Name="NewFile" x="321" y="318" width="255" height="130" PrefWidth="255" PrefHeight="130">
       <RectView width="255" height="130" GrowWidth="true" GrowHeight="true" LeanX="CENTER" LeanY="CENTER">
         <LineBorder />
         <fill type="image" resource="1161328792" />
       </RectView>
-      <TextView x="7" y="6.547" width="242" height="118" Align="CENTER_LEFT" Rich="true" Editable="false" WrapText="true">
+      <TextArea x="7" y="6.547" width="242" height="118" Align="CENTER_LEFT" Rich="true" Editable="false" WrapText="true">
         <effect type="shadow" radius="5" dx="2" dy="2" color="#00000086" />
         <RichText>
           <font name="Arial Bold" size="24" />
           <pgraph align="center" />
           <string>New File</string>
         </RichText>
-      </TextView>
+      </TextArea>
     </SpringView>
     <SpringView Name="AddSnapKit" x="36" y="469" width="255" height="130" PrefWidth="255" PrefHeight="130">
       <RectView width="255" height="130" GrowWidth="true" GrowHeight="true" LeanX="CENTER" LeanY="CENTER">
         <LineBorder />
         <fill type="image" resource="1161328792" />
       </RectView>
-      <TextView x="4" y="6.547" width="242" height="117.842" Align="CENTER_LEFT" Rich="true" Editable="false" WrapText="true">
+      <TextArea x="4" y="6.547" width="242" height="117.842" Align="CENTER_LEFT" Rich="true" Editable="false" WrapText="true">
         <effect type="shadow" radius="5" dx="2" dy="2" color="#00000086" />
         <RichText>
           <font name="Arial Bold" size="24" />
           <pgraph align="center" />
           <string>Add SnapKit  Project</string>
         </RichText>
-      </TextView>
+      </TextArea>
     </SpringView>
     <SpringView Name="AddSnapCheerp" x="321" y="469" width="255" height="130" PrefWidth="255" PrefHeight="130">
       <RectView width="255" height="130" GrowWidth="true" GrowHeight="true" LeanX="CENTER" LeanY="CENTER">
         <LineBorder />
         <fill type="image" resource="1161328792" />
       </RectView>
-      <TextView x="7" y="6.547" width="242" height="117.842" Align="CENTER_LEFT" Rich="true" Editable="false" WrapText="true">
+      <TextArea x="7" y="6.547" width="242" height="117.842" Align="CENTER_LEFT" Rich="true" Editable="false" WrapText="true">
         <effect type="shadow" radius="5" dx="2" dy="2" color="#00000086" />
         <RichText>
           <font name="Arial Bold" size="24" />
           <pgraph align="center" />
           <string>Add Snap-Cheerp Project</string>
         </RichText>
-      </TextView>
+      </TextArea>
     </SpringView>
     <SpringView Name="SnapDocs" x="36" y="621" width="255" height="130" PrefWidth="255" PrefHeight="130">
       <RectView width="255" height="130" GrowWidth="true" GrowHeight="true" LeanX="CENTER" LeanY="CENTER">
         <LineBorder />
         <fill type="image" resource="1161328792" />
       </RectView>
-      <TextView x="4" y="6.547" width="242" height="117.842" Align="CENTER_LEFT" Rich="true" Editable="false" WrapText="true">
+      <TextArea x="4" y="6.547" width="242" height="117.842" Align="CENTER_LEFT" Rich="true" Editable="false" WrapText="true">
         <effect type="shadow" radius="5" dx="2" dy="2" color="#00000086" />
         <RichText>
           <font name="Arial Bold" size="24" />
           <pgraph align="center" />
           <string>SnapKit Docs</string>
         </RichText>
-      </TextView>
+      </TextArea>
     </SpringView>
     <SpringView Name="RMDocs" x="321" y="621" width="255" height="130" PrefWidth="255" PrefHeight="130">
       <RectView width="255" height="130" GrowWidth="true" GrowHeight="true" LeanX="CENTER" LeanY="CENTER">
         <LineBorder />
         <fill type="image" resource="1161328792" />
       </RectView>
-      <TextView x="4" y="6.547" width="242" height="117.842" Align="CENTER_LEFT" Rich="true" Editable="false" WrapText="true">
+      <TextArea x="4" y="6.547" width="242" height="117.842" Align="CENTER_LEFT" Rich="true" Editable="false" WrapText="true">
         <effect type="shadow" radius="5" dx="2" dy="2" color="#00000086" />
         <RichText>
           <font name="Arial Bold" size="24" />
           <pgraph align="center" />
           <string>ReportMill User Guide</string>
         </RichText>
-      </TextView>
+      </TextArea>
     </SpringView>
   </PageView>
   <resource name="128492831" rm-byte-encoding="Ascii85">

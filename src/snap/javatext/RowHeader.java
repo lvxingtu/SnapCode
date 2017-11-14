@@ -13,8 +13,8 @@ import snap.view.*;
  */
 public class RowHeader extends View {
 
-    // The JavaTextView
-    JavaTextView             _textView;
+    // The JavaTextArea
+    JavaTextArea             _textArea;
 
     // The list of markers
     List <Marker>            _markers;
@@ -44,19 +44,19 @@ public RowHeader()
 }
 
 /**
- * Returns the JavaTextView.
+ * Returns the JavaTextArea.
  */
-public JavaTextView getTextView()  { return _textView; }
+public JavaTextArea getTextArea()  { return _textArea; }
 
 /**
- * Sets the JavaTextView.
+ * Sets the JavaTextArea.
  */
-public void setTextView(JavaTextView aJTA)  { _textView = aJTA; }
+public void setTextArea(JavaTextArea aJTA)  { _textArea = aJTA; }
 
 /**
- * Sets the JavaTextView selection.
+ * Sets the JavaTextArea selection.
  */
-public void setTextSelection(int aStart, int anEnd)  { _textView.setSel(aStart, anEnd); }
+public void setTextSelection(int aStart, int anEnd)  { _textArea.setSel(aStart, anEnd); }
 
 /**
  * Returns the list of markers.
@@ -72,21 +72,21 @@ protected List <Marker> createMarkers()
     List <Marker> markers = new ArrayList();
     
     // Add markers for member Overrides/Implements
-    JClassDecl cd = _textView.getJFile().getClassDecl();
+    JClassDecl cd = _textArea.getJFile().getClassDecl();
     if(cd!=null)
         getSuperMemberMarkers(cd, markers);
 
     // Add markers for BuildIssues
-    BuildIssue buildIssues[] = _textView.getBuildIssues();
+    BuildIssue buildIssues[] = _textArea.getBuildIssues();
     for(BuildIssue issue : buildIssues)
-        if(issue.getEnd()<_textView.length())
+        if(issue.getEnd()<_textArea.length())
             markers.add(new BuildIssueMarker(issue));
         
     // Add markers for breakpoints
-    for(Breakpoint bp : _textView.getBreakpoints()) {
-        if(bp.getLine()<_textView.getLineCount())
+    for(Breakpoint bp : _textArea.getBreakpoints()) {
+        if(bp.getLine()<_textArea.getLineCount())
             markers.add(new BreakpointMarker(bp));
-        else _textView.removeBreakpoint(bp);
+        else _textArea.removeBreakpoint(bp);
     }
     
     // Return markers
@@ -128,9 +128,9 @@ protected void processEvent(ViewEvent anEvent)
         for(Marker marker : markers)
             if(marker.contains(x,y) && marker instanceof BreakpointMarker) {
                 marker.mouseClicked(anEvent); return; }
-            TextBoxLine line = _textView.getTextBox().getLineForY(anEvent.getY());
+            TextBoxLine line = _textArea.getTextBox().getLineForY(anEvent.getY());
             int index = line.getIndex();
-            _textView.addBreakpoint(index);
+            _textArea.addBreakpoint(index);
             resetAll();
             return;
         }
@@ -156,7 +156,7 @@ protected void processEvent(ViewEvent anEvent)
  */
 protected void paintFront(Painter aPntr)
 {
-    double th = _textView.getHeight(), h = Math.min(getHeight(), th);
+    double th = _textArea.getHeight(), h = Math.min(getHeight(), th);
     aPntr.setStroke(Stroke.Stroke1);
     for(Marker m : getMarkers())
         aPntr.drawImage(m._image, m.x, m.y);
@@ -207,7 +207,7 @@ public class SuperMemberMarker extends Marker <JMemberDecl> {
         super(aTarget);
         _superDecl = aTarget.getSuperDecl();
         _interface = aTarget.isSuperDeclInterface();
-        TextBoxLine line = _textView.getLine(aTarget.getLineIndex());
+        TextBoxLine line = _textArea.getLine(aTarget.getLineIndex());
         setY(Math.round(line.getY()));
         _image = isInterface()? _implImage : _overImage;
     }
@@ -225,7 +225,7 @@ public class SuperMemberMarker extends Marker <JMemberDecl> {
     /** Handles MouseClick. */
     public void mouseClicked(ViewEvent anEvent)
     {
-        JavaTextPane tp = _textView.getTextPane(); if(tp==null) return;
+        JavaTextPane tp = _textArea.getTextPane(); if(tp==null) return;
         tp.openSuperDeclaration(_target);
     }
 }
@@ -242,7 +242,7 @@ public class BuildIssueMarker extends Marker <BuildIssue> {
     public BuildIssueMarker(BuildIssue aTarget)
     {
         super(aTarget); _isError = aTarget.isError();
-        TextBoxLine line = _textView.getLineAt(aTarget.getEnd());
+        TextBoxLine line = _textArea.getLineAt(aTarget.getEnd());
         setY(Math.round(line.getY()));
         _image = _isError? _errorImage : _warningImage;
     }
@@ -263,7 +263,7 @@ public class BreakpointMarker extends Marker <Breakpoint> {
     public BreakpointMarker(Breakpoint aBP)
     {
         super(aBP);
-        TextBoxLine line = _textView.getLine(aBP.getLine());
+        TextBoxLine line = _textArea.getLine(aBP.getLine());
         setY(Math.round(line.getY()));
         _image = _breakpointImage;
     }
@@ -274,7 +274,7 @@ public class BreakpointMarker extends Marker <Breakpoint> {
     /** Handles MouseClick. */
     public void mouseClicked(ViewEvent anEvent)
     {
-        if(anEvent.getClickCount()==2) _textView.removeBreakpoint(_target);
+        if(anEvent.getClickCount()==2) _textArea.removeBreakpoint(_target);
         resetAll();
     }
 }

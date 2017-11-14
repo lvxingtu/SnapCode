@@ -16,7 +16,7 @@ public class ClassViewer extends TextPane {
 protected void initUI()
 {
     super.initUI();
-    enableEvents(getTextView(), DragEvents);
+    enableEvents(getTextArea(), DragEvents);
     getUI().setPrefSize(800,1000);
 }
 
@@ -58,7 +58,7 @@ public void loadClassFile(Object aSource)
     for(ClassFileData.Constant con : (List <ClassFileData.Constant>)cfd.constantPool._constants)
         sb.append(con).append('\n');
         
-    getTextView().setText(sb.toString());
+    getTextArea().setText(sb.toString());
 }
 
 /**

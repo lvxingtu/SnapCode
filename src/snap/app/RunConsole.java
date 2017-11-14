@@ -147,7 +147,7 @@ protected void initUI()
 
     // Get output text
     _tview = getView("OutputText", RCTextView.class); _tview._rpanel = this;
-    _tview.setFont(defaultFont); _tview.setRich(true);
+    _tview.setFont(defaultFont); _tview.setPlainText(false);
 }
 
 /**

@@ -13,8 +13,8 @@ import snap.viewx.TextPane;
  */
 public class JavaTextPane extends TextPane {
 
-    // The JavaTextView
-    JavaTextView          _textView;
+    // The JavaTextArea
+    JavaTextArea          _textArea;
     
     // The SplitView
     SplitView             _splitView;
@@ -23,24 +23,24 @@ public class JavaTextPane extends TextPane {
     JavaPage              _javaPage;
     
 /**
- * Returns the JavaTextView.
+ * Returns the JavaTextArea.
  */
-public JavaTextView getTextView()  { return (JavaTextView)super.getTextView(); }
+public JavaTextArea getTextArea()  { return (JavaTextArea)super.getTextArea(); }
 
 /**
- * Creates the JavaTextView.
+ * Creates the JavaTextArea.
  */
-protected JavaTextView createTextView()  { return new JavaTextView(); }
+protected JavaTextArea createTextArea()  { return new JavaTextArea(); }
 
 /**
  * Returns the code completion popup.
  */
-public JavaPopupList getPopup()  { return getTextView().getPopup(); }
+public JavaPopupList getPopup()  { return getTextArea().getPopup(); }
 
 /**
  * Returns the CodeBuilder.
  */
-public CodeBuilder getCodeBuilder()  { return getTextView().getCodeBuilder(); }
+public CodeBuilder getCodeBuilder()  { return getTextArea().getCodeBuilder(); }
 
 /**
  * Returns whether CodeBuilder is visible.
@@ -75,23 +75,23 @@ protected void initUI()
     // Do normal version
     super.initUI();
     
-    // Get TextView and start listening for events (KeyEvents, MouseReleased, DragOver/Exit/Drop)
-    _textView = getTextView(); _textView._textPane = this;
-    _textView.setGrowWidth(true);
-    enableEvents(_textView, KeyPress, KeyRelease, KeyType, MousePress, MouseRelease, DragOver, DragExit,DragDrop);
+    // Get TextArea and start listening for events (KeyEvents, MouseReleased, DragOver/Exit/Drop)
+    _textArea = getTextArea(); _textArea._textPane = this;
+    _textArea.setGrowWidth(true);
+    enableEvents(_textArea, KeyPress, KeyRelease, KeyType, MousePress, MouseRelease, DragOver, DragExit,DragDrop);
     
-    // Reset TextView font
+    // Reset TextArea font
     float fontSize = Prefs.get().getFloat("JavaFontSize", 12); if(fontSize<8) fontSize = 12;
-    _textView.setFont(new Font(_textView.getDefaultFont().getName(), fontSize));
+    _textArea.setFont(new Font(_textArea.getDefaultFont().getName(), fontSize));
     
-    // Get TextView.RowHeader and configure
+    // Get TextArea.RowHeader and configure
     RowHeader rowHeader = createRowHeader();
-    rowHeader.setTextView(_textView); _textView._rowHeader = rowHeader;
+    rowHeader.setTextArea(_textArea); _textArea._rowHeader = rowHeader;
     
     // Get ScrollView and add RowHeader
     ScrollView spane = getView("ScrollView", ScrollView.class); spane.setGrowWidth(true);
     RowView hbox = new RowView(); hbox.setFillHeight(true);
-    hbox.setChildren(rowHeader, _textView);
+    hbox.setChildren(rowHeader, _textArea);
     spane.setContent(hbox);
     
     // Get SplitView and add ScrollView and CodeBuilder
@@ -99,9 +99,9 @@ protected void initUI()
     _splitView.addItem(spane);
     getUI(BorderView.class).setCenter(_splitView);
     
-    // Get OverviewPane and set JavaTextView
+    // Get OverviewPane and set JavaTextArea
     OverviewPane overviewPane = createOverviewPane();
-    overviewPane.setTextView(_textView); _textView._overviewPane = overviewPane;
+    overviewPane.setTextArea(_textArea); _textArea._overviewPane = overviewPane;
     getUI(BorderView.class).setRight(overviewPane);
 }
 
@@ -111,14 +111,14 @@ protected void initUI()
 public void resetUI()
 {    
     // Reset FontSizeText
-    setViewValue("FontSizeText", getTextView().getFont().getSize());
+    setViewValue("FontSizeText", getTextArea().getFont().getSize());
     
     // Clear path box and add Lin/Col postion label
     RowView nodePathBox = getView("BottomBox", RowView.class);
     while(nodePathBox.getChildCount()>1) nodePathBox.removeChild(1); Font font = Font.get("Arial",11);
     
     // Iterate up from DeepPart and add parts
-    JNode deepNode = getTextView()._deepNode, selNode = getTextView().getSelectedNode();
+    JNode deepNode = getTextArea()._deepNode, selNode = getTextArea().getSelectedNode();
     for(JNode part=deepNode, spart=selNode; part!=null; part=part.getParent()) {
         Label label = new Label(); label.setText(part.getNodeString()); label.setFont(font);
         label.setName("NodePathLabel"); label.setProp("JNode", part);
@@ -150,25 +150,25 @@ public void respondUI(ViewEvent anEvent)
     // Do normal version
     super.respondUI(anEvent);
     
-    // Handle TextView key events
-    if(anEvent.equals("TextView")) {
+    // Handle TextArea key events
+    if(anEvent.equals("TextArea")) {
         
         // Handle KeyPressed/KeyReleased to watch for CONTROL/COMMAND press/release
         if(anEvent.isKeyPress() || anEvent.isKeyRelease()) { int kc = anEvent.getKeyCode();
             if(kc==KeyCode.COMMAND || kc==KeyCode.CONTROL)
-                setTextViewHoverEnabled(anEvent.isKeyPress());
+                setTextAreaHoverEnabled(anEvent.isKeyPress());
         }
         
         // Handle KeyTyped: If PopupList not visible, ActivatePopupList
         else if(anEvent.isKeyType()) {
             if(getPopup().isShowing() || anEvent.isShortcutDown()) return;
             if(anEvent.isControlChar() || anEvent.isSpaceKey()) return;
-            runLater(() -> getTextView().activatePopupList());
+            runLater(() -> getTextArea().activatePopupList());
         }
         
         // Handle PopupTrigger
         else if(anEvent.isPopupTrigger()) { //anEvent.consume();
-            Menu cmenu = createContextMenu(); cmenu.show(_textView, anEvent.getX(), anEvent.getY()); }
+            Menu cmenu = createContextMenu(); cmenu.show(_textArea, anEvent.getX(), anEvent.getY()); }
         
         // Handle MouseClick: If alt-down, open JavaDoc. If HoverNode, open declaration
         else if(anEvent.isMouseClick()) {
@@ -178,18 +178,18 @@ public void respondUI(ViewEvent anEvent)
                 URLUtils.openURL(getJavaDocURL());
                 
             // If there is a hover node, open it (and clear Hover)
-            else if(getTextView().getHoverNode()!=null) {
-                openDeclaration(getTextView().getHoverNode());
-                setTextViewHoverEnabled(false);
+            else if(getTextArea().getHoverNode()!=null) {
+                openDeclaration(getTextArea().getHoverNode());
+                setTextAreaHoverEnabled(false);
             }
         }
         
         // Handle MouseMoved
         else if(anEvent.isMouseMove()) {
-            if(!anEvent.isShortcutDown()) { setTextViewHoverEnabled(false); return; }
-            int index = _textView.getCharIndex(anEvent.getX(), anEvent.getY());
-            JNode node = _textView.getJFile().getNodeAtCharIndex(index);
-            _textView.setHoverNode(node instanceof JExprId || node instanceof JType? node : null);
+            if(!anEvent.isShortcutDown()) { setTextAreaHoverEnabled(false); return; }
+            int index = _textArea.getCharIndex(anEvent.getX(), anEvent.getY());
+            JNode node = _textArea.getJFile().getNodeAtCharIndex(index);
+            _textArea.setHoverNode(node instanceof JExprId || node instanceof JType? node : null);
         }
         
         // Handle DragOver, DragExit, DragDrop
@@ -206,24 +206,24 @@ public void respondUI(ViewEvent anEvent)
 
     // Handle FontSizeText, IncreaseFontButton, DecreaseFontButton
     else if(anEvent.equals("FontSizeText")||anEvent.equals("IncreaseFontButton")||anEvent.equals("DecreaseFontButton"))
-        Prefs.get().set("JavaFontSize", getTextView().getFont().getSize()); 
+        Prefs.get().set("JavaFontSize", _textArea.getFont().getSize()); 
     
     // Handle OpenDeclarationMenuItem
     else if(anEvent.equals("OpenDeclarationMenuItem"))
-        openDeclaration(getTextView().getSelectedNode());
+        openDeclaration(_textArea.getSelectedNode());
     
     // Handle ShowReferencesMenuItem
     else if(anEvent.equals("ShowReferencesMenuItem"))
-        showReferences(getTextView().getSelectedNode());
+        showReferences(_textArea.getSelectedNode());
     
     // Handle ShowDeclarationsMenuItem
     else if(anEvent.equals("ShowDeclarationsMenuItem"))
-        showDeclarations(getTextView().getSelectedNode());
+        showDeclarations(_textArea.getSelectedNode());
     
     // Handle NodePathLabel
     else if(anEvent.equals("NodePathLabel")) {
-        JNode part = (JNode)anEvent.getView().getProp("JNode"), dnode = getTextView()._deepNode;
-        getTextView().setSel(part.getStart(), part.getEnd()); getTextView()._deepNode = dnode;
+        JNode part = (JNode)anEvent.getView().getProp("JNode"), dnode = _textArea._deepNode;
+        _textArea.setSel(part.getStart(), part.getEnd()); _textArea._deepNode = dnode;
     }
     
     // Handle SnapCodeButton
@@ -238,8 +238,8 @@ public void saveChanges()
 {
     getPopup().hide(); // Close popup
     super.saveChanges();
-    getTextView().getTextBox()._jfile = null;
-    getTextView().getTextBox().getJFile(); // Force reparse
+    _textArea.getTextBox()._jfile = null;
+    _textArea.getTextBox().getJFile(); // Force reparse
 }
 
 /**
@@ -248,7 +248,7 @@ public void saveChanges()
 public String getJavaDocText()
 {
     // Get class name for selected JNode
-    Class cls = getTextView().getSelectedNodeClass(); if(cls==null) return null;
+    Class cls = _textArea.getSelectedNodeClass(); if(cls==null) return null;
     if(cls.isArray()) cls = cls.getComponentType();
     
     // Iterate up through class parents until URL found or null
@@ -265,7 +265,7 @@ public String getJavaDocText()
 public String getJavaDocURL()
 {
     // Get class name for selected JNode
-    Class cls = getTextView().getSelectedNodeClass(); if(cls==null) return null;
+    Class cls = _textArea.getSelectedNodeClass(); if(cls==null) return null;
     if(cls.isArray()) cls = cls.getComponentType();
     
     // Iterate up through class parents until URL found or null
@@ -308,19 +308,19 @@ public String getJavaDocURL(Class aClass)
 }
 
 /**
- * Sets whether MouseMoved over JavaTextView should set hover node.
+ * Sets whether MouseMoved over JavaTextArea should set hover node.
  */
-protected void setTextViewHoverEnabled(boolean isEnabled)
+protected void setTextAreaHoverEnabled(boolean isEnabled)
 {
-    if(isEnabled) enableEvents(_textView, MouseMove);
-    else disableEvents(_textView, MouseMove);
-    _textView.setHoverNode(null);
+    if(isEnabled) enableEvents(_textArea, MouseMove);
+    else disableEvents(_textArea, MouseMove);
+    _textArea.setHoverNode(null);
 }
 
 /**
- * Override to turn off TextViewHoverEnabled.
+ * Override to turn off TextAreaHoverEnabled.
  */
-public void showLineNumberPanel()  { super.showLineNumberPanel(); setTextViewHoverEnabled(false); }
+public void showLineNumberPanel()  { super.showLineNumberPanel(); setTextAreaHoverEnabled(false); }
 
 /**
  * Creates the ContextMenu.
@@ -348,7 +348,7 @@ protected OverviewPane createOverviewPane()  { return new OverviewPane(); }
 /**
  * Sets the TextSelection.
  */
-public void setTextSel(int aStart, int anEnd)  { _textView.setSel(aStart, anEnd); }
+public void setTextSel(int aStart, int anEnd)  { _textArea.setSel(aStart, anEnd); }
 
 /**
  * Open declaration.

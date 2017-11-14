@@ -13,8 +13,8 @@ import snap.view.*;
  */
 public class CodeBuilder extends ViewOwner {
 
-    // The JavaTextView this inspector works for.
-    JavaTextView           _textView;
+    // The JavaTextArea this inspector works for.
+    JavaTextArea           _textArea;
     
     // The selected node
     JNode                  _node;
@@ -37,12 +37,12 @@ public class CodeBuilder extends ViewOwner {
 /**
  * Creates a new JavaInspector.
  */
-public CodeBuilder(JavaTextView aJavaTextView)  { _textView = aJavaTextView; }
+public CodeBuilder(JavaTextArea aJavaTextArea)  { _textArea = aJavaTextArea; }
 
 /**
- * Returns the JavaTextView associated with text pane.
+ * Returns the JavaTextArea associated with text pane.
  */
-public JavaTextView getTextView()  { return _textView; }
+public JavaTextArea getTextArea()  { return _textArea; }
 
 /**
  * Whether inspector is visible.
@@ -50,12 +50,12 @@ public JavaTextView getTextView()  { return _textView; }
 public boolean isVisible()  { return isUISet() && getUI().isVisible(); }
 
 /**
- * Sets CodeBlocks for current TextView.SelectedNode.
+ * Sets CodeBlocks for current TextArea.SelectedNode.
  */
 public void setCodeBlocks()
 {
     // Get SelectedNode (or first node parent with class) and its class
-    _node = getTextView().getSelectedNode();
+    _node = getTextArea().getSelectedNode();
     while(_node!=null && _node.getEvalClass()==null) _node = _node.getParent();
     
     // Get suggested CodeBlocks for class and set in Suggestions list
@@ -129,7 +129,7 @@ public void respondUI(ViewEvent anEvent)
             // Get event dboard and start drag
             Clipboard cboard = anEvent.getClipboard();
             cboard.addData(dragString);
-            //cboard.setDragImageFromString(dragString, getTextView().getFont().deriveFont(10f));
+            //cboard.setDragImageFromString(dragString, getTextArea().getFont().deriveFont(10f));
             //cboard.setDragImagePoint(0, dboard.getDragImage().getHeight()/2);
             cboard.startDrag();
         }
@@ -150,20 +150,20 @@ protected void configureSuggestionsList(ListCell <CodeBlock> aCell)
 }
 
 /**
- * Called when drag is over TextView.
+ * Called when drag is over TextArea.
  */
 public void dragOver(double anX, double aY)
 {
     // Bail?
     if(_dragCodeBlock==null) return;
     
-    // Set DragPoint and register TextView to repaint
+    // Set DragPoint and register TextArea to repaint
     _dragPoint = new Point(anX, aY);
-    getTextView().repaint();
+    getTextArea().repaint();
     
     // Set DragNode
-    int index = getTextView().getCharIndex(anX, aY);
-    _dragNode = getTextView().getJFile().getNodeAtCharIndex(index);
+    int index = getTextArea().getCharIndex(anX, aY);
+    _dragNode = getTextArea().getJFile().getNodeAtCharIndex(index);
     
     // Get DragBlock
     _dragBlock = _dragNode;
@@ -184,14 +184,14 @@ public void dragOver(double anX, double aY)
 
     // If DragText needs to be reset, create and reset
     if(_dragText==null || !_dragText.getString().equals(dragString)) {
-        JavaTextView textView = getTextView(); JavaTextBox text = textView.getTextBox();
-        _dragText = textView.createText(); _dragText.setX(text.getX());
+        JavaTextArea textArea = getTextArea(); JavaTextBox text = textArea.getTextBox();
+        _dragText = textArea.createTextBox(); _dragText.setX(text.getX());
         _dragText.setString(dragString);
      }
 }
 
 /**
- * Called when drag exits TextView.
+ * Called when drag exits TextArea.
  */
 public void dragExit()  { clearDrag(); }
 
@@ -200,16 +200,16 @@ public void dragExit()  { clearDrag(); }
  */
 public void drop(double anX, double aY)
 {
-    JavaTextView textView = getTextView();
-    TextBoxLine line = textView.getTextBox().getLineForY(_dragPoint.getY());
+    JavaTextArea textArea = getTextArea();
+    TextBoxLine line = textArea.getTextBox().getLineForY(_dragPoint.getY());
     CharSequence indent = getIndentString(line.getIndex());
     String string = _dragCodeBlock.getReplaceString(), fullString = indent + string + "\n";
     int selStart = line.getStart();
-    textView.replaceChars(fullString, null, selStart, selStart, false);
-    textView.setSel(selStart + indent.length(), selStart + indent.length() + string.length());
+    textArea.replaceChars(fullString, null, selStart, selStart, false);
+    textArea.setSel(selStart + indent.length(), selStart + indent.length() + string.length());
     //int argStart = string.indexOf('('), argEnd = argStart>0? string.indexOf(')', argStart) : -1;
-    //if(argEnd>argStart+1) textView.setSelection(selStart + argStart + 1, selStart + argEnd);
-    textView.requestFocus();
+    //if(argEnd>argStart+1) textArea.setSelection(selStart + argStart + 1, selStart + argEnd);
+    textArea.requestFocus();
     clearDrag();
 }
 
@@ -241,15 +241,15 @@ public TextBox getDragText()  { return _dragText; }
 /**
  * Override to provide hook for CodeBuilder to paint.
  */
-/*protected boolean paintTextSelection(JavaTextView aTextView, Graphics2D aGraphics)
+/*protected boolean paintTextSelection(JavaTextArea aTextArea, Graphics2D aGraphics)
 {
     // If DragBlock is null, return false
     if(_dragBlock==null || _dragText==null) return false;
     
     // Get SelectionPath for DragBlock and paint
-    TextToken startToken = aTextView.getText().getTokenAt(_dragBlock.getStart());
-    TextToken endToken = aTextView.getText().getTokenAt(_dragBlock.getEnd());
-    double x = Math.min(startToken.getX(), endToken.getX()) - 2, w = aTextView.getWidth() - x - 10;
+    TextToken startToken = aTextArea.getText().getTokenAt(_dragBlock.getStart());
+    TextToken endToken = aTextArea.getText().getTokenAt(_dragBlock.getEnd());
+    double x = Math.min(startToken.getX(), endToken.getX()) - 2, w = aTextArea.getWidth() - x - 10;
     double y = startToken.getY() - 3, h = endToken.getMaxY() - y + _dragText.getPrefHeight() + 2;
     Rectangle2D rect = new Rectangle2D(x, y, w, h); 
     aGraphics.setColor(_dbFill); aGraphics.fill(rect);
@@ -263,7 +263,7 @@ public TextBox getDragText()  { return _dragText; }
 /**
  * Paints a TextLine.
  */
-/*protected boolean paintLine(JavaTextView aTextView, Graphics2D aGraphics, TextLine aLine, double anX, double aY)
+/*protected boolean paintLine(JavaTextArea aTextArea, Graphics2D aGraphics, TextLine aLine, double anX, double aY)
 {
     // Get DragText and DragPoint (return false if no DragText or not to DragPoint yet)
     Text dragText = getDragText(); if(dragText==null) return false;
@@ -276,12 +276,12 @@ public TextBox getDragText()  { return _dragText; }
         double x = dragLineToken0.getX(), w = dragLine.getMaxX() - x;
         aGraphics.setColor(Color.decode("#FFF280"));
         aGraphics.fillRect((int)x, (int)aLine.getY()-2, (int)w, (int)aLine.getHeight()+2);
-        //aTextView.paintLineImpl(aGraphics, dragLine, 0, y);
+        //aTextArea.paintLineImpl(aGraphics, dragLine, 0, y);
     }
     y += aLine.getLineAdvance();
     
     // Do normal version
-    aTextView.paintLineImpl(aGraphics, aLine, anX, y);
+    aTextArea.paintLineImpl(aGraphics, aLine, anX, y);
     return true;
 }*/
 
@@ -291,7 +291,7 @@ public TextBox getDragText()  { return _dragText; }
 public int getIndent(int anIndex)
 {
     if(anIndex==0) return 0;
-    TextBoxLine line = getTextView().getTextBox().getLine(anIndex-1);
+    TextBoxLine line = getTextArea().getTextBox().getLine(anIndex-1);
     int c = 0; while(c<line.length() && Character.isWhitespace(line.charAt(c))) c++;
     if(!line.getString().trim().endsWith(";")) c += 4;
     return c;

@@ -12,8 +12,8 @@ import snap.view.*;
  */
 public class OverviewPane extends View {
 
-    // The JavaTextView
-    JavaTextView        _textView;
+    // The JavaTextArea
+    JavaTextArea        _textArea;
     
     // The list of markers
     List <Marker>       _markers;
@@ -36,19 +36,19 @@ public OverviewPane()
 }
 
 /**
- * Returns the JavaTextView.
+ * Returns the JavaTextArea.
  */
-public JavaTextView getTextView()  { return _textView; }
+public JavaTextArea getTextArea()  { return _textArea; }
 
 /**
- * Sets the JavaTextView.
+ * Sets the JavaTextArea.
  */
-public void setTextView(JavaTextView aJTA)  { _textView = aJTA; }
+public void setTextArea(JavaTextArea aJTA)  { _textArea = aJTA; }
 
 /**
- * Sets the JavaTextView selection.
+ * Sets the JavaTextArea selection.
  */
-public void setTextSel(int aStart, int anEnd)  { _textView._textPane.setTextSel(aStart, anEnd); }
+public void setTextSel(int aStart, int anEnd)  { _textArea._textPane.setTextSel(aStart, anEnd); }
 
 /**
  * Returns the list of markers.
@@ -63,13 +63,13 @@ protected List <Marker> createMarkers()
     // Create list
     List <Marker> markers = new ArrayList();
     
-    // Add markers for TextView.JavaSource.BuildIssues
-    BuildIssue buildIssues[] = _textView.getBuildIssues();
+    // Add markers for TextArea.JavaSource.BuildIssues
+    BuildIssue buildIssues[] = _textArea.getBuildIssues();
     for(BuildIssue issue : buildIssues)
         markers.add(new BuildIssueMarker(issue));
     
-    // Add markers for TextView.SelectedTokens
-    List <TextBoxToken> tokens = _textView.getSelectedTokens();
+    // Add markers for TextArea.SelectedTokens
+    List <TextBoxToken> tokens = _textArea.getSelectedTokens();
     for(TextBoxToken token : tokens)
         markers.add(new TokenMarker(token));
     
@@ -92,7 +92,7 @@ protected void processEvent(ViewEvent anEvent)
         for(Marker m : getMarkers()) {
             if(m.contains(anEvent.getX(), anEvent.getY())) {
                 setTextSel(m.getSelStart(), m.getSelEnd()); return; }}
-        TextBoxLine line = _textView.getTextBox().getLineForY(anEvent.getY()/getHeight()*_textView.getHeight());
+        TextBoxLine line = _textArea.getTextBox().getLineForY(anEvent.getY()/getHeight()*_textArea.getHeight());
         setTextSel(line.getStart(), line.getEnd());
     }
     
@@ -111,7 +111,7 @@ protected void processEvent(ViewEvent anEvent)
  */
 protected void paintFront(Painter aPntr)
 {
-    double th = _textView.getHeight(), h = Math.min(getHeight(), th);
+    double th = _textArea.getHeight(), h = Math.min(getHeight(), th);
     aPntr.setStroke(Stroke.Stroke1);
     for(Marker m : getMarkers()) {
         m.setY(m._y/th*h);
@@ -128,7 +128,7 @@ public String getToolTip(ViewEvent anEvent)
     for(Marker marker : getMarkers())
         if(marker.contains(_mx, _my))
             return marker.getToolTip();
-    TextBoxLine line = _textView.getTextBox().getLineForY(_my/getHeight()*_textView.getHeight());
+    TextBoxLine line = _textArea.getTextBox().getLineForY(_my/getHeight()*_textArea.getHeight());
     return "Line: " + (line.getIndex()+1);
 }
 
@@ -169,7 +169,7 @@ public class BuildIssueMarker extends Marker <BuildIssue> {
     public BuildIssueMarker(BuildIssue anIssue)
     {
         super(anIssue);
-        TextBoxLine line = _textView.getLineAt(Math.min(anIssue.getEnd(), _textView.length()));
+        TextBoxLine line = _textArea.getLineAt(Math.min(anIssue.getEnd(), _textArea.length()));
         _y = line.getY() + line.getHeight()/2;
     }
     

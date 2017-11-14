@@ -34,7 +34,7 @@ public class JavaTextBox extends TextBox {
 /**
  * Creates a new JavaText.
  */
-public JavaTextBox()  { getText().setSingleStyle(true); }
+public JavaTextBox()  { getText().setPlainText(true); }
 
 /**
  * Returns the JFile (parsed representation of Java file).

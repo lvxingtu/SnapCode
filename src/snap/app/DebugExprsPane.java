@@ -61,11 +61,10 @@ protected View createUI()
             titem._expr = titem._name = (String)e.getNewValue(); resetVarTable(); } });*/
     
     // Create VarText TextView and configure in ScrollView
-    _varText = new TextView(); _varText.setWrapText(true);
-    ScrollView textScroll = new ScrollView(_varText); textScroll.setPrefHeight(40);
+    _varText = new TextView(); _varText.setWrapText(true); _varText.setPrefHeight(40);
     
     // Create SplitView with VarTree and VarText
-    SplitView split = new SplitView(); split.setItems(_varTree, textScroll);
+    SplitView split = new SplitView(); split.setItems(_varTree, _varText);
     split.setVertical(true); split.setGrowHeight(true);
     
     // Create Buttons

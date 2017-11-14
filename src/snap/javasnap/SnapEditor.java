@@ -2,7 +2,7 @@ package snap.javasnap;
 import java.util.List;
 import snap.gfx.TextBoxLine;
 import snap.javakit.*;
-import snap.javatext.JavaTextView;
+import snap.javatext.JavaTextArea;
 import snap.view.*;
 
 /**
@@ -10,8 +10,8 @@ import snap.view.*;
  */
 public class SnapEditor extends StackView {
 
-    // The JavaTextView
-    JavaTextView         _jtextView;
+    // The JavaTextArea
+    JavaTextArea         _jtextArea;
     
     // The scripts pane
     JFileView            _filePart;
@@ -25,10 +25,10 @@ public class SnapEditor extends StackView {
 /**
  * Creates a new SnapCodeArea.
  */
-public SnapEditor(JavaTextView aJTV)
+public SnapEditor(JavaTextArea aJTA)
 {
-    // Set JavaTextView
-    _jtextView = aJTV;
+    // Set JavaTextArea
+    _jtextArea = aJTA;
     
     // Create FilePart and add
     _filePart = new JFileView(); _filePart._editor = this;
@@ -46,9 +46,9 @@ public SnapEditor(JavaTextView aJTV)
 public SnapEditorPane getEditorPane()  { return getOwner(SnapEditorPane.class); }
 
 /**
- * Returns the JavaTextView.
+ * Returns the JavaTextArea.
  */
-public JavaTextView getJavaTextView()  { return _jtextView; }
+public JavaTextArea getJavaTextArea()  { return _jtextArea; }
 
 /**
  * Returns the selected part.
@@ -64,10 +64,10 @@ public void setSelectedPart(JNodeView aPart)
     _selPart = aPart!=null? aPart : _filePart;
     _selPart.setSelected(true);
 
-    // Update JavaTextView selection    
+    // Update JavaTextArea selection    
     JNode jnode = _selPart.getJNode();
     int ss = jnode.getStart(), se = jnode.getEnd();
-    getJavaTextView().setSel(ss, se);
+    getJavaTextArea().setSel(ss, se);
 
     // Forward to editor
     SnapEditorPane ep = getEditorPane();
@@ -82,7 +82,7 @@ public JFileView getFilePart()  { return _filePart; }
 /**
  * Returns the JFile JNode.
  */
-public JFile getJFile()  { return getJavaTextView().getJFile(); }
+public JFile getJFile()  { return getJavaTextArea().getJFile(); }
 
 /**
  * Returns the selected part's class.
@@ -125,7 +125,7 @@ protected void rebuildUI()
  */
 void setSelectedPartFromTextArea()
 {
-    int index = getJavaTextView().getSelStart();
+    int index = getJavaTextArea().getSelStart();
     JNodeView spart = getSnapPartAt(getFilePart(), index);
     setSelectedPart(spart);
 }
@@ -153,7 +153,7 @@ public JNodeView getSnapPartAt(JNodeView aPart, int anIndex)
  */
 protected void replaceText(String aString, int aStart, int anEnd)
 {
-    JavaTextView tview = getJavaTextView();
+    JavaTextArea tview = getJavaTextArea();
     tview.undoerSaveChanges();
     tview.replaceChars(aString, null, aStart, anEnd, true);
     rebuildUI();
@@ -164,7 +164,7 @@ protected void replaceText(String aString, int aStart, int anEnd)
  */
 protected void setTextSelection(int aStart, int anEnd)
 {
-    JavaTextView tview = getJavaTextView();
+    JavaTextArea tview = getJavaTextArea();
     tview.setSel(aStart, anEnd);
 }
 
@@ -217,7 +217,7 @@ public int getBeforeNode(JNode aNode)
 {
     int index = aNode.getStart();
     JExpr pexpr = aNode instanceof JExpr? ((JExpr)aNode).getParentExpr() : null; if(pexpr!=null) return pexpr.getEnd();
-    TextBoxLine tline = getJavaTextView().getLineAt(index);
+    TextBoxLine tline = getJavaTextArea().getLineAt(index);
     return tline.getStart();
 }
 
@@ -229,7 +229,7 @@ public int getAfterNode(JNode aNode)
     int index = aNode.getEnd();
     JExprChain cexpr = aNode.getParent() instanceof JExprChain? (JExprChain)aNode.getParent() : null;
     if(cexpr!=null) return cexpr.getExpr(cexpr.getExprCount()-1).getEnd();
-    TextBoxLine tline = getJavaTextView().getLineAt(index);
+    TextBoxLine tline = getJavaTextArea().getLineAt(index);
     return tline.getEnd();
 }
 
@@ -238,7 +238,7 @@ public int getAfterNode(JNode aNode)
  */
 public int getInNode(JNode aNode)
 {
-    JavaTextView tview = getJavaTextView();
+    JavaTextArea tview = getJavaTextArea();
     int index = aNode.getStart(); while(index<tview.length() && tview.charAt(index)!='{') index++;
     TextBoxLine tline = tview.getLineAt(index);
     return tline.getEnd();
@@ -250,7 +250,7 @@ public int getInNode(JNode aNode)
 String getIndent(JNode aNode, int aPos)
 {
     int index = aNode.getStart();
-    TextBoxLine tline = getJavaTextView().getLineAt(index);
+    TextBoxLine tline = getJavaTextArea().getLineAt(index);
     int c = 0; while(c<tline.length() && Character.isWhitespace(tline.charAt(c))) c++;
     StringBuffer sb = new StringBuffer(); for(int i=0;i<c;i++) sb.append(' ');
     if(aPos==0) sb.append("    ");

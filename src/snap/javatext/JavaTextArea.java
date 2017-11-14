@@ -11,9 +11,9 @@ import snap.view.*;
 import snap.web.WebFile;
 
 /**
- * A TextView subclass for Java source editing.
+ * A TextArea subclass for Java source editing.
  */
-public class JavaTextView extends TextView {
+public class JavaTextArea extends TextArea {
 
     // The max column
     int                    _printMarginColumn = 120;
@@ -49,9 +49,14 @@ public class JavaTextView extends TextView {
     OverviewPane           _overviewPane;
     
 /**
- * Creates a new JavaTextView.
+ * Creates a new JavaTextArea.
  */
-public JavaTextView()  { setFont(getDefaultFont()); }
+public JavaTextArea()
+{
+    setFill(Color.WHITE);
+    setFont(getDefaultFont());
+    setEditable(true);
+}
 
 /**
  * Returns the Java text pane.
@@ -66,7 +71,7 @@ public JavaTextBox getTextBox()  { return (JavaTextBox)super.getTextBox(); }
 /**
  * Override to create JavaText.
  */
-protected TextBox createText()  { return new JavaTextBox(); }
+protected TextBox createTextBox()  { return new JavaTextBox(); }
 
 /**
  * Returns the code completion popup.

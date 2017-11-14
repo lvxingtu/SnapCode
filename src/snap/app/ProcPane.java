@@ -3,7 +3,7 @@ import java.util.*;
 import snap.debug.*;
 import snap.gfx.*;
 import snap.javatext.JavaPage;
-import snap.javatext.JavaTextView;
+import snap.javatext.JavaTextArea;
 import snap.util.*;
 import snap.view.*;
 import snap.viewx.WebPage;
@@ -327,13 +327,13 @@ public void setProgramCounter(WebFile aFile, int aLine)
     // Store old value, set new value
     WebFile oldPCF = _progCounterFile; _progCounterFile = aFile; _progCounterLine = aLine;
     
-    // Reset JavaPage.TextView for old/new files
+    // Reset JavaPage.TextArea for old/new files
     WebPage page = oldPCF!=null? getAppPane().getBrowser().getPage(oldPCF.getURL()) : null;
     if(page instanceof JavaPage)
-        ((JavaPage)page).getTextView().repaint();
+        ((JavaPage)page).getTextArea().repaint();
     page = _progCounterFile!=null? getAppPane().getBrowser().getPage(_progCounterFile.getURL()) : null;
     if(page instanceof JavaPage)
-        ((JavaPage)page).getTextView().repaint();    
+        ((JavaPage)page).getTextArea().repaint();    
 }
 
 /**
@@ -427,9 +427,9 @@ protected void respondUI(ViewEvent anEvent)
     else if(anEvent.equals("RunToLineButton")) {
         WebPage page = getAppPane().getBrowser().getPage();
         JavaPage jpage = page instanceof JavaPage? (JavaPage)page : null; if(jpage==null) return;
-        JavaTextView tview = jpage.getTextView();
+        JavaTextArea tarea = jpage.getTextArea();
         WebFile file = jpage.getFile();
-        int line = tview.getSel().getStartLine().getIndex();
+        int line = tarea.getSel().getStartLine().getIndex();
         dapp.runToLine(file, line);
     }
     

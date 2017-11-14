@@ -13,25 +13,25 @@ import snap.view.*;
  */
 public class JavaPopupList extends PopupList <JavaDecl> implements PropChangeListener {
 
-    // The JavaTextView
-    JavaTextView           _textView;
+    // The JavaTextArea
+    JavaTextArea           _textArea;
     
     // The current selection start
     int                    _selStart;
     
 /**
- * Creates a new java popup for given JavaTextView.
+ * Creates a new java popup for given JavaTextArea.
  */
-public JavaPopupList(JavaTextView aJavaTextView)
+public JavaPopupList(JavaTextArea aJavaTextArea)
 {
-    _textView = aJavaTextView;
+    _textArea = aJavaTextArea;
     setPrefWidth(500); setPrefRowCount(15);
 }
 
 /**
- * Returns the JavaTextView.
+ * Returns the JavaTextArea.
  */
-public JavaTextView getTextView()  { return _textView; }
+public JavaTextArea getTextArea()  { return _textArea; }
 
 /**
  * Applies the current suggestion.
@@ -44,19 +44,19 @@ public void applySuggestion()  { applySuggestion(getSelectedItem()); }
 public void applySuggestion(JavaDecl aDecl)
 {
     // Add suggestion text
-    JavaTextView textView = getTextView();
-    JNode selectedNode = textView.getSelectedNode();
+    JavaTextArea textArea = getTextArea();
+    JNode selectedNode = textArea.getSelectedNode();
     String completion = aDecl.getReplaceString();
     int selStart = selectedNode.getStart();
-    textView.replaceChars(completion, null, selStart, textView.getSelEnd(), false);
+    textArea.replaceChars(completion, null, selStart, textArea.getSelEnd(), false);
     int argStart = completion.indexOf('('), argEnd = argStart>0? completion.indexOf(')', argStart) : -1;
-    if(argEnd>argStart+1) textView.setSel(selStart + argStart + 1, selStart + argEnd);
+    if(argEnd>argStart+1) textArea.setSel(selStart + argStart + 1, selStart + argEnd);
     
     // Add import for suggestion Class, if not present
     addImport(aDecl, selectedNode.getFile());
     
     // Hide PopupList
-    hide(); //textView.requestFocus();
+    hide();
 }
 
 /**
@@ -76,20 +76,20 @@ protected void addImport(JavaDecl aDecl, JFile aFile)
                 if(cpath.compareTo(i.getName())<0) break;
                 else is = i.getLineIndex() + 1;
             }
-            TextBoxLine line = getTextView().getLine(is);
-            getTextView().replaceChars(istring, null, line.getStart(), line.getStart(), false);
+            TextBoxLine line = getTextArea().getLine(is);
+            getTextArea().replaceChars(istring, null, line.getStart(), line.getStart(), false);
         }
     }
 }
 
 /**
- * Override to register for TextView property change.
+ * Override to register for textArea property change.
  */
 public void show(View aView, double aX, double aY)
 {
     super.show(aView, aX, aY);
-    _textView.addPropChangeListener(_textViewLsnr);
-    _selStart = _textView.getSelStart();
+    _textArea.addPropChangeListener(_textAreaLsnr);
+    _selStart = _textArea.getSelStart();
 }
 
 /**
@@ -98,23 +98,23 @@ public void show(View aView, double aX, double aY)
 public void hide()
 {
     super.hide();
-    _textView.removePropChangeListener(_textViewLsnr);
+    _textArea.removePropChangeListener(_textAreaLsnr);
 }
 
-// PropChangeListner for TextView prop changes
-PropChangeListener _textViewLsnr = pce -> textViewPropChange(pce);
+// PropChangeListner for TextArea prop changes
+PropChangeListener _textAreaLsnr = pce -> textAreaPropChange(pce);
 
 /**
- * Catch TextEditor Selection changes that should cause Popup to close.
+ * Catch TextArea Selection changes that should cause Popup to close.
  */
-public void textViewPropChange(PropChange anEvent)
+public void textAreaPropChange(PropChange anEvent)
 {
     // If not showing, unregister (in case we were PopupList was dismissed without hide)
-    if(!isShowing()) { _textView.removePropChangeListener(this); return; }
+    if(!isShowing()) { _textArea.removePropChangeListener(this); return; }
     
     // If Selection change, update or hide
     if(anEvent.getPropertyName().equals("Selection")) {
-        int start = _textView.getSelStart(), end = _textView.getSelEnd();
+        int start = _textArea.getSelStart(), end = _textArea.getSelEnd();
         if(start!=end || !(start==_selStart+1 || start==_selStart-1))
             hide();
         _selStart = start;

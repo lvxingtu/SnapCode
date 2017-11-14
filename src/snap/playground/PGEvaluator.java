@@ -2,7 +2,7 @@ package snap.playground;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import snap.javakit.*;
-import snap.view.TextView;
+import snap.view.TextArea;
 
 /**
  * A class to evaluate playground code.
@@ -69,7 +69,7 @@ protected Object evalLine(String aLine)
     String line = aLine.trim(); if(line.length()==0 || line.startsWith("//")) return null;
     
     // Get textview and mark current length, in case we need to check for console output
-    TextView tview = _pg.getConsole().getConsoleView();
+    TextArea tview = _pg.getConsole().getConsoleView();
     int start = tview.length();
     
     // Eval as statement (or expression, if that fails)
