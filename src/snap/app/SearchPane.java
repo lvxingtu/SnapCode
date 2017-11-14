@@ -159,6 +159,10 @@ public void searchReference(JNode aNode)
         while(decl.getSuper()!=null)
             decl = decl.getSuper();
     
+    // If param class
+    if(decl.isParamType())
+        decl = decl.getClassType();
+    
     // Configure search
     _search = new Search(); _search._string = decl.getMatchName(); _search._kind = Search.Kind.Reference;
     

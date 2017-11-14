@@ -698,8 +698,14 @@ public JavaDecl getArrayTypeDecl()
  */
 public boolean matches(JavaDecl aDecl)
 {
-    // Check identity, type
+    // Check identity
     if(aDecl==this) return true;
+    
+    // Handle ParamTypes: Test against ClassType instead
+    if(isParamType()) return getClassType().matches(aDecl);
+    else if(aDecl.isParamType()) return matches(aDecl.getClassType());
+    
+    // If Types don't match, just return
     if(aDecl._type!=_type) return false;
 
     // For Method, Constructor: Check supers
@@ -707,6 +713,8 @@ public boolean matches(JavaDecl aDecl)
         for(JavaDecl sup=aDecl.getSuper();sup!=null;sup=sup.getSuper())
             if(sup==this)
                 return true;
+                
+    // Return false, since no match
     return false;
 }
 
