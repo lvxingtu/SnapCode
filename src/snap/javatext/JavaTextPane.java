@@ -76,8 +76,7 @@ protected void initUI()
     super.initUI();
     
     // Get TextArea and start listening for events (KeyEvents, MouseReleased, DragOver/Exit/Drop)
-    _textArea = getTextArea(); _textArea._textPane = this;
-    _textArea.setGrowWidth(true);
+    _textArea = getTextArea(); _textArea._textPane = this; _textArea.setGrowWidth(true);
     enableEvents(_textArea, KeyPress, KeyRelease, KeyType, MousePress, MouseRelease, DragOver, DragExit,DragDrop);
     
     // Reset TextArea font
