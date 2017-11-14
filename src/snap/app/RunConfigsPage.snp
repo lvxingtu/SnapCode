@@ -2,13 +2,13 @@
 <DocView Align="CENTER">
   <PageView width="700" height="612" PrefWidth="700" PrefHeight="612">
     <effect type="shadow" radius="10" dx="0" dy="0" />
-    <TextView x="36" y="36" width="457" height="42" Rich="true" Editable="false">
+    <TextArea x="36" y="36" width="457" height="42" Rich="true">
       <effect type="shadow" radius="10" dx="5" dy="5" color="#000000a6" />
       <RichText>
         <font name="Arial Bold" size="36" />
         <string>Run Configurations</string>
       </RichText>
-    </TextView>
+    </TextArea>
     <Button Name="AddButton" x="60" y="518" width="80" height="22" text="Add" />
     <Button Name="RemoveButton" x="144" y="518" width="80" height="22" text="Remove" />
     <Label x="289" y="131" width="67" height="22" Align="CENTER_RIGHT" text="Name:" />

@@ -5,7 +5,7 @@
     <SpringView Name="Header" x="36" y="36" width="540" height="109" PrefWidth="540" PrefHeight="109">
       <LineBorder />
       <fill type="image" resource="128492831" />
-      <TextArea y="7" width="540" height="99" Rich="true" Editable="false" WrapText="true">
+      <TextArea y="7" width="540" height="99" Rich="true" WrapText="true">
         <effect type="shadow" radius="5" dx="2" dy="2" color="#00000086" />
         <RichText>
           <font name="Arial Bold" size="48" />
@@ -26,7 +26,7 @@
         <LineBorder />
         <fill type="image" resource="1161328792" />
       </RectView>
-      <TextArea x="4" y="6.547" width="242" height="117.842" Align="CENTER_LEFT" Rich="true" Editable="false" WrapText="true">
+      <TextArea x="4" y="6.547" width="242" height="117.842" Align="CENTER_LEFT" Rich="true" WrapText="true">
         <effect type="shadow" radius="5" dx="2" dy="2" color="#00000086" />
         <RichText>
           <font name="Arial Bold" size="24" />
@@ -43,7 +43,7 @@
         <LineBorder />
         <fill type="image" resource="1161328792" />
       </RectView>
-      <TextArea x="7" y="6.547" width="242" height="117.842" Align="CENTER_LEFT" Rich="true" Editable="false" WrapText="true">
+      <TextArea x="7" y="6.547" width="242" height="117.842" Align="CENTER_LEFT" Rich="true" WrapText="true">
         <effect type="shadow" radius="5" dx="2" dy="2" color="#00000086" />
         <RichText>
           <font name="Arial Bold" size="24" />
@@ -57,7 +57,7 @@
         <LineBorder />
         <fill type="image" resource="1161328792" />
       </RectView>
-      <TextArea x="13" y="12.547" width="201" height="100.453" Align="CENTER_LEFT" Rich="true" Editable="false" WrapText="true">
+      <TextArea x="13" y="12.547" width="201" height="100.453" Align="CENTER_LEFT" Rich="true" WrapText="true">
         <effect type="shadow" radius="5" dx="2" dy="2" color="#00000086" />
         <RichText>
           <font name="Arial Bold" size="24" />
@@ -71,7 +71,7 @@
         <LineBorder />
         <fill type="image" resource="1161328792" />
       </RectView>
-      <TextArea x="7" y="6.547" width="242" height="118" Align="CENTER_LEFT" Rich="true" Editable="false" WrapText="true">
+      <TextArea x="7" y="6.547" width="242" height="118" Align="CENTER_LEFT" Rich="true" WrapText="true">
         <effect type="shadow" radius="5" dx="2" dy="2" color="#00000086" />
         <RichText>
           <font name="Arial Bold" size="24" />
@@ -85,7 +85,7 @@
         <LineBorder />
         <fill type="image" resource="1161328792" />
       </RectView>
-      <TextArea x="4" y="6.547" width="242" height="117.842" Align="CENTER_LEFT" Rich="true" Editable="false" WrapText="true">
+      <TextArea x="4" y="6.547" width="242" height="117.842" Align="CENTER_LEFT" Rich="true" WrapText="true">
         <effect type="shadow" radius="5" dx="2" dy="2" color="#00000086" />
         <RichText>
           <font name="Arial Bold" size="24" />
@@ -99,7 +99,7 @@
         <LineBorder />
         <fill type="image" resource="1161328792" />
       </RectView>
-      <TextArea x="7" y="6.547" width="242" height="117.842" Align="CENTER_LEFT" Rich="true" Editable="false" WrapText="true">
+      <TextArea x="7" y="6.547" width="242" height="117.842" Align="CENTER_LEFT" Rich="true" WrapText="true">
         <effect type="shadow" radius="5" dx="2" dy="2" color="#00000086" />
         <RichText>
           <font name="Arial Bold" size="24" />
@@ -113,7 +113,7 @@
         <LineBorder />
         <fill type="image" resource="1161328792" />
       </RectView>
-      <TextArea x="4" y="6.547" width="242" height="117.842" Align="CENTER_LEFT" Rich="true" Editable="false" WrapText="true">
+      <TextArea x="4" y="6.547" width="242" height="117.842" Align="CENTER_LEFT" Rich="true" WrapText="true">
         <effect type="shadow" radius="5" dx="2" dy="2" color="#00000086" />
         <RichText>
           <font name="Arial Bold" size="24" />
@@ -127,7 +127,7 @@
         <LineBorder />
         <fill type="image" resource="1161328792" />
       </RectView>
-      <TextArea x="4" y="6.547" width="242" height="117.842" Align="CENTER_LEFT" Rich="true" Editable="false" WrapText="true">
+      <TextArea x="4" y="6.547" width="242" height="117.842" Align="CENTER_LEFT" Rich="true" WrapText="true">
         <effect type="shadow" radius="5" dx="2" dy="2" color="#00000086" />
         <RichText>
           <font name="Arial Bold" size="24" />
