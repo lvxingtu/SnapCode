@@ -296,12 +296,12 @@ protected void paintBack(Painter aPntr)
         if(c2=='{' || c2=='}') {    // || c2=='(' || c2==')'
             JNode jnode = getJFile().getNodeAtCharIndex(ind);
             ind2 = c2=='}' || c2==')'? jnode.getStart() : jnode.getEnd()-1;
-            if(ind2+1>length()) { System.err.println("JavaTextView.paintBack: Invalid-A " + ind2); ind2 = -1; }
+            if(ind2+1>length()) { System.err.println("JavaTextArea.paintBack: Invalid-A " + ind2); ind2 = -1; }
         }
         else if(c1=='{' || c1=='}') {  //  || c1=='(' || c1==')'
             JNode jnode = getJFile().getNodeAtCharIndex(ind-1);
             ind2 = c1=='}' || c1==')'? jnode.getStart() : jnode.getEnd()-1;
-            if(ind2+1>length()) { System.err.println("JavaTextView.paintBack: Invalid-B" + ind2); ind2 = -1; }
+            if(ind2+1>length()) { System.err.println("JavaTextArea.paintBack: Invalid-B" + ind2); ind2 = -1; }
         }
         if(ind2>=0) {
             TextBoxLine line = getLineAt(ind2); int s1 = ind2-line.getStart(), s2 = ind2+1-line.getStart();

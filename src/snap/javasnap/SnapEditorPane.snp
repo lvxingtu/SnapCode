@@ -8,10 +8,10 @@
   <Button Name="DeleteButton" PrefWidth="22" PrefHeight="22" ToolTip="Delete" image="/snap/viewx/pkg.images/Edit_Delete.png" ShowBorder="false" />
   <Separator PrefWidth="13" PrefHeight="18" Vertical="true" />
   <Button Name="UndoButton" PrefWidth="22" PrefHeight="22" ToolTip="Undo" image="/snap/viewx/pkg.images/Edit_Undo.png" ShowBorder="false">
-    <binding aspect="Enabled" key="JavaTextView.Undoer.hasUndos" />
+    <binding aspect="Enabled" key="JavaTextArea.Undoer.hasUndos" />
   </Button>
   <Button Name="RedoButton" PrefWidth="22" PrefHeight="22" ToolTip="Redo" image="/snap/viewx/pkg.images/Edit_Redo.png" ShowBorder="false">
-    <binding aspect="Enabled" key="JavaTextView.Undoer.hasRedos" />
+    <binding aspect="Enabled" key="JavaTextArea.Undoer.hasRedos" />
   </Button>
   <Button Name="JavaDocButton" PrefWidth="116" PrefHeight="22" LeanX="RIGHT" text="Documentation">
     <binding aspect="Visible" key="JavaDocURL" />
