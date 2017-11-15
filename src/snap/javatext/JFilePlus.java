@@ -45,7 +45,7 @@ void replace(JStmtBlock aStmt)
     if(aStmt!=null) { //System.out.println("Replacing: " + aStmt.getString().replace("\n", "  "));
     
         // Parse new JStmtBlock (create empty one if there wasn't enough in block to create it)
-        _stmtParser.setInput(_jtbox.getText());
+        _stmtParser.setInput(_jtbox.getRichText());
         _stmtParser.setCharIndex(aStmt.getStart());
         JStmtBlock stmt2 = null; try { stmt2 = _stmtParser.parseCustom(JStmtBlock.class); } catch(Exception e) { }
         if(stmt2==null) { stmt2 = new JStmtBlock(); stmt2.setStartToken(aStmt.getStartToken()); }
