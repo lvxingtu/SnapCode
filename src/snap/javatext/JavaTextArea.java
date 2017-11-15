@@ -278,7 +278,7 @@ protected void paintBack(Painter aPntr)
     // Underline build issues
     BuildIssue issues[] = getBuildIssues();
     for(BuildIssue issue : issues) {
-        int istart = issue.getStart(), iend = issue.getEnd(); if(iend<istart) continue;
+        int istart = issue.getStart(), iend = issue.getEnd(); if(iend<istart || iend>length()) continue;
         TextBoxLine line = getLineAt(iend); int lstart = line.getStart(); if(istart<lstart) istart = lstart;
         TextBoxToken token = getTokenAt(istart);
         if(token!=null) { int tend = token.getLine().getStart()+token.getEnd(); if(iend<tend) iend = tend; }
