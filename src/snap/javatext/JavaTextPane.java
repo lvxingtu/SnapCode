@@ -107,8 +107,11 @@ protected void initUI()
 /**
  * Reset UI.
  */
-public void resetUI()
-{    
+protected void resetUI()
+{
+    // Do normal version
+    super.resetUI();
+    
     // Reset FontSizeText
     setViewValue("FontSizeText", getTextArea().getFont().getSize());
     

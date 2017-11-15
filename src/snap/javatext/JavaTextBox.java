@@ -34,7 +34,7 @@ public class JavaTextBox extends TextBox {
 /**
  * Creates a new JavaText.
  */
-public JavaTextBox()  { getText().setPlainText(true); }
+public JavaTextBox()  { getRichText().setPlainText(true); }
 
 /**
  * Returns the JFile (parsed representation of Java file).
@@ -82,7 +82,7 @@ public void updateLines(int aStart, int endOld, int endNew)
     
     // If unterminated comment state changed, update successive lines until it stops
     if(utermComment!=getLineAt(endNew).isUnterminatedComment()) {
-        int start = getLineAt(endNew).getEnd(), end = getText().indexOf("*/", start); if(end<0) end = length();
+        int start = getLineAt(endNew).getEnd(), end = getRichText().indexOf("*/", start); if(end<0) end = length();
         super.updateLines(start, end, end);
     }
     

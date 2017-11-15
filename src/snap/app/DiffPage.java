@@ -133,7 +133,7 @@ static class DiffTextArea extends TextArea {
     List <TextSel> ranges = new ArrayList();
     
     /** Create new DiffTextArea. */
-    public DiffTextArea()  { setFill(Color.WHITE); }
+    public DiffTextArea()  { setFill(Color.WHITE); setEditable(true); }
     
     /** Override to add ranges. */
     protected void paintBack(Painter aPntr)

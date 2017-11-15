@@ -47,7 +47,12 @@ public class JavaTextArea extends TextArea {
     
     // The OverviewPane
     OverviewPane           _overviewPane;
-    
+
+/**
+ * Creates a new JavaTextArea.
+ */
+public JavaTextArea()  { setFill(Color.WHITE); setEditable(true); }
+
 /**
  * Returns the Java text pane.
  */
