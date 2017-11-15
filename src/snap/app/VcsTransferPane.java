@@ -93,8 +93,8 @@ protected void initUI()
     filesList.setRowHeight(22);
     filesList.setCellConfigure(this :: configureFilesListCell);
     if(getOp()!=Op.Commit) {
-        View commentText = getView("CommentText"), sview = commentText.getParent(ScrollView.class);
-        getView("SplitView", SplitView.class).removeItem(sview);
+        TextView commentText = getView("CommentText", TextView.class);
+        getView("SplitView", SplitView.class).removeItem(commentText);
     }
 }
 
