@@ -5,12 +5,17 @@ import snap.viewx.WebPage;
 import snap.web.*;
 
 /**
- * A custom class.
+ * A WebPage subclass that is the default homepage for SnapCode projects.
  */
 public class HomePage extends WebPage {
     
     // Whether to do stupid animation (rotate buttons on mouse enter)
     boolean       _stupidAnim;
+
+/**
+ * Creates a new HomePage.
+ */
+public HomePage()  { setURL(WebURL.getURL(getClass())); }
 
 /**
  * Returns the browser as AppBrowser.
@@ -208,6 +213,6 @@ public void reload()  { }
 /**
  * Return better title.
  */
-public String getTitle()  { return "Home Page"; }
+public String getTitle()  { return getRootSite().getName() + " Home Page"; }
 
 }

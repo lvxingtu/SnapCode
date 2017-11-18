@@ -6,12 +6,15 @@ import snap.javatext.JavaTextArea;
 import snap.project.VersionControl;
 import snap.view.*;
 import snap.viewx.WebPage;
-import snap.web.WebFile;
+import snap.web.*;
 
 /**
  * A WebPage subclass for viewing a DiffFile.
  */
 public class DiffPage extends WebPage {
+    
+    // The LocalFile
+    WebFile           _localFile;
 
     // The diff pane
     SplitView         _splitView;
@@ -21,6 +24,16 @@ public class DiffPage extends WebPage {
     
     // The default font
     static Font       _dfont;
+
+/**
+ * Creates a new DiffPage for given file.
+ */
+public DiffPage(WebFile aFile)
+{
+    _localFile = aFile; //WebURL url = WebURL.getURL(aFile.getURL().getString() + ".diff"); setURL(url);
+    WebFile cmpFile = aFile.getSite().createFile(aFile.getPath() + ".diff", false);
+    setFile(cmpFile);
+}
 
 /**
  * Creates the UI.
@@ -74,19 +87,16 @@ protected void initUI()
 /**
  * Returns the file local to project.
  */
-public WebFile getLocalFile()
-{
-    String path = getFile().getPath(); path = path.substring(0, path.length() - ".diff".length());
-    return getSite().getFile(path);
-}
+public WebFile getLocalFile()  { return _localFile; }
 
 /**
  * Returns the file from Project.RemoteSite.
  */
 public WebFile getRemoteFile()
 {
-    VersionControl vc = VersionControl.get(getFile().getSite());
-    return vc.getRepoFile(getLocalFile().getPath(), false, false);
+    WebFile locFile = getLocalFile();
+    VersionControl vc = VersionControl.get(locFile.getSite());
+    return vc.getRepoFile(locFile.getPath(), false, false);
 }
 
 /**

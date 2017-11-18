@@ -57,8 +57,7 @@ protected Class <? extends WebPage> getPageClass(WebResponse aResp)
         return JavaPage.class;
     }
     if(type.equals("rpt")) return getPageClass("com.reportmill.app.ReportPageEditor", TextPage.class);
-    if(type.equals("snp") || type.equals("rib") || type.equals("jfx")) return studio.app.EditorPage.class;
-    if(type.equals("diff")) return snap.app.DiffPage.class;
+    if(type.equals("snp")) return studio.app.EditorPage.class;
     if(type.equals("class") && getAppPane().getSites().contains(file.getSite())) return ClassInfoPage.class;
     if(type.equals("pgd")) return snap.playground.PGPage.class;
     

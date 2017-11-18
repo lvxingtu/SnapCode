@@ -2,7 +2,7 @@ package snap.app;
 import java.util.List;
 import snap.view.*;
 import snap.viewx.WebPage;
-import snap.web.WebSite;
+import snap.web.*;
 
 /**
  * Manages a list of run configurations for project.
@@ -11,6 +11,11 @@ public class RunConfigsPage extends WebPage {
 
     // The selected RunConfig
     RunConfig   _runConfig;
+
+/**
+ * Creates a new RunConfigsPage.
+ */
+public RunConfigsPage()  { setURL(WebURL.getURL(getClass())); }
 
 /**
  * Returns the app browser.
@@ -79,5 +84,10 @@ public void respondUI(ViewEvent anEvent)
  * Override to suppress.
  */
 public void reload()  { }
+
+/**
+ * Return better title.
+ */
+public String getTitle()  { return getSelectedSite().getName() + " Run Configurations"; }
 
 }

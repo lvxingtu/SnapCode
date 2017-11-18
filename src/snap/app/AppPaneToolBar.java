@@ -29,6 +29,9 @@ public class AppPaneToolBar extends ViewOwner {
     // A placeholder for fill from toolbar button under mouse
     Paint                    _tempFill;
     
+    // RunConfigsPage
+    RunConfigsPage           _runConfigsPage;
+
     // Constant for file tab attributes
     static Font              TAB_FONT = new Font("Arial Bold", 12);
     static Color             TAB_COLOR = new Color(.5,.65,.8,.8);
@@ -51,6 +54,11 @@ public AppPaneToolBar(AppPane anAppPane)  { _appPane = anAppPane; }
  * Returns the AppPane.
  */
 public AppPane getAppPane()  { return _appPane; }
+
+/**
+ * Returns the AppPane AppBrowser.
+ */
+public AppBrowser getAppBrowser()  { return getAppPane().getBrowser(); }
 
 /**
  * Returns the RootSite.
@@ -103,8 +111,8 @@ public int removeOpenFile(WebFile aFile)
     if(aFile==_selectedFile) {
         WebURL url = getFallbackURL();
         if(!url.equals(getAppPane().getHomePageURL()))
-            getAppPane().getBrowser().setTransition(WebBrowser.Instant);
-        getAppPane().getBrowser().setURL(url);
+            getAppBrowser().setTransition(WebBrowser.Instant);
+        getAppBrowser().setURL(url);
     }
     
     // Rebuild file tabs and return
@@ -118,7 +126,7 @@ public int removeOpenFile(WebFile aFile)
 private WebURL getFallbackURL()
 {
     // Return the most recently opened of the remaining OpenFiles, or the Project.HomePageURL
-    AppPane appPane = getAppPane(); AppBrowser browser = appPane.getBrowser();
+    AppBrowser browser = getAppBrowser();
     WebURL urls[] = browser.getHistory().getNextURLs();
     for(WebURL url : urls) { WebFile file = url.getFile();
         if(_openFiles.contains(file))
@@ -204,8 +212,9 @@ protected void resetUI()
  */
 public void respondUI(ViewEvent anEvent)
 {
-    // Get AppPane
+    // Get AppPane and AppBrowser
     AppPane appPane = getAppPane();
+    AppBrowser appBrowser = getAppBrowser();
     
     // Make buttons glow
     if(anEvent.isMouseEnter() && anEvent.getView()!=_selectedView) { View view = anEvent.getView();
@@ -219,13 +228,13 @@ public void respondUI(ViewEvent anEvent)
     
     // Handle LastButton, NextButton
     if(anEvent.equals("BackButton") && anEvent.isMouseRelease())
-        appPane.getBrowser().trackBack();
+        appBrowser.trackBack();
     if(anEvent.equals("NextButton") && anEvent.isMouseRelease())
-        appPane.getBrowser().trackForward();
+        appBrowser.trackForward();
     
     // Handle RefreshButton
     if(anEvent.equals("RefreshButton") && anEvent.isMouseRelease())
-        appPane.getBrowser().reloadPage();
+        appBrowser.reloadPage();
     
     // Handle RunButton, RunInBrowserButton
     if(anEvent.equals("RunButton") && anEvent.isMouseRelease()) appPane._filesPane.run();
@@ -247,7 +256,7 @@ public void respondUI(ViewEvent anEvent)
     
     // Handle RunConfigsMenuItem
     if(anEvent.equals("RunConfigsMenuItem"))
-        appPane.getBrowser().setURL(getRunConfigsPageURL());
+        appBrowser.setURL(getRunConfigsPageURL());
         
     // Show history
     if(anEvent.equals("ShowHistoryMenuItem"))
@@ -265,25 +274,27 @@ public void respondUI(ViewEvent anEvent)
     if(anEvent.equals("ExpandButton")) {
         boolean showSideBar = !appPane.isShowSideBar();
         appPane.setShowSideBar(showSideBar);
-        WebPage page = appPane.getBrowser().getPage();
+        WebPage page = appBrowser.getPage();
         if(page!=null)
             page.getUI().setProp("HideSideBar", !showSideBar);
     }
 }
 
 /**
- * Returns the RunConfigsPageURL.
+ * Returns the RunConfigsPage.
  */
-public WebURL getRunConfigsPageURL()
+public RunConfigsPage getRunConfigsPage()
 {
-    if(_runConfigsPageURL!=null) return _runConfigsPageURL;
-    _runConfigsPageURL = WebURL.getURL("class:/RunConfigsPageURL");
-    getAppPane().getBrowser().setPage(_runConfigsPageURL, new RunConfigsPage());
-    return _runConfigsPageURL;
+    if(_runConfigsPage!=null) return _runConfigsPage;
+    _runConfigsPage = new RunConfigsPage();
+    getAppBrowser().setPage(_runConfigsPage.getURL(), _runConfigsPage);
+    return _runConfigsPage;
 }
 
-// RunConfigsPageURL
-WebURL _runConfigsPageURL;
+/**
+ * Returns the RunConfigsPageURL.
+ */
+public WebURL getRunConfigsPageURL()  { return getRunConfigsPage().getURL(); }
 
 /**
  * Handle FileTab clicked.
@@ -295,7 +306,7 @@ protected void handleFileTabClicked(ViewEvent anEvent)
     
     // Handle single click
     if(anEvent.getClickCount()==1) {
-        getAppPane().getBrowser().setTransition(WebBrowser.Instant);
+        getAppBrowser().setTransition(WebBrowser.Instant);
         getAppPane().setSelectedFile(file);
     }
     
@@ -318,14 +329,14 @@ public void handleSearchComboBox(ViewEvent anEvent)
     
     // If file available, open file
     if(file!=null)
-        getAppPane().getBrowser().setFile(file);
+        getAppBrowser().setFile(file);
 
     // If text available, either open URL or search for string
     else if(text!=null && text.length()>0) {
         int colon = text.indexOf(':');
         if(colon>0 && colon<6) {
             WebURL url = WebURL.getURL(text);
-            getAppPane().getBrowser().setURL(url);
+            getAppBrowser().setURL(url);
         }
         else {
             getAppPane().getSearchPane().search(text);
@@ -429,7 +440,7 @@ private void getFilesForPrefix(String aPrefix, WebFile aFile, List <WebFile> the
  */
 private void showHistory()
 {
-    WebBrowser browser = getAppPane().getBrowser();
+    WebBrowser browser = getAppBrowser();
     WebBrowserHistory history = browser.getHistory();
     StringBuffer sb = new StringBuffer();
     for(WebURL url : history.getLastURLs())

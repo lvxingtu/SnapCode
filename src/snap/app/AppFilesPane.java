@@ -26,6 +26,9 @@ public class AppFilesPane extends ViewOwner {
     
     // The root AppFiles (for TreeView)
     List <AppFile>        _rootFiles;
+    
+    // The default HomePage
+    HomePage              _homePage;
 
     // Images for files tree/list
     static Image FILES_TREE_ICON = Image.get(AppFilesPane.class, "FilesTree.png");
@@ -272,9 +275,9 @@ public void respondUI(ViewEvent anEvent)
     // Handle OpenInTextEditorMenuItem
     if(anEvent.equals("OpenInTextEditorMenuItem")) {
         WebFile file = getSelectedFile(); WebURL url = file.getURL();
-        WebPage page = new TextPage(); page.setFile(file);
-        AppBrowser browser = getBrowser(); browser.setPage(url, page);
-        browser.setURL(file.getURL());
+        WebPage page = new TextPage(); page.setURL(url);
+        getBrowser().setPage(page.getURL(), page);
+        getBrowser().setURL(url);
     }
     
     // Handle OpenInBrowserMenuItem
@@ -311,9 +314,9 @@ public void respondUI(ViewEvent anEvent)
     // Handle DiffFilesMenuItem
     if(anEvent.equals("DiffFilesMenuItem")) {
         WebFile file = getSelectedFile();
-        WebFile cmpFile = file.getSite().createFile(file.getPath() + ".diff", false);
-        getBrowser().setPage(cmpFile.getURL(), null);
-        getBrowser().setFile(cmpFile);
+        DiffPage diffPage = new DiffPage(file);
+        getBrowser().setPage(diffPage.getURL(), diffPage);
+        getBrowser().setURL(diffPage.getURL());
     }
     
     // Handle CleanProjectMenuItem
@@ -683,18 +686,20 @@ protected void run(RunConfig aConfig, WebFile aFile, boolean isDebug, boolean in
 }
 
 /**
- * Returns the HomePageURL.
+ * Returns the HomePage.
  */
-public WebURL getHomePageURL()
+public HomePage getHomePage()
 {
-    if(_homePageURL!=null) return _homePageURL;
-    _homePageURL = WebURL.getURL("class:/HomePage");
-    getBrowser().setPage(_homePageURL, new HomePage());
-    return _homePageURL;
+    if(_homePage!=null) return _homePage;
+    _homePage = new HomePage();
+    getBrowser().setPage(_homePage.getURL(), _homePage);
+    return _homePage;
 }
 
-// HomePageURL
-WebURL _homePageURL;
+/**
+ * Returns the HomePageURL.
+ */
+public WebURL getHomePageURL()  { return getHomePage().getURL(); }
 
 /**
  * Handle Copy.
