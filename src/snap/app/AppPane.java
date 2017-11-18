@@ -10,7 +10,7 @@ import snap.web.*;
 /**
  * The main view class for Projects.
  */
-public class AppPane extends ViewOwner implements PropChangeListener, DeepChangeListener {
+public class AppPane extends ViewOwner implements DeepChangeListener {
 
     // The list of sites
     List <WebSite>                _sites = new ArrayList();
@@ -290,23 +290,6 @@ public WebFile getBuildDir()
 }
 
 /**
- * Listens to changes to sites.
- */
-public void propertyChange(PropChange anEvent)
-{
-    // Get source and property name
-    Object source = anEvent.getSource(); String pname = anEvent.getPropertyName();
-    
-    // Handle WebPage.Modified change
-    if(source instanceof WebPage && pname.equals("Modified"))
-        resetLater();
-    
-    // Handle WebBrowser change
-    else if(source instanceof WebBrowser)
-        resetLater();
-}
-
-/**
  * Catch changes to files.
  */
 public void deepChange(PropChangeListener aSource, PropChange anEvent)
@@ -339,7 +322,9 @@ protected void initUI()
     // Get AppBrowser
     _browser = getView("Browser", AppBrowser.class);
     _browser.setAppPane(this);
-    _browser.addPropChangeListener(this);
+    
+    // Listen to Browser PropChanges, to update ActivityText, ProgressBar, Window.Title
+    _browser.addPropChangeListener(pc -> resetLater());
     
     // Get SideBarSplit and add FilesPane, ProcPane
     _sideBarSplit = getView("SideBarSplitView", SplitView.class); _sideBarSplit.setBorder(null);

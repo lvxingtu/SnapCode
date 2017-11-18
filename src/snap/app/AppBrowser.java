@@ -42,16 +42,6 @@ public void setPage(WebPage aPage)
 }
 
 /**
- * Override to start listening to page changes
- */
-public WebPage createPage(WebResponse aResp)
-{
-    WebPage page = super.createPage(aResp); if(page==null) return null;
-    page.addPropChangeListener(getAppPane());
-    return page;
-}
-
-/**
  * Creates a WebPage for given file.
  */
 protected Class <? extends WebPage> getPageClass(WebResponse aResp)
