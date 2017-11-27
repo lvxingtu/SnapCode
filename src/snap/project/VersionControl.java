@@ -180,7 +180,7 @@ protected Status getStatus(WebFile aFile, boolean isDeep)
         return Status.Added;
     
     // Check modified times match, or bytes match, return identical
-    long cloneMT = cloneFile.getLastModifiedTime(), localMT = aFile.getLastModifiedTime();
+    long cloneMT = cloneFile.getLastModTime(), localMT = aFile.getLastModTime();
     if(localMT==cloneMT)
         return Status.Identical;
     if(aFile.isFile() && cloneFile.isFile() && ArrayUtils.equals(aFile.getBytes(), cloneFile.getBytes()))
@@ -326,8 +326,8 @@ protected void commitFile(WebFile aLocalFile, String aMessage) throws Exception
         repoFile.save();
         if(aLocalFile.isFile()) cloneFile.setBytes(aLocalFile.getBytes());
         cloneFile.save();
-        cloneFile.setLastModifiedTimeDeep(repoFile.getLastModifiedTime());
-        aLocalFile.setLastModifiedTimeDeep(repoFile.getLastModifiedTime());
+        cloneFile.setLastModTimeDeep(repoFile.getLastModTime());
+        aLocalFile.setLastModTimeDeep(repoFile.getLastModTime());
         setStatus(aLocalFile, null);
     }    
 }
@@ -364,10 +364,10 @@ protected void updateFile(WebFile aLocalFile) throws Exception
     if(repoFile.getExists()) {
         if(aLocalFile.isFile()) aLocalFile.setBytes(repoFile.getBytes());
         aLocalFile.save();
-        aLocalFile.setLastModifiedTimeDeep(repoFile.getLastModifiedTime());
+        aLocalFile.setLastModTimeDeep(repoFile.getLastModTime());
         if(cloneFile.isFile()) cloneFile.setBytes(repoFile.getBytes());
         cloneFile.save();
-        cloneFile.setLastModifiedTimeDeep(repoFile.getLastModifiedTime());
+        cloneFile.setLastModTimeDeep(repoFile.getLastModTime());
         setStatus(aLocalFile, null);
     }
     
@@ -410,7 +410,7 @@ protected void replaceFile(WebFile aLocalFile) throws Exception
     if(cloneFile.getExists()) {
         if(aLocalFile.isFile()) aLocalFile.setBytes(cloneFile.getBytes());
         aLocalFile.save();
-        aLocalFile.setLastModifiedTimeDeep(cloneFile.getLastModifiedTime());
+        aLocalFile.setLastModTimeDeep(cloneFile.getLastModTime());
         setStatus(aLocalFile, null);
     }
     

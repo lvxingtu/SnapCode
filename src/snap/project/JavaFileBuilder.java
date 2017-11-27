@@ -44,7 +44,7 @@ public boolean getNeedsBuild(WebFile aFile)
 {
     // See if Java file has out of date Class file 
     WebFile cfile = _proj.getClassFile(aFile);
-    boolean needsBuild = !cfile.getExists() || cfile.getLastModifiedTime()<aFile.getLastModifiedTime();
+    boolean needsBuild = !cfile.getExists() || cfile.getLastModTime()<aFile.getLastModTime();
     
     // If not out of date, updateDependencies, compatibilities
     if(!needsBuild && !JavaData.get(aFile).isDependenciesSet()) {
@@ -183,7 +183,7 @@ private void deleteZombieClassFiles(WebFile aJavaFile)
     // Get all ClassFiles for JavaFile and delete those older than JavaFile
     WebFile cfiles[] = _proj.getClassFiles(aJavaFile); if(cfiles==null) return;
     for(WebFile cfile : cfiles) {
-        if(cfile.getLastModifiedTime()<aJavaFile.getLastModifiedTime()) {
+        if(cfile.getLastModTime()<aJavaFile.getLastModTime()) {
             try { cfile.delete(); }
             catch(Exception e) { throw new RuntimeException(e); }
         }

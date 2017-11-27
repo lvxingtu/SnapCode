@@ -162,7 +162,7 @@ private void updateTeaFiles(WebFile aFile)
         String path = aFile.getPath(); if(path.startsWith("/src/")) path = path.substring(4);
         WebURL url = WebURL.getURL(_proj.getClassPath().getBuildPathAbsolute() + "/tea" + path);
         WebFile tfile = url.getFile();
-        if(tfile==null || aFile.getLastModifiedTime()>tfile.getLastModifiedTime()) {
+        if(tfile==null || aFile.getLastModTime()>tfile.getLastModTime()) {
             //System.out.println("Updating Tea Resource File: " + url.getPath());
             if(tfile==null) tfile = url.createFile(false);
             tfile.setBytes(aFile.getBytes());

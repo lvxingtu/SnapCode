@@ -213,7 +213,7 @@ class SnapFileJFO extends SimpleJavaFileObject {
     public WebFile getFile()  { return _file; }
     
     /** Returns ModifiedTime of WebFile. */
-    public long getLastModified()  { return _forceCompile? 0 : _file.getLastModifiedTime(); }
+    public long getLastModified()  { return _forceCompile? 0 : _file.getLastModTime(); }
     
     /** Returns the "binary name" for the CompilerFileManager inferBinaryName method. */
     public String getBinaryName()
@@ -256,7 +256,7 @@ class SnapFileJFO extends SimpleJavaFileObject {
                 }
                 
                 // If file was modified or a real compile file, save
-                if(modified || _file.getLastModifiedTime()<_sourceFile.getLastModifiedTime()) {
+                if(modified || _file.getLastModTime()<_sourceFile.getLastModTime()) {
                     try { _file.save(); }
                     catch(Exception e) { throw new RuntimeException(e); }
                 }

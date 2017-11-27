@@ -182,7 +182,7 @@ public void replaceFile(WebFile aLocalFile) throws Exception
     if(cloneFile.getExists()) { //_project.removeBuildFile(aLocalFile);
         if(aLocalFile.isFile()) aLocalFile.setBytes(cloneFile.getBytes());
         aLocalFile.save();
-        aLocalFile.setLastModifiedTimeDeep(cloneFile.getLastModifiedTime());
+        aLocalFile.setLastModTimeDeep(cloneFile.getLastModTime());
         setStatus(aLocalFile, null);
     }
     

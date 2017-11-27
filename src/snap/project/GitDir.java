@@ -572,7 +572,7 @@ public class GitFileSite extends WebSite {
         
         // Create file for path and commit time
         FileHeader file = new FileHeader(aPath, gfile.isDir());
-        file.setLastModifiedTime(_cmt.getCommitTime());
+        file.setLastModTime(_cmt.getCommitTime());
         return file;
     }
     
@@ -611,7 +611,7 @@ protected class GitIndexSite extends WebSite {
     {
         GitIndex.Entry entry = getIndex().getEntry(aPath); if(entry==null) return null;
         FileHeader file = new FileHeader(aPath, entry.isDir());
-        file.setLastModifiedTime(entry.getLastModified()); file.setSize(entry.getLength());
+        file.setLastModTime(entry.getLastModified()); file.setSize(entry.getLength());
         return file;
     }
     

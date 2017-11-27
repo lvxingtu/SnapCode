@@ -6,7 +6,6 @@ import java.io.Closeable;
 import java.net.*;
 import java.util.*;
 import snap.javakit.*;
-import snap.typescript.TSFileBuilder;
 import snap.util.*;
 import snap.web.*;
 
@@ -29,9 +28,6 @@ public class Project extends SnapObject {
     
     // The default file builder
     ProjectFileBuilder                 _defaultFileBuilder = new ProjectFileBuilder.DefaultBuilder(this);
-    
-    // The TypeScript file builder
-    TSFileBuilder                      _tsBuilder;
     
     // The list of Breakpoints
     Breakpoints                        _bpoints;
@@ -74,10 +70,6 @@ protected Project(WebSite aSite)
     readSettings();
     getProjects();
     
-    // If Project has TypeScript create builder
-    if(aSite.getName().equals("TypeScript"))
-        _tsBuilder = new TSFileBuilder(this);
-        
     // Set as current project
     _current = this;
 }
@@ -419,10 +411,6 @@ public boolean buildProject(TaskMonitor aTM)
     buildSuccess |= _defaultFileBuilder.buildFiles(aTM);
     _buildDate = new Date(); _building = false;
     
-    // Build TypeScript
-    if(_tsBuilder!=null)
-        _tsBuilder.buildFiles(aTM);
-
     // Return build success
     return buildSuccess;
 }
@@ -495,8 +483,6 @@ public void addBuildFile(WebFile aFile)
     if(!fileBuilder.getNeedsBuild(aFile))
         return;
     fileBuilder.addBuildFile(aFile);
-    if(_tsBuilder!=null && fileBuilder instanceof JavaFileBuilder)
-        _tsBuilder.addBuildFile(aFile);
 }
 
 /**
@@ -506,8 +492,6 @@ public void addBuildFileForce(WebFile aFile)
 {
     ProjectFileBuilder fileBuilder = getFileBuilder(aFile); if(fileBuilder==null) return;
     fileBuilder.addBuildFile(aFile);
-    if(_tsBuilder!=null && fileBuilder instanceof JavaFileBuilder)
-        _tsBuilder.addBuildFile(aFile);
 }
 
 /**

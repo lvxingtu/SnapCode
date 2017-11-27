@@ -259,8 +259,9 @@ private class SimpleHttpHandler implements HttpHandler {
             anExch.sendResponseHeaders(resp.getCode(),-1); return; }
             
         // Get length and LastModified
-        long len = resp.getFileHeader().getSize();
-        Date lastMod = new Date(resp.getFileHeader().getLastModifiedTime());
+        FileHeader fhdr = resp.getFileHeader();
+        long len = fhdr.getSize();
+        Date lastMod = new Date(fhdr.getLastModTime());
         String ext = FilePathUtils.getExtension(url.getPath());
         
         // Add ResponseHeaders: last-modified, cache-control, content-length, content-type
@@ -289,8 +290,9 @@ private class SimpleHttpHandler implements HttpHandler {
             anExch.sendResponseHeaders(resp.getCode(),-1); return; }
             
         // Get length and LastModified
-        long len = resp.getFileHeader().getSize();
-        Date lastMod = new Date(resp.getFileHeader().getLastModifiedTime());
+        FileHeader fhdr = resp.getFileHeader();
+        long len = fhdr.getSize();
+        Date lastMod = new Date(fhdr.getLastModTime());
         String ext = FilePathUtils.getExtension(url.getPath());
         byte bytes[] = resp.getBytes();
         

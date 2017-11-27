@@ -61,7 +61,7 @@ public static class DefaultBuilder implements ProjectFileBuilder {
     public boolean getNeedsBuild(WebFile aFile)
     {
         WebFile bfile = _proj.getBuildFile(aFile.getPath(), false, false);
-        return bfile==null || !bfile.getExists() || bfile.getLastModifiedTime()<aFile.getLastModifiedTime();
+        return bfile==null || !bfile.getExists() || bfile.getLastModTime()<aFile.getLastModTime();
     }
 
     /** Adds a compile file. */
