@@ -55,4 +55,21 @@ protected JavaDecl getDeclImpl()
     return tvar;
 }
 
+/**
+ * Override to handle ID and nested case, e.g.: T extends Class <? super T>
+ */
+protected JavaDecl getDeclImpl(JNode aNode)
+{
+    // Handle ID
+    if(aNode==_id)
+        return getDecl();
+    
+    // Handle nested case, e.g.: T extends Class <? super T>
+    if(aNode.getName().equals(getName()))
+        return getJavaDecl(Object.class);
+    
+    // Do normal version
+    return super.getDeclImpl(aNode);
+}
+
 }
