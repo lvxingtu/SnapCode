@@ -158,16 +158,27 @@ protected JavaDecl getDeclImpl(JNode aNode)
  */
 protected JavaDecl[] getParamClassTypesSafe()
 {
+    // Declare array for return types
     JavaDecl ptypes[] = new JavaDecl[_params.size()];
+    
+    // Iterate over params to get types
     for(int i=0, iMax=_params.size(); i<iMax; i++) { JVarDecl vd = _params.get(i);
+    
+        // Get current type and TypeVar (if type is one)
         JType type = vd.getType();
         JTypeParam tvar = getTypeParam(type.getName());
-        ptypes[i] = tvar!=null? tvar.getBoundsType() : type.getBaseDecl();
-        if(ptypes[i]==null) return null; // Can happen if params are bogus (being edited)
-        if(type.getArrayCount()>0) {
-            String name = ptypes[i].getName(); for(int j=0,jMax=type.getArrayCount();j<jMax;j++) name += "[]";
-            ptypes[i] = getJavaDecl(name);
-        }
+        
+        // If type is TypeVar, set to TypeVar.BoundsType
+        if(tvar!=null)
+            ptypes[i] = tvar.getBoundsType();
+        else ptypes[i] = type.getBaseDecl();
+        
+        // If param type is null, just return (can happen if params are bogus (being edited))
+        if(ptypes[i]==null) return null;
+        
+        // If array, get array type instead
+        if(type.getArrayCount()>0) for(int j=0,jMax=type.getArrayCount();j<jMax;j++)
+            ptypes[i] = ptypes[i].getArrayTypeDecl();
     }
     return ptypes;
 }

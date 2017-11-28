@@ -682,9 +682,10 @@ public JavaDecl getParamTypeDecl(JavaDecl ... theTypeDecls)  { return _owner.get
  */
 public JavaDecl getArrayTypeDecl()
 {
-    // Handle not class: Return ClassType.getArrayTypeDecl()
+    // Handle ParamType or unexpected type: Return ClassType.getArrayTypeDecl()
     if(!isClass()) {
-        System.err.println("JavaDecl: Asking for array of non-class: " + this);
+        if(!isParamType() && !isTypeVar())
+            System.err.println("JavaDecl.getArrayTypeDecl: Unexpected type: " + this);
         return getClassType().getArrayTypeDecl();
     }
     
