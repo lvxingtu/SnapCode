@@ -30,7 +30,6 @@ public void setId(JExprId anId)
 {
     replaceChild(_id, _id = anId);
     if(_id!=null) setName(_id.getName());
-    System.out.println("JTypeVar.Name = " + getName());
 }
 
 /**
