@@ -49,19 +49,19 @@ public void setId(JExprId anId)
 }
 
 /**
- * Returns the type parameters for this member.
+ * Returns the type variables for this member.
  */
-public List <JTypeParam> getTypeParams()  { return null; }
+public List <JTypeVar> getTypeVars()  { return null; }
 
 /**
- * Returns the type parameters for this member.
+ * Returns the type variable for this member with given name.
  */
-public JTypeParam getTypeParam(String aName)
+public JTypeVar getTypeVar(String aName)
 {
-    List <JTypeParam> tps = getTypeParams(); if(tps==null) return null;
-    for(JTypeParam tp : tps)
-        if(tp.getName().equals(aName))
-            return tp;
+    List <JTypeVar> tvars = getTypeVars(); if(tvars==null) return null;
+    for(JTypeVar tvar : tvars)
+        if(tvar.getName().equals(aName))
+            return tvar;
     return null;
 }
 

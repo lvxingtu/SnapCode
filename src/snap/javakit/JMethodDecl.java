@@ -13,8 +13,8 @@ public class JMethodDecl extends JMemberDecl
     // The type/return-type
     JType                  _type;
 
-    // Type parameters
-    List <JTypeParam>      _typeParams;
+    // Type variables
+    List <JTypeVar>        _typeVars;
     
     // The formal parameters
     List <JVarDecl>        _params = new ArrayList();
@@ -36,18 +36,18 @@ public JType getType()  { return _type; }
 public void setType(JType aType)  { replaceChild(_type, _type = aType); }
 
 /**
- * Returns the method JTypeParams.
+ * Returns the method type variables.
  */
-public List <JTypeParam> getTypeParams()  { return _typeParams; }
+public List <JTypeVar> getTypeVars()  { return _typeVars; }
 
 /**
- * Sets the method JTypeParams.
+ * Sets the method type variables.
  */
-public void setTypeParams(List <JTypeParam> theTPs)
+public void setTypeVars(List <JTypeVar> theTVs)
 {
-    if(_typeParams!=null) for(JTypeParam tp : _typeParams) removeChild(tp);
-    _typeParams = theTPs;
-    if(_typeParams!=null) for(JTypeParam tp : _typeParams) addChild(tp, -1);
+    if(_typeVars!=null) for(JTypeVar tvar : _typeVars) removeChild(tvar);
+    _typeVars = theTVs;
+    if(_typeVars!=null) for(JTypeVar tvar : _typeVars) addChild(tvar, -1);
 }
 
 /**
@@ -145,9 +145,9 @@ protected JavaDecl getDeclImpl(JNode aNode)
             return param.getDecl(); }
     
     // Handle TypeVar name: return typevar decl
-    JTypeParam tp = getTypeParam(name);
-    if(tp!=null)
-        return tp.getDecl();
+    JTypeVar tvar = getTypeVar(name);
+    if(tvar!=null)
+        return tvar.getDecl();
     
     // Do normal version
     return super.getDeclImpl(aNode);
@@ -166,7 +166,7 @@ protected JavaDecl[] getParamClassTypesSafe()
     
         // Get current type and TypeVar (if type is one)
         JType type = vd.getType();
-        JTypeParam tvar = getTypeParam(type.getName());
+        JTypeVar tvar = getTypeVar(type.getName());
         
         // If type is TypeVar, set to TypeVar.BoundsType
         if(tvar!=null)

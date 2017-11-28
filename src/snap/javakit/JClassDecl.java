@@ -14,8 +14,8 @@ public class JClassDecl extends JMemberDecl
     // The type of class (Class, Interface, Enum, Annotation)
     ClassType              _classType = ClassType.Class;
     
-    // TypeParams
-    List <JTypeParam>      _typeParams;
+    // TypeVars
+    List <JTypeVar>        _typeVars;
     
     // The extends list
     List <JType>           _extendsTypes = new ArrayList();
@@ -50,18 +50,18 @@ public class JClassDecl extends JMemberDecl
 public String getSimpleName()  { return getName(); }
 
 /**
- * Returns the JTypeParam(s).
+ * Returns the JTypeVar(s).
  */
-public List <JTypeParam> getTypeParams()  { return _typeParams; }
+public List <JTypeVar> getTypeVars()  { return _typeVars; }
 
 /**
- * Sets the JTypeParam(s).
+ * Sets the JTypeVar(s).
  */
-public void setTypeParams(List <JTypeParam> theTPs)
+public void setTypeVars(List <JTypeVar> theTVs)
 {
-    if(_typeParams!=null) for(JNode n : _typeParams) removeChild(n);
-    _typeParams = theTPs;
-    if(_typeParams!=null) for(JNode n : _typeParams) addChild(n, -1);
+    if(_typeVars!=null) for(JNode n : _typeVars) removeChild(n);
+    _typeVars = theTVs;
+    if(_typeVars!=null) for(JNode n : _typeVars) addChild(n, -1);
 }
 
 /**
@@ -389,10 +389,10 @@ protected JavaDecl getDeclImpl(JNode aNode)
             return getJavaDecl(fd);
     }
 
-    // Look for JTypeParam for given name
-    JTypeParam tp = getTypeParam(name);
-    if(tp!=null)
-        return tp.getDecl();
+    // Look for JTypeVar for given name
+    JTypeVar tvar = getTypeVar(name);
+    if(tvar!=null)
+        return tvar.getDecl();
     
     // Look for InnerClass of given name
     Class cdClass = getEvalClass();

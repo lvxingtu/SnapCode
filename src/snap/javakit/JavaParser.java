@@ -241,7 +241,7 @@ public static class ClassDeclHandler extends JNodeParseHandler <JClassDecl> {
         
         // Handle TypeParams
         else if(anId=="TypeParams")
-            getPart().setTypeParams(aNode.getCustomNode(List.class));
+            getPart().setTypeVars(aNode.getCustomNode(List.class));
         
         // Handle ExtendsList or ImplementsList mode and extendsList/implementsList
         else if(anId=="extends") _extending = true;
@@ -378,7 +378,7 @@ public static class EnumConstantHandler extends JNodeParseHandler <JEnumConst>
 /**
  * TypeParam Handler.
  */
-public static class TypeParamHandler extends JNodeParseHandler <JTypeParam>
+public static class TypeParamHandler extends JNodeParseHandler <JTypeVar>
 {
     /** ParseHandler method. */
     protected void parsedOne(ParseNode aNode, String anId)
@@ -396,14 +396,14 @@ public static class TypeParamHandler extends JNodeParseHandler <JTypeParam>
 /**
  * TypeParams Handler.
  */
-public static class TypeParamsHandler extends ParseHandler <ArrayList<JTypeParam>>
+public static class TypeParamsHandler extends ParseHandler <ArrayList<JTypeVar>>
 {
     /** ParseHandler method. */
     protected void parsedOne(ParseNode aNode, String anId)
     {
         // Handle TypeParam
         if(anId=="TypeParam")
-            getPart().add(aNode.getCustomNode(JTypeParam.class));
+            getPart().add(aNode.getCustomNode(JTypeVar.class));
     }
 }
 
@@ -437,7 +437,7 @@ public static class MethodDeclHandler extends JNodeParseHandler <JMethodDecl>
     {
         // Handle TypeParams
         if(anId=="TypeParams")
-            getPart().setTypeParams(aNode.getCustomNode(List.class));
+            getPart().setTypeVars(aNode.getCustomNode(List.class));
         
         // Handle ResultType
         else if(anId=="ResultType")
@@ -471,7 +471,7 @@ public static class ConstrDeclHandler extends JNodeParseHandler <JConstrDecl>
     {
         // Handle TypeParams
         if(anId=="TypeParams")
-            getPart().setTypeParams(aNode.getCustomNode(List.class));
+            getPart().setTypeVars(aNode.getCustomNode(List.class));
         
         // Handle Identifier
         else if(anId=="Identifier")

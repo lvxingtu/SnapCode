@@ -5,9 +5,12 @@ package snap.javakit;
 import java.util.*;
 
 /**
- * A JNode subclass for type parameters.
+ * A JNode subclass for type variables (aka type paramters).
+ * These are the unresolved types found in class, method, constructor declarations:
+ *    public class MyClass <T>
+ *    public <T> T myMethod(T anObj) { ... }
  */
-public class JTypeParam extends JNode {
+public class JTypeVar extends JNode {
 
     // The name identifier
     JExprId        _id;
@@ -27,6 +30,7 @@ public void setId(JExprId anId)
 {
     replaceChild(_id, _id = anId);
     if(_id!=null) setName(_id.getName());
+    System.out.println("JTypeVar.Name = " + getName());
 }
 
 /**

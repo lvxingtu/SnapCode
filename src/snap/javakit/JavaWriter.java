@@ -44,7 +44,7 @@ public void writeJNode(JNode aNode)
     else if(aNode instanceof JType) writeJType((JType)aNode);
     else if(aNode instanceof JVarDecl) writeJVarDecl((JVarDecl)aNode);
     else if(aNode instanceof JEnumConst) writeJEnumConst((JEnumConst)aNode);
-    else if(aNode instanceof JTypeParam) writeJTypeParam((JTypeParam)aNode);
+    else if(aNode instanceof JTypeVar) writeJTypeVar((JTypeVar)aNode);
     else if(aNode instanceof JModifiers) writeJModifiers((JModifiers)aNode);
     else append("JavaWriter: write" + aNode.getClass().getSimpleName() + " not implemented");
 }
@@ -160,9 +160,9 @@ public void writeJClassDecl(JClassDecl aCDecl)
 public void writeJEnumConst(JEnumConst aConst)  { append(aConst.getName()); }
 
 /**
- * Write JTypeParam.
+ * Write JTypeVar.
  */
-public void writeJTypeParam(JTypeParam aTP)  { append(aTP.getName()); }
+public void writeJTypeVar(JTypeVar aTV)  { append(aTV.getName()); }
 
 /**
  * Writes a JFieldDecl.
