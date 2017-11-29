@@ -184,7 +184,7 @@ private Color getColor(Token aToken)
         return JavaTextBox._reservedWordColor;
     
     // Handle string literals
-    else if(aToken.getName()=="StringLiteral")
+    else if(aToken.getName()=="StringLiteral" || aToken.getName()=="CharacterLiteral")
         return JavaTextBox._stringLiteralColor;
     return null;
 }
