@@ -135,43 +135,6 @@ public static String getTypeName(Type aType)
 }
 
 /**
- * Returns the class simple name, converting primitive arrays to 'int[]' instead of '[I'.
- */
-public static String getTypeSimpleName(Type aType)
-{
-    // Handle Class
-    if(aType instanceof Class) { Class cls = (Class)aType;
-        return cls.getSimpleName(); }
-
-    // Handle GenericArrayType
-    if(aType instanceof GenericArrayType) { GenericArrayType gat = (GenericArrayType)aType;
-        return getTypeSimpleName(gat.getGenericComponentType()) + "[]"; }
-        
-    // Handle ParameterizedType (e.g., Class <T>, List <T>, Map <K,V>)
-    if(aType instanceof ParameterizedType) { ParameterizedType pt = (ParameterizedType)aType;
-        Type base = pt.getRawType(), types[] = pt.getActualTypeArguments();
-        StringBuffer sb = new StringBuffer(getTypeSimpleName(base)).append('<');
-        for(int i=0,iMax=types.length,last=iMax-1;i<iMax;i++) { Type type = types[i];
-            sb.append(getTypeSimpleName(type)); if(i!=last) sb.append(','); }
-        return sb.append('>').toString();
-    }
-        
-    // Handle TypeVariable
-    if(aType instanceof TypeVariable) { TypeVariable tv = (TypeVariable)aType;
-        return tv.getName(); }
-        
-    // Handle WildcardType
-    if(aType instanceof WildcardType) { WildcardType wc = (WildcardType)aType;
-        if(wc.getLowerBounds().length>0)
-            return getTypeSimpleName(wc.getLowerBounds()[0]);
-        return getTypeSimpleName(wc.getUpperBounds()[0]);
-    }
-    
-    // Complain about anything else
-    throw new RuntimeException("JavaKitUtils.getTypeSimpleName: Can't get name from type: " + aType);
-}
-
-/**
  * Returns the class name, converting primitive arrays to 'int[]' instead of '[I'.
  */
 public static Class getClass(Type aType)

@@ -4,7 +4,6 @@
 package snap.javakit;
 import java.util.*;
 import snap.util.ClassUtils;
-import snap.util.SnapUtils;
 
 /**
  * A JNode for types.
@@ -23,18 +22,6 @@ public class JType extends JNode {
     // The base type
     JavaDecl              _baseDecl;
     
-    // The full name
-    String                _fullName;
-    
-/**
- * Returns the simple name.
- */
-public String getSimpleName()
-{
-    int index = _name.lastIndexOf('.');
-    return index>0?  _name.substring(index+1, _name.length()) : _name;
-}
-
 /**
  * Returns whether type is primitive type.
  */
@@ -61,9 +48,18 @@ public int getArrayCount()  { return _arrayCount; }
 public void setArrayCount(int aValue)  { _arrayCount = aValue; }
 
 /**
- * Returns whether type is reference (array or class/interface type).
+ * Returns the generic types.
  */
-public boolean isReferenceType()  { return _primitive && _arrayCount==0; }
+public List <JType> getTypeArgs()  { return _typeArgs; }
+
+/**
+ * Adds a type arg.
+ */
+public void addTypeArg(JType aType)
+{
+    if(_typeArgs==null) _typeArgs = new ArrayList();
+    _typeArgs.add(aType); addChild(aType, -1);
+}
 
 /**
  * Returns the number of type args.
@@ -86,17 +82,12 @@ public JavaDecl getTypeArgDecl(int anIndex)
 }
 
 /**
- * Returns the generic types.
+ * Returns the simple name.
  */
-public List <JType> getTypeArgs()  { return _typeArgs; }
-
-/**
- * Adds a type arg.
- */
-public void addTypeArg(JType aType)
+public String getSimpleName()
 {
-    if(_typeArgs==null) _typeArgs = new ArrayList();
-    _typeArgs.add(aType); addChild(aType, -1);
+    int index = _name.lastIndexOf('.');
+    return index>0?  _name.substring(index+1, _name.length()) : _name;
 }
 
 /**
@@ -165,21 +156,17 @@ protected JavaDecl getDeclImpl()
  */
 public boolean equals(Object anObj)
 {
-    // Check identity and get other JType
+    System.out.println("JType.equals: Was called"); // I don't think this method is ever used
+    
+    // Check identity, get other JType, check SimpleNames and Decls
     if(anObj==this) return true;
     JType other = anObj instanceof JType? (JType)anObj : null; if(other==null) return false;
-    
-    // If simple names don't match, return false
-    if(!other.getSimpleName().equals(getSimpleName())) return false;
-
-    // Check Class names
-    String cn1 = getEvalClassName(), cn2 = other.getEvalClassName(); if(cn1!=null && cn2!=null) return cn1.equals(cn2);
-    return SnapUtils.equals(_name, other._name); // Check name
+    return getSimpleName().equals(other.getSimpleName()) && getDecl()==other.getDecl();
 }
 
 /**
  * Standard hashCode implementation.
  */
-public int hashCode()  { return _name!=null? _name.hashCode() : 0; }
+public int hashCode()  { return getDecl()!=null? getDecl().hashCode() : super.hashCode(); }
 
 }

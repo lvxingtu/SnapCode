@@ -265,12 +265,14 @@ public static void getDeclMatches(JNode aNode, JavaDecl aDecl, List <JNode> theM
 /** Returns whether node is a possible match. */
 private static boolean isPossibleMatch(JNode aNode, JavaDecl aDecl)
 {
-    if(aNode instanceof JType) { JType type = (JType)aNode;
-        if(type.getSimpleName().equals(aDecl.getSimpleName()))
-            return true; }
-    else if(aNode instanceof JExprId) { JExprId id = (JExprId)aNode;
-        if(id.getName().equals(aDecl.getSimpleName()))
-            return true; }
+    // If Node is type and Decl is type and Decl.SimpleName contains Node.SimpleName
+    if(aNode instanceof JType && aDecl.isType()) { JType type = (JType)aNode; String sname = type.getSimpleName();
+        return aDecl.getSimpleName().contains(sname); }
+
+    // If Node is identifier and Decl.Name contains Node.Name
+    if(aNode instanceof JExprId)
+        return aDecl.getName().contains(aNode.getName());
+        
     return false;
 }
 

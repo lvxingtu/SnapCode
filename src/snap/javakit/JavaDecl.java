@@ -111,12 +111,13 @@ private void initType(Type aType)
     // Handle ParameterizedType
     if(aType instanceof ParameterizedType) { ParameterizedType pt = (ParameterizedType)aType;
         _type = DeclType.ParamType;
-        _name = JavaKitUtils.getTypeName(pt); _sname = JavaKitUtils.getTypeSimpleName(pt);
+        _name = JavaKitUtils.getTypeName(pt);
         _par = _owner.getTypeDecl(pt.getRawType());
         Type typArgs[] = pt.getActualTypeArguments();
         _paramTypes = new JavaDecl[typArgs.length];
         for(int i=0,iMax=typArgs.length;i<iMax;i++) _paramTypes[i] = _owner.getTypeDecl(typArgs[i]);
         _evalType = this;
+        _sname = _par.getSimpleName() + '<' + StringUtils.join(getParamTypeSimpleNames(),",") + '>';
         _owner._decls.put(_id, this);
     }
     
@@ -179,14 +180,9 @@ private void initMember(Member aMmbr)
  */
 private void initParamType(JavaDecl theTypeDecls[])
 {
-    // Set Type, Name, EvalType, ParamTypes
     _type = DeclType.ParamType; _name = _id; _evalType = this;
     _paramTypes = Arrays.copyOf(theTypeDecls, theTypeDecls.length);
-    
-    // Build simple name
-    _sname = _par.getSimpleName() + '<'; JavaDecl last = _paramTypes[_paramTypes.length-1];
-    for(JavaDecl a : _paramTypes) { _sname += a.getSimpleName(); if(a!=last) _sname += ','; }
-    _sname += '>';
+    _sname = _par.getSimpleName() + '<' + StringUtils.join(getParamTypeSimpleNames(),",") + '>';
 }
 
 /**
