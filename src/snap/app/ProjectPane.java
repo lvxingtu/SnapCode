@@ -226,17 +226,32 @@ public void checkout(View aView, VersionControl aVC)
  */
 public void removeProject(String aName)
 {
-    // Get View
-    View view = isUISet() && getUI().isShowing()? getUI() : getAppPane().getUI();
+    // Just return if bogus
+    if(aName==null || aName.length()==0) { beep(); return; }
     
     // Get named project
     Project proj = _proj.getProjectSet().getProject(aName);
-    if(proj==null) { DialogBox.showWarningDialog(view, "Error Removing Project", "Project not found"); return; }
-    WebSite site = proj.getSite();
+    if(proj==null) {
+        View view = isUISet() && getUI().isShowing()? getUI() : getAppPane().getUI();
+        DialogBox.showWarningDialog(view, "Error Removing Project", "Project not found"); return;
+    }
 
     // Remove dependent project from root project and AppPane
     _proj.getProjectSet().removeProject(aName);
+    WebSite site = proj.getSite();
     getAppPane().removeSite(site);
+}
+
+/**
+ * Removes the given Jar path.
+ */
+public void removeJarPath(String aJarPath)
+{
+    // Just return if bogus
+    if(aJarPath==null || aJarPath.length()==0) { beep(); return; }
+    
+    // Remove path from classpath
+    _proj.getClassPath().removeLibPath(aJarPath);
 }
 
 /**
@@ -502,9 +517,9 @@ public void respondUI(ViewEvent anEvent)
     
     // Handle DeleteAction
     if(anEvent.equals("DeleteAction") || anEvent.equals("BackSpaceAction")) {
-        if(getView("JarPathsList").isFocused())
-            _proj.getClassPath().removeLibPath(getSelectedJarPath());
-        else if(getView("ProjectPathsList").isFocused())
+        if(getView("JarPathsList").isShowing())
+            removeJarPath(getSelectedJarPath());
+        else if(getView("ProjectPathsList").isShowing())
             removeProject(getSelectedProjectPath());
     }
     
