@@ -165,7 +165,7 @@ protected void initUI()
     _filesTree.expandItem(_filesTree.getItems().get(1));
     
     // Enable events to get MouseUp on TreeView
-    enableEvents(_filesTree, MousePress, MouseRelease); enableEvents(_filesTree, DragEvents);
+    enableEvents(_filesTree, MousePress, MouseRelease, DragGesture); enableEvents(_filesTree, DragEvents);
     
     // Register for copy/paste
     addKeyActionHandler("CopyAction", "Shortcut+C");
@@ -229,6 +229,13 @@ public void respondUI(ViewEvent anEvent)
                 addFiles(files);
                 anEvent.dropComplete(); //anEvent.setDropCompleted(true);
             }
+        }
+        
+        // Handle DragGesture
+        else if(anEvent.isDragGesture() && getSelectedFile()!=null) {
+            Clipboard cb = anEvent.getClipboard();
+            cb.addData(getSelectedFile().getStandardFile());
+            cb.startDrag();
         }
         
         // Handle Selection event: Select file for tree selection
