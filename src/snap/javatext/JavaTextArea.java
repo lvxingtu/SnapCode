@@ -514,7 +514,7 @@ public void outdentLines()
 protected void richTextPropChange(PropChange anEvent)
 {
     // Do normal version and update TextPane.TextModified (just return if not chars change)
-    super.propertyChange(anEvent); if(anEvent.getPropertyName()!=RichText.Chars_Prop) return;
+    super.richTextPropChange(anEvent); if(anEvent.getPropertyName()!=RichText.Chars_Prop) return;
 
     // Set TextPane modified
     JavaTextPane tp = getTextPane(); if(tp!=null) tp.setTextModified(getUndoer().hasUndos());

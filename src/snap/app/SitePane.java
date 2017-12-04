@@ -239,7 +239,7 @@ public boolean isHiddenFile(WebFile aFile)
 /**
  * Implement to listen to Site File changes.
  */
-public void deepChange(PropChangeListener aSource, PropChange anEvent)
+public void deepChange(Object aSource, PropChange anEvent)
 {
     // Get source and property name
     Object source = anEvent.getSource(); String pname = anEvent.getPropertyName();
