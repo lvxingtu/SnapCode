@@ -7,7 +7,7 @@ import snap.web.*;
 /**
  * A class to return class file info for Project class paths.
  */
-public class ClassPathInfo implements PropChangeListener {
+public class ClassPathInfo {
 
     // The Project
     Project             _proj;
@@ -17,6 +17,9 @@ public class ClassPathInfo implements PropChangeListener {
     
     // The list of all package files and class files
     List <WebFile>      _apkgs, _acls;
+    
+    // A listener for ClassPath PropChange
+    PropChangeListener  _classPathPCL = pc -> classPathDidPropChange(pc);
     
 /**
  * Creates a new new ClassPathInfo for project class paths.
@@ -223,11 +226,11 @@ private static boolean isInterestingPath(String aPath)
 /**
  * Watches Project.ClassPath for JarPaths change to reset ClassPathInfo.
  */
-public void propertyChange(PropChange anEvent)
+void classPathDidPropChange(PropChange anEvent)
 {
     if(anEvent.getPropertyName()==snap.project.ClassPath.JarPaths_Prop) {
         _proj.getSite().setProp("ClassPathInfo", null);
-        _proj.getClassPath().removePropChangeListener(this);
+        _proj.getClassPath().removePropChangeListener(_classPathPCL);
     }
 }
 
@@ -255,7 +258,7 @@ public static ClassPathInfo get(WebSite aSite)
     if(cpinfo==null) {
         Project proj = Project.get(aSite);
         aSite.setProp("ClassPathInfo", cpinfo = new ClassPathInfo(proj));
-        proj.getClassPath().addPropChangeListener(cpinfo);
+        proj.getClassPath().addPropChangeListener(cpinfo._classPathPCL);
     }
     return cpinfo;
 }

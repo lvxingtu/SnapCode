@@ -11,7 +11,7 @@ import snap.view.*;
 /**
  * A PopupList for an JavaTextPane.
  */
-public class JavaPopupList extends PopupList <JavaDecl> implements PropChangeListener {
+public class JavaPopupList extends PopupList <JavaDecl> {
 
     // The JavaTextArea
     JavaTextArea           _textArea;
@@ -110,7 +110,7 @@ PropChangeListener _textAreaLsnr = pce -> textAreaPropChange(pce);
 public void textAreaPropChange(PropChange anEvent)
 {
     // If not showing, unregister (in case we were PopupList was dismissed without hide)
-    if(!isShowing()) { _textArea.removePropChangeListener(this); return; }
+    if(!isShowing()) { _textArea.removePropChangeListener(_textAreaLsnr); return; }
     
     // If Selection change, update or hide
     if(anEvent.getPropertyName().equals("Selection")) {
