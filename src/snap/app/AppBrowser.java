@@ -47,12 +47,15 @@ public void setPage(WebPage aPage)
 protected Class <? extends WebPage> getPageClass(WebResponse aResp)
 {
     // Get file and data
-    WebFile file = aResp.getFile(); String type = file!=null? file.getType() : null;
+    WebFile file = aResp.getFile();
+    String type = aResp.getPathType();
     
-    // Handle app files
+    // Handle Project Root directory
     if(file!=null && file.isRoot() && getAppPane().getSites().contains(file.getSite())) return SitePage.class;
+    
+    // Handle Java
     if(type.equals("java")) {
-        if(snap.javasnap.SnapEditorPage.isSnapEditSet(file))
+        if(file!=null && snap.javasnap.SnapEditorPage.isSnapEditSet(file))
             return snap.javasnap.SnapEditorPage.class;
         return JavaPage.class;
     }

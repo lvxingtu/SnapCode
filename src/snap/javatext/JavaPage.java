@@ -61,6 +61,10 @@ public void setResponse(WebResponse aResp)
     // Do normal version
     super.setResponse(aResp);
     
+    // If no real file, just return
+    if(getFile()==null)
+        return;
+    
     // Load UI
     getUI();
     

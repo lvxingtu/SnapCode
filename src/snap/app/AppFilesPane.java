@@ -604,7 +604,7 @@ public void showNewFilePanel()
     WebPage page = _appPane.getBrowser().createPage(file);
     
     // ShowNewFilePanel and save returned file
-    file = page.showNewFilePanel(_appPane.getUI()); if(file==null) return;
+    file = page.showNewFilePanel(_appPane.getUI(), file); if(file==null) return;
     try { file.save(); }
     catch(Exception e) { _appPane.getBrowser().showException(file.getURL(), e); return; }
 
