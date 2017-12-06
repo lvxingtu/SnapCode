@@ -462,7 +462,13 @@ public List <JavaDecl> getPrefixMethods(String aPrefix)
             if(StringUtils.startsWithIC(md.getName(), aPrefix))
                 pmeths.add(md);
                 
-        // Should iterate over class interfaces, too
+        // If interface, iterate over class interfaces, too (should probably do this anyway to catch default methods).
+        if(cls.isInterface()) {
+            for(JavaDeclClass c2 : cls.getInterfaces()) {
+                List <JavaDecl> pmeths2 = c2.getPrefixMethods(aPrefix);
+                pmeths.addAll(pmeths2);
+            }
+        }
     }
     
     // Return list of prefix methods
