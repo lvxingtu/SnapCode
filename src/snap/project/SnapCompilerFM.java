@@ -23,9 +23,6 @@ public class SnapCompilerFM extends ForwardingJavaFileManager<JavaFileManager> {
     // A map of previously accessed SnapFileObjects for paths
     Map <String,SnapFileJFO>  _jfos = new HashMap();
     
-    // Bogus flag to indicate we should use JavaFiles instead of ClassFiles when available
-    Set <WebFile>            _buildFiles = new HashSet();
-    
 /**
  * Construct a new FileManager which forwards to the <var>fileManager</var>
  * for source and to the <var>classLoader</var> for classes
@@ -192,7 +189,6 @@ class SnapFileJFO extends SimpleJavaFileObject {
     // The SnapCompiler and JavaFile (if available)
     WebFile         _file;
     WebFile         _sourceFile;
-    boolean         _forceCompile;
     String          _bname, _str;
 
     /** Creates a new SnapFileJFO with WebFile, SnapCompiler and (optional) source file. */
@@ -201,19 +197,16 @@ class SnapFileJFO extends SimpleJavaFileObject {
         super(URI.create(aFile.getPath()), isJavaFile(aFile)? Kind.SOURCE : Kind.CLASS);
         _file = aFile;
         
-        // If Class file, Get SourceFile and if in BuildFiles, set ForceCompile
-        if(_file.getType().equals("class")) {
+        // If Class file, Get SourceFile
+        if(_file.getType().equals("class"))
             _sourceFile = _proj.getJavaFile(_file); 
-            if(_buildFiles.contains(_sourceFile))
-                _forceCompile = true;
-        }
     }
     
     /** Returns the file. */
     public WebFile getFile()  { return _file; }
     
     /** Returns ModifiedTime of WebFile. */
-    public long getLastModified()  { return _forceCompile? 0 : _file.getLastModTime(); }
+    public long getLastModified()  { return _file.getLastModTime(); }
     
     /** Returns the "binary name" for the CompilerFileManager inferBinaryName method. */
     public String getBinaryName()
@@ -241,9 +234,9 @@ class SnapFileJFO extends SimpleJavaFileObject {
         return new ByteArrayOutputStream() {
             public void close() throws IOException {
                 
-                // Do normal close, add SourceFile to Compiler.CompiledFiles and reset ForceCompile
+                // Do normal close and add SourceFile to Compiler.CompiledFiles
                 super.close();
-                _compiler._compJFs.add(_sourceFile); _forceCompile = false;
+                _compiler._compJFs.add(_sourceFile);
                 
                 // Get bytes and whether class file is modified
                 byte bytes[] = toByteArray();

@@ -96,8 +96,7 @@ public boolean buildFiles(TaskMonitor aTaskMonitor)
     SnapCompiler compiler = new SnapCompiler(_proj);
     Set <WebFile> compiledFiles = new HashSet(), errorFiles = new HashSet();
     
-    // Add known build files to FileManager, to force use of JavaFile instead of ClassFile, regardless of ModTime
-    compiler.getFileManaer()._buildFiles.addAll(files);
+    // Reset Interrupt flag
     _interrupt = false;
     
     // Iterate over build files and compile
