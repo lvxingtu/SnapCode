@@ -14,7 +14,10 @@ public class AppLauncher {
     // The run config
     RunConfig         _config;
 
-    // The file to make an applet for
+    // The file to launch
+    WebFile            _file;
+    
+    // The url to launch
     WebURL            _url;
     
     // The Project
@@ -24,9 +27,14 @@ public class AppLauncher {
     static WebFile    _lastRunFile;
     
 /**
+ * Returns the WebFile.
+ */
+public WebFile getFile()  { return _file; }
+
+/**
  * Returns the WebURL.
  */
-public WebURL getURL()  { return _url; }
+public WebURL getURL()  { return _file.getURL(); }
 
 /**
  * Returns the URL String.
@@ -56,7 +64,8 @@ public void runFile(AppPane anAppPane, RunConfig aConfig, WebFile aFile, boolean
     if(bfile!=null) file = bfile;
     
     // Set URL
-    _url = file.getURL();
+    _file = file;
+    _url = _file.getURL();
     _config = aConfig;
     
     // Set last run file
@@ -133,7 +142,7 @@ protected List <String> getCommand()
     commands.add("-cp"); commands.add(cpath);
 
     // Add class name
-    commands.add(_proj.getClassName(getURL().getFile()));
+    commands.add(_proj.getClassName(getFile()));
     
     // Add App Args
     if(getAppArgs()!=null && getAppArgs().length()>0)
