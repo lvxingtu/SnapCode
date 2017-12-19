@@ -6,20 +6,19 @@ import snap.viewx.TextPage;
 import snap.web.*;
 
 /**
- * A custom class.
+ * A WebPage subclass to show class info for a .class file.
  */
 public class ClassInfoPage extends TextPage {
 
 /**
- * Override to configure page.
+ * Override to return class info text instead of class file contents.
  */
-public void setResponse(WebResponse aResp)
+protected String getDefaultText()
 {
-    super.setResponse(aResp);
-    
-    String jpath = getFile().getPath().replace(".class", ".java").replace("/bin/", "/src/");
-    WebFile jfile = getFile().getSite().getFile(jpath);
-    JavaData jdata = jfile!=null? JavaData.get(jfile) : null; if(jdata==null) { setText("Class File not found"); return; }
+    WebFile cfile = getFile();
+    String jpath = cfile.getPath().replace(".class", ".java").replace("/bin/", "/src/");
+    WebFile jfile = cfile.getSite().getFile(jpath);
+    JavaData jdata = jfile!=null? JavaData.get(jfile) : null; if(jdata==null) return "Class File not found";
     Set <JavaDecl> decls = jdata.getDecls(), refs = jdata.getRefs();
     
     // Create StringBuffer and append Declarations
@@ -42,7 +41,7 @@ public void setResponse(WebResponse aResp)
     for(JavaDecl d : refArray) sb.append(d.getType()).append(' ').append(d.getFullName()).append('\n');
     
     // Set Text
-    setText(sb.toString());
+    return sb.toString();
 }
 
 }
