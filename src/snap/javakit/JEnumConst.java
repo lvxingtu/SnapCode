@@ -8,7 +8,7 @@ import java.util.List;
 public class JEnumConst extends JMemberDecl
 {
     // The args
-    List <JExpr>   _args = Collections.EMPTY_LIST;
+    List <JExpr>    _args = Collections.EMPTY_LIST;
 
     // The class or interface body
     String          _classBody;
@@ -43,10 +43,15 @@ public void setClassBody(String aBody)  { _classBody = aBody; }
  */
 protected JavaDecl getDeclImpl()
 {
+    // Get enum name, enclosing JClassDecl and it's JavaDeclClass (can be null if enum hasn't been compiled yet)
     String name = getName();
-    JClassDecl cls = (JClassDecl)getParent();
-    JavaDeclClass cdecl = cls.getDecl();
-    JavaDecl edecl = cdecl.getField(name);
+    JClassDecl cdecl = (JClassDecl)getParent();
+    JavaDeclClass jdecl = cdecl.getDecl();
+    if(jdecl==null)
+        return null;
+    
+    // Get JavaDecl for enum constant, which is just a field of enum class
+    JavaDecl edecl = jdecl.getField(name);
     return edecl;
 }
 
