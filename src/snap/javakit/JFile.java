@@ -194,22 +194,22 @@ public String getImportClassName(String aName)
         return cdecl!=null? cdecl.getName() : null;
     }
     
-    // Get import for name
-    JImportDecl imp = getImport(aName);
-    if(imp!=null)
-        return imp.getImportClassName(aName);
-    
+    // Try "java.lang" + name
+    JavaDecl jld = getJavaDecl("java.lang." + aName);
+    if(jld!=null && jld.isClass())
+        return jld.getName();
+
     // If file declares package, see if it's in package
     String pname = getPackageName();
     if(pname!=null && pname.length()>0) { String cname = pname + '.' + aName;
         if(isKnownClassName(cname))
             return cname; }
     
-    // Try "java.lang" + name
-    JavaDecl jld = getJavaDecl("java.lang." + aName);
-    if(jld!=null && jld.isClass())
-        return jld.getName();
-
+    // Get import for name
+    JImportDecl imp = getImport(aName);
+    if(imp!=null)
+        return imp.getImportClassName(aName);
+    
     // Return null since class not found
     return null;
 }

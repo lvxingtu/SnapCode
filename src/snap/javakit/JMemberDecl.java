@@ -21,7 +21,7 @@ public class JMemberDecl extends JNode {
  */
 public JModifiers getMods()
 {
-    if(_mods==null) setMods(new JModifiers());
+    if(_mods==null) _mods = new JModifiers();
     return _mods;
 }
 

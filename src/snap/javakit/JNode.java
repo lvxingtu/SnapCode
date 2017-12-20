@@ -242,7 +242,7 @@ protected void addChild(JNode aNode, int anIndex)
     if(_children==Collections.EMPTY_LIST) _children = new ArrayList();
     _children.add(anIndex, aNode); aNode.setParent(this);
     if(getStartToken()==null || getStart()>aNode.getStart()) {
-        if(aNode.getStartToken()==null) System.err.println("JNode.addChild: Bogus start token for " + aNode);
+        if(aNode.getStartToken()==null) System.err.println("JNode.addChild: Bogus start token");
         else setStartToken(aNode.getStartToken());
     }
     

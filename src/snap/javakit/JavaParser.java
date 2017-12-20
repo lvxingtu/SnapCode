@@ -560,23 +560,30 @@ public static class StatementHandler extends JNodeParseHandler <JStmt>
 
 /**
  * Modifiers Handler.
+ *     Modifiers { Modifier* }
+ *     Modifier { "public" | "static" | "protected" | "private" | "final" | "abstract" | ... | Annotation }
  */
 public static class ModifiersHandler extends JNodeParseHandler <JModifiers> {
 
     /** ParseHandler method. */
     protected void parsedOne(ParseNode aNode, String anId)
     {
-        if(anId=="public") getPart().addValue(Modifier.PUBLIC);
-        else if(anId=="static") getPart().addValue(Modifier.STATIC);
-        else if(anId=="protected") getPart().addValue(Modifier.PROTECTED);
-        else if(anId=="private") getPart().addValue(Modifier.PRIVATE);
-        else if(anId=="final") getPart().addValue(Modifier.FINAL);
-        else if(anId=="abstract") getPart().addValue(Modifier.ABSTRACT);
-        else if(anId=="synchronized") getPart().addValue(Modifier.SYNCHRONIZED);
-        else if(anId=="native") getPart().addValue(Modifier.NATIVE);
-        else if(anId=="transient") getPart().addValue(Modifier.TRANSIENT);
-        else if(anId=="volatile") getPart().addValue(Modifier.VOLATILE);
-        else if(anId=="strictfp") getPart().addValue(Modifier.STRICT);
+        JModifiers part = getPart();
+        switch(anId) {
+            case "public": part.addValue(Modifier.PUBLIC); break;
+            case "static": part.addValue(Modifier.STATIC); break;
+            case "protected": part.addValue(Modifier.PROTECTED); break;
+            case "private": part.addValue(Modifier.PRIVATE); break;
+            case "final": part.addValue(Modifier.FINAL); break;
+            case "abstract": part.addValue(Modifier.ABSTRACT); break;
+            case "synchronized": part.addValue(Modifier.SYNCHRONIZED); break;
+            case "native": part.addValue(Modifier.NATIVE); break;
+            case "transient": part.addValue(Modifier.TRANSIENT); break;
+            case "volatile": part.addValue(Modifier.VOLATILE); break;
+            case "strictfp": part.addValue(Modifier.STRICT); break;
+            case "default": break; // Should we really treat as modifier? No support in java.lang.reflect.Modifier.
+            default: break; // "Modifer" or Annotation
+        }
     }
 }
 
