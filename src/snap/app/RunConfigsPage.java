@@ -13,11 +13,6 @@ public class RunConfigsPage extends WebPage {
     RunConfig   _runConfig;
 
 /**
- * Creates a new RunConfigsPage.
- */
-public RunConfigsPage()  { setURL(WebURL.getURL(getClass())); }
-
-/**
  * Returns the app browser.
  */
 public AppBrowser getBrowser()  { return (AppBrowser)super.getBrowser(); }

@@ -13,11 +13,6 @@ public class HomePage extends WebPage {
     boolean       _stupidAnim;
 
 /**
- * Creates a new HomePage.
- */
-public HomePage()  { setURL(WebURL.getURL(getClass())); }
-
-/**
  * Returns the browser as AppBrowser.
  */
 public AppBrowser getBrowser()  { return (AppBrowser)super.getBrowser(); }
