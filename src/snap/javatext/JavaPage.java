@@ -54,6 +54,15 @@ protected void initUI()
 }
 
 /**
+ * Override to reload text from file.
+ */
+public void reload()
+{
+    super.reload();
+    getTextArea().setSource(getFile());
+}
+
+/**
  * Override to set parameters.
  */
 public void setResponse(WebResponse aResp)

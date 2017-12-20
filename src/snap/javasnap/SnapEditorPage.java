@@ -45,6 +45,9 @@ public void setFile(WebFile aFile)  { super.setFile(aFile); _javaPage.setFile(aF
 /** Override to forward to JavaPage. */
 public void setResponse(WebResponse aResp)  { super.setResponse(aResp); _javaPage.setResponse(aResp); }
 
+/** Override to forward to JavaPage. */
+public void reload()  { super.reload(); _javaPage.reload(); }
+
 /**
  * Create UI.
  */
