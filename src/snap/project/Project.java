@@ -460,12 +460,12 @@ public ProjectFileBuilder getFileBuilder(WebFile aFile)
 /**
  * Adds a build file.
  */
-public void addBuildFilesAll()  { addBuildFile(getSourceDir()); }
+public void addBuildFilesAll()  { addBuildFile(getSourceDir(), true); }
 
 /**
  * Adds a build file.
  */
-public void addBuildFile(WebFile aFile)
+public void addBuildFile(WebFile aFile, boolean doForce)
 {
     // If file doesn't exist, just return
     if(!aFile.getExists()) return;
@@ -474,13 +474,13 @@ public void addBuildFile(WebFile aFile)
     // Handle directory
     if(aFile.isDir()) {
         if(aFile==getBuildDir()) return; // If build directory, just return (assuming build dir is in source dir)
-        for(WebFile file : aFile.getFiles()) addBuildFile(file);
+        for(WebFile file : aFile.getFiles()) addBuildFile(file, doForce);
         return;
     }
 
     // Get FileBuilder for file and add
     ProjectFileBuilder fileBuilder = getFileBuilder(aFile); if(fileBuilder==null) return;
-    if(!fileBuilder.getNeedsBuild(aFile))
+    if(!doForce && !fileBuilder.getNeedsBuild(aFile))
         return;
     fileBuilder.addBuildFile(aFile);
 }
@@ -528,7 +528,7 @@ public BuildIssues getBuildIssues()  { return _bissues!=null? _bissues : (_bissu
 public void fileAdded(WebFile aFile)
 {
     if(aFile.isDir()) readSettings(); 
-    addBuildFile(aFile);
+    addBuildFile(aFile, false);
 }
 
 /**
@@ -546,7 +546,7 @@ public void fileRemoved(WebFile aFile)
 public void fileSaved(WebFile aFile)
 {
     if(aFile.isDir() && aFile==getClassPath().getFile()) readSettings();
-    if(!aFile.isDir()) addBuildFile(aFile);
+    if(!aFile.isDir()) addBuildFile(aFile, false);
 }
 
 /**

@@ -24,6 +24,9 @@ public class SitePane extends ViewOwner implements DeepChangeListener {
     // The VersionControl pane
     VcsPane            _vcp;
     
+    // The BuildPane
+    BuildPane          _buildPane;
+    
     // The HttpServerPane
     HttpServerPane     _httpServerPane;
     
@@ -41,6 +44,9 @@ protected SitePane(WebSite aSite)
     // Set VersionControlPane
     String urls = getRemoteURLString();
     _vcp = VersionControl.get(_site) instanceof VersionControlGit? new VcsPaneGit(this) : new VcsPane(this);
+    
+    // Set BuildPane
+    _buildPane = new BuildPane(this);
     
     // Set HttpServerPane
     _httpServerPane = new HttpServerPane(this);

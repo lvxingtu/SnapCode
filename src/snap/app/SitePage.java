@@ -34,6 +34,10 @@ protected View createUI()
     AppConsole consolePane = sitePane.getConsolePane();
     _tview.addTab("Console", consolePane.getUI());  //tab.setTooltip(new Tooltip("Console Text"));
     
+    // Add BuildPane
+    BuildPane buildPane = sitePane._buildPane;
+    _tview.addTab("Build Dir", buildPane.getUI());
+    
     // Add HttpServerPane
     HttpServerPane httpServPane = sitePane._httpServerPane;
     _tview.addTab("HTTP-Server", httpServPane.getUI());
