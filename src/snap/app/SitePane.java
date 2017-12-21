@@ -2,12 +2,13 @@ package snap.app;
 import snap.project.*;
 import snap.util.*;
 import snap.view.*;
+import snap.viewx.WebPage;
 import snap.web.*;
 
 /**
  * A class to manage UI aspects of a WebSite for app.
  */
-public class SitePane extends ViewOwner implements DeepChangeListener {
+public class SitePane extends WebPage {
 
     // The AppPane that owns this SitePane
     AppPane            _appPane;
@@ -30,13 +31,16 @@ public class SitePane extends ViewOwner implements DeepChangeListener {
     // The HttpServerPane
     HttpServerPane     _httpServerPane;
     
+    // DeepChangeListener for Site
+    DeepChangeListener _siteDCL = (src,pc) -> siteHadDeepChange(src,pc);
+    
 /**
  * Creates a new SitePane for given site.
  */
 protected SitePane(WebSite aSite)
 {
     _site = aSite;
-    _site.addDeepChangeListener(this);
+    _site.addDeepChangeListener(_siteDCL);
     
     // Set ProjectPane
     _projPane = new ProjectPane(this);
@@ -192,7 +196,7 @@ public void openSite()
  */
 public void closeSite()
 {
-    _site.removeDeepChangeListener(this);
+    _site.removeDeepChangeListener(_siteDCL);
     _site.setProp(SitePane.class.getName(), null);
     _appPane = null; _site = null; _consolePane = null; _projPane = null; _vcp = null;
     
@@ -245,7 +249,7 @@ public boolean isHiddenFile(WebFile aFile)
 /**
  * Implement to listen to Site File changes.
  */
-public void deepChange(Object aSource, PropChange anEvent)
+private void siteHadDeepChange(Object aSource, PropChange anEvent)
 {
     // Get source and property name
     Object source = anEvent.getSource(); String pname = anEvent.getPropertyName();
@@ -292,6 +296,42 @@ void fileSaved(WebFile aFile)
 }
 
 /**
+ * Initialize UI panel.
+ */
+protected View createUI()
+{
+    // Create TabView
+    TabView _tview = new TabView();
+    
+    // Add ProjectPane
+    ProjectPane projPane = getProjPane();
+    if(projPane!=null)
+        _tview.addTab("Settings", projPane.getUI()); //tab.setTooltip(new Tooltip("Project Settings"));
+    
+    // Add VersionControlPane
+    VcsPane vcp = getVersionControlPane();
+    if(vcp!=null) {
+        String title = vcp instanceof VcsPaneGit? "Git" : "Versioning";
+        _tview.addTab(title, vcp.getUI()); //tab.setTooltip(new Tooltip("Manage Remote Site"));
+    }
+        
+    // Add console pane and return
+    AppConsole consolePane = getConsolePane();
+    _tview.addTab("Console", consolePane.getUI());  //tab.setTooltip(new Tooltip("Console Text"));
+    
+    // Add BuildPane
+    BuildPane buildPane = _buildPane;
+    _tview.addTab("Build Dir", buildPane.getUI());
+    
+    // Add HttpServerPane
+    HttpServerPane httpServPane = _httpServerPane;
+    _tview.addTab("HTTP-Server", httpServPane.getUI());
+    
+    // Return TabView
+    return _tview;
+}
+
+/**
  * Returns the site pane for a site.
  */
 public static SitePane get(WebSite aSite)  { return get(aSite, false); }
@@ -304,6 +344,22 @@ public synchronized static SitePane get(WebSite aSite, boolean doCreate)
     SitePane sp = (SitePane)aSite.getProp(SitePane.class.getName());
     if(sp==null && doCreate) aSite.setProp(SitePane.class.getName(), sp=new SitePane(aSite));
     return sp;
+}
+
+/**
+ * A WebPage subclass for SitePane.
+ */
+public static class SitePage extends WebPage {
+
+    /** Initialize UI panel. */
+    protected View createUI()
+    {
+        SitePane sp = SitePane.get(getSite());
+        return sp.getUI();
+    }
+    
+    /** Override to provide better title. */
+    public String getTitle()  { return getURL().getSite().getName() + " - Site Settings"; }
 }
 
 }

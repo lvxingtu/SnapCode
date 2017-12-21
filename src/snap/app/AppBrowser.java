@@ -51,7 +51,8 @@ protected Class <? extends WebPage> getPageClass(WebResponse aResp)
     String type = aResp.getPathType();
     
     // Handle Project Root directory
-    if(file!=null && file.isRoot() && getAppPane().getSites().contains(file.getSite())) return SitePage.class;
+    if(file!=null && file.isRoot() && getAppPane().getSites().contains(file.getSite()))
+        return SitePane.SitePage.class;
     
     // Handle Java
     if(type.equals("java")) {
