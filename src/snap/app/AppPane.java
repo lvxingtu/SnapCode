@@ -1,6 +1,5 @@
 package snap.app;
 import java.util.*;
-import snap.app.SearchPane;
 import snap.project.*;
 import snap.util.*;
 import snap.view.*;
