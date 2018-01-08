@@ -480,9 +480,9 @@ public void addBuildFile(WebFile aFile, boolean doForce)
 
     // Get FileBuilder for file and add
     ProjectFileBuilder fileBuilder = getFileBuilder(aFile); if(fileBuilder==null) return;
-    if(!doForce && !fileBuilder.getNeedsBuild(aFile))
-        return;
-    fileBuilder.addBuildFile(aFile);
+    boolean needsBuild = fileBuilder.getNeedsBuild(aFile);
+    if(doForce || needsBuild)
+        fileBuilder.addBuildFile(aFile);
 }
 
 /**

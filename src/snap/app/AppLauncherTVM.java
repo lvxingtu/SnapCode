@@ -19,7 +19,10 @@ public class AppLauncherTVM extends AppLauncher {
 /**
  * Creates a new AppLauncherTVM.
  */
-public AppLauncherTVM(AppLauncher anAL)  { _config = anAL._config; _url = anAL._url; _proj = anAL._proj; }
+public AppLauncherTVM(AppLauncher anAL)
+{
+    _config = anAL._config; _file = anAL._file; _url = anAL._url; _proj = anAL._proj;
+}
 
 /**
  * Returns whether this is TeaVM launch.
