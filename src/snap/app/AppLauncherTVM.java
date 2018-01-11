@@ -118,7 +118,7 @@ private void updateTeaFiles()
     updateTeaFiles(_proj.getSourceDir());
     for(Project proj : _proj.getProjects()) {
         WebFile file = proj.getSourceDir();
-        if(proj.getName().equals("SnapKit")) {
+        /*if(proj.getName().equals("SnapKit")) {
             updateTeaFiles(proj.getFile("/src/snap/util/XMLParser.txt"));
             updateTeaFiles(proj.getFile("/src/snap/view"));
             updateTeaFiles(proj.getFile("/src/snap/viewx/JTokens.txt"));
@@ -135,8 +135,8 @@ private void updateTeaFiles()
             updateTeaFiles(proj.getFile("/src/snap/viewx/pkg.images/File_Save.png"));
             updateTeaFiles(proj.getFile("/src/snap/viewx/pkg.images/Font_Increase.png"));
             updateTeaFiles(proj.getFile("/src/snap/viewx/pkg.images/Font_Decrease.png"));
-        }
-        else updateTeaFiles(file);
+        } else */
+        updateTeaFiles(file);
     }
     
     // Write tea file
