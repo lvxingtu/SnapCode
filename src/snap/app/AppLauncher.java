@@ -72,10 +72,23 @@ public void runFile(AppPane anAppPane, RunConfig aConfig, WebFile aFile, boolean
     _lastRunFile = aFile;
     
     // If Cheerp (links against SnapCJ), generate cheerp files and open in browser
-    if(inBrowser) { //AppLauncherCJ.isCheerp(_proj, aFile)) {
+    if(inBrowser) {
+    
+        // If CheerpJ support, generate cheerp files and open in browser
+        if(AppLauncherCJ.isCheerp(_proj)) {
+            new AppLauncherCJ(this).runCheerp(anAppPane); return; }
+            
+        // If CheerpJ support, generate cheerp files and open in browser
+        if(AppLauncherTVM.isTeaVM(_proj)) {
+            new AppLauncherTVM(this).runTea(anAppPane); return; }
+        anAppPane.beep(); return;
+    }
+        
+    // If CheerpJ support and file invokes it, generate cheerp files and open in browser
+    if(AppLauncherCJ.isCheerp(_proj, aFile)) {
         new AppLauncherCJ(this).runCheerp(anAppPane); return; }
         
-    // If TeaVM (links against jar and activates TVViewEnv), generate tea files and open in browser
+    // If TeaVM support and file invokes it, generate cheerp files and open in browser
     if(AppLauncherTVM.isTeaVM(_proj, aFile)) {
         new AppLauncherTVM(this).runTea(anAppPane); return; }
         

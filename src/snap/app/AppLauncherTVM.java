@@ -25,13 +25,21 @@ public AppLauncherTVM(AppLauncher anAL)
 }
 
 /**
- * Returns whether this is TeaVM launch.
+ * Returns whether this project includes TeaVM support.
+ */
+public static boolean isTeaVM(Project aProj)
+{
+    String cpath = FilePathUtils.getJoinedPath(aProj.getProjectSet().getLibPaths());
+    return cpath.contains("teavm-");
+}
+
+/**
+ * Returns whether this project includes TeaVM support and given file invokes it.
  */
 public static boolean isTeaVM(Project aProj, WebFile aFile)
 {
     // If class path doesn't include TeaVM jar, return false
-    String cpath = FilePathUtils.getJoinedPath(aProj.getProjectSet().getLibPaths());
-    if(!cpath.contains("teavm-")) return false;
+    if(!isTeaVM(aProj)) return false;
     
     // If main class contains TVViewEnv, return true
     Set <JavaDecl> decls = JavaData.get(aFile).getRefs(); for(JavaDecl decl : decls) {
@@ -59,7 +67,7 @@ void runTea(AppPane anAppPane)
     RunApp proc = new RunApp(getURL(), command);
     anAppPane.getProcPane().execProc(proc);
     proc.addListener(new RunApp.AppAdapter() {
-        public void appExited(RunApp ra) { teaExited(); }});
+        public void appExited(RunApp ra) { teaCompileDone(); }});
 }
 
 /**
@@ -87,6 +95,9 @@ protected List <String> getTeaCommand()
     String bpathNtv = FilePathUtils.getNativePath(bpath);
     commands.add("-d"); commands.add(bpathNtv);
     
+    // Add Preserve Class
+    commands.add("-preserve-class"); commands.add("snaptea.TV");
+    
     // Add other options
     //commands.add("-S"); commands.add("-D");
     commands.add("-G"); commands.add("-g");
@@ -100,14 +111,30 @@ protected List <String> getTeaCommand()
 }
 
 /**
- * Called when tea Exited.
+ * Called when tea compile is done.
  */
-public void teaExited()
+public void teaCompileDone()
 {
-    WebURL html = WebURL.getURL(_proj.getClassPath().getBuildPathAbsolute() + "/tea/index.html");
-    WebFile htmlFile = html.getFile();
-    if(htmlFile==null) htmlFile = getHTMLIndexFile();
-    snap.gfx.GFXEnv.getEnv().openFile(htmlFile);
+    // Start HttpServer
+    SitePane.get(_url.getSite()).getHttpServerPane().startServer();
+    
+    // Get HTML file and open
+    WebFile htmlFile = getHTMLIndexFile();
+    WebURL htmlURL = getHTMLURL();
+    snap.gfx.GFXEnv.getEnv().openURL(htmlURL);
+
+    //WebFile htmlFile = getHTMLIndexFile();
+    //snap.gfx.GFXEnv.getEnv().openFile(htmlFile);
+}
+
+/**
+ * Creates and returns an HTML file for given name.
+ */
+public WebURL getHTMLURL()
+{
+    //String className = _url.getPathNameSimple();
+    String htmlPath = "http://127.0.0.1:8080/tea/index.html"; // + className + ".html";
+    return WebURL.getURL(htmlPath);
 }
 
 /**

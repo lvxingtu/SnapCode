@@ -2,6 +2,7 @@ package snap.app;
 import java.io.File;
 import java.util.*;
 import snap.debug.RunApp;
+import snap.javakit.*;
 import snap.project.Project;
 import snap.util.*;
 import snap.view.DialogBox;
@@ -19,18 +20,26 @@ public class AppLauncherCJ extends AppLauncher {
 public AppLauncherCJ(AppLauncher anAL)  { _config = anAL._config; _url = anAL._url; _proj = anAL._proj; }
 
 /**
- * Returns whether this is Cheerp launch.
+ * Returns whether this project includes CheerpJ support.
+ */
+public static boolean isCheerp(Project aProj)
+{
+    // If class path doesn't include SnapCJ jar, return false
+    String cpath = FilePathUtils.getJoinedPath(aProj.getProjectSet().getLibPaths());
+    return cpath.contains("SnapCJ");
+}
+
+/**
+ * Returns whether this project includes CheerpJ and given file invokes it.
  */
 public static boolean isCheerp(Project aProj, WebFile aFile)
 {
     // If class path doesn't include SnapCJ jar, return false
-    String cpath = FilePathUtils.getJoinedPath(aProj.getProjectSet().getLibPaths());
-    //if(!cpath.contains("SnapCJ")) return false;
-    if(cpath.contains("SnapCJ")) return true;
+    if(!isCheerp(aProj)) return false;
     
     // If main class contains snapcj.CJ.set() reference, return true
-    //Set <JavaDecl> decls = JavaData.get(aFile).getRefs(); for(JavaDecl decl : decls) {
-    //    if(decl.getName().startsWith("snapcj.CJ")) return true; }
+    Set <JavaDecl> decls = JavaData.get(aFile).getRefs(); for(JavaDecl decl : decls) {
+        if(decl.getName().startsWith("snapcj.CJ")) return true; }
     return false;
 }
 
@@ -163,15 +172,15 @@ public void cheerpCompileDone()
     SitePane.get(_url.getSite()).getHttpServerPane().startServer();
     
     // Get HTML file and open
-    WebFile htmlFile = getCheerpHTMLFile();
-    WebURL htmlURL = getCheerpHTMLURL();
+    WebFile htmlFile = getHTMLFile();
+    WebURL htmlURL = getHTMLURL();
     snap.gfx.GFXEnv.getEnv().openURL(htmlURL);
 }
 
 /**
  * Creates and returns an HTML file for given name.
  */
-public WebURL getCheerpHTMLURL()
+public WebURL getHTMLURL()
 {
     String className = _url.getPathNameSimple();
     String htmlPath = "http://127.0.0.1:8080/" + className + ".html";
@@ -181,18 +190,18 @@ public WebURL getCheerpHTMLURL()
 /**
  * Creates and returns an HTML file for given name.
  */
-public WebFile getCheerpHTMLFile()
+public WebFile getHTMLFile()
 {
     String cpath = FilePathUtils.getJoinedPath(_proj.getProjectSet().getLibPaths());
     if(cpath.contains("SnapCJ"))
-        return getCheerpHTMLFileSnapKit();
-    return getCheerpHTMLFileSwing();
+        return getHTMLFileSnapKit();
+    return getHTMLFileSwing();
 }
 
 /**
  * Creates and returns an HTML file for given name.
  */
-public WebFile getCheerpHTMLFileSnapKit()
+public WebFile getHTMLFileSnapKit()
 {
     String classNameSimple = _url.getPathNameSimple();
     String htmlPath = _proj.getClassPath().getBuildPathAbsolute() + '/' + classNameSimple + ".html";
@@ -225,7 +234,7 @@ public WebFile getCheerpHTMLFileSnapKit()
 /**
  * Creates and returns an HTML file for given name.
  */
-public WebFile getCheerpHTMLFileSwing()
+public WebFile getHTMLFileSwing()
 {
     String classNameSimple = _url.getPathNameSimple();
     String htmlPath = _proj.getClassPath().getBuildPathAbsolute() + '/' + classNameSimple + ".html";
