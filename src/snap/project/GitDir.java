@@ -564,8 +564,50 @@ public class GitFileSite extends WebSite {
     /** Returns the tree for this site. */
     public GitTree getTree()  { return _cmt.getTree(); }
     
+    /** Handles a get or head request. */
+    protected WebResponse doGetOrHead(WebRequest aReq, boolean isHead)
+    {
+        // Get URL and path and create empty response
+        WebURL url = aReq.getURL();
+        String path = url.getPath(); if(path==null) path = "/";
+        WebResponse resp = new WebResponse(aReq);
+        
+        // Get Head branch Commit Tree and look for file - f not found, set Response.Code to NOT_FOUND and return
+        GitFile gfile = getTree().getFile(path);
+        if(gfile==null) {
+            resp.setCode(WebResponse.NOT_FOUND); return resp; }
+            
+        // Otherwise configure
+        resp.setCode(WebResponse.OK);
+        resp.setDir(gfile.isDir());
+        resp.setLastModTime(_cmt.getCommitTime());
+        
+        // If Head, just return
+        if(isHead)
+            return resp;
+        
+        // Handle plain file
+        if(resp.isFile()) {
+            byte bytes[] = gfile.getBytes();
+            resp.setBytes(bytes);
+        }
+            
+        // Handle directory: Walk RevTree and get files for children
+        else {
+            List <FileHeader> fhdrs = new ArrayList();
+            for(GitFile gf : gfile.getFiles()) {
+                FileHeader child = getFileHeader(gf.getPath());
+                fhdrs.add(child);
+            }
+            resp.setFileHeaders(fhdrs);
+        }
+        
+        // Set FileHeaderReturn response
+        return resp;
+    }
+    
     /** Get file from directory. */
-    protected FileHeader getFileHeader(String aPath) throws Exception
+    protected FileHeader getFileHeader(String aPath)
     {
         // Get Head branch Commit Tree and look for file
         GitFile gfile = getTree().getFile(aPath); if(gfile==null) return null;
@@ -574,27 +616,6 @@ public class GitFileSite extends WebSite {
         FileHeader file = new FileHeader(aPath, gfile.isDir());
         file.setLastModTime(_cmt.getCommitTime());
         return file;
-    }
-    
-    /** Returns file content (bytes for file, FileHeaders for dir). */
-    protected Object getFileContent(String aPath) throws Exception
-    {
-        // Get root tree and look for file
-        GitFile gfile = getTree().getFile(aPath); if(gfile==null) return null;
-        
-        // Handle plain file
-        if(!gfile.isDir())
-            return gfile.getBytes();
-            
-        // Handle directory: Walk RevTree and get files for children
-        List <FileHeader> files = new ArrayList();
-        for(GitFile gf : gfile.getFiles()) {
-            FileHeader child = getFileHeader(gf.getPath());
-            files.add(child);
-        }
-        
-        // Return files
-        return files;
     }
 }
 
@@ -606,34 +627,56 @@ protected class GitIndexSite extends WebSite {
     /** Creates a GitIndexSite. */
     public GitIndexSite()  { setURL(WebURL.getURL(getDir().getURL().getString() + ".index")); }
     
+    /** Handles a get or head request. */
+    protected WebResponse doGetOrHead(WebRequest aReq, boolean isHead)
+    {
+        // Get URL and path and create empty response
+        WebURL url = aReq.getURL();
+        String path = url.getPath(); if(path==null) path = "/";
+        WebResponse resp = new WebResponse(aReq);
+        
+        // Get entry - if not found, set Response.Code to NOT_FOUND and return
+        GitIndex.Entry entry = getIndex().getEntry(path);
+        if(entry==null) {
+            resp.setCode(WebResponse.NOT_FOUND); return resp; }
+            
+        // Otherwise configure
+        resp.setCode(WebResponse.OK);
+        resp.setDir(entry.isDir());
+        resp.setLastModTime(entry.getLastModified());
+        resp.setSize(entry.getLength());
+        
+        // If Head, just return
+        if(isHead)
+            return resp;
+        
+        // Handle plain file
+        if(resp.isFile()) {
+            byte bytes[] = entry.getBytes();
+            resp.setBytes(bytes);
+        }
+            
+        // Handle directory: Walk RevTree and get files for children
+        else {
+            List <FileHeader> fhdrs = new ArrayList();
+            for(GitIndex.Entry child : entry.getEntries()) {
+                FileHeader fhdr = getFileHeader(child.getPath());
+                fhdrs.add(fhdr);
+            }
+            resp.setFileHeaders(fhdrs);
+        }
+        
+        // Set FileHeaderReturn response
+        return resp;
+    }
+    
     /** Get file from directory. */
-    protected FileHeader getFileHeader(String aPath) throws Exception
+    protected FileHeader getFileHeader(String aPath)
     {
         GitIndex.Entry entry = getIndex().getEntry(aPath); if(entry==null) return null;
         FileHeader file = new FileHeader(aPath, entry.isDir());
         file.setLastModTime(entry.getLastModified()); file.setSize(entry.getLength());
         return file;
-    }
-    
-    /** Returns file content (bytes for file, FileHeaders for dir). */
-    protected Object getFileContent(String aPath) throws Exception
-    {
-        // Get entry
-        GitIndex.Entry entry = getIndex().getEntry(aPath); if(entry==null) return null;
-        
-        // Handle plain file
-        if(!entry.isDir())
-            return entry.getBytes();
-        
-        // Handle directory
-        List <FileHeader> files = new ArrayList(); String lastPath = "";
-        for(GitIndex.Entry child : entry.getEntries()) {
-            FileHeader file = getFileHeader(child.getPath());
-            files.add(file);
-        }
-        
-        // Return files
-        return files;
     }
 }
 
