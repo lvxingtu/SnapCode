@@ -78,7 +78,7 @@ public void setResponse(WebResponse aResp)
     getUI();
     
     // Look for LineNumber
-    WebURL aURL = aResp.getRequestURL();
+    WebURL aURL = aResp.getURL();
     String lineNumberString = aURL.getRefValue("LineNumber");
     if(lineNumberString!=null) { int lineNumber = SnapUtils.intValue(lineNumberString);
         getTextArea().selectLine(lineNumber-1); }
