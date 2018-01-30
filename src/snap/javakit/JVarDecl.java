@@ -151,12 +151,15 @@ public Class getDeclaringClass()
  */
 protected JavaDecl getDeclImpl()
 {
+    // Get name - if not set, just bail
+    String name = getName(); if(name==null) return null;
+    
     // If part of a JFieldDecl, get JavaDecl for field
     JNode par = getParent();
     if(par instanceof JFieldDecl) {
         JClassDecl cd = getEnclosingClassDecl(); if(cd==null) return null;
         JavaDeclClass cdecl = cd.getDecl(); if(cdecl==null) return null;
-        JavaDecl fdecl = cdecl.getField(getName());
+        JavaDecl fdecl = cdecl.getField(name);
         return fdecl;
     }
     
