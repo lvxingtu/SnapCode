@@ -53,7 +53,7 @@ protected Git getGit()  { return new Git(_repo); }
 protected Repository getRepo()
 {
     if(_repo==null) {
-        File gdir = getDir().getStandardFile(); if(!gdir.exists()) return null;
+        File gdir = getDir().getJavaFile(); if(!gdir.exists()) return null;
         try { _repo = new FileRepositoryBuilder().setGitDir(gdir).readEnvironment().build(); }
         catch(Exception e) { throw new RuntimeException(e); }
     }

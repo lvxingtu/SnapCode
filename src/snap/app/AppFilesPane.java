@@ -234,7 +234,7 @@ public void respondUI(ViewEvent anEvent)
         // Handle DragGesture
         else if(anEvent.isDragGesture() && getSelectedFile()!=null) {
             Clipboard cb = anEvent.getClipboard();
-            cb.addData(getSelectedFile().getStandardFile());
+            cb.addData(getSelectedFile().getJavaFile());
             cb.startDrag();
         }
         
@@ -296,7 +296,7 @@ public void respondUI(ViewEvent anEvent)
     // Handle ShowFileMenuItem
     if(anEvent.equals("ShowFileMenuItem")) {
         WebFile file = getSelectedFile(); if(!file.isDir()) file = file.getParent();
-        File file2 = file.getStandardFile();
+        File file2 = file.getJavaFile();
         FileUtils.openFile(file2);
     }
     
@@ -398,7 +398,7 @@ boolean addFile(WebFile aDirectory, File aFile)
         WebFile siteFile = site.getFile(aDirectory.getDirPath() + name);
         
         // See if IsDuplicating (there is a local file and it is the same as given file)
-        File siteLocalFile = siteFile!=null? siteFile.getStandardFile() : null;
+        File siteLocalFile = siteFile!=null? siteFile.getJavaFile() : null;
         boolean isDuplicating = SnapUtils.equals(aFile, siteLocalFile);
         
         // If file exists, run option panel for replace
@@ -699,7 +699,7 @@ public void copy()
 {
     List <WebFile> dfiles = getSelectedFiles();
     List <File> files = new ArrayList();
-    for(WebFile df : dfiles) if(df.getStandardFile()!=null) files.add(df.getStandardFile());
+    for(WebFile df : dfiles) if(df.getJavaFile()!=null) files.add(df.getJavaFile());
     Clipboard cb = Clipboard.getCleared();
     cb.addData(files);
 }

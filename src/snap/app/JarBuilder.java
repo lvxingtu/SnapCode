@@ -38,7 +38,7 @@ public void build() throws IOException
     manifest.getMainAttributes().put(Attributes.Name.MANIFEST_VERSION, "1.0");
     
     // Create Jar output
-    File jarFile = _jarURL.getSourceFile();
+    File jarFile = _jarURL.getJavaFile();
     JarOutputStream target = new JarOutputStream(new FileOutputStream(jarFile), manifest);
     for(int i=0,iMax=_files.size();i<iMax;i++) { File file = _files.get(i), dir = _dirs.get(i);
         add(file, dir, target); }
@@ -53,9 +53,9 @@ public void build() throws IOException
 public void addFile(Object aFile, Object aDir)
 {
     WebURL url = WebURL.getURL(aFile);
-    File file = url.getSourceFile();
+    File file = url.getJavaFile();
     WebURL durl = WebURL.getURL(aDir);
-    File dir = durl.getSourceFile();
+    File dir = durl.getJavaFile();
     if(file!=null) {
         _files.add(file); _dirs.add(dir); }
     else System.err.println("JarBuilder.addFile: Source not file: " + aFile);
@@ -67,7 +67,7 @@ public void addFile(Object aFile, Object aDir)
 public void addFiles(Object aTopDir)
 {
     WebURL url = WebURL.getURL(aTopDir);
-    File file = url.getSourceFile();
+    File file = url.getJavaFile();
     
     if(file.isDirectory()) {
         for (File nestedFile: file.listFiles()) {

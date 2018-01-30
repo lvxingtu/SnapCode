@@ -70,7 +70,7 @@ public WebSite getRepoSite()
 public void checkout(TaskMonitor aTM) throws Exception
 {
     // Get SiteDir, CloneDir and RemoteURL
-    File sdir = getSite().getRootDir().getStandardFile(), tdir = new File(sdir, "git-temp");
+    File sdir = getSite().getRootDir().getJavaFile(), tdir = new File(sdir, "git-temp");
     String uri = getRemoteURL().getString(); if(uri.startsWith("git:")) uri = uri.replace("git:", "https:") + ".git";
     
     // Create CloneCommand and configure

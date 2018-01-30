@@ -368,7 +368,7 @@ private String getRelativePath(String aPath)
  */
 private String getProjRootDirPath()
 {
-    String root = _site.getRootDir().getStandardFile().getAbsolutePath();
+    String root = _site.getRootDir().getJavaFile().getAbsolutePath();
     if(File.separatorChar!='/') root = root.replace(File.separatorChar, '/');
     if(!root.endsWith("/")) root = root + '/'; if(!root.startsWith("/")) root = '/' + root;
     return root;

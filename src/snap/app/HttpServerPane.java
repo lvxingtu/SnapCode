@@ -54,7 +54,7 @@ public HttpServerPane(SitePane aSitePane)
     _sitePane = aSitePane;
     
     WebSite site = aSitePane.getSite();
-    File file = site.getRootDir().getStandardFile();
+    File file = site.getRootDir().getJavaFile();
     _sitePath = FilePathUtils.getStandardized(file.getAbsolutePath());
     _sitePath = FilePathUtils.getChild(_sitePath,"/bin/");
 }

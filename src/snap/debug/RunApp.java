@@ -132,7 +132,7 @@ public void setWorkingDirectory(Object aDir)
         _workDir = (File)aDir;
     else {
         WebURL url = WebURL.getURL(aDir);
-        _workDir = url!=null? url.getSourceFile() : null;
+        _workDir = url!=null? url.getJavaFile() : null;
     }
 }
 
