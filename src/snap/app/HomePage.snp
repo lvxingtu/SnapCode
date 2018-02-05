@@ -94,7 +94,7 @@
         </RichText>
       </TextArea>
     </SpringView>
-    <SpringView Name="AddSnapCheerp" x="321" y="469" width="255" height="130" PrefWidth="255" PrefHeight="130">
+    <SpringView Name="AddSnapTea" x="321" y="469" width="255" height="130" PrefWidth="255" PrefHeight="130">
       <RectView width="255" height="130" GrowWidth="true" GrowHeight="true" LeanX="CENTER" LeanY="CENTER">
         <LineBorder />
         <fill type="image" resource="1161328792" />
@@ -104,7 +104,7 @@
         <RichText>
           <font name="Arial Bold" size="24" />
           <pgraph align="center" />
-          <string>Add Snap-Cheerp Project</string>
+          <string>Add SnapTea Project</string>
         </RichText>
       </TextArea>
     </SpringView>

@@ -41,7 +41,7 @@ public void initUI()
     enableEvents("JavaPlayground", MouseEvents);
     enableEvents("NewSnapScene", MouseEvents);
     enableEvents("AddSnapKit", MouseEvents);
-    enableEvents("AddSnapCheerp", MouseEvents);
+    enableEvents("AddSnapTea", MouseEvents);
     enableEvents("NewJavaFile", MouseEvents);
     enableEvents("NewFile", MouseEvents);
     enableEvents("SnapDocs", MouseEvents);
@@ -100,15 +100,17 @@ public void respondUI(ViewEvent anEvent)
         ppane.addProject("SnapKit", "https://github.com/reportmill/SnapKit.git");
     }
 
-    // Handle AddSnapKit
-    if(anEvent.equals("AddSnapCheerp") && anEvent.isMouseRelease()) {
+    // Handle AddSnapTea
+    if(anEvent.equals("AddSnapTea") && anEvent.isMouseRelease()) {
         ProjectPane ppane = ProjectPane.get(getRootSite());
         if(ppane.getProject().getProjectSet().getProject("SnapKit")==null)
             ppane.addProject("SnapKit", "https://github.com/reportmill/SnapKit.git");
         if(ppane.getProject().getProjectSet().getProject("CJDom")==null)
-            ppane.addProject("CJDom", "https://github.com/reportmill/CJDom.git");
-        if(ppane.getProject().getProjectSet().getProject("SnapCJ")==null)
-            ppane.addProject("SnapCJ", "https://github.com/reportmill/SnapCJ.git");
+            ppane.addProject("SnapTea", "https://github.com/reportmill/SnapTea.git");
+        //if(ppane.getProject().getProjectSet().getProject("CJDom")==null)
+        //    ppane.addProject("CJDom", "https://github.com/reportmill/CJDom.git");
+        //if(ppane.getProject().getProjectSet().getProject("SnapCJ")==null)
+        //    ppane.addProject("SnapCJ", "https://github.com/reportmill/SnapCJ.git");
     }
 
     // Handle SnapDocs
