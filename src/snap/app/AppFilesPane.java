@@ -205,7 +205,7 @@ public void respondUI(ViewEvent anEvent)
         WelcomePanel.getShared().quitApp();
 
     // Handle FilesTree
-    if(anEvent.equals("FilesTree") || anEvent.equals("FilesList")) {
+    if(anEvent.equals(_filesTree) || anEvent.equals(_filesList)) {
         
         // Handle PopupTrigger
         if(anEvent.isPopupTrigger()) {
@@ -248,11 +248,9 @@ public void respondUI(ViewEvent anEvent)
     
     // Handle AllFilesButton
     if(anEvent.equals("AllFilesButton"))  {
-        boolean flip = !getView("FilesTree").getParent().getParent().isVisible(), flop = !flip;;
-        getView("FilesTree").getParent().getParent().setVisible(flip);
-        getView("FilesTree").getParent().getParent().setPickable(flip);
-        getView("FilesList").getParent().getParent().setVisible(flop);
-        getView("FilesList").getParent().getParent().setPickable(flop);
+        boolean flip = !_filesTree.isVisible(), flop = !flip;;
+        _filesTree.setVisible(flip); _filesTree.setPickable(flip);
+        _filesList.setVisible(flop); _filesList.setPickable(flop);
         getView("AllFilesButton", ButtonBase.class).setImage(flip? FILES_TREE_ICON : FILES_LIST_ICON);
     }
     
