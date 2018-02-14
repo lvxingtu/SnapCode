@@ -138,7 +138,7 @@ protected TextField createTextField(String aString)
 {
     TextField tfield = new TextField(); tfield.setText(aString);
     tfield.setFont(new Font("Arial", 11)); tfield.setAlign(Pos.CENTER);
-    tfield.setColumnCount(0); tfield.setMinWidth(36); tfield.setPrefHeight(18); tfield.setPadding(2,6,2,6);
+    tfield.setColCount(0); tfield.setMinWidth(36); tfield.setPrefHeight(18); tfield.setPadding(2,6,2,6);
     return tfield;
 }
 
