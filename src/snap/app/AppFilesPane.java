@@ -222,12 +222,17 @@ public void respondUI(ViewEvent anEvent)
                 run(null, getSelectedFile(), false, false); }
         
         // Handle DragEvent
-        else if(anEvent.isDragEvent()) { //DragEvent de = anEvent.getEvent(DragEvent.class);
-            anEvent.acceptDrag(); //de.acceptTransferModes(TransferMode.COPY); de.consume();
+        else if(anEvent.isDragEvent()) {
+            
+            // If from this app, just return
+            if(anEvent.getClipboard().getDragSourceView()!=null) return;
+            
+            // Accept drag and add files
+            anEvent.acceptDrag();
             if(anEvent.isDragDropEvent() && anEvent.getClipboard().hasFiles()) {
                 List <File> files = anEvent.getClipboard().getJavaFiles(); if(files==null || files.size()==0) return;
                 addFiles(files);
-                anEvent.dropComplete(); //anEvent.setDropCompleted(true);
+                anEvent.dropComplete();
             }
         }
         
