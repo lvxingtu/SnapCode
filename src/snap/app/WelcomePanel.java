@@ -2,6 +2,7 @@ package snap.app;
 import java.util.*;
 import snap.util.*;
 import snap.view.*;
+import snap.viewx.DialogBox;
 import snap.web.*;
 
 /**

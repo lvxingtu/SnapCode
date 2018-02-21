@@ -3,6 +3,7 @@ import java.util.*;
 import snap.gfx.*;
 import snap.project.VersionControl.Op;
 import snap.view.*;
+import snap.viewx.DialogBox;
 import snap.web.*;
 
 /**

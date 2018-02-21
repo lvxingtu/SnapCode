@@ -2,6 +2,7 @@ package snap.app;
 import snap.project.*;
 import snap.util.*;
 import snap.view.*;
+import snap.viewx.DialogBox;
 import snap.viewx.WebPage;
 import snap.web.*;
 

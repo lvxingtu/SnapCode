@@ -5,6 +5,7 @@ import snap.javakit.*;
 import snap.project.Project;
 import snap.util.ArrayUtils;
 import snap.view.*;
+import snap.viewx.DialogBox;
 import snap.web.*;
 
 /**
