@@ -237,7 +237,7 @@ public void respondUI(ViewEvent anEvent)
         }
         
         // Handle DragGesture
-        else if(anEvent.isDragGesture() && getSelectedFile()!=null) {
+        else if(anEvent.isDragGesture() && getSelectedFile()!=null && !anEvent.isConsumed()) {
             Clipboard cb = anEvent.getClipboard();
             cb.addData(getSelectedFile().getJavaFile());
             cb.startDrag();
