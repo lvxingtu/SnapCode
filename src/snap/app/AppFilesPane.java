@@ -170,6 +170,10 @@ protected void initUI()
     // Register for copy/paste
     addKeyActionHandler("CopyAction", "Shortcut+C");
     addKeyActionHandler("PasteAction", "Shortcut+V");
+    
+        
+    // Register for WinActivated update
+    _appPane.getWindow().addEventHandler(e -> windowDidActivate(), WinActivate);
 }
 
 /**
@@ -714,6 +718,34 @@ public void paste()
 {
     Clipboard cb = Clipboard.get();
     if(cb.hasFiles()) addFiles(cb.getJavaFiles());
+}
+
+/**
+ * Called when window activates.
+ */
+protected void windowDidActivate()
+{
+    for(AppFile file : getRootFiles())
+        checkForExternalMods(file.getFile());
+}
+
+/**
+ * Checks file for external updates.
+ */
+protected void checkForExternalMods(WebFile aFile)
+{
+    // If file has been changed since last load, reload
+    if(aFile.getLastModTime()<aFile.getURL().getLastModTime()) {
+        aFile.reload();
+        getBrowser().reloadFile(aFile);
+    }
+    
+    // If file is directory, recurse
+    if(aFile.isDir()) { String name = aFile.getName();
+        if(name.equals(".git") || name.equals("bin")) return;
+        for(WebFile file : aFile.getFiles())
+            checkForExternalMods(file);
+    }
 }
 
 /**
