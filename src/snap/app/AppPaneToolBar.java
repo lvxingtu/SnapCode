@@ -121,6 +121,15 @@ public int removeOpenFile(WebFile aFile)
 }
 
 /**
+ * Removes a file from OpenFiles list.
+ */
+public void removeAllOpenFilesExcept(WebFile aFile)
+{
+    for(WebFile file : _openFiles.toArray(new WebFile[0]))
+        if(file!=aFile) removeOpenFile(file);
+}
+
+/**
  * Returns the URL to fallback on when open file is closed.
  */
 private WebURL getFallbackURL()
@@ -494,7 +503,10 @@ protected class FileTab extends Label {
         View cbox = anEvent.getView();
         if(anEvent.isMouseEnter()) { cbox.setFill(Color.CRIMSON); cbox.setBorder(TAB_CLOSE_BORDER2); }
         else if(anEvent.isMouseExit()) { cbox.setFill(null); cbox.setBorder(TAB_CLOSE_BORDER1); }
-        else if(anEvent.isMouseRelease()) removeOpenFile(_file);
+        else if(anEvent.isMouseRelease()) {
+            if(anEvent.isAltDown()) removeAllOpenFilesExcept(_file);
+            else removeOpenFile(_file);
+        }
         anEvent.consume();
     }
 

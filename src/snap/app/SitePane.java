@@ -132,7 +132,7 @@ public String getRemoteURLString()  { return VersionControl.getRemoteURLString(_
  */
 public void setRemoteURLString(String urls)
 {
-    TabView tpane = _vcp.getUI().getParent(TabView.class);
+    TabView tpane = _vcp.getUI().getParent(TabView.class); if(tpane==null) return; // Bogus: TField should fire earlier
     int index = -1; for(int i=0;i<tpane.getTabCount();i++) if(tpane.getTabContent(i)==_vcp.getUI()) index = i;
     
     // Deactivate Version control pane and re-open site
