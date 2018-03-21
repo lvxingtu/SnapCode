@@ -83,7 +83,7 @@ protected void respondUI(ViewEvent anEvent)
 {
     // Handle FileBrowser
     if(anEvent.equals("FileBrowser")) {
-        WebFile file = _fileBrowser.getSelectedItem();
+        WebFile file = _fileBrowser.getSelItem();
         if(file!=null && !file.isDir())
             _pageBrowser.setURL(file.getURL());
     }

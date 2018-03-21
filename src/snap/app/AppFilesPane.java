@@ -139,7 +139,7 @@ public void showInTree(WebFile aFile)
     
     // If file is SelectedFile, make FilesTree select it
     if(aFile==getSelectedFile())
-        _filesTree.setSelectedItem(afile);
+        _filesTree.setSelItem(afile);
 }
 
 /**
@@ -185,14 +185,14 @@ public void resetUI()
     WebFile file = getAppPane().getSelectedFile();
     AppFile afile = getAppFile(file);
     _filesTree.setItems(getRootFiles());
-    _filesTree.setSelectedItem(afile);
+    _filesTree.setSelItem(afile);
     
     // Update FilesList
     List <WebFile> wfiles = _appPane._toolBar._openFiles;
     List afiles = new ArrayList(wfiles.size());
     for(WebFile wf : wfiles) afiles.add(getAppFile(wf));
     _filesList.setItems(afiles);
-    _filesList.setSelectedItem(afile);
+    _filesList.setSelItem(afile);
 }
 
 /**
@@ -249,7 +249,7 @@ public void respondUI(ViewEvent anEvent)
         
         // Handle Selection event: Select file for tree selection
         else if(anEvent.isActionEvent()) { //if(anEvent.isSelectionEvent()) {
-            AppFile item = (AppFile)anEvent.getSelectedItem();
+            AppFile item = (AppFile)anEvent.getSelItem();
             WebFile file = item!=null? item.getFile() : null;
             _appPane.setSelectedFile(file);
         }

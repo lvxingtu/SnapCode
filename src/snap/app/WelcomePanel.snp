@@ -5,7 +5,7 @@
   </Label>
   <TableView Name="SitesTable" x="9" y="247" width="382" height="193" GrowWidth="true" GrowHeight="true">
     <binding aspect="Items" key="Sites" />
-    <binding aspect="SelectedItem" key="SelectedSite" />
+    <binding aspect="SelItem" key="SelectedSite" />
     <TableCol PrefWidth="120" ItemKey="Name" Header="Name" />
     <TableCol GrowWidth="true" ItemKey="RemoteURLString" Header="URL" />
   </TableView>

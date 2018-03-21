@@ -7,6 +7,6 @@
   <ListView Name="ErrorsList" GrowWidth="true" GrowHeight="true">
     <font name="Arial" size="14" />
     <binding aspect="Items" key="Issues" />
-    <binding aspect="SelectedItem" key="SelectedIssue" />
+    <binding aspect="SelItem" key="SelectedIssue" />
   </ListView>
 </VBox>

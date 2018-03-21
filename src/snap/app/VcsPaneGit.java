@@ -106,7 +106,7 @@ public void respondUI(ViewEvent anEvent)
     if(anEvent.equals("GitBrowser")) {
         
         // Get selected item
-        Object item = anEvent.getSelectedItem(); Object items[] = null;
+        Object item = anEvent.getSelItem(); Object items[] = null;
         if(item instanceof GitRef) item = ((GitRef)item).getBranch();
         
         // Handle GitFile
@@ -154,7 +154,7 @@ protected Object[] getRootItems()
 public <T> T getSelectedParent(Class <T> aClass)
 {
     for(int i=_gitBrowser.getSelColIndex()-1;i>=0;i--) { BrowserCol bcol = _gitBrowser.getCol(i);
-        Object item = bcol.getSelectedItem();
+        Object item = bcol.getSelItem();
         if(aClass.isInstance(item))
             return (T)item; }
     return null;

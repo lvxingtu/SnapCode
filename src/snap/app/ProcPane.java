@@ -375,7 +375,7 @@ protected void resetUI()
     DebugFrame frame = getSelFrame();
     if(frame!=null) {
         _procTree.expandItem(frame.getThread());
-        _procTree.setSelectedItem(frame);
+        _procTree.setSelItem(frame);
     }
     
     // Reset Console
@@ -435,7 +435,7 @@ protected void respondUI(ViewEvent anEvent)
     
     // Handle ProcTree
     else if(anEvent.equals("ProcTree")) {
-        Object item = anEvent.getSelectedItem();
+        Object item = anEvent.getSelItem();
         if(item instanceof RunApp)
             setSelApp((RunApp)item);
         else if(item instanceof DebugFrame) { DebugFrame frame = (DebugFrame)item;

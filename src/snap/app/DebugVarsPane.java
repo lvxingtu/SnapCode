@@ -74,7 +74,7 @@ public void resetUI()
     }
     
     // Update VarText
-    VarTreeItem vitem = _varTree.getSelectedItem();
+    VarTreeItem vitem = _varTree.getSelItem();
     if(vitem!=null && getDebugApp()!=null && getDebugApp().isPaused()) {
         String pvalue = vitem.getValueToString();
         _varText.setText(pvalue!=null? pvalue : "(null)");

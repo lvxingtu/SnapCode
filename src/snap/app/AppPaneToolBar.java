@@ -333,7 +333,7 @@ protected void handleFileTabClicked(ViewEvent anEvent)
 public void handleSearchComboBox(ViewEvent anEvent)
 {
     // Get selected file and/or text
-    WebFile file = (WebFile)anEvent.getSelectedItem();
+    WebFile file = (WebFile)anEvent.getSelItem();
     String text = anEvent.getStringValue();
     
     // If file available, open file

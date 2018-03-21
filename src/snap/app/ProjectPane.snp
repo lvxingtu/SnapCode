@@ -26,14 +26,14 @@
       <ListView Name="JarPathsList">
         <font name="Arial" size="12" />
         <binding aspect="Items" key="JarPaths" />
-        <binding aspect="SelectedItem" key="SelectedJarPath" />
+        <binding aspect="SelItem" key="SelectedJarPath" />
       </ListView>
     </Box>
     <Box Padding="3" FillWidth="true" FillHeight="true" title="  Projects  ">
       <ListView Name="ProjectPathsList">
         <font name="Arial" size="12" />
         <binding aspect="Items" key="ProjectPaths" />
-        <binding aspect="SelectedItem" key="SelectedProjectPath" />
+        <binding aspect="SelItem" key="SelectedProjectPath" />
       </ListView>
     </Box>
   </TabView>

@@ -34,12 +34,12 @@ public SupportTray(AppPane anAppPane)  { _appPane = anAppPane; }
 /**
  * Returns the selected index.
  */
-public int getSelectedIndex()  { return _tpane!=null? _tpane.getSelectedIndex() : -1; }
+public int getSelectedIndex()  { return _tpane!=null? _tpane.getSelIndex() : -1; }
 
 /**
  * Sets the selected index.
  */
-public void setSelectedIndex(int anIndex)  { _tpane.setSelectedIndex(anIndex); }
+public void setSelectedIndex(int anIndex)  { _tpane.setSelIndex(anIndex); }
 
 /**
  * Sets selected index to debug.
@@ -87,7 +87,7 @@ protected View createUI()
  */
 protected void resetUI()
 {
-    int index = _tpane.getSelectedIndex();
+    int index = _tpane.getSelIndex();
     ViewOwner sowner = _tabOwners[index];
     if(sowner!=null)
         sowner.resetLater();
@@ -99,8 +99,8 @@ protected void resetUI()
 protected void respondUI(ViewEvent anEvent)
 {
     // Handle TabView
-    if(_tpane.getTabContent(_tpane.getSelectedIndex()) instanceof Label) {
-        int index = _tpane.getSelectedIndex();
+    if(_tpane.getTabContent(_tpane.getSelIndex()) instanceof Label) {
+        int index = _tpane.getSelIndex();
         ViewOwner sowner = _tabOwners[index];
         _tpane.setTabContent(sowner.getUI(), index);
     }

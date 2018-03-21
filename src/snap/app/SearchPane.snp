@@ -10,6 +10,6 @@
   <ListView Name="ResultsList" x="2" y="30" width="636" height="448" GrowWidth="true" GrowHeight="true">
     <font name="Arial" size="12" />
     <binding aspect="Items" key="Results" />
-    <binding aspect="SelectedItem" key="SelectedResult" />
+    <binding aspect="SelItem" key="SelectedResult" />
   </ListView>
 </SpringView>

@@ -91,7 +91,7 @@ protected void resetUI()
 {
     // Set items
     _varTree.setItems(_exprItems);
-    if(_varTree.getSelectedItem()==null && _exprItems.size()>0) _varTree.setSelectedIndex(0);
+    if(_varTree.getSelItem()==null && _exprItems.size()>0) _varTree.setSelIndex(0);
     
     // Iterate over ExprTableItems and reset values
     if(_resetVarTable) { _resetVarTable = false;
@@ -100,7 +100,7 @@ protected void resetUI()
     }
     
     // Update ExprText
-    VarTreeItem vitem = _varTree.getSelectedItem();
+    VarTreeItem vitem = _varTree.getSelItem();
     setViewText("ExprText", vitem instanceof ExprTreeItem? vitem.getName() : null);
     setViewEnabled("ExprText", vitem instanceof ExprTreeItem);
     
@@ -124,13 +124,13 @@ protected void respondUI(ViewEvent anEvent)
 {
     // Handle ExprText
     if(anEvent.equals("ExprText")) {
-        VarTreeItem item = _varTree.getSelectedItem();
+        VarTreeItem item = _varTree.getSelItem();
         ExprTreeItem exitem = item instanceof ExprTreeItem? (ExprTreeItem)item : null; if(exitem==null) return;
         ExprTreeItem nitem = new ExprTreeItem(anEvent.getStringValue());
         nitem.eval();
         _exprItems.set(_exprItems.indexOf(exitem), nitem);
         _varTree.setItems(_exprItems);
-        _varTree.setSelectedItem(nitem);
+        _varTree.setSelItem(nitem);
         resetVarTable();
     }
     
@@ -140,13 +140,13 @@ protected void respondUI(ViewEvent anEvent)
         nitem.eval();
         _exprItems.add(nitem);
         _varTree.setItems(_exprItems);
-        _varTree.setSelectedItem(nitem);
+        _varTree.setSelItem(nitem);
         //runLater(() -> _varTree.edit(_exprItems.size()-1, _varTree.getCol(0)));
     }
     
     // Handle RemoveButton
     if(anEvent.equals("RemoveButton")) {
-        int index = _varTree.getSelectedIndex();
+        int index = _varTree.getSelIndex();
         if(index>=0 && index<_exprItems.size()) _exprItems.remove(index);
     }
     

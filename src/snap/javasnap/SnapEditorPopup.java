@@ -56,7 +56,7 @@ public void activatePopupList(JNodeView aPart, String aString, int anIndex)
     
     // If multiple suggestions
     _listView.setItems(suggestions);
-    _listView.setSelectedIndex(0);
+    _listView.setSelIndex(0);
     showPopup(aPart);
     
     // Get fixed text
@@ -127,7 +127,7 @@ protected void respondUI(ViewEvent anEvent)
  */
 public String getFixedText()
 {
-    JavaDecl item = _listView.getSelectedItem();
+    JavaDecl item = _listView.getSelItem();
     return _startText + item.getReplaceString() + _endText;
 }
 

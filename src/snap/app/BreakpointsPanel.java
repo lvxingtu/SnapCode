@@ -39,7 +39,7 @@ public Breakpoints getBreakpoints()  { return getProject().getBreakpoints(); }
 /**
  * Returns the selected Breakpoint.
  */
-public Breakpoint getSelectedBreakpoint()  { return _bpList.getSelectedItem(); }
+public Breakpoint getSelectedBreakpoint()  { return _bpList.getSelItem(); }
 
 /**
  * Initialize UI.

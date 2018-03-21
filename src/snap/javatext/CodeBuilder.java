@@ -123,7 +123,7 @@ public void respondUI(ViewEvent anEvent)
         if(anEvent.isDragGesture()) {
             
             // Set DragSuggestion and DragString
-            _dragCodeBlock = anEvent.getSelectedItem(CodeBlock.class);
+            _dragCodeBlock = (CodeBlock)anEvent.getSelItem();
             String dragString = _dragCodeBlock.getString();
             
             // Get event dboard and start drag

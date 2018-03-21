@@ -36,7 +36,7 @@ public JavaTextArea getTextArea()  { return _textArea; }
 /**
  * Applies the current suggestion.
  */
-public void applySuggestion()  { applySuggestion(getSelectedItem()); }
+public void applySuggestion()  { applySuggestion(getSelItem()); }
 
 /**
  * Applies a suggestion.
@@ -128,7 +128,7 @@ public void setItems(List <JavaDecl> theItems)
 {
     super.setItems(theItems);
     if(theItems!=null && theItems.size()>0)
-        setSelectedIndex(0);
+        setSelIndex(0);
 }
 
 /**
