@@ -54,7 +54,7 @@ public List <WebFile> getSelectedFiles()
 {
     WebFile sf = _appPane.getSelectedFile();
     return sf==null? Collections.EMPTY_LIST : Collections.singletonList(sf);
-    //List files = new ArrayList(); AppFile item = _app.getSelectedItem();
+    //List files = new ArrayList(); AppFile item = _app.getSelItem();
     //if(item!=null && item.getFile()!=null) files.add(item.getFile()); return files;
 }
 

@@ -149,7 +149,7 @@ protected Object[] getRootItems()
 }
 
 /**
- * Returns the parent for current GitBrowser.SelectedItem (as given class).
+ * Returns the parent for current GitBrowser.SelItem (as given class).
  */
 public <T> T getSelectedParent(Class <T> aClass)
 {

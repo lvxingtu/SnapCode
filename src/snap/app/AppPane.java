@@ -129,12 +129,12 @@ public void setSupportTrayVisible(boolean aValue)
 /**
  * Returns the SupportTray index.
  */
-public int getSupportTrayIndex()  { return isSupportTrayVisible()? _supportTray.getSelectedIndex() : -1; }
+public int getSupportTrayIndex()  { return isSupportTrayVisible()? _supportTray.getSelIndex() : -1; }
 
 /**
  * Sets SupportTray visible to given index.
  */
-public void setSupportTrayIndex(int anIndex) { setSupportTrayVisible(true); _supportTray.setSelectedIndex(anIndex); }
+public void setSupportTrayIndex(int anIndex) { setSupportTrayVisible(true); _supportTray.setSelIndex(anIndex); }
 
 /**
  * Returns the top level site.

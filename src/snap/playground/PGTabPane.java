@@ -29,12 +29,12 @@ public PGTabPane(Playground aPG)  { _pg = aPG; }
 /**
  * Returns the selected index.
  */
-public int getSelectedIndex()  { return _tview!=null? _tview.getSelIndex() : -1; }
+public int getSelIndex()  { return _tview!=null? _tview.getSelIndex() : -1; }
 
 /**
  * Sets the selected index.
  */
-public void setSelectedIndex(int anIndex)  { _tview.setSelIndex(anIndex); }
+public void setSelIndex(int anIndex)  { _tview.setSelIndex(anIndex); }
 
 /**
  * Creates UI for SupportTray.
@@ -80,8 +80,8 @@ protected void resetUI()
 protected void respondUI(ViewEvent anEvent)
 {
     // Handle TabView
-    /*if(_tpane.getTabContent(_tpane.getSelectedIndex()) instanceof Label) {
-        int index = _tpane.getSelectedIndex();
+    /*if(_tpane.getTabContent(_tpane.getSelIndex()) instanceof Label) {
+        int index = _tpane.getSelIndex();
         ViewOwner sowner = _tabOwners[index];
         _tpane.setTabContent(sowner.getUI(), index);
     }*/

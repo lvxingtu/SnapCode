@@ -34,19 +34,19 @@ public SupportTray(AppPane anAppPane)  { _appPane = anAppPane; }
 /**
  * Returns the selected index.
  */
-public int getSelectedIndex()  { return _tpane!=null? _tpane.getSelIndex() : -1; }
+public int getSelIndex()  { return _tpane!=null? _tpane.getSelIndex() : -1; }
 
 /**
  * Sets the selected index.
  */
-public void setSelectedIndex(int anIndex)  { _tpane.setSelIndex(anIndex); }
+public void setSelIndex(int anIndex)  { _tpane.setSelIndex(anIndex); }
 
 /**
  * Sets selected index to debug.
  */
 public void setDebug()
 {
-    int ind = getSelectedIndex();
+    int ind = getSelIndex();
     if(ind!=DEBUG_PANE_VARS && ind!=DEBUG_PANE_EXPRS)
         _appPane.setSupportTrayIndex(DEBUG_PANE_VARS);
 }
