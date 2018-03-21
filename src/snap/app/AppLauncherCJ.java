@@ -17,7 +17,10 @@ public class AppLauncherCJ extends AppLauncher {
 /**
  * Creates a new AppLauncherCJ.
  */
-public AppLauncherCJ(AppLauncher anAL)  { _config = anAL._config; _url = anAL._url; _proj = anAL._proj; }
+public AppLauncherCJ(AppLauncher anAL)
+{
+    _config = anAL._config; _file = anAL._file; _url = anAL._url; _proj = anAL._proj;
+}
 
 /**
  * Returns whether this project includes CheerpJ support.
@@ -26,7 +29,7 @@ public static boolean isCheerp(Project aProj)
 {
     // If class path doesn't include SnapCJ jar, return false
     String cpath = FilePathUtils.getJoinedPath(aProj.getProjectSet().getLibPaths());
-    return cpath.contains("SnapCJ");
+    return aProj.getName().equals("CJDom") || cpath.contains("CJDom"); // Was SnapCJ
 }
 
 /**
@@ -192,8 +195,7 @@ public WebURL getHTMLURL()
  */
 public WebFile getHTMLFile()
 {
-    String cpath = FilePathUtils.getJoinedPath(_proj.getProjectSet().getLibPaths());
-    if(cpath.contains("SnapCJ"))
+    if(isCheerp(_proj))
         return getHTMLFileSnapKit();
     return getHTMLFileSwing();
 }
@@ -216,14 +218,14 @@ public WebFile getHTMLFileSnapKit()
 
     StringBuffer sb = new StringBuffer();
     sb.append("<!DOCTYPE html>\n<html>\n<head>\n<title>" + classNameSimple + " CheerpJ</title>\n");
-    sb.append("<meta http-equiv=\"Content-Type\" content=\"text/html;charset=utf-8\">\n");
-    sb.append("<script src=\"https://cheerpjdeploy.leaningtech.com/loader.js\" crossorigin=\"anonymous\"></script>\n");
+    sb.append("<meta charset=\"utf-8\">\n");
+    sb.append("<script src=\"https://cjrtnc.leaningtech.com/latest/loader.js\"></script>\n");
     sb.append("</head>\n");
     sb.append("<body>\n");
-    sb.append("</body>\n");
-    sb.append("<script src=\"http://reportmill.com/cj/scripts/Loader.js\"></script>\n");
-    sb.append("<script>\n");
-    sb.append("snapRunJar(\"" + className + "\",\"" + jarPath + "\");\n");
+    sb.append("</body>\n");  //sb.append("<script src=\"http://reportmill.com/cj/scripts/Loader.js\"></script>\n");
+    sb.append("<script>\n"); //sb.append("snapRunJar(\"" + className + "\",\"" + jarPath + "\");\n");
+    sb.append("cheerpjInit();\n");
+    sb.append("cheerpjRunMain(\"" + className + "\",\"" + jarPath + "\");\n");
     sb.append("</script>\n");
     sb.append("</html>");
     hfile.setText(sb.toString());
@@ -249,14 +251,15 @@ public WebFile getHTMLFileSwing()
 
     StringBuffer sb = new StringBuffer();
     sb.append("<!DOCTYPE html>\n<html>\n<head>\n<title>" + classNameSimple + " CheerpJ</title>\n");
-    sb.append("<meta http-equiv=\"Content-Type\" content=\"text/html;charset=utf-8\">\n");
-    sb.append("<script src=\"https://cheerpjdeploy.leaningtech.com/loader.js\" crossorigin=\"anonymous\"></script>\n");
+    sb.append("<meta charset=\"utf-8\">\n");
+    sb.append("<script src=\"https://cjrtnc.leaningtech.com/latest/loader.js\"></script>\n");
     sb.append("</head>\n");
     sb.append("<body>\n");
-    sb.append("</body>\n");
-    sb.append("<script src=\"http://reportmill.com/cj/scripts/Loader.js\"></script>\n");
-    sb.append("<script>\n");
-    sb.append("snapRunJarSwing(\"" + className + "\",\"" + jarPath + "\",1000,1000);\n");
+    sb.append("</body>\n");  //sb.append("<script src=\"http://reportmill.com/cj/scripts/Loader.js\"></script>\n");
+    sb.append("<script>\n"); //sb.append("snapRunJarSwing(\"" + className + "\",\"" + jarPath + "\",1000,1000);\n");
+    sb.append("cheerpjInit();\n");
+    sb.append("cheerpjCreateDisplay(1000,1000);\n");
+    sb.append("cheerpjRunMain(\"" + className + "\",\"" + jarPath + "\");\n");
     sb.append("</script>\n");
     sb.append("</html>");
     hfile.setText(sb.toString());
