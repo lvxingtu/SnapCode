@@ -17,18 +17,18 @@ public static VirtualMachine getVM(String theVMArgs, String cmdLine, OutputListe
 {
     VirtualMachineManager manager = Bootstrap.virtualMachineManager();
     LaunchingConnector connector = manager.defaultConnector();
-    Map arguments = connector.defaultArguments();
-    ((Connector.Argument)arguments.get("options")).setValue(theVMArgs);
-    ((Connector.Argument)arguments.get("main")).setValue(cmdLine);
-    return generalGetVM(connector, arguments, diagnostics);
+    Map <String, Connector.Argument> args = connector.defaultArguments();
+    args.get("options").setValue(theVMArgs);
+    args.get("main").setValue(cmdLine);  // Should probably figure out how to specify 'localhost'
+    return generalGetVM(connector, args, diagnostics);
 }
 
-static private VirtualMachine generalGetVM(LaunchingConnector connector, Map arguments, OutputListener diagnostics)
+static private VirtualMachine generalGetVM(LaunchingConnector connector, Map args, OutputListener diagnostics)
 {
     VirtualMachine vm = null;
     try {
         diagnostics.putString("Starting child.");
-        vm = connector.launch(arguments);
+        vm = connector.launch(args);
     }
 
     catch (IOException ioe) { diagnostics.putString("Unable to start child: " + ioe.getMessage()); }
