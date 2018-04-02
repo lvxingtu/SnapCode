@@ -772,7 +772,7 @@ public static class ExprStatementHandler extends JNodeParseHandler<JStmtExpr>
 }
 
 /**
- * SwitchStatement Handler.
+ * SwitchStatement Handler: { "switch" "(" Expression ")" "{" (SwitchLabel BlockStatement*)* "}" }
  */
 public static class SwitchStatementHandler extends JNodeParseHandler<JStmtSwitch>
 {
@@ -791,8 +791,9 @@ public static class SwitchStatementHandler extends JNodeParseHandler<JStmtSwitch
         else if(anId=="BlockStatement") {
             List <JStmtSwitch.SwitchLabel> switchLabels = getPart().getSwitchLabels();
             JStmtSwitch.SwitchLabel switchLabel = switchLabels.get(switchLabels.size()-1);
-            JStmt blockStatement = aNode.getCustomNode(JStmt.class);
-            switchLabel.addStatement(blockStatement);
+            JStmt blockStmt = aNode.getCustomNode(JStmt.class);
+            if(blockStmt!=null) // Can be null when parse fails
+                switchLabel.addStatement(blockStmt);
         }
         
         // Handle anything else
