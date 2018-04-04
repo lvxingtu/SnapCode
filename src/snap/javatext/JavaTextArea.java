@@ -312,7 +312,7 @@ protected void paintBack(Painter aPntr)
     
     // Paint program counter
     int progCounterLine = getProgramCounterLine();
-    if(progCounterLine>=0) {
+    if(progCounterLine>=0 && progCounterLine<getLineCount()) {
         TextBoxLine line = getLine(progCounterLine);
         aPntr.setPaint(new Color(199,218,175,200));
         aPntr.fillRect(line.getX(), line.getY()+.5, line.getWidth(), line.getHeight());
