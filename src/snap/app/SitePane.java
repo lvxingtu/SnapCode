@@ -258,14 +258,14 @@ private void siteHadDeepChange(Object aSource, PropChange anEvent)
     // Handle WebFile
     if(source instanceof WebFile) { WebFile file = (WebFile)source;
         
-        // Handle Exists property: Call fileAdded or fileSaved
-        if(pname==WebFile.Exists_Prop) {
+        // Handle Saved property: Call fileAdded or fileSaved
+        if(pname==WebFile.Saved_Prop) {
             if((Boolean)anEvent.getNewValue()) fileAdded(file);
             else fileRemoved(file);
         }
         
         // Handle ModifedTime property: Call file saved
-        if(pname==WebFile.ModifiedTime_Prop && file.getExists()) fileSaved(file);
+        if(pname==WebFile.ModTime_Prop && file.getExists()) fileSaved(file);
     }
 }
 

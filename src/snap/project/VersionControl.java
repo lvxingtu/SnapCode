@@ -326,8 +326,8 @@ protected void commitFile(WebFile aLocalFile, String aMessage) throws Exception
         repoFile.save();
         if(aLocalFile.isFile()) cloneFile.setBytes(aLocalFile.getBytes());
         cloneFile.save();
-        cloneFile.setLastModTimeDeep(repoFile.getLastModTime());
-        aLocalFile.setLastModTimeDeep(repoFile.getLastModTime());
+        cloneFile.setModTimeSaved(repoFile.getLastModTime());
+        aLocalFile.setModTimeSaved(repoFile.getLastModTime());
         setStatus(aLocalFile, null);
     }    
 }
@@ -364,10 +364,10 @@ protected void updateFile(WebFile aLocalFile) throws Exception
     if(repoFile.getExists()) {
         if(aLocalFile.isFile()) aLocalFile.setBytes(repoFile.getBytes());
         aLocalFile.save();
-        aLocalFile.setLastModTimeDeep(repoFile.getLastModTime());
+        aLocalFile.setModTimeSaved(repoFile.getLastModTime());
         if(cloneFile.isFile()) cloneFile.setBytes(repoFile.getBytes());
         cloneFile.save();
-        cloneFile.setLastModTimeDeep(repoFile.getLastModTime());
+        cloneFile.setModTimeSaved(repoFile.getLastModTime());
         setStatus(aLocalFile, null);
     }
     
@@ -410,7 +410,7 @@ protected void replaceFile(WebFile aLocalFile) throws Exception
     if(cloneFile.getExists()) {
         if(aLocalFile.isFile()) aLocalFile.setBytes(cloneFile.getBytes());
         aLocalFile.save();
-        aLocalFile.setLastModTimeDeep(cloneFile.getLastModTime());
+        aLocalFile.setModTimeSaved(cloneFile.getLastModTime());
         setStatus(aLocalFile, null);
     }
     
