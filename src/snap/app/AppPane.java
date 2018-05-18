@@ -9,7 +9,7 @@ import snap.web.*;
 /**
  * The main view class for Projects.
  */
-public class AppPane extends ViewOwner implements DeepChangeListener {
+public class AppPane extends ViewOwner {
 
     // The list of sites
     List <WebSite>                _sites = new ArrayList();
@@ -58,6 +58,9 @@ public class AppPane extends ViewOwner implements DeepChangeListener {
     
     // The currently open AppPane
     static AppPane                _openAppPane;
+    
+    // A deep change listener to watch for site file changes
+    DeepChangeListener            _siteDeepChangeLsnr = (src,pc) -> siteDidDeepChange(src,pc);
 
 /**
  * Returns the browser.
@@ -170,7 +173,7 @@ public void addSite(WebSite aSite)
     // Add site
     _sites.add(getSiteCount(), aSite);  // Add site
     SitePane.get(aSite, true).setAppPane(this);
-    aSite.addDeepChangeListener(this);
+    aSite.addDeepChangeListener(_siteDeepChangeLsnr);
     
     // Add dependent sites
     for(Project p : proj.getProjects())
@@ -187,7 +190,7 @@ public void addSite(WebSite aSite)
 public void removeSite(WebSite aSite)
 {
     _sites.remove(aSite);
-    aSite.removeDeepChangeListener(this);
+    aSite.removeDeepChangeListener(_siteDeepChangeLsnr);
     _filesPane._rootFiles = null;
     resetLater();
 }
@@ -289,12 +292,12 @@ public WebFile getBuildDir()
 }
 
 /**
- * Catch changes to files.
+ * Called when site has file changes.
  */
-public void deepChange(Object aSource, PropChange anEvent)
+void siteDidDeepChange(Object aSource, PropChange anEvent)
 {
     // Get source and property name
-    Object source = anEvent.getSource(); String pname = anEvent.getPropertyName();
+    Object source = anEvent.getSource();
     
     // If WebFile, update FilesPane.TreeView
     if(source instanceof WebFile) { WebFile file = (WebFile)source;
