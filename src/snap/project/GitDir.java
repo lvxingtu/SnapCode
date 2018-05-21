@@ -565,31 +565,30 @@ public class GitFileSite extends WebSite {
     public GitTree getTree()  { return _cmt.getTree(); }
     
     /** Handles a get or head request. */
-    protected WebResponse doGetOrHead(WebRequest aReq, boolean isHead)
+    protected void doGetOrHead(WebRequest aReq, WebResponse aResp, boolean isHead)
     {
         // Get URL and path and create empty response
         WebURL url = aReq.getURL();
         String path = url.getPath(); if(path==null) path = "/";
-        WebResponse resp = new WebResponse(aReq);
         
         // Get Head branch Commit Tree and look for file - f not found, set Response.Code to NOT_FOUND and return
         GitFile gfile = getTree().getFile(path);
         if(gfile==null) {
-            resp.setCode(WebResponse.NOT_FOUND); return resp; }
+            aResp.setCode(WebResponse.NOT_FOUND); return; }
             
         // Otherwise configure
-        resp.setCode(WebResponse.OK);
-        resp.setDir(gfile.isDir());
-        resp.setLastModTime(_cmt.getCommitTime());
+        aResp.setCode(WebResponse.OK);
+        aResp.setDir(gfile.isDir());
+        aResp.setLastModTime(_cmt.getCommitTime());
         
         // If Head, just return
         if(isHead)
-            return resp;
+            return;
         
         // Handle plain file
-        if(resp.isFile()) {
+        if(aResp.isFile()) {
             byte bytes[] = gfile.getBytes();
-            resp.setBytes(bytes);
+            aResp.setBytes(bytes);
         }
             
         // Handle directory: Walk RevTree and get files for children
@@ -599,11 +598,8 @@ public class GitFileSite extends WebSite {
                 FileHeader child = getFileHeader(gf.getPath());
                 fhdrs.add(child);
             }
-            resp.setFileHeaders(fhdrs);
+            aResp.setFileHeaders(fhdrs);
         }
-        
-        // Set FileHeaderReturn response
-        return resp;
     }
     
     /** Get file from directory. */
@@ -628,32 +624,31 @@ protected class GitIndexSite extends WebSite {
     public GitIndexSite()  { setURL(WebURL.getURL(getDir().getURL().getString() + ".index")); }
     
     /** Handles a get or head request. */
-    protected WebResponse doGetOrHead(WebRequest aReq, boolean isHead)
+    protected void doGetOrHead(WebRequest aReq, WebResponse aResp, boolean isHead)
     {
         // Get URL and path and create empty response
         WebURL url = aReq.getURL();
         String path = url.getPath(); if(path==null) path = "/";
-        WebResponse resp = new WebResponse(aReq);
         
         // Get entry - if not found, set Response.Code to NOT_FOUND and return
         GitIndex.Entry entry = getIndex().getEntry(path);
         if(entry==null) {
-            resp.setCode(WebResponse.NOT_FOUND); return resp; }
+            aResp.setCode(WebResponse.NOT_FOUND); return; }
             
         // Otherwise configure
-        resp.setCode(WebResponse.OK);
-        resp.setDir(entry.isDir());
-        resp.setLastModTime(entry.getLastModified());
-        resp.setSize(entry.getLength());
+        aResp.setCode(WebResponse.OK);
+        aResp.setDir(entry.isDir());
+        aResp.setLastModTime(entry.getLastModified());
+        aResp.setSize(entry.getLength());
         
         // If Head, just return
         if(isHead)
-            return resp;
+            return;
         
         // Handle plain file
-        if(resp.isFile()) {
+        if(aResp.isFile()) {
             byte bytes[] = entry.getBytes();
-            resp.setBytes(bytes);
+            aResp.setBytes(bytes);
         }
             
         // Handle directory: Walk RevTree and get files for children
@@ -663,11 +658,8 @@ protected class GitIndexSite extends WebSite {
                 FileHeader fhdr = getFileHeader(child.getPath());
                 fhdrs.add(fhdr);
             }
-            resp.setFileHeaders(fhdrs);
+            aResp.setFileHeaders(fhdrs);
         }
-        
-        // Set FileHeaderReturn response
-        return resp;
     }
     
     /** Get file from directory. */
