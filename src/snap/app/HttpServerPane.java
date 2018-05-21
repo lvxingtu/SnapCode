@@ -262,7 +262,7 @@ private class SimpleHttpHandler implements HttpHandler {
         // Get length and LastModified
         FileHeader fhdr = resp.getFileHeader();
         long len = fhdr.getSize();
-        Date lastMod = new Date(fhdr.getLastModTime());
+        Date lastMod = new Date(fhdr.getModTime());
         String ext = FilePathUtils.getExtension(url.getPath());
         
         // Add ResponseHeaders: last-modified, cache-control, content-length, content-type
@@ -293,7 +293,7 @@ private class SimpleHttpHandler implements HttpHandler {
         // Get length and LastModified
         FileHeader fhdr = resp.getFileHeader();
         long len = fhdr.getSize();
-        Date lastMod = new Date(fhdr.getLastModTime());
+        Date lastMod = new Date(fhdr.getModTime());
         String ext = FilePathUtils.getExtension(url.getPath());
         byte bytes[] = resp.getBytes();
         

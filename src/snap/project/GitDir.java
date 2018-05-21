@@ -579,7 +579,7 @@ public class GitFileSite extends WebSite {
         // Otherwise configure
         aResp.setCode(WebResponse.OK);
         aResp.setDir(gfile.isDir());
-        aResp.setLastModTime(_cmt.getCommitTime());
+        aResp.setModTime(_cmt.getCommitTime());
         
         // If Head, just return
         if(isHead)
@@ -610,7 +610,7 @@ public class GitFileSite extends WebSite {
         
         // Create file for path and commit time
         FileHeader file = new FileHeader(aPath, gfile.isDir());
-        file.setLastModTime(_cmt.getCommitTime());
+        file.setModTime(_cmt.getCommitTime());
         return file;
     }
 }
@@ -638,7 +638,7 @@ protected class GitIndexSite extends WebSite {
         // Otherwise configure
         aResp.setCode(WebResponse.OK);
         aResp.setDir(entry.isDir());
-        aResp.setLastModTime(entry.getLastModified());
+        aResp.setModTime(entry.getLastModified());
         aResp.setSize(entry.getLength());
         
         // If Head, just return
@@ -667,7 +667,7 @@ protected class GitIndexSite extends WebSite {
     {
         GitIndex.Entry entry = getIndex().getEntry(aPath); if(entry==null) return null;
         FileHeader file = new FileHeader(aPath, entry.isDir());
-        file.setLastModTime(entry.getLastModified()); file.setSize(entry.getLength());
+        file.setModTime(entry.getLastModified()); file.setSize(entry.getLength());
         return file;
     }
 }
