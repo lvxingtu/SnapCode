@@ -151,9 +151,12 @@ public boolean isAssignable(JavaDecl aDecl)
     if(getName().equals("java.lang.Object")) return true;
     JavaDeclClass ctype1 = aDecl.getClassType(); if(ctype1.isPrimitive()) ctype1 = ctype1.getPrimitiveAlt();
     
-    // If both are array type, check ArrayItemTypes instead
-    if(isArray() && ctype1.isArray())
-        return getArrayItemType().isAssignable(ctype1.getArrayItemType());
+    // If either are array type, check ArrayItemTypes if both are (otherwise return false)
+    if(isArray() || ctype1.isArray()) {
+        if(isArray() && ctype1.isArray())
+            return getArrayItemType().isAssignable(ctype1.getArrayItemType());
+        return false;
+    }
     
     // Iterate up given class superclasses and check class and interfaces
     for(JavaDeclClass ct1=ctype1; ct1!=null; ct1=ct1.getSuper()) {
@@ -163,10 +166,11 @@ public boolean isAssignable(JavaDecl aDecl)
             return true;
             
         // If any interface of this decl match, return true
-        if(isInterface())
+        if(isInterface()) {
             for(JavaDeclClass infc : ct1.getInterfaces())
                 if(isAssignable(infc))
                     return true;
+        }
     }
     
     // Return false since no match found
