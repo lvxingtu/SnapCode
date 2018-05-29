@@ -228,11 +228,6 @@ protected void initUI()
     WindowView win = getWindow(); win.setTitle("Welcome"); win.setResizable(false);
     enableEvents(win, WinClose);
     getView("OpenButton", Button.class).setDefaultButton(true);
-    
-    // Register buttons for MouseReleased so we can look for alt-Down click
-    enableEvents("NewButton", MouseRelease);
-    enableEvents("OpenButton", MouseRelease);
-    enableEvents("RemoveButton", MouseRelease);
 }
 
 /**
@@ -261,23 +256,19 @@ public void respondUI(ViewEvent anEvent)
         }
     
     // Handle NewButton
-    if(anEvent.equals("NewButton")) {
-        if(anEvent.isMouseClick())  { if(anEvent.isAltDown()) handleNewButtonAlt(); return; }
+    if(anEvent.equals("NewButton"))
         createSite();
-    }
     
     // Handle OpenButton
     if(anEvent.equals("OpenButton")) {
-        if(anEvent.isMouseClick()) { if(anEvent.isAltDown()) handleOpenButtonAlt(); return; }
+        if(ViewUtils.isAltDown()) { handleOpenButtonAlt(); return; }
         hide();
         openSites();
     }
     
     // Handle RemoveButton
-    if(anEvent.equals("RemoveButton")) {
-        if(anEvent.isMouseClick())  { if(anEvent.isAltDown()) handleRemoveButtonAlt(); return; }
+    if(anEvent.equals("RemoveButton"))
         showRemoveSitePanel();
-    }
 
     // Handle QuitButton
     if(anEvent.equals("QuitButton"))
@@ -376,28 +367,9 @@ public void showRemoveSitePanel()
     resetLater();
 }
 
-/** Called when NewButton hit with Alt down. */
-void handleNewButtonAlt()
-{
-    AppPane apane = new AppPane();
-    WebSite site = WebURL.getURL("file:/Temp/Cust").getAsSite();
-    apane.addSite(site);
-    apane.show();
-    hide();
-}
-
-/** Called when RemoveButton hit with Alt down. */
-void handleRemoveButtonAlt()
-{
-    WebSite site = getSelectedSite(); if(site==null) return;
-    String msg = "Delete backend resources for Snap site?";
-    DialogBox dbox = new DialogBox("Delete Snap Site Resources"); dbox.setMessage(msg);
-    if(!dbox.showConfirmDialog(getUI())) return;
-    try { site.deleteSite(); }
-    catch(Exception e) { throw new RuntimeException(e); }
-}
-
-/** Open a file viewer site. */
+/**
+ * Open a file viewer site.
+ */
 void handleOpenButtonAlt()
 {
     DialogBox dbox = new DialogBox("Open File Viewer"); dbox.setQuestionMessage("Enter path:");

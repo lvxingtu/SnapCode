@@ -12,7 +12,7 @@ import snap.web.WebFile;
 /**
  * A Java File Manager class for Snap.
  */
-public class SnapCompilerFM extends ForwardingJavaFileManager<JavaFileManager> {
+public class SnapCompilerFM extends ForwardingJavaFileManager <JavaFileManager> {
 
     // The SnapCompiler
     SnapCompiler              _compiler;
@@ -23,18 +23,32 @@ public class SnapCompilerFM extends ForwardingJavaFileManager<JavaFileManager> {
     // A map of previously accessed SnapFileObjects for paths
     Map <String,SnapFileJFO>  _jfos = new HashMap();
     
+    // The class loader to find project lib classes
+    ClassLoader               _cldr;
+    
+    // Whether compile includes SnapKit
+    boolean                   _excludeSnapKit;
+    
 /**
  * Construct a new FileManager which forwards to the <var>fileManager</var>
  * for source and to the <var>classLoader</var> for classes
  */
 public SnapCompilerFM(SnapCompiler aCompiler, JavaFileManager aFileManager)
 {
+    // Do normal version and set vars
     super(aFileManager); _compiler = aCompiler; _proj = _compiler._proj;
+    
+    // Determine whether we're compiling something with SnapKit, so we can exclude it from standard ClassPath if not
+    //_excludeSnapKit = _proj.getProjectSet().getProject("SnapKit")==null && !_proj.getName().equals("SnapKit");
 }
 
-/** Override to return class loader. */
-public ClassLoader getClassLoader(Location aLoc)  { return _cldr!=null? _cldr : (_cldr=_proj.createLibClassLoader()); }
-ClassLoader _cldr;
+/**
+ * Override to return class loader.
+ */
+public ClassLoader getClassLoader(Location aLoc)
+{
+    return _cldr!=null? _cldr : (_cldr=_proj.createLibClassLoader());
+}
 
 /**
  * Return a FileObject for a given location from which compiler can obtain source or byte code.
@@ -108,6 +122,10 @@ public Iterable<JavaFileObject> list(Location aLoc, String aPkgName, Set<Kind> k
     // If not CLASS_PATH or SOURCE_PATH, just return
     if(aLoc!=StandardLocation.CLASS_PATH && aLoc!=StandardLocation.SOURCE_PATH)
         return iterable;
+        
+    // If we need to explicitly exclude SnapKit (because it's in the standard CLASS_PATH), return emtpy list
+    if(_excludeSnapKit && aLoc==StandardLocation.CLASS_PATH && aPkgName.startsWith("snap."))
+        return Collections.EMPTY_LIST;
         
     // If system path (package files were found), just return
     if(aPkgName.length()>0 && iterable.iterator().hasNext())
