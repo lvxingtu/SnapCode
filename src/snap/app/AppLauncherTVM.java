@@ -61,7 +61,7 @@ void runTea(AppPane anAppPane)
     String command[] = commands.toArray(new String[commands.size()]);
     
     // Print run command to console
-    System.err.println(ListUtils.joinStrings(ListUtils.newList((Object[])command), " "));
+    System.err.println(String.join(" ", command));
     
     // Create RunApp
     RunApp proc = new RunApp(getURL(), command);

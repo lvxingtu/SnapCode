@@ -108,7 +108,7 @@ void runApp(AppPane anAppPane)
     String command[] = commands.toArray(new String[commands.size()]);
     
     // Print run command to console
-    System.err.println(ListUtils.joinStrings(ListUtils.newList((Object[])command), " "));
+    System.err.println(String.join(" ", command));
     
     // Create RunApp and exec
     RunApp proc = new RunApp(getURL(), command);
@@ -125,7 +125,7 @@ void debugApp(AppPane anAppPane)
     String command[] = commands.toArray(new String[commands.size()]);
     
     // Print run command to console
-    System.err.println("debug " + ListUtils.joinStrings(ListUtils.newList((Object[])command), " "));
+    System.err.println("debug " + String.join(" ", command));
     
     // Create DebugApp and add project breakpoints
     DebugApp proc = new DebugApp(getURL(), command);
