@@ -350,6 +350,16 @@ public void respondUI(ViewEvent anEvent)
     // Handle CopyAction, PasteAction
     if(anEvent.equals("CopyAction")) copy();
     if(anEvent.equals("PasteAction")) paste();
+    
+    // Handle GenerateJavaScriptMenuItem
+    if(anEvent.equals("GenerateTypeScriptMenuItem")) {
+        WebFile jfile = getSelectedFile(); if(!jfile.getType().equals("java")) return;
+        snap.javakit.JavaData jdata = snap.javakit.JavaData.get(jfile);
+        String str = new snap.javascript.JSWriter().getString(jdata.getJFile());
+        String fname = "/tmp/" + jfile.getSimpleName() + ".js";
+        SnapUtils.writeBytes(str.getBytes(), fname);
+        GFXEnv.getEnv().openFile(fname);
+    }
 }
 
 /**

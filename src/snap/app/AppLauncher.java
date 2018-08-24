@@ -71,7 +71,7 @@ public void runFile(AppPane anAppPane, RunConfig aConfig, WebFile aFile, boolean
     // Set last run file
     _lastRunFile = aFile;
     
-    // If Cheerp (links against SnapTea or SnapCJ), generate deployment files and open in browser
+    // If Browser (links against SnapTea, SnapCJ or JSAPI), generate deployment files and open in browser
     if(inBrowser) {
             
         // If TeaVM support, generate files and open in browser
@@ -81,6 +81,10 @@ public void runFile(AppPane anAppPane, RunConfig aConfig, WebFile aFile, boolean
         // If CheerpJ support, generate files and open in browser
         if(AppLauncherCJ.isCheerp(_proj)) {
             new AppLauncherCJ(this).runCheerp(anAppPane); return; }
+            
+        // If JS
+        if(AppLauncherJS.isJS(_proj)) {
+            new AppLauncherJS(this).runJS(anAppPane); return; }
         anAppPane.beep(); return;
     }
         
