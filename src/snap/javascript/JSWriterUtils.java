@@ -1,5 +1,4 @@
 package snap.javascript;
-import java.lang.reflect.TypeVariable;
 import java.util.*;
 import snap.javakit.*;
 
@@ -7,16 +6,24 @@ import snap.javakit.*;
  * A custom class.
  */
 public class JSWriterUtils {
+    
+/**
+ * Returns the method name for given JExpr
+ */
+public static String getMethodName(JExprMethodCall aExpr)
+{
+    String name = aExpr.getId().getName();
+    if(name.equals("add")) {
+        if(aExpr.getDecl().getClassName().equals("java.util.List"))
+            name = "push";
+    }
+    return name;
+}
 
 /**
  * Returns a type string.
  */
-public static String getTypeString(JType aType)  { return getTypeString(aType, true); }
-
-/**
- * Returns a type string.
- */
-public static String getTypeString(JType aType, boolean includeTypeParams)
+public static String getTypeString(JType aType)
 {
     // Get name
     String name = aType.getName();
@@ -28,7 +35,8 @@ public static String getTypeString(JType aType, boolean includeTypeParams)
     else if(name.equals("String") || name.equals("char") || name.equals("Character")) name = "string";
     else if(aType.isNumberType()) name = "number";
     else if(name.equals("Boolean")) name = "boolean";
-    else if(cname!=null && cname.startsWith("java.lang.")) name = "java.lang." + name;
+    else if(name.equals("ArrayList")) name = "Array";
+    //else if(cname!=null && cname.startsWith("java.lang.")) name = "java.lang." + name;
     
     // Add array chars
     if(aType.isArrayType())
@@ -41,14 +49,6 @@ public static String getTypeString(JType aType, boolean includeTypeParams)
         if(ecls!=null) name = ecls.getSimpleName() + '.' + name;
     }
     
-    // Add type parameters
-    TypeVariable tparams[] = includeTypeParams && cls!=null? cls.getTypeParameters() : null;
-    if(tparams!=null && tparams.length>0) {
-        name += '<';
-        for(int i=0,iMax=tparams.length;i<iMax;i++) { name += "any"; if(i+1<iMax) name += ','; }
-        name += '>';
-    }
-
     // Return name
     return name;
 }
@@ -146,7 +146,7 @@ public static JType getCommonType(JType aTyp0, JType aTyp1)
     if(aTyp0==null || aTyp1==null) return aTyp0!=null? aTyp0 : aTyp1;
     
     // If either is void, return other
-    String tstr0 = getTypeString(aTyp0, false), tstr1 = getTypeString(aTyp1, false);
+    String tstr0 = getTypeString(aTyp0), tstr1 = getTypeString(aTyp1);
     if(tstr0.length()==0 || tstr1.length()==0) return tstr0.length()==0? aTyp1 : aTyp0;
     
     // If types are equal return type 0
@@ -184,7 +184,7 @@ public static List <String> getMethodDispatchConditionals(JMethodDecl theMDecls[
         // Iterate over args and build arg check: if((argX != null && argX instanceof type) || argX === null) && ...
         //                 or for primitive type: if((typeof argX ==='ptype') || argX ===nul) && ...
         for(int j=0;j<pcount;j++) { JVarDecl vd = md.getParam(j); String arg = theParams[j].getName();
-            String tstr = getTypeString(vd.getType(),false); if(tstr.contains("[]")) tstr = "Array";
+            String tstr = getTypeString(vd.getType()); if(tstr.contains("[]")) tstr = "Array";
             boolean prim = tstr.equals("boolean") || tstr.equals("number") || tstr.equals("string");
             if(prim) {
                 sb.append("((typeof ").append(arg).append(" === ").append('\'').append(tstr).append("\')");

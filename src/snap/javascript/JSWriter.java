@@ -886,11 +886,8 @@ public void writeJExprArrayIndex(JExprArrayIndex aExpr)
  */
 public void writeJExprCast(JExpr.CastExpr aExpr)
 {
-    append('(').append('<');
-    writeJType(aExpr.getType());
-    append('>');
-    writeJExpr(aExpr.getExpr());
-    append(')');
+    //append('(').append('<'); writeJType(aExpr.getType()); append('>');
+    writeJExpr(aExpr.getExpr()); //append(')');
 }
 
 /**
@@ -945,7 +942,7 @@ public void writeJExprInstanceOf(JExpr.InstanceOfExpr aExpr)
     // Get the type and type string
     JExpr expr = aExpr.getExpr();
     JType typ = aExpr.getType();
-    String tstr = JSWriterUtils.getTypeString(typ, false);
+    String tstr = JSWriterUtils.getTypeString(typ);
     
     // Handle primitive types
     if(tstr.equals("number") || tstr.equals("string") || tstr.equals("boolean")) {
@@ -1050,8 +1047,9 @@ public void writeJExprMethodCall(JExprMethodCall aExpr)
     if(writeJExprMethodCallSpecial(aExpr)) return;
     
     // Append name and open char
-    JExprId id = aExpr.getId(); String name = id.getName();
-    writeJExprId(id); append('(');
+    JExprId id = aExpr.getId(); String name = JSWriterUtils.getMethodName(aExpr); //String name = id.getName();
+    append(name); //writeJExprId(id);
+    append('(');
     
     // Append args and close char
     List <JExpr> args = aExpr.getArgs();
