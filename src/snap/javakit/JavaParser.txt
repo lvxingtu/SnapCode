@@ -58,7 +58,7 @@ TypeParam { Identifier TypeBound? }
 
 TypeBound { "extends" ClassType ("&" ClassType)* }
 
-TypeArgs { "<" TypeArg ("," TypeArg)* ">" }
+TypeArgs { "<" (TypeArg ("," TypeArg)*)? ">" }
 
 TypeArg { ReferenceType | "?" WildcardBounds? }
 
