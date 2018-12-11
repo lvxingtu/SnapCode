@@ -128,7 +128,7 @@ private void getSuggestions(JExprId anId)
         JClassDecl ecd = anId.getEnclosingClassDecl();
         Class ec = ecd!=null? ecd.getEvalClass() : null;
         while(ecd!=null && ec!=null) {
-            for(Method meth : ClassUtils.getMethods(ec, prefix))
+            for(Method meth : ClassExtras.getMethods(ec, prefix))
                 addDecl(meth);
             ecd = ecd.getEnclosingClassDecl(); ec = ecd!=null? ecd.getEvalClass() : null;
         }

@@ -494,7 +494,7 @@ public void setLocalVarValue(String aName, Object aValue)  { _locals.put(aName, 
 public boolean isField(Object anObj, String aName)
 {
     Class cls = anObj instanceof Class? (Class)anObj : anObj.getClass();
-    Field field = ClassUtils.getField(cls, aName);
+    Field field = ClassExtras.getField(cls, aName);
     return field!=null;
 }
 
@@ -504,7 +504,7 @@ public boolean isField(Object anObj, String aName)
 public Object getFieldValue(Object anObj, String aName)
 {
     Class cls = anObj instanceof Class? (Class)anObj : anObj.getClass();
-    Field field = ClassUtils.getField(cls, aName);
+    Field field = ClassExtras.getField(cls, aName);
     try { return field.get(anObj); }
     catch(Exception e) { return null; }
     //ReferenceType refType = anOR.referenceType();
@@ -521,7 +521,7 @@ public Object invokeMethod(Object anObj, String aName, Object theArgs[])
     Class classes[] = new Class[theArgs.length];
     for(int i=0,iMax=theArgs.length;i<iMax;i++) { Object arg = theArgs[i];
         classes[i] = arg!=null? arg.getClass() : null; }
-    Method meth = ClassUtils.getMethod(cls, aName, classes);
+    Method meth = ClassUtils.getMethodBest(cls, aName, classes);
     try { return meth.invoke(anObj, theArgs); }
     catch(Exception e) { return null; }
 }

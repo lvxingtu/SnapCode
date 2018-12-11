@@ -377,14 +377,14 @@ protected JavaDecl getDeclImpl(JNode aNode)
     
     // See if it's a field reference from superclass
     Class sclass = getSuperClass();
-    Field field = sclass!=null? ClassUtils.getField(sclass, name) : null;
+    Field field = sclass!=null? ClassExtras.getField(sclass, name) : null;
     if(field!=null)
         return getJavaDecl(field);
     
     // Check interfaces
     if(isId) for(JType tp : getImplementsTypes()) {
         Class cls = tp.getEvalClass();
-        Field fd = cls!=null? ClassUtils.getField(cls, name) : null;
+        Field fd = cls!=null? ClassExtras.getField(cls, name) : null;
         if(fd!=null)
             return getJavaDecl(fd);
     }
@@ -396,7 +396,7 @@ protected JavaDecl getDeclImpl(JNode aNode)
     
     // Look for InnerClass of given name
     Class cdClass = getEvalClass();
-    Class cls = null; try { cls = cdClass!=null? ClassUtils.getClass(cdClass, name) : null; } catch(Throwable t) { }
+    Class cls = null; try { cls = cdClass!=null? ClassExtras.getClass(cdClass, name) : null; } catch(Throwable t) { }
     if(cls!=null)
         return getJavaDecl(cls);
     

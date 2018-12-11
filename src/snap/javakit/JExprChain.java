@@ -4,7 +4,6 @@
 package snap.javakit;
 import java.lang.reflect.Field;
 import java.util.*;
-import snap.util.ClassUtils;
 
 /**
  * A class to represent a chain of expressions.
@@ -94,12 +93,12 @@ protected JavaDecl getDeclImpl(JNode aNode)
         }
             
         // Handle inner class
-        Class cls = pclass!=null? ClassUtils.getClass(pclass, name) : null;
+        Class cls = pclass!=null? ClassExtras.getClass(pclass, name) : null;
         if(cls!=null)
             return getJavaDecl(cls);
             
         // Handle Field
-        Field field = pclass!=null? ClassUtils.getField(pclass, name) : null;
+        Field field = pclass!=null? ClassExtras.getField(pclass, name) : null;
         if(field!=null) // && Modifier.isStatic(field.getModifiers()))
             return getJavaDecl(field); // was FieldName
     }
