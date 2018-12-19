@@ -99,7 +99,7 @@ protected List <Marker> createMarkers()
 private void getSuperMemberMarkers(JClassDecl aCD, List <Marker> theMarkers)
 {
     for(JMemberDecl md : aCD.getMemberDecls()) {
-        if(md.getSuperDecl()!=null)
+        if(md.getSuperDecl()!=null && md.getEnd()<_textArea.length())
             theMarkers.add(new SuperMemberMarker(md));
         if(md instanceof JClassDecl)
             getSuperMemberMarkers((JClassDecl)md, theMarkers);
