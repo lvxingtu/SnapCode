@@ -57,7 +57,7 @@ void replace(JStmtBlock aStmt)
     }
     
     // Otherwise, do full parse
-    else _jtbox._jfile = null; //System.out.println("Full Parse");
+    //else _jtbox._jfile = null; //System.out.println("Full Parse");
 }
 
 /**

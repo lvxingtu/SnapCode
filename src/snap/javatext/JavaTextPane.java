@@ -240,8 +240,6 @@ public void saveChanges()
 {
     getPopup().hide(); // Close popup
     super.saveChanges();
-    _textArea.getTextBox()._jfile = null;
-    _textArea.getTextBox().getJFile(); // Force reparse
 }
 
 /**

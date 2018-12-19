@@ -6,6 +6,8 @@ import snap.parse.*;
 import snap.gfx.*;
 import snap.javakit.*;
 import snap.javakit.JavaParser.JavaTokenizer;
+import snap.util.StringUtils;
+import snap.view.ViewUtils;
 
 /**
  * A text implementation specifically for Java.
@@ -52,6 +54,15 @@ protected JFilePlus createJFile()
 }
 
 /**
+ * Reloads symbols.
+ */
+public void reloadSymbols()
+{
+    ViewUtils.runLater(() -> {
+        _jfile = null; getJFile(); });
+}
+
+/**
  * Override to clear JFile.
  */
 public void setString(String aString)  { super.setString(aString); _jfile = null; }
@@ -65,6 +76,19 @@ public JavaTextLine getLine(int anIndex)  { return (JavaTextLine)super.getLine(a
  * Override to return JavaTextLine.
  */
 public JavaTextLine getLineAt(int anIndex)  { return (JavaTextLine)super.getLineAt(anIndex); }
+
+/**
+ * Override to do full parse when newline typed.
+ */
+public void replaceChars(CharSequence theChars, TextStyle theStyle, int aStart, int anEnd)
+{
+    // Do normal version
+    super.replaceChars(theChars, theStyle, aStart, anEnd);
+    
+    // If newline, do full parse
+    if(theChars!=null && StringUtils.indexOfNewline(theChars, 0)>=0)
+        reloadSymbols();
+}
 
 /**
  * Override to adjust build issues start/end.
