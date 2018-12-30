@@ -240,6 +240,7 @@ public void saveChanges()
 {
     getPopup().hide(); // Close popup
     super.saveChanges();
+    getTextArea().getTextBox().reloadSymbols();
 }
 
 /**
