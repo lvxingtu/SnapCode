@@ -321,9 +321,9 @@ protected void handleFileTabClicked(ViewEvent anEvent)
     
     // Handle double click
     else if(anEvent.getClickCount()==2) {
-        WebBrowserPane bpane = new WebBrowserPane();
+        WebBrowserPane bpane = new WebBrowserPane(); bpane.getUI().setPrefSize(800,800);
         bpane.getBrowser().setURL(file.getURL());
-        bpane.getWindow().setVisible(true);
+        bpane.getWindow().show(getUI().getRootView(), 600, 200);
     }
 }
 
