@@ -35,6 +35,9 @@ public class JavaDeclClass extends JavaDecl {
     // The type var decls
     List <JavaDecl>       _tvdecls = new ArrayList();
     
+    // A cached list of all decls
+    List <JavaDecl>       _allDecls;
+    
     // The Array item type (if Array)
     JavaDecl              _arrayItemType;
     
@@ -51,13 +54,9 @@ public JavaDeclClass(JavaDeclOwner anOwner, JavaDecl aPar, Class aClass)
     _name = JavaKitUtils.getId(aClass); _sname = aClass.getSimpleName();
     _enum = aClass.isEnum(); _interface = aClass.isInterface(); _primitive = aClass.isPrimitive();
     _evalType = this; _sdecl = null; // Set by owner
-    if(aClass.isArray())
-        _arrayItemType = getJavaDecl(aClass.getComponentType());
         
-    // Create class decl and add to Decls map
+    // Add to Owner.Decls map
     _owner._decls.put(_id, this);
-    if(aClass.isArray())
-        _owner._decls.put(aClass.getName(), this);
         
     // Get type super type and set in decl
     AnnotatedType superAType = aClass.getAnnotatedSuperclass();
@@ -65,6 +64,22 @@ public JavaDeclClass(JavaDeclOwner anOwner, JavaDecl aPar, Class aClass)
     if(superType!=null) {
         _stype = getJavaDecl(superType);
         _sdecl = _scdecl = _stype.getClassType();
+    }
+    
+    // Handle Array
+    if(aClass.isArray()) {
+        
+        // Set ArrayItemType and add alternate name to Owner.Decls map
+        _arrayItemType = getJavaDecl(aClass.getComponentType());
+        _owner._decls.put(aClass.getName(), this);
+        
+        // Set Decls from Object[] for efficiency
+        if(aClass!=Object[].class) {
+            JavaDeclClass aryDecl = (JavaDeclClass)getJavaDecl(Object[].class);
+            _fdecls = aryDecl.getFields(); _interfaces = aryDecl._interfaces;
+            _mdecls = aryDecl._mdecls; _cdecls = aryDecl._cdecls; _icdecls = aryDecl._icdecls;
+            _tvdecls = aryDecl._tvdecls; _allDecls = aryDecl.getAllDecls();
+        }
     }
 }
 
@@ -224,8 +239,10 @@ public JavaDecl getResolvedType(JavaDecl aDecl)
 
 /**
  * Updates JavaDecls.
+ * 
+ * @return whether the decls changed since last update.
  */
-public HashSet <JavaDecl> updateDecls()
+public boolean updateDecls()
 {
     // If first time, set decls
     if(_fdecls==null) _fdecls = new ArrayList();
@@ -234,8 +251,8 @@ public HashSet <JavaDecl> updateDecls()
     Class cls = getEvalClass();
     String cname = getClassName();
     if(cls==null) {
-        System.err.println("JavaDeclClass: Failed to load class: " + cname); return null; }
-    
+        System.err.println("JavaDeclClass: Failed to load class: " + cname); return false; }
+        
     // Get interfaces
     Class interfaces[] = cls.getInterfaces();
     _interfaces = new JavaDeclClass[interfaces.length];
@@ -243,10 +260,8 @@ public HashSet <JavaDecl> updateDecls()
         _interfaces[i] = getClassDecl(infc); }
     
     // Create set for added/removed decls
-    HashSet <JavaDecl> addedDecls = new HashSet();
-    HashSet <JavaDecl> removedDecls = new HashSet(); removedDecls.add(this);
-    removedDecls.addAll(_fdecls); removedDecls.addAll(_mdecls);
-    removedDecls.addAll(_cdecls); removedDecls.addAll(_icdecls); removedDecls.addAll(_tvdecls);
+    int addedDecls = 0;
+    HashSet <JavaDecl> removedDecls = new HashSet(getAllDecls());
 
     // Make sure class decl is up to date
     if(getModifiers()!=cls.getModifiers())
@@ -254,70 +269,65 @@ public HashSet <JavaDecl> updateDecls()
         
     // TypeVariables: Add JavaDecl for each Type parameter
     TypeVariable tvars[]; try { tvars = cls.getTypeParameters(); }
-    catch(Throwable e) { System.err.println(e + " in " + cname); return null; }
+    catch(Throwable e) { System.err.println(e + " in " + cname); return false; }
     for(TypeVariable tv : tvars) { String name = tv.getName();
         JavaDecl decl = getTypeVar(name);
-        if(decl==null) { decl = new JavaDecl(_owner,this,tv); addedDecls.add(decl); addDecl(decl); }
+        if(decl==null) { decl = new JavaDecl(_owner,this,tv); addDecl(decl); addedDecls++; }
         else removedDecls.remove(decl);
     }
     
     // Inner Classes: Add JavaDecl for each inner class
     Class iclss[]; try { iclss = cls.getDeclaredClasses(); }
-    catch(Throwable e) { System.err.println(e + " in " + cname); return null; }
+    catch(Throwable e) { System.err.println(e + " in " + cname); return false; }
     for(Class icls : iclss) {   //if(icls.isSynthetic()) continue;
         JavaDecl decl = getClassDecl(icls.getSimpleName());
-        if(decl==null) { decl = getJavaDecl(icls); addedDecls.add(decl); addDecl(decl); }
+        if(decl==null) { decl = getJavaDecl(icls); addDecl(decl); addedDecls++; }
         else removedDecls.remove(decl);
     }
     
     // Fields: add JavaDecl for each declared field - also make sure field type is in refs
     Field fields[]; try { fields = cls.getDeclaredFields(); }
-    catch(Throwable e) { System.err.println(e + " in " + cname); return null; }
+    catch(Throwable e) { System.err.println(e + " in " + cname); return false; }
     for(Field field : fields) {
         JavaDecl decl = getField(field);
-        if(decl==null) { decl = new JavaDecl(_owner,this,field); addedDecls.add(decl); addDecl(decl); }
+        if(decl==null) { decl = new JavaDecl(_owner,this,field); addDecl(decl); addedDecls++; }
         else removedDecls.remove(decl);
     }
     
     // Methods: Add JavaDecl for each declared method - also make sure return/parameter types are in refs
     Method methods[]; try { methods = cls.getDeclaredMethods(); }
-    catch(Throwable e) { System.err.println(e + " in " + cname); return null; }
+    catch(Throwable e) { System.err.println(e + " in " + cname); return false; }
     for(Method meth : methods) {
         if(meth.isSynthetic()) continue;
         JavaDecl decl = getMethodDecl(meth);
-        if(decl==null) { decl = new JavaDecl(_owner,this,meth); addedDecls.add(decl); addDecl(decl); }
+        if(decl==null) { decl = new JavaDecl(_owner,this,meth); addDecl(decl); addedDecls++; }
         else removedDecls.remove(decl);
     }
     
     // Constructors: Add JavaDecl for each constructor - also make sure parameter types are in refs
     Constructor constrs[]; try { constrs = cls.getDeclaredConstructors(); }
-    catch(Throwable e) { System.err.println(e + " in " + cname); return null; }
+    catch(Throwable e) { System.err.println(e + " in " + cname); return false; }
     for(Constructor constr : constrs) {
         if(constr.isSynthetic()) continue;
         JavaDecl decl = getConstructorDecl(constr);
-        if(decl==null) { decl = new JavaDecl(_owner,this,constr); addedDecls.add(decl); addDecl(decl); }
+        if(decl==null) { decl = new JavaDecl(_owner,this,constr); addDecl(decl); addedDecls++; }
         else removedDecls.remove(decl);
     }
     
-    // Array.length: Have to handle this special
+    // Array.length: Handle this special for Object[]
     if(isArray() && getField("length")==null) {
         Field lenField = getLenField();
-        JavaDecl decl = new JavaDecl(_owner,this,lenField); addedDecls.add(decl); addDecl(decl);
+        JavaDecl decl = new JavaDecl(_owner,this,lenField); addDecl(decl); addedDecls++;
     }
     
     // Remove unused decls
     for(JavaDecl jd : removedDecls) removeDecl(jd);
     
-    // Return all decls
-    HashSet <JavaDecl> allDecls = new HashSet(); allDecls.add(this);
-    allDecls.addAll(_fdecls); allDecls.addAll(_mdecls); allDecls.addAll(_cdecls); allDecls.addAll(_icdecls);
-    return allDecls;
+    // Return whether decls were changed
+    boolean changed = addedDecls>0 || removedDecls.size()>0; if(changed) _allDecls = null;
+    return changed;
 }
 
-// Bogus class to get length
-private static class Array { public int length; }
-private static Field getLenField() { try { return Array.class.getField("length"); } catch(Exception e) { return null; }}
-    
 /**
  * Returns the interfaces this class implments.
  */
@@ -347,6 +357,20 @@ public List <JavaDeclClass> getClasses()  { getFields(); return _icdecls; }
  * Returns the inner classes.
  */
 public List <JavaDecl> getTypeVars2()  { getFields(); return _tvdecls; }
+
+/**
+ * Returns the list of all decls.
+ */
+public List <JavaDecl> getAllDecls()
+{
+    // If already set, just return
+    if(_allDecls!=null) return _allDecls;
+    
+    // Create new AllDecls cached list with decls for fields, methods, constructors, inner classes and this class
+    List <JavaDecl> decls = new ArrayList(_fdecls.size() + _mdecls.size() + _cdecls.size() + _icdecls.size() + 1);
+    decls.add(this); decls.addAll(_fdecls); decls.addAll(_mdecls); decls.addAll(_cdecls); decls.addAll(_icdecls);
+    return _allDecls = decls;
+}
 
 /**
  * Returns the field decl for field.
@@ -840,4 +864,8 @@ public void removeDecl(JavaDecl aDecl)
  */
 public String toString()  { return "ClassDecl { ClassName=" + getClassName() + " }"; }
 
+// Bogus class to get length
+private static class Array { public int length; }
+private static Field getLenField() { try { return Array.class.getField("length"); } catch(Exception e) { return null; }}
+    
 }

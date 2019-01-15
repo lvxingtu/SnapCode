@@ -139,7 +139,12 @@ public boolean buildFiles(TaskMonitor aTaskMonitor)
             deleteZombieClassFiles(jfile);
             
             // Update dependencies and get files that need to be updated
-            Set <WebFile> updateFiles = JavaData.get(jfile).updateDependencies();
+            JavaData jdata = JavaData.get(jfile);
+            boolean dependsChanged = jdata.updateDependencies();
+            if(!dependsChanged) continue;
+            
+            // Iterate over Java files dependent on loop JavaFile and mark for update
+            Set <WebFile> updateFiles = jdata.getDependents();
             for(WebFile ufile : updateFiles) {
                 Project proj = Project.get(ufile);
                 if(proj==_proj) {

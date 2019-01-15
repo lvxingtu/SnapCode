@@ -11,6 +11,9 @@ public class JavaData {
 
     // The java file
     WebFile          _file;
+    
+    // The Project that owns this file
+    Project          _proj;
 
     // The set of declarations in this JavaFile
     Set <JavaDecl>   _decls = new HashSet();
@@ -33,9 +36,41 @@ public class JavaData {
 public JavaData(WebFile aFile)  { _file = aFile; }
 
 /**
+ * Returns the project for this JavaFile.
+ */
+public Project getProject()  { return _proj!=null? _proj : (_proj=Project.get(_file)); }
+
+/**
+ * Returns the class files for this JavaFile.
+ */
+public WebFile[] getClassFiles()
+{
+    Project proj = getProject();
+    WebFile cfiles[] = proj.getClassFiles(_file);
+    return cfiles;
+}
+
+/**
  * Returns the declarations in this JavaFile.
  */
-public Set <JavaDecl> getDecls()  { return _decls; }
+public synchronized Set <JavaDecl> getDecls()
+{
+    // If already loaded, just return
+    if(_decls.size()>0) return _decls;
+    
+    // Iterate over JavaFile.Class files
+    Project proj = getProject();
+    WebFile cfiles[] = getClassFiles();
+    for(WebFile cfile : cfiles) {
+        String cname = proj.getClassName(cfile);
+        JavaDeclClass cdecl = proj.getClassDecl(cname);
+        if(cdecl==null) { System.err.println("JavaData.getDecls: Can't find decl " + cname); continue; }
+        _decls.addAll(cdecl.getAllDecls());
+    }
+    
+    // Return decls
+    return _decls;
+}
 
 /**
  * Returns the references in this JavaFile.
@@ -59,31 +94,28 @@ public boolean isDependenciesSet()  { return _dset; } boolean _dset;
 
 /**
  * Updates dependencies for a given file and list of new/old dependencies.
+ * 
+ * @return whether any dependencies (the declarations or references) have changed since last update.
  */
-public Set <WebFile> updateDependencies()
+public synchronized boolean updateDependencies()
 {
     // Get Java file, project, RootProject, ProjectSet and class files
     WebFile jfile = _file;
-    Project proj = Project.get(jfile), rootProj = proj.getRootProject();
-    ProjectSet projSet = rootProj.getProjectSet();
-    WebFile cfiles[] = proj.getClassFiles(jfile);
+    Project proj = getProject();
+    WebFile cfiles[] = getClassFiles();
     
     // Get new declarations
-    Set <JavaDecl> ndecls = new HashSet();
+    boolean declsChanged = false;
     if(cfiles!=null) for(WebFile cfile : cfiles) {
         String cname = proj.getClassName(cfile);
-        JavaDeclClass cdecl = proj.getClassDecl(cname); if(cdecl==null) return Collections.EMPTY_SET;
-        try { ndecls.addAll(cdecl.updateDecls()); }
-        //catch(Throwable t) { System.err.printf("JavaData.updateDepends failed to get decls in %s: %s\n", cfile, t); }
-        catch(Throwable t) { t.printStackTrace(); }
+        JavaDeclClass cdecl = proj.getClassDecl(cname); if(cdecl==null) return false;
+        try { declsChanged = declsChanged || cdecl.updateDecls(); }
+        catch(Throwable t) { System.err.printf("JavaData.updateDepends failed to get decls in %s: %s\n", cfile, t); }
     }
     
-    // If declarations have changed, get set of update files
-    Set <WebFile> updateFiles = new HashSet();
-    if(!ndecls.equals(_decls)) {
-        updateFiles.addAll(getDependents());
-        _decls = ndecls;
-    }
+    // If declarations have changed, clear cached list
+    if(declsChanged)
+        _decls.clear();
     
     // Get new refs
     Set <JavaDecl> nrefs = new HashSet(); _dset = true; _jfile = null;
@@ -93,11 +125,9 @@ public Set <WebFile> updateDependencies()
         catch(Throwable t) { System.err.printf("JavaData.updateDepends failed to get refs in %s: %s\n", cfile, t); }
     }
     
-    //System.out.println(jfile.getName() + ": " + StringUtils.join(updateFiles.toArray(), ", "));
-    
     // If references haven't changed, just return
     if(nrefs.equals(_refs))
-        return updateFiles;
+        return declsChanged;
     
     // Get set of added/removed refs
     Set <JavaDecl> refsAdded = new HashSet(_refs); refsAdded.addAll(nrefs);
@@ -105,6 +135,8 @@ public Set <WebFile> updateDependencies()
     _refs = nrefs;
     
     // Iterate over added refs and add dependencies
+    Project rootProj = proj.getRootProject();
+    ProjectSet projSet = rootProj.getProjectSet();
     for(JavaDecl ref : refsAdded) {
         if(!ref.isClass()) continue;
         String cname = ref.getRootClassName();
@@ -128,8 +160,8 @@ public Set <WebFile> updateDependencies()
         }
     }
     
-    // Return files that need to be updated
-    return updateFiles;
+    // Return true since references changed
+    return true;
 }
 
 /**
