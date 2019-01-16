@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<HBox PrefHeight="28" Padding="0,15,0,4" Spacing="3">
+<RowView PrefHeight="28" Padding="0,15,0,4" Spacing="3">
   <Button Name="SaveButton" PrefWidth="22" PrefHeight="22" ToolTip="Save" image="/snap/viewx/pkg.images/File_Save.png" ShowBorder="false" />
   <Separator PrefHeight="18" Vertical="true" />
   <Button Name="CutButton" PrefWidth="22" PrefHeight="22" ToolTip="Cut" image="/snap/viewx/pkg.images/Edit_Cut.png" ShowBorder="false" />
@@ -26,5 +26,5 @@
     <binding aspect="Visible" key="JavaDocURL" />
     <binding aspect="Text" key="JavaDocText" />
   </Button>
-  <Button Name="SnapCodeButton" PrefWidth="75" PrefHeight="22" ToolTip="Snap Code" text="SnapCode" />
-</HBox>
+  <Button Name="SnapCodeButton" PrefWidth="75" PrefHeight="22" LeanX="RIGHT" ToolTip="Snap Code" text="SnapCode" />
+</RowView>
