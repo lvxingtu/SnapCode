@@ -367,7 +367,8 @@ public List <JavaDecl> getAllDecls()
     if(_allDecls!=null) return _allDecls;
     
     // Create new AllDecls cached list with decls for fields, methods, constructors, inner classes and this class
-    List <JavaDecl> decls = new ArrayList(_fdecls.size() + _mdecls.size() + _cdecls.size() + _icdecls.size() + 1);
+    List <JavaDecl> fdecls = getFields();
+    List <JavaDecl> decls = new ArrayList(fdecls.size() + _mdecls.size() + _cdecls.size() + _icdecls.size() + 1);
     decls.add(this); decls.addAll(_fdecls); decls.addAll(_mdecls); decls.addAll(_cdecls); decls.addAll(_icdecls);
     return _allDecls = decls;
 }
