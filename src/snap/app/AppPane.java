@@ -310,10 +310,16 @@ void siteDidDeepChange(Object aSource, PropChange anEvent)
  */
 protected View createUI()
 {
+    // Create basic UI
     _mainSplit = (SplitView)super.createUI();
+    
+    // Create ColView to hold ToolBar and MainSplit
     ColView vbox = new ColView(); vbox.setFillWidth(true);
-    vbox.setChildren(_toolBar.getUI(), _mainSplit);
-    return vbox;
+    vbox.setChildren(_toolBar.getUI(), _mainSplit); //return vbox;
+    
+    // Create ColView holding MenuBar and EditorPane UI (with key listener so MenuBar catches shortcut keys)
+    View mbarView = MenuBar.createMenuBarView(getMenuBar(), vbox);
+    return mbarView;
 }
 
 /**
@@ -347,7 +353,7 @@ protected void initUI()
 
     // Configure Window
     getWindow().setTitle("SnapCode Project");
-    getRootView().setMenuBar(getMenuBar());
+    //getRootView().setMenuBar(getMenuBar());
     
     // Register for WelcomePanel on close
     enableEvents(getWindow(), WinClose);
