@@ -348,8 +348,8 @@ protected void initUI()
     _browserBox.getChild(0).setGrowHeight(true); // So support tray has constant size
     
     // Add key binding to OpenMenuItem and CloseWindow
-    addKeyActionHandler("OpenMenuItem", "meta O");
-    addKeyActionHandler("CloseFileAction", "meta W");
+    //addKeyActionHandler("OpenMenuItem", "meta O");
+    //addKeyActionHandler("CloseFileAction", "meta W");
 
     // Configure Window
     getWindow().setTitle("SnapCode Project");
@@ -389,20 +389,20 @@ public void resetUI()
 public void respondUI(ViewEvent anEvent)
 {
     // Handle OpenMenuItem
-    if(anEvent.equals("OpenMenuItem"))
-        getToolBar().selectSearchText();
+    if(anEvent.equals("OpenMenuItem")) {
+        getToolBar().selectSearchText(); anEvent.consume(); }
 
     // Handle QuitMenuItem
-    if(anEvent.equals("QuitMenuItem"))
-        WelcomePanel.getShared().quitApp();
+    if(anEvent.equals("QuitMenuItem")) {
+        WelcomePanel.getShared().quitApp(); anEvent.consume(); }
 
     // Handle NewFileMenuItem, NewFileButton
-    if(anEvent.equals("NewFileMenuItem") || anEvent.equals("NewFileButton"))
-        showNewFilePanel();
+    if(anEvent.equals("NewFileMenuItem") || anEvent.equals("NewFileButton")) {
+        showNewFilePanel(); anEvent.consume(); }
 
     // Handle CloseMenuItem, CloseFileAction
-    if(anEvent.equals("CloseMenuItem") || anEvent.equals("CloseFileAction"))
-        getToolBar().removeOpenFile(getSelectedFile());
+    if(anEvent.equals("CloseMenuItem") || anEvent.equals("CloseFileAction")) {
+        getToolBar().removeOpenFile(getSelectedFile()); anEvent.consume(); }
     
     // Handle ShowTrayButton
     if(anEvent.equals("ShowTrayButton")) { boolean isVisible = isSupportTrayVisible();
