@@ -144,7 +144,7 @@ protected void configureCell(ListCell <JavaDecl> aCell)
 /**
  * Override to apply suggestion.
  */
-public void fireActionEvent()  { applySuggestion(); }
+public void fireActionEvent(ViewEvent anEvent)  { applySuggestion(); }
 
 /**
  * Returns an icon for suggestion.
