@@ -35,7 +35,7 @@ public void updateUI()
 }
 
 /** Fires TextFieldAction. */
-void fireTextFieldAction()  { _tfield.fireActionEvent(null); }
+void fireTextFieldAction()  { ViewUtils.fireActionEvent(_tfield, null); }
 
 /**
  * Handle TextField event.
