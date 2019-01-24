@@ -217,7 +217,7 @@ public void respondUI(ViewEvent anEvent)
             List <MenuItem> mitems2 = ViewUtils.copyMenuItems(mitems);
             Menu menu = new Menu(); for(MenuItem mi : mitems2) menu.addItem(mi);
             menu.setOwner(this);
-            PopupWindow popup = menu.getPopup(); popup.show(anEvent.getView(), anEvent.getX(), anEvent.getY());
+            menu.show(anEvent.getView(), anEvent.getX(), anEvent.getY());
         }
         
         // Handle MouseClick (double-click): RunSelectedFile
