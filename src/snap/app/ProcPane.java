@@ -274,6 +274,9 @@ protected void handleLocationTrigger()
  */
 public void frameChanged(DebugApp aProc)
 {
+    // Only run on event thread
+    if(!isEventThread()) { runLater(() -> frameChanged(aProc)); return; }
+    
     // Make DebugVarsPane visible and updateVarTable
     getAppPane().getSupportTray().setDebug();
     
