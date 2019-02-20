@@ -486,6 +486,7 @@ public void removeFile(WebFile aFile)
 {
     try { aFile.delete(); }
     catch(Exception e) { throw new RuntimeException(e); }
+    _appPane._toolBar.removeOpenFile(aFile);
 }
 
 /**
