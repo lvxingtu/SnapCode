@@ -76,7 +76,8 @@ protected void initUI()
 {
     // Get TextView and configure
     _textView = getView("LogText", TextView.class);
-    _textView.setRich(true); _textView.setWrapText(true);
+    _textView.setRich(true);
+    _textView.setWrapLines(true);
     
     // Make font bigger and increase space between lines
     _textView.getRichText().setDefaultStyle(_textView.getRichText().getDefaultStyle().copyFor(Font.Arial12));

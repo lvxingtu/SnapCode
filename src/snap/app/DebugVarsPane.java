@@ -50,7 +50,9 @@ protected View createUI()
     _varTree.addCols(c1,c2); _varTree.setResolver(new VarTreeResolver());
     
     // Create VarText TextView and configure in ScrollView
-    _varText = new TextView(); _varText.setWrapText(true); _varText.setPrefHeight(40);
+    _varText = new TextView();
+    _varText.setWrapLines(true);
+    _varText.setPrefHeight(40);
     
     // Create SplitView with VarTable and VarText
     SplitView split = new SplitView(); split.setItems(_varTree, _varText);
