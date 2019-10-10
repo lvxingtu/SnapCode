@@ -12,7 +12,7 @@ import snap.web.*;
 /**
  * A class to manage build attributes and behavior for a WebSite.
  */
-public class Project extends SnapObject {
+public class Project {
 
     // The encapsulated data site
     WebSite                            _site;

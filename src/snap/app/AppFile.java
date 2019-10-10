@@ -8,7 +8,7 @@ import snap.view.*;
 import snap.web.WebFile;
 
 /**
- * A custom class.
+ * A class to represent a project file in AppFilesPane.
  */
 public class AppFile implements Comparable <AppFile> {
     

@@ -7,7 +7,7 @@ import snap.web.*;
 /**
  * A class to read/edit the .classpath file.
  */
-public class ClassPath extends SnapObject {
+public class ClassPath {
 
     // The project
     Project         _proj;
@@ -32,6 +32,9 @@ public class ClassPath extends SnapObject {
     
     // The project paths
     String          _projPaths[];
+    
+    // The PropChangeSupport
+    PropChangeSupport  _pcs = PropChangeSupport.EMPTY;
     
     // Constants for ClassPath properties
     public static final String         SrcPaths_Prop = "SrcPaths";
@@ -446,6 +449,35 @@ public void writeFile() throws Exception
 }
 
 /**
+ * Add listener.
+ */
+public void addPropChangeListener(PropChangeListener aLsnr)
+{
+    if(_pcs==PropChangeSupport.EMPTY) _pcs = new PropChangeSupport(this);
+    _pcs.addPropChangeListener(aLsnr);
+}
+
+/**
+ * Remove listener.
+ */
+public void removePropChangeListener(PropChangeListener aLsnr)  { _pcs.removePropChangeListener(aLsnr); }
+
+/**
+ * Fires a property change for given property name, old value, new value and index.
+ */
+protected void firePropChange(String aProp, Object oldVal, Object newVal)
+{
+    if(!_pcs.hasListener(aProp)) return;
+    PropChange pc = new PropChange(this, aProp, oldVal, newVal);
+    _pcs.firePropChange(pc);
+}
+
+/**
+ * Standard toString implementation.
+ */
+public String toString()  { return getXML().toString(); }
+
+/**
  * Creates the ClassPath file for given project.
  */
 public static void createFile(Project aProj)
@@ -472,10 +504,5 @@ public static synchronized ClassPath get(Project aProj)
     if(cpf==null) site.setProp("snap.project.ClassPathFile", cpf=new ClassPath(aProj));
     return cpf;
 }
-
-/**
- * Standard toString implementation.
- */
-public String toString()  { return getXML().toString(); }
 
 }

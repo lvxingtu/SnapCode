@@ -9,7 +9,7 @@ import snap.web.*;
 /**
  * This is a class to handle file synchronization with a remote WebSite for a data source.
  */
-public class VersionControl extends SnapObject {
+public class VersionControl {
 
     // The local site
     WebSite                _site;
@@ -19,6 +19,9 @@ public class VersionControl extends SnapObject {
     
     // A map of file to it's status
     Map <WebFile,Status>   _filesStatus = new HashMap();
+    
+    // The PropChangeSupport
+    PropChangeSupport      _pcs = PropChangeSupport.EMPTY;
     
     // Constants for Synchronization operations
     public enum Op { Update, Replace, Commit }
@@ -148,8 +151,14 @@ public boolean isModified(WebFile aFile)  { return getStatus(aFile)!=Status.Iden
  */
 public synchronized Status getStatus(WebFile aFile)
 {
+    // Get cached status
     Status status = _filesStatus.get(aFile);
-    if(status==null) _filesStatus.put(aFile, status=getStatus(aFile, true));
+    if(status!=null)
+        return status;
+        
+    // Determine status, cache and return
+    status = getStatus(aFile, true);
+    _filesStatus.put(aFile, status);
     return status;
 }
 
@@ -195,8 +204,17 @@ protected Status getStatus(WebFile aFile, boolean isDeep)
  */
 public void setStatus(WebFile aFile, Status aStatus)
 {
-    Status old = null; synchronized (this) { old = _filesStatus.put(aFile, aStatus); }
-    if(aFile.getParent()!=null) setStatus(aFile.getParent(), null);
+    // Set new status, get old
+    Status old = null;
+    synchronized (this) {
+        old = _filesStatus.put(aFile, aStatus);
+    }
+    
+    // If parent, clear Parent.Status
+    if(aFile.getParent()!=null)
+        setStatus(aFile.getParent(), null);
+    
+    // Fire PropChange
     firePropChange(new PropChange(aFile, "Status", old, aStatus));
 }
 
@@ -208,9 +226,13 @@ public void getUpdateFiles(WebFile aFile, List <WebFile> theFiles) throws Except
     // If no clone site, just return
     if(!getExists()) return;
     
-    // Get remote file for given file, get remote changed files (update files) and add local versions to list
+    // Get remote file for given file
     WebFile remoteFile = getRepoFile(aFile.getPath(), true, aFile.isDir());
+    
+    // Get remote changed files (update files)
     Set <WebFile> updateFiles = getChangedFiles(remoteFile, new HashSet());
+    
+    // Add local versions to list
     for(WebFile file : updateFiles) {
         WebFile lfile = getSiteFile(file.getPath(), true, file.isDir());
         theFiles.add(lfile);
@@ -435,6 +457,38 @@ public void fileRemoved(WebFile aFile)  { setStatus(aFile, null); }
  * Called when file saved.
  */
 public void fileSaved(WebFile aFile)  { setStatus(aFile, null); }
+
+/**
+ * Add listener.
+ */
+public void addPropChangeListener(PropChangeListener aLsnr)
+{
+    if(_pcs==PropChangeSupport.EMPTY) _pcs = new PropChangeSupport(this);
+    _pcs.addPropChangeListener(aLsnr);
+}
+
+/**
+ * Remove listener.
+ */
+public void removePropChangeListener(PropChangeListener aLsnr)  { _pcs.removePropChangeListener(aLsnr); }
+
+/**
+ * Fires a property change for given property name, old value, new value and index.
+ */
+protected void firePropChange(String aProp, Object oldVal, Object newVal)
+{
+    if(!_pcs.hasListener(aProp)) return;
+    PropChange pc = new PropChange(this, aProp, oldVal, newVal);
+    firePropChange(pc);
+}
+
+/**
+ * Fires a given property change.
+ */
+protected void firePropChange(PropChange aPC)
+{
+    _pcs.firePropChange(aPC);
+}
 
 /**
  * Returns the Remote URL string for a site.
