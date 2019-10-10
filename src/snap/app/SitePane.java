@@ -32,8 +32,8 @@ public class SitePane extends WebPage {
     // The HttpServerPane
     HttpServerPane     _httpServerPane;
     
-    // DeepChangeListener for Site
-    DeepChangeListener _siteDCL = (src,pc) -> siteHadDeepChange(src,pc);
+    // A PropChangeListener for Site file changes
+    PropChangeListener _siteFileLsnr = pc -> siteFileChanged(pc);
     
 /**
  * Creates a new SitePane for given site.
@@ -41,7 +41,7 @@ public class SitePane extends WebPage {
 protected SitePane(WebSite aSite)
 {
     _site = aSite;
-    _site.addDeepChangeListener(_siteDCL);
+    _site.addFileChangeListener(_siteFileLsnr);
     
     // Set ProjectPane
     _projPane = new ProjectPane(this);
@@ -197,7 +197,7 @@ public void openSite()
  */
 public void closeSite()
 {
-    _site.removeDeepChangeListener(_siteDCL);
+    _site.removeFileChangeListener(_siteFileLsnr);
     _site.setProp(SitePane.class.getName(), null);
     _appPane = null; _site = null; _consolePane = null; _projPane = null; _vcp = null;
     
@@ -248,25 +248,24 @@ public boolean isHiddenFile(WebFile aFile)
 }
 
 /**
- * Implement to listen to Site File changes.
+ * Called when a site file changes.
  */
-private void siteHadDeepChange(Object aSource, PropChange anEvent)
+private void siteFileChanged(PropChange aPC)
 {
     // Get source and property name
-    Object source = anEvent.getSource(); String pname = anEvent.getPropertyName();
+    WebFile file = (WebFile)aPC.getSource();
+    String pname = aPC.getPropertyName();
     
-    // Handle WebFile
-    if(source instanceof WebFile) { WebFile file = (WebFile)source;
-        
-        // Handle Saved property: Call fileAdded or fileSaved
-        if(pname==WebFile.Saved_Prop) {
-            if((Boolean)anEvent.getNewValue()) fileAdded(file);
-            else fileRemoved(file);
-        }
-        
-        // Handle ModifedTime property: Call file saved
-        if(pname==WebFile.ModTime_Prop && file.getExists()) fileSaved(file);
+    // Handle Saved property: Call fileAdded or fileSaved
+    if(pname==WebFile.Saved_Prop) {
+        if((Boolean)aPC.getNewValue())
+            fileAdded(file);
+        else fileRemoved(file);
     }
+    
+    // Handle ModifedTime property: Call file saved
+    if(pname==WebFile.ModTime_Prop && file.getExists())
+        fileSaved(file);
 }
 
 /**

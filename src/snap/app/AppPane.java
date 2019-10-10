@@ -59,8 +59,8 @@ public class AppPane extends ViewOwner {
     // The currently open AppPane
     static AppPane                _openAppPane;
     
-    // A deep change listener to watch for site file changes
-    DeepChangeListener            _siteDeepChangeLsnr = (src,pc) -> siteDidDeepChange(src,pc);
+    // A PropChangeListener to watch for site file changes
+    PropChangeListener            _siteFileLsnr = pc -> siteFileChanged(pc);
 
 /**
  * Returns the browser.
@@ -173,7 +173,7 @@ public void addSite(WebSite aSite)
     // Add site
     _sites.add(getSiteCount(), aSite);  // Add site
     SitePane.get(aSite, true).setAppPane(this);
-    aSite.addDeepChangeListener(_siteDeepChangeLsnr);
+    aSite.addFileChangeListener(_siteFileLsnr);
     
     // Add dependent sites
     for(Project p : proj.getProjects())
@@ -190,7 +190,7 @@ public void addSite(WebSite aSite)
 public void removeSite(WebSite aSite)
 {
     _sites.remove(aSite);
-    aSite.removeDeepChangeListener(_siteDeepChangeLsnr);
+    aSite.removeFileChangeListener(_siteFileLsnr);
     _filesPane._rootFiles = null;
     resetLater();
 }
@@ -292,17 +292,14 @@ public WebFile getBuildDir()
 }
 
 /**
- * Called when site has file changes.
+ * Called when site file changes with File PropChange.
  */
-void siteDidDeepChange(Object aSource, PropChange anEvent)
+void siteFileChanged(PropChange aPC)
 {
-    // Get source and property name
-    Object source = anEvent.getSource();
-    
-    // If WebFile, update FilesPane.TreeView
-    if(source instanceof WebFile) { WebFile file = (WebFile)source;
-        if(file.getExists())
-            _filesPane.updateFile(file); }
+    // Get file and update in FilesPane
+    WebFile file = (WebFile)aPC.getSource();
+    if(file.getExists())
+        _filesPane.updateFile(file);
 }
 
 /**
