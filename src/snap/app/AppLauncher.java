@@ -83,8 +83,7 @@ public void runFile(AppPane anAppPane, RunConfig aConfig, WebFile aFile, boolean
             new AppLauncherCJ(this).runCheerp(anAppPane); return; }
             
         // If JS
-        if(AppLauncherJS.isJS(_proj)) {
-            new AppLauncherJS(this).runJS(anAppPane); return; }
+        //if (AppLauncherJS.isJS(_proj)) { new AppLauncherJS(this).runJS(anAppPane); return; }
         anAppPane.beep(); return;
     }
         

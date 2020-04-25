@@ -29,7 +29,6 @@
     <MenuItem Name="BuildProjectMenuItem" text="Build Project" />
     <MenuItem />
     <MenuItem Name="ShowClassInfoMenuItem" text="Show Class File Info" />
-    <MenuItem Name="GenerateTypeScriptMenuItem" text="Generate TypeScript" />
   </MenuButton>
   <ListView Name="FilesList"  y="30" width="200" height="365" GrowWidth="true" GrowHeight="true" ItemKey="Text">
     <font name="Arial" size="15" />
