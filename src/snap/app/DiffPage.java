@@ -1,7 +1,9 @@
 package snap.app;
 import java.util.*;
 import snap.app.DiffUtil.*;
+import snap.geom.*;
 import snap.gfx.*;
+import snap.text.*;
 import snap.javatext.JavaTextArea;
 import snap.project.VersionControl;
 import snap.view.*;

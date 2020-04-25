@@ -1,6 +1,7 @@
 package snap.app;
 import snap.debug.RunApp;
 import snap.gfx.*;
+import snap.text.*;
 import snap.project.Project;
 import snap.util.SnapUtils;
 import snap.view.*;

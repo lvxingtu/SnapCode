@@ -155,7 +155,7 @@ protected WebFile addSceneUIFile(WebSite aSite, String aName)
     
     // Create content
     snap.viewx.SnapScene scene = new snap.viewx.SnapScene(); scene.setSize(800,500);
-    String str = new ViewArchiver().writeObject(scene).toString();
+    String str = new ViewArchiver().writeToXML(scene).getString();
 
     // Create file, set content, save and return
     sfile = aSite.createFile(path, false);

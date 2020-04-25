@@ -4,7 +4,8 @@
 package snap.javatext;
 import java.lang.reflect.Method;
 import java.util.*;
-import snap.gfx.*;
+import snap.geom.*;
+import snap.text.*;
 import snap.javakit.*;
 import snap.view.*;
 

@@ -2,7 +2,7 @@ package snap.javatext;
 import snap.app.AppBrowser;
 import snap.app.AppPane;
 import snap.app.SupportTray;
-import snap.gfx.TextBoxLine;
+import snap.text.TextBoxLine;
 import snap.javakit.*;
 import snap.project.*;
 import snap.util.*;

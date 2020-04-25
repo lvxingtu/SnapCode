@@ -1,5 +1,6 @@
 package snap.app;
 import java.util.*;
+import snap.geom.*;
 import snap.gfx.*;
 import snap.util.*;
 import snap.view.*;

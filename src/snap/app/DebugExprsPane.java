@@ -2,6 +2,7 @@ package snap.app;
 import java.util.*;
 import snap.app.DebugVarsPane.*;
 import snap.debug.*;
+import snap.geom.*;
 import snap.gfx.*;
 import snap.view.*;
 

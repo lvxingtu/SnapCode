@@ -3,7 +3,9 @@
  */
 package snap.javatext;
 import java.util.*;
+import snap.geom.*;
 import snap.gfx.*;
+import snap.text.*;
 import snap.project.BuildIssue;
 import snap.view.*;
 

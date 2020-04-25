@@ -5,6 +5,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import snap.gfx.*;
+import snap.text.*;
 import snap.util.*;
 import snap.view.*;
 import snap.viewx.DialogBox;

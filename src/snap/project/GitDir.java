@@ -65,8 +65,11 @@ protected Repository getRepo()
  */
 public GitRef getRef(String aName)
 {
-    Ref ref = null; try { ref = getRepo().getRef(aName); } catch(Exception e) { throw new RuntimeException(e); }
-    return ref!=null? new GitRef(ref) : null;
+    Ref ref;
+    System.out.println("GitDir.getRef: Used to be getRef() but that is gone now. Don't know if this is okay");
+    try { ref = getRepo().exactRef(aName); }
+    catch(Exception e) { throw new RuntimeException(e); }
+    return ref!=null ? new GitRef(ref) : null;
 }
 
 /**
@@ -79,11 +82,13 @@ public GitRef getHead()  { return getRef(Constants.HEAD); }
  */
 public GitBranch getBranch(String aName)
 {
-    Ref ref = null; try { ref = getRepo().getRef(aName); if(ref==null) return null; }
+    Ref ref;
+    System.out.println("GitDir.getRef: Used to be getRef() but that is gone now. Don't know if this is okay");
+    try { ref = getRepo().exactRef(aName); if (ref==null) return null; }
     catch(Exception e) { throw new RuntimeException(e); }
     String name = ref.getTarget().getName();
     GitBranch b = _branches.get(name);
-    if(b==null) _branches.put(name, b=new GitBranch(name));
+    if (b==null) _branches.put(name, b=new GitBranch(name));
     return b;
 }
 

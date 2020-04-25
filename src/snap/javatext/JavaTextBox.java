@@ -4,6 +4,7 @@
 package snap.javatext;
 import snap.parse.*;
 import snap.gfx.*;
+import snap.text.*;
 import snap.javakit.*;
 import snap.javakit.JavaParser.JavaTokenizer;
 import snap.util.StringUtils;

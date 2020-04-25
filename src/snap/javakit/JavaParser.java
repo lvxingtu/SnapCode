@@ -2,13 +2,14 @@
  * Copyright (c) 2010, ReportMill Software. All rights reserved.
  */
 package snap.javakit;
-import java.lang.reflect.Modifier;
+import java.lang.reflect.*;
 import java.util.*;
 import snap.parse.*;
 
 /**
  * A parser for java files.
  */
+@SuppressWarnings("unused")
 public class JavaParser extends Parser {
 
     // The exception, if one was hit
@@ -405,6 +406,9 @@ public static class TypeParamsHandler extends ParseHandler <ArrayList<JTypeVar>>
         if(anId=="TypeParam")
             getPart().add(aNode.getCustomNode(JTypeVar.class));
     }
+
+    @Override
+    protected Class getPartClass()  { return ArrayList.class; }
 }
 
 /**
@@ -517,6 +521,9 @@ public static class ThrowsListHandler extends ParseHandler <ArrayList<JExpr>>
         if(anId=="Name")
             getPart().add(aNode.getCustomNode(JExpr.class));
     }
+
+    @Override
+    protected Class getPartClass()  { return ArrayList.class; }
 }
 
 /**
@@ -1294,6 +1301,9 @@ public static abstract class BinaryExprHandler extends ParseHandler <JExpr> {
         else if(anId=="/") _op = JExprMath.Op.Divide;
         else if(anId=="%") _op = JExprMath.Op.Mod;
     }
+
+    @Override
+    protected Class getPartClass()  { return JExpr.class; }
 }
 
 /**
@@ -1526,6 +1536,9 @@ public static class ArgumentsHandler extends ParseHandler <ArrayList<JExpr>>
             getPart().add(aNode.getCustomNode(JExpr.class));
         else getPart();
     }
+
+    @Override
+    protected Class getPartClass()  { return ArrayList.class; }
 }
 
 /**
@@ -1582,6 +1595,9 @@ public static class ArrayInitHandler extends ParseHandler <ArrayList<JExpr>>
             getPart().add(aNode.getCustomNode(JExpr.class));
         else getPart();
     }
+
+    @Override
+    protected Class getPartClass()  { return ArrayList.class; }
 }
 
 /**
@@ -1692,6 +1708,38 @@ private abstract static class JNodeParseHandler <T extends JNode> extends ParseH
         part.setStartToken(token);
         return part;
     }
+
+    /**
+     * Returns the part class.
+     */
+    protected Class<T> getPartClass()
+    {
+        return getTypeParameterClass(getClass());
+    }
 }
 
+    /**
+     * Returns a type parameter class.
+     * */
+    private static Class getTypeParameterClass(Class aClass)
+    {
+        Type type = aClass.getGenericSuperclass();
+        if(type instanceof ParameterizedType) { ParameterizedType ptype = (ParameterizedType)type;
+            Type type2 = ptype.getActualTypeArguments()[0];
+            if(type2 instanceof Class)
+                return (Class)type2;
+            if(type2 instanceof ParameterizedType) { ParameterizedType ptype2 = (ParameterizedType)type2;
+                if(ptype2.getRawType() instanceof Class)
+                    return (Class)ptype2.getRawType(); }
+        }
+
+        // Try superclass
+        Class scls = aClass.getSuperclass();
+        if(scls!=null)
+            return getTypeParameterClass(scls);
+
+        // Complain and return null
+        System.err.println("ParseHandler.getTypeParameterClass: Type Parameter Not Found for " + aClass.getName());
+        return null;
+    }
 }

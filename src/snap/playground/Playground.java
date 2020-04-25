@@ -1,5 +1,5 @@
 package snap.playground;
-import snap.gfx.HPos;
+import snap.geom.HPos;
 import snap.view.*;
 
 /**

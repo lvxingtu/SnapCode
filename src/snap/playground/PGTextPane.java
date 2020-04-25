@@ -1,5 +1,7 @@
 package snap.playground;
+import snap.geom.HPos;
 import snap.gfx.*;
+import snap.text.*;
 import snap.view.*;
 import snap.viewx.CodeView;
 import snap.viewx.TextPane;

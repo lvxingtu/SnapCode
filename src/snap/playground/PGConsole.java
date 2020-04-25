@@ -1,5 +1,6 @@
 package snap.playground;
 import snap.gfx.*;
+import snap.text.*;
 import snap.util.SnapUtils;
 import snap.view.*;
 import snap.viewx.ConsoleView;

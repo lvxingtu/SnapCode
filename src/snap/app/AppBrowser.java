@@ -61,10 +61,10 @@ protected Class <? extends WebPage> getPageClass(WebResponse aResp)
         return JavaPage.class;
     }
     
-    if(type.equals("snp") && file.getName().equals("Scene1.snp")) return studio.app.EditorPage.class;
+    //if(type.equals("snp") && file.getName().equals("Scene1.snp")) return studio.app.EditorPage.class;
 
     if(type.equals("rpt")) return getPageClass("com.reportmill.app.ReportPageEditor", TextPage.class);
-    if(type.equals("snp")) return snapbuild.app.EditorPage.class;
+    //if(type.equals("snp")) return snapbuild.app.EditorPage.class;
     if(type.equals("class") && getAppPane().getSites().contains(file.getSite())) return ClassInfoPage.class;
     if(type.equals("pgd")) return snap.playground.PGPage.class;
     
