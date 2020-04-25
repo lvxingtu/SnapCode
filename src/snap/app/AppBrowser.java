@@ -1,5 +1,4 @@
 package snap.app;
-import snap.javatext.JavaPage;
 import snap.util.SnapUtils;
 import snap.viewx.*;
 import snap.web.*;
@@ -56,8 +55,8 @@ protected Class <? extends WebPage> getPageClass(WebResponse aResp)
     
     // Handle Java
     if(type.equals("java")) {
-        if(file!=null && snap.javasnap.SnapEditorPage.isSnapEditSet(file))
-            return snap.javasnap.SnapEditorPage.class;
+        if(file!=null && SnapEditorPage.isSnapEditSet(file))
+            return SnapEditorPage.class;
         return JavaPage.class;
     }
     

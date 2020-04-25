@@ -1,8 +1,9 @@
 package snap.app;
 import java.io.File;
 import java.util.*;
+import javakit.parse.JavaData;
+import javakit.parse.JavaDecl;
 import snap.debug.RunApp;
-import snap.javakit.*;
 import snap.project.Project;
 import snap.util.*;
 import snap.view.ViewUtils;

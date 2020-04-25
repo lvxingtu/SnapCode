@@ -1,7 +1,7 @@
 package snap.debug;
 import java.util.*;
 import com.sun.jdi.*;
-import snap.javakit.*;
+import javakit.parse.*;
 import snap.parse.Parser;
 
 /**

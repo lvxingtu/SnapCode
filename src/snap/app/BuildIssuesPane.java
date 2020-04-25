@@ -1,5 +1,5 @@
 package snap.app;
-import snap.javatext.JavaTextBox;
+import javakit.text.JavaTextBox;
 import snap.gfx.*;
 import snap.project.*;
 import snap.view.*;

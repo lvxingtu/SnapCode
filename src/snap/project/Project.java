@@ -5,7 +5,9 @@ package snap.project;
 import java.io.Closeable;
 import java.net.*;
 import java.util.*;
-import snap.javakit.*;
+import javakit.parse.JavaDecl;
+import javakit.parse.JavaDeclClass;
+import javakit.parse.JavaDeclOwner;
 import snap.util.*;
 import snap.web.*;
 
@@ -42,7 +44,7 @@ public class Project {
     ProjectSet                         _projSet = new ProjectSet(this);
     
     // A map of JavaDecls objects to provide JavaDecls for project
-    JavaDeclOwner                      _javaDeclOwnr = new ProjJavaDeclOwner();
+    JavaDeclOwner _javaDeclOwnr = new ProjJavaDeclOwner();
     
     // The current project
     static Project                     _current;

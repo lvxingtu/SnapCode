@@ -1,7 +1,8 @@
 package snap.playground;
 import java.io.OutputStream;
 import java.io.PrintStream;
-import snap.javakit.*;
+import javakit.parse.EvalExpr;
+import javakit.parse.EvalStmt;
 import snap.view.TextArea;
 
 /**
@@ -13,10 +14,10 @@ public class PGEvaluator {
     Playground        _pg;
     
     // A Statement evaluator
-    EvalStmt          _stmtEval = new EvalStmt();
+    EvalStmt _stmtEval = new EvalStmt();
     
     // An expression evaluator
-    EvalExpr          _exprEval;
+    EvalExpr _exprEval;
     
     // The lines
     String            _lines[];

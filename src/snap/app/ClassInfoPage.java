@@ -1,7 +1,8 @@
 package snap.app;
 import java.util.Arrays;
 import java.util.Set;
-import snap.javakit.*;
+import javakit.parse.JavaData;
+import javakit.parse.JavaDecl;
 import snap.viewx.TextPage;
 import snap.web.*;
 

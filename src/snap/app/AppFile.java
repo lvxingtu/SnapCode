@@ -1,5 +1,7 @@
 package snap.app;
 import java.util.*;
+
+import javakit.text.JavaTextBox;
 import snap.geom.*;
 import snap.gfx.*;
 import snap.project.BuildIssue;
@@ -40,7 +42,7 @@ public class AppFile implements Comparable <AppFile> {
     // Icons
     static Image ErrorBadge = Image.get(AppFile.class, "ErrorBadge.png");
     static Image WarningBadge = Image.get(AppFile.class, "WarningBadge.png");
-    static Image Package = snap.javatext.JavaTextBox.PackageImage;
+    static Image Package = JavaTextBox.PackageImage;
 
 /**
  * Creates a new file.

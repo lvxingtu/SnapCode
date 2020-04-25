@@ -3,7 +3,7 @@
  */
 package snap.project;
 import java.util.*;
-import snap.javakit.*;
+import javakit.parse.JavaData;
 import snap.util.*;
 import snap.web.WebFile;
 

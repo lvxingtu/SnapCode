@@ -4,7 +4,7 @@ import snap.app.DiffUtil.*;
 import snap.geom.*;
 import snap.gfx.*;
 import snap.text.*;
-import snap.javatext.JavaTextArea;
+import javakit.text.JavaTextArea;
 import snap.project.VersionControl;
 import snap.view.*;
 import snap.viewx.WebPage;

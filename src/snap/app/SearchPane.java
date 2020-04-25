@@ -1,7 +1,11 @@
 package snap.app;
 import java.util.*;
+import javakit.parse.JNode;
+import javakit.parse.JavaData;
+import javakit.parse.JavaDecl;
+import javakit.parse.JavaDeclOwner;
+import javakit.text.JavaTextBox;
 import snap.gfx.*;
-import snap.javakit.*;
 import snap.project.Project;
 import snap.util.ArrayUtils;
 import snap.view.*;
@@ -310,9 +314,9 @@ public class Result {
     {
         JavaDecl decl = _node!=null? _node.isDecl()? _node.getDecl() : _node.getEnclosingDecl() : null;
         if(decl==null) return ViewUtils.getFileIconImage(_file);
-        if(decl.isClass()) return snap.javatext.JavaTextBox.ClassImage;
-        if(decl.isField()) return snap.javatext.JavaTextBox.FieldImage;
-        return snap.javatext.JavaTextBox.MethodImage;
+        if(decl.isClass()) return JavaTextBox.ClassImage;
+        if(decl.isField()) return JavaTextBox.FieldImage;
+        return JavaTextBox.MethodImage;
     }
     
     /** Returns a URL for result. */
