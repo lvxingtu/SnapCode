@@ -373,10 +373,10 @@ public void showRemoveSitePanel()
 void handleOpenButtonAlt()
 {
     DialogBox dbox = new DialogBox("Open File Viewer"); dbox.setQuestionMessage("Enter path:");
-    String path = Prefs.get().get("SnapFileViewerPath", System.getProperty("user.home"));
+    String path = Prefs.get().getString("SnapFileViewerPath", System.getProperty("user.home"));
     path = dbox.showInputDialog(getUI(), path); if(path==null) return;
     WebURL url = WebURL.getURL(path); if(url==null || url.getFile()==null) return;
-    Prefs.get().set("SnapFileViewerPath", path);
+    Prefs.get().setValue("SnapFileViewerPath", path);
     AppPane apane = new AppPane();
     WebSite site = url.getAsSite();
     apane.addSite(site);

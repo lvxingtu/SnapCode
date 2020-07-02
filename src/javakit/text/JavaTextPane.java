@@ -77,7 +77,7 @@ public class JavaTextPane extends TextPane {
         enableEvents(_textArea, KeyPress, KeyRelease, KeyType, MousePress, MouseRelease, DragOver, DragExit,DragDrop);
 
         // Reset TextArea font
-        float fontSize = Prefs.get().getFloat("JavaFontSize", 12); if(fontSize<8) fontSize = 12;
+        double fontSize = Prefs.get().getDouble("JavaFontSize", 12); if(fontSize<8) fontSize = 12;
         _textArea.setFont(new Font(_textArea.getDefaultFont().getName(), fontSize));
 
         // Get TextArea.RowHeader and configure
@@ -205,7 +205,7 @@ public class JavaTextPane extends TextPane {
 
         // Handle FontSizeText, IncreaseFontButton, DecreaseFontButton
         else if(anEvent.equals("FontSizeText")||anEvent.equals("IncreaseFontButton")||anEvent.equals("DecreaseFontButton"))
-            Prefs.get().set("JavaFontSize", _textArea.getFont().getSize());
+            Prefs.get().setValue("JavaFontSize", _textArea.getFont().getSize());
 
         // Handle OpenDeclarationMenuItem
         else if(anEvent.equals("OpenDeclarationMenuItem"))
